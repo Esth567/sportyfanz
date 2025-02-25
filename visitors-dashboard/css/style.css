@@ -15,7 +15,6 @@ body{
     padding: 0;
     display: flex;
     flex-direction: column;
-    font-family: 'Lato';
 }
 
 /* Sidebar Container */
@@ -136,6 +135,7 @@ body{
     text-decoration: none;
     color: #fff;
     font-size: 0.75rem;
+    font-family: 'Lato';
     flex: 1;
 }
 .menu .stroke {
@@ -160,6 +160,7 @@ body{
     transform: translate(-50%, -50%);
     color: #fff;
     font-size: 1.2rem;
+    font-family: 'Lato';
     font-weight: bold;
     text-align: center;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Adds depth to the text */
@@ -183,6 +184,7 @@ body{
 
 .sidebar.collapsed .text-overlay {
     font-size: 0.8rem; /* Smaller text for collapsed sidebar */
+    font-family: 'Lato';
 }
 
 .body-container {
@@ -199,6 +201,7 @@ body{
 }
 
 
+
 /* Header */
 .header {
     position: fixed; /* Make the header fixed */
@@ -210,7 +213,6 @@ body{
     padding: 20px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .header-topbar{
     display: flex;
@@ -230,6 +232,7 @@ body{
     padding: 6px 12px 8px 35px;
     border-radius: 15px;
     font-size: 0.70rem;
+    font-family: 'Lato';
     width: 250px;
     outline: none;
     transition: background 0.3s;
@@ -283,6 +286,7 @@ body{
     background: #fff;
     color: #1A2F4B;
     font-size: 0.70rem;
+    font-family: 'Lato';
     font-weight: bold;
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
@@ -305,19 +309,23 @@ body{
 /* Welcome Message */
 .header-topbar h1 {
     font-size: 20px;
+    font-family: 'Lato';
     font-weight: 600;
 }
 
 .header-top h3 {
     margin: 0;
     font-size: 0.75rem;
+    font-family: 'Lato';
     margin-bottom: -5px;
     font-weight: 300;
+    color: #ffffffcb;
 }
 /* Header Title */
 .header h1 {
     margin: 0;
     font-size: 1rem;
+    font-family: 'lato';
     flex: 1;
 }
 .highlight {
@@ -331,6 +339,9 @@ body{
     background: #ffffff1a;
 }
 
+.menu-header-top {
+    display: none;
+}
 
 /* Content Section */
 .content {
@@ -366,10 +377,12 @@ body{
 
 .text-cont h4 {
     font-size: 0.75rem;
+    font-family: 'Lato';
     font-weight: 400;
 }
 .live-matches {
     font-size: 0.85rem;
+    font-family: 'Lato';
     font-weight: bold;
     color: #ffffff;
 }
@@ -387,6 +400,7 @@ body{
   outline: none;
   text-decoration: none;
   font-size: 0.68rem;
+  font-family: 'Lato';
   font-size: 400;
 
 }
@@ -399,30 +413,32 @@ body{
 .live-match-demo {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
     background-color: #70c17123;
     color: white;
     width: 100%;
     position: relative;
-    margin-bottom: 50px;
-    padding: 8px;
+    padding: 10px;
     border-radius: 15px;
     border: 1px solid #fbc12d8c;
 
 }
 .game-leag {
-    font-size: 0.50rem;
+    font-size: 0.55rem;
     font-weight: 400;
+    font-family: 'lato';
+    color: #f4f6f698;
  
 }
 .live-match-event{
     display: flex;
     flex-direction: column;
     text-align: center;
+    margin-left: 10px;
+    padding-right: 10px;
 }
 .vs-score {
     font-size: 0.85rem;
+    font-family: 'Lato';
     font-weight: bold;
     color: #70c172;
     padding: 2px;
@@ -430,12 +446,13 @@ body{
 }
 .teams-time {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
     width: 100%;
-    gap: 4px;
-    padding: 5px;
-    margin-left: -10px;
+    padding-top: 5px;
+    margin-bottom: 5px;
+    
+    
 
 }
 
@@ -443,6 +460,7 @@ body{
     flex: 1;
     text-align: center;
     font-size: 0.60rem;
+    font-family: 'Lato';
     word-break: keep-all;
     overflow: hidden;
     white-space: nowrap;
@@ -460,6 +478,7 @@ body{
  }
 .highlight-time {
     font-size: 10px;
+    font-family: 'Lato';
     font-weight: 300;
     color: white;
 }
@@ -475,24 +494,26 @@ body{
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     color: white;
     width: 100%;
-    margin-bottom: 20px;
     overflow: hidden;
     display: flex;
     padding: 10px 10px;
     flex-direction: column;  
+    margin-bottom: 15px;
 }
 
 .leagueTable-text-cont {
     display: flex;
-    padding-bottom: 15px;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-top: -30px;
+    margin-top: 15px;
+    padding-bottom: 10px;
+ 
 }
 
 .leagueTable-text-cont h4 {
     font-size: 0.75rem;
+    font-family: 'Lato';
     font-weight: 300;
 }
 
@@ -502,12 +523,16 @@ body{
     font-size: 0.70rem;
     float: left;
     color: #fff;
+    font-family: 'lato';
+    font-weight: 400;
     padding-bottom: 5px;
     margin-bottom: 10px;
 }
 
-.team-header {
+.team-head {
   font-size: 0.7rem;
+  font-family: 'Lato';
+  font-weight: 200;
 }
 
 /* Table Header and Rows as Grid */
@@ -517,8 +542,7 @@ body{
     grid-template-columns: 5fr repeat(5, 1fr); /* Adjust column sizes */
     margin: 0;
     gap: 0;
-    padding: 2px 5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 5px 2px;
     
 }
 
@@ -529,26 +553,27 @@ body{
     align-items: center;
     gap: 3px;
     overflow: hidden;
+    margin-bottom: 3px;
 }
 
 /* Team Logo */
 .team-info img {
-    width: 20px;
-    height: auto;
-    border-radius: 50px;
+    width: 15px;
+    height: 15px;
     object-fit: cover;
 }
-.table-header .team-name-header {
+.table-header .teamName-header {
     font-weight: 400;
 }
 /* Team Name */
-.team-info .team-name-header {
-    font-size: 0.6rem;
+.team-info .teamName-header{
+    font-size: 0.7rem;
+    font-family: 'Lato';
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     flex-grow: 1;
-    font-weight: 400; 
+    font-weight: 300; 
 }
 
 
@@ -561,8 +586,10 @@ body{
 /* Stats Header and Team Stats (Aligned in Columns) */
 .team-stats {
     text-align: center;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 400;
+    font-family: 'Lato';
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Stats Header */
@@ -570,8 +597,11 @@ body{
     font-weight: 400;
     font-size: 0.6rem;
     text-transform: uppercase;
-    color: #fff;
+    color: #ffffff85;
     text-align: center;
+    font-family: 'Lato';
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 3px;
 }
 
 .news-update{
@@ -604,15 +634,16 @@ body{
     flex: 2;
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 8px;
 }
 
 /* Headline */
 .news-headline {
-    font-size: 0.6rem; /* Adjust the font size */
+    font-size: 0.7rem; /* Adjust the font size */
+    font-family: 'Lato';
     word-spacing: 1.5px;
-    color: #FFFFFF;
-    font-weight: 300;
+    color: #ffffffe7;
+    font-weight: 400;
     line-height: 1.5; /* Adjust the spacing between lines */
     overflow: hidden; /* Ensures text doesn't overflow its container */
     min-width: 100px;
@@ -621,7 +652,7 @@ body{
     -webkit-box-orient: vertical; /* Ensures text is vertically oriented */
     text-overflow: ellipsis; /* Adds ellipsis at the end if text overflows */
     white-space: normal; /* Allows wrapping for multi-line text */
-    margin-bottom: 5px;
+    
 }
 
 /* Middle Layer */
@@ -699,6 +730,7 @@ body{
 
 .slider-title {
     font-size: 1rem;
+    font-family: 'Lato';
     margin-bottom: 10px;
     font-weight: bold;
 }
@@ -710,6 +742,7 @@ body{
     align-items: center;
     margin-bottom: 5px;
     font-size: 0.6rem;
+    font-family: 'Lato';
 }
 
 /* Adjustments for Time, Date, and Country Rows */
@@ -737,6 +770,7 @@ body{
     border-radius: 20px;
     margin-top: 15px;
     font-size: 0.75rem;
+    font-family: 'Lato';
     text-align: center;
     width: 110px;
     font-weight: bold;
@@ -751,8 +785,6 @@ body{
     background: #ffdf00;
     transform: scale(1.05);
 }
-
-
 
 
 
@@ -803,7 +835,8 @@ body{
 /* Headline */
 .shortNews-header {
     color: #fff;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
+    font-family: 'Lato';
     font-weight: 400;
     line-height: 1.5;
     word-spacing: 1px;
@@ -818,9 +851,10 @@ body{
 
 /* Description */
 .shortNews-description {
-    color: #fff;
-    font-size: 0.5rem;
-    font-weight: 300;
+    color: #ffffffd0;
+    font-size: 0.6rem;
+    font-family: 'Lato';
+    font-weight: 400;
     line-height: 1.3;
     word-spacing: 1px;
     display: -webkit-box;
@@ -854,6 +888,7 @@ body{
     color: #fff;
     padding-top: 10px;
     font-size: 0.75rem;
+    font-family: 'Lato';
 }
 .podcast-update-img img{
     width: 100%;
@@ -863,9 +898,9 @@ body{
 }
 
 
-
 .shortTop-story {
     font-size: 0.75rem;
+    font-family: 'Lato';
     color: #fff;
     font-weight: bold;
 }
@@ -900,14 +935,15 @@ body{
     padding: 4px 12px;
     background-color: #14273f;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    color: white;
+    color: #ffffffbe;
     border-radius: 20px;
     text-align: center;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 0.70rem;
-    font-weight: 300;
+    font-family: 'Lato';
+    font-weight: 400;
     gap: 3px;
     margin-bottom: -15px;
 }
@@ -927,6 +963,7 @@ body{
     border-radius: 5px;
     padding: 5px;
     font-size: 0.9rem;
+    font-family: 'Lato';
     color: #333;
     cursor: pointer;
 }
@@ -997,6 +1034,7 @@ body{
 /* Team Names */
 .Matchteam {
     font-size: 0.70rem;
+    font-family: 'Lato';
     font-weight: normal;
     align-items: center;
     text-align: center;
@@ -1022,6 +1060,7 @@ body{
     border-radius: 15px;
     margin-top: 15px;
     font-size: 0.67rem;
+    font-family: 'Lato';
    
 }
 
@@ -1037,6 +1076,7 @@ body{
     align-items: center;
     text-align: center;
     font-size: 0.7rem;
+    font-family: 'Lato';
     font-weight: 300;
     display: flex;
     gap: 2px;
@@ -1075,7 +1115,7 @@ body{
     position: relative;
     overflow: hidden;
     width: 100%;
-    height: 110px;
+    height: 115px;
     background-color: #244537; 
     border-radius: 10px;
     border: 1px solid #ffc107a2;
@@ -1087,7 +1127,7 @@ body{
     width: 80px; /* Adjust size as needed */
     object-fit: cover; /* Ensures the image maintains aspect ratio */
     border-radius: 50%; /* Makes the image circular */
-    margin-left: -20px;
+    
 }
 
 /* Player Item */
@@ -1099,7 +1139,7 @@ body{
     width: 100%;
     background: linear-gradient(to bottom, #244537 40%, #1b364e 80%);
     border-radius: 10px;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     opacity: 0;
     visibility: hidden;
@@ -1115,19 +1155,23 @@ body{
     display: flex;
     flex-direction: column;
     gap: 5px; /* Spacing between player details */
+    margin-bottom: 5px;
 }
 
 .player-name {
-    font-size: 0.70rem;
-    font-weight: bold;
+    font-size: 0.75rem;
+    font-family: 'Lato';
+    margin-top: -10px;
+    font-weight: 500;
     color: #fff;
 }
 .goals,
 .team-name,
 .leagues {
-    font-size: 0.55rem;
-    color: #ffffff; /* White text for other details */
-    font-weight: 300;
+    font-size: 0.57rem;
+    font-family: 'Lato';
+    color: #ffffffa2; /* White text for other details */
+    font-weight: 400;
     margin-right: 10px;
 }
 .player-item.player-1 .player-image {
@@ -1191,24 +1235,34 @@ body{
     }
 }
 
-.swiper-pagination {
+
+/* Slider Dots Container */
+.slider-dots {
     position: absolute;
     bottom: 10px;
-    text-align: center;
-    width: 100%;
-    color: #fff;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
 }
 
-.swiper-button-prev,
-.swiper-button-next {
-    color: #fff;
+/* Individual Dot */
+.dot {
+    width: 5px;
+    height: 5px;
+    background-color: #ffffff50; /* Light white */
+    border-radius: 50%;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.advertisement img {
-    height: 100%;
-    width: 100%;
-    margin-top: 10px;
+/* Active Dot */
+.active-dot {
+    background-color: #fff; /* Highlight color */
+    transform: scale(1.2);
 }
+
+
+
 
 /*prdition styling*/
 
@@ -1216,7 +1270,7 @@ body{
     display: flex;
     align-items: center; /* Vertically centers content */
     background: #fff; /* Semi-transparent background */
-    color: black;
+    color: #000000e7;
     width: 100%;
     padding: 10px;
     border-radius: 10px; 
@@ -1224,6 +1278,7 @@ body{
 
 .predition-content h4{
     font-size: 0.70rem;
+    font-family: 'Lato';
     margin-bottom: 15px;
 }
 .predit-selection {
@@ -1234,6 +1289,7 @@ body{
 }
 .team-nam {
     font-size: 0.70rem;
+    font-family: 'Lato';
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1244,6 +1300,7 @@ body{
 }
 .Select-team {
     font-size: 0.70rem;
+    font-family: 'Lato';
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1268,6 +1325,7 @@ body{
     border: 1px solid #ffc1077c;
     border-radius: 5px;
     font-size: 1rem;
+    font-family: 'Lato';
     text-align: center;
     outline: none;
     width: 60px; /* Adjust as needed */
@@ -1335,25 +1393,11 @@ body{
 }
 
 
-.news-messages h2{
-    font-size: 0.65rem;
-    margin-bottom: 7px;
-    word-spacing: 1.2px;  
-    font-weight: 500;
-}
-
-
-
-.feature-img img {
-    width: 80px;
-    height: 55px;
-    object-fit: cover; /* Ensures proper scaling */
-    border-radius: 8px;
-}
 .news-headers {
     font-size: 0.80rem;
     font-weight: bold;
     color: #ffffff;
+    font-family: 'Lato';
 }
 
 .news-text-cont {
@@ -1367,6 +1411,7 @@ body{
 .news-text-cont h4 {
     font-size: 0.75rem;
     font-weight: 400;
+    font-family: 'Lato';
 }
 
 .see-more {
@@ -1376,40 +1421,46 @@ body{
     gap: 5px;
     color: #fff;
     font-size: 0.70rem;   
- 
-    font-weight: bold;
+    font-family: 'Lato';
+    font-weight: 300;
 }
 
-.see-more ion-icon {
+.see-more img {
+    width: 10px; /* Adjust size */
+    height: 10px; /* Maintain aspect ratio */
+    object-fit: contain;
+}
+
+.news-messages h2{
     font-size: 0.75rem;
-}
-#news-details-view p {
-    color: #fff;
-    font-size: 0.60rem;
-}
-
-#news-details-view ion-icon {
-    color: #fff;
-    font-size: 0.40rem;
+    margin-bottom: 7px;
+    word-spacing: 1.2px;  
+    font-weight: 500;
+    font-family: 'Lato';
 }
 
+.feature-img img {
+    width: 120px;
+    height: 70px;
+    border-radius: 12px;
+}
 
 /* Style for the news meta information */
 .news-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 5px;
+    margin-top: 8px;
 }
 
 .news-meta .news-description {
     flex: 4;
-    font-size: 0.60rem;
-    line-height: 1.3;
-    font-weight: normal;
-    color: #ffffff5e;
+    font-size: 0.63rem;
+    line-height: 1.5;
+    font-weight: 500;
+    font-family: 'Lato';
     margin: 0;
-    color: #ccccccad;
+    color: #cccccc;
     word-wrap: break-word;
     
 }
@@ -1417,47 +1468,53 @@ body{
 .news-time {
     flex: 1;
     text-align: right;
-    font-size: 0.5rem;
-    font-weight: normal;
-    margin-top: 15px;
+    font-size: 0.6rem;
+    font-family: 'Lato';
+    font-weight: 300;
     margin-left: 10px;
+    margin-top: 30px;
     white-space: nowrap;
 }
 
-/* News Header */
-#news-detail-content h2 {
-    font-size: 24px;
-    font-weight: 700;
-    font-family: Lato;
+.newsDetails-content {
     color: #fff;
-    margin-bottom: 10px;
 }
 
+.newsDetails-content h2 {
+    font-size: 1.2rem;
+    font-family: 'Lato';
+    margin-top: 15px;
+}
+
+
+.newsDetails-content p {
+    font-family: 'Lato';
+    line-height: 1.5;
+    font-size: 0.75rem;   
+    color: #f4f6f6e8;
+}
+
+
+
 /* News Date */
-#news-detail-content p small {
+.newsDetails-content p small {
     font-size: 10px;
     color: #fff;
     text-align: right;
     font-style: italic;
     display: block;
-    margin-bottom: 5px;
+    margin-top: 10px;
+    font-family: 'Lato';
 }
 
-/* News Description */
-#news-detail-content p {
-    font-size: 16px;
-    line-height: 22.4px;
-    color: #f4f6f6;
-    font-weight: 500;
-    font: 'Lato';
-}
 
-#news-detail-content img {
+.newsDetails-content img {
     max-width: 852px;
     max-height: 480px;
     object-fit: cover;
     border-radius: 12px;
     margin-bottom: 10px;
+    padding-top: 10px;
 }
 
 
@@ -1467,29 +1524,26 @@ body{
     align-items: center;   /* Aligns icon and text vertically */
     border: none;          /* Remove border */
     background: none;      /* Remove background color */
-    color: #333;           /* Adjust text color */
-    font-size: 16px;
+    color: #fff;           /* Adjust text color */
+    font-size: 0.7rem;
+    font-family: 'Lato';
+    font-weight: 300;
+}
+
+.see-more ion-icon {
+    font-size: 0.8rem;
 }
 
 #back-button .search-icon {
-    margin-right: 8px; /* Space between arrow and text */
+    margin-right: 7px; /* Space between arrow and text */
 }
 
 #back-button:hover {
     color: #70c172; /* Optional: Change text color on hover */
 }
 
-#news-detail-content {
-    color: #fff;
-}
 
-#news-detail-content h2 {
-    font-size: 1.2rem;
-}
 
-#news-detail-content p {
-    font-size: 0.75rem;
-}
 
 .live-games {
     background-color: #14273f;
@@ -1542,14 +1596,14 @@ body{
     font-size: 0.70rem;
     font-weight: bold;
     color: #70c172;
-    
-
+    font-family: 'Lato';
 }
 
 .teams-nameLogo {
     flex: 2;
     text-align: center;
     font-size: 0.55rem;
+    font-family: 'Lato';
     font-weight: bold;
     word-break: keep-all;
     overflow: hidden;
@@ -1577,6 +1631,7 @@ body{
     flex: 1;
     color: #fff;
     font-size: 0.70rem;  
+    font-family: 'Lato';
 }
 
 .podcast-comingSoon h4 {
@@ -1627,8 +1682,8 @@ body{
 
 .leagues-country {
     width: 100%;
-    margin-top: -40px;
-    margin-bottom: 20px;
+    margin-top: 5px;
+    padding-bottom: 15px;
 
 }
 .leagueNames {
@@ -1637,79 +1692,129 @@ body{
     width: 100%;
     color: #fff;
     padding-top: 15px;
+    font-family: 'Lato';
   
   }
 
+  .leag-count {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+.leag-count img {
+    width: 17px;
+    height: 17px;
+   object-fit: contain;
+}
+
   .league-info h3 {
-    font-size: 0.80rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+    font-family: 'Lato';
   }
   
   .league-info p {
     font-size: 0.60rem;
     font-weight: 300;
-  }
-
-
-  .table-headers,
-  .team-rows {
-    display: grid;
-    grid-template-columns: 2fr 3fr repeat(5, 1fr);
-    gap: 0px;
-    align-items: center;
+    font-family: 'Lato';
   }
   
-.table-headers {
+  .table-headers {
+    display: flex;
+    align-items: center;
     font-weight: bold;
     color: #fff;
-    
+    font-family: 'Lato';
+  }
+  
+
+/* Position header and team name header aligned left with 5px gap */
+.position-header {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    justify-content: flex-start;
+    font-weight: 300;
+    font-family: 'Lato';
+  
 }
 
-/* Row styles */
+.team-name-header {
+    font-family: 'Lato';
+    font-size: 12px;
+    text-align: left;
+    margin-left: 23px;
+    font-weight: 300;
+    flex: 1;
+
+}
+
+/* Table Rows */
 .team-rows {
-    background-color: #1A2F4B; /* Background color for rows */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1A2F4B;
     color: #fff;
+    gap: 10px;
     border-radius: 10px;
     font-size: 0.9rem;
+    font-family: 'Lato';
     margin-top: 10px;
     padding: 8px 10px;
-
 }
-/* Image and text alignment */
-.team-info {
+
+
+/* Team position and team infos aligned left with 5px gap */
+.team-position {
     display: flex;
-    align-items: center; /* Align text and image */
-    gap: 8px; /* Space between image and text */
+    justify-content: flex-start;
+    min-width: 25px; /* Ensure spacing */
+    font-size: 12px;
 }
 
-.team-info img {
-    width: 20px; /* Adjust logo size */
-    height: 20px;
+.team-infos {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-grow: 1; /* Allow team info to take necessary space */
+}
+
+.teamLeague-name{
+    font-size: 12px;
+    font-weight: 400;
+    font-family: 'Lato';
+    text-align: left;
+    
+}
+.team-infos img {
+    width: 15px; /* Adjust logo size */
+    height: 15px;
+    object-fit: cover;
 }
 
 /* Stats alignment */
 .stat-header, 
 .team-stat {
   text-align: right; /* Align to the extreme right */
-  font-size: 0.9rem; /* Consistent font size */
   white-space: nowrap;
+  flex: 0 0 35px; 
+  
 }
-  .team-rows img {
-    width: 18px;
-    height: 18px;
-  }
-
+ 
   .stat-header {
-    gap: 16px;
-    padding-right: 5px;
     font-size: 12px;
-    font: Lato;
+    font-family: 'Lato';
     color: #dce5e3af; /* Slight padding for header alignment */
+    margin-right: 10px;
   }
   
    .team-stat {
     color: #fff;
-    font-size: 0.7rem;
-    padding-right: 5px;
+    font-size: 0.7rem; 
+    font-family: 'Lato';
   }
 
   .arrow-direct {
@@ -1753,8 +1858,9 @@ body{
 
 
 .league-headers .league-details h3 {
-    font-size: 0.85rem;
+    font-size: 0.80rem;
     font-weight: bold;
+    font-family: 'Lato';
    
   }
 
@@ -1762,34 +1868,13 @@ body{
    font-size: 0.60rem;
    font-weight: 300;
    margin-top: 2px;
+   font-family: 'lato';
   
  }
 .league-details {
-    margin-left: 8px;
+    margin-left: 5px;
 }
 
-.leag-count {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-}
-.leag-count img {
-    width: 20px;
-    height: 20px;
-   object-fit: contain;
-}
-
-.position-header,
-.team-position {
-    font-size: 0.7rem;
-    font-weight: 300;
-    padding: 5px;
-}
-
-
-.advertisement img {
-    padding: 15px;
-}
 
 
 
@@ -1807,7 +1892,7 @@ body{
     gap: 8px;
   }
   .match-category-btn {
-    color: #fff;
+    color: #ffffffab;
     border-radius: 20px;
     padding: 4px 10px;
     background-color: #1f3750d2;
@@ -1817,10 +1902,17 @@ body{
     align-items: center;
     justify-content: center;
     font-size: 0.70rem;
-    font-weight: 300;
+    font-family: 'Lato';
+    font-weight: 400;
     gap: 5px;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 } 
 
+.match-category-btn.active {
+    background-color: #ffc107; /* Highlight color */
+    color: #000;
+    font-weight: bold;
+}
 
 .match-category-btn.calendar {
     margin-left: auto; /* Pushes the calendar button to the far right */
@@ -1845,11 +1937,9 @@ body{
 }
 .matches-live-ongoing {
     width: 100%;
-    margin-top: -30px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    padding-left: -20px;
-
+    margin-top: 5px;
+    padding-bottom: 10px;
+   
 }
 
 .leagues-matches {
@@ -1857,7 +1947,7 @@ body{
     justify-content: space-between;
     width: 100%;
     color: #fff;
-    padding: 10px;
+   margin-top: 15px;
     
 }
 
@@ -1868,6 +1958,7 @@ body{
     color: white; /* Set text color to white */
     font-size: 0.75rem; /* Adjust font size for the header */
     margin-bottom: 8px; 
+    font-family: "Lato";
   }
 
   .league-header img.league-logo {
@@ -2939,3 +3030,217 @@ body{
     background: rgba(0, 0, 0, 0.5);
     z-index: 999; /* Ensures it covers everything */
 }
+
+@media screen and (max-width: 1024px) { /* Tablet */
+    .sidebar {
+        display: none;
+    }
+
+    .body-container {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .header {
+        width: 100%;
+    }
+
+    .header-top {
+        display: none;
+    }
+
+    .header-top h3 {
+        display: none;
+    }
+
+    .header-line {
+        display: none;
+    }
+
+    .signup-btn {
+        display: none;
+    }
+
+      /* Flex row for menu, logo, and header actions */
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .menu-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .menu-logo ion-icon {
+        width: 25px;
+        height: 25px;
+    }
+
+    .logo {
+        width: 120px;
+        
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        justify-content: space-between;
+    }
+
+
+    .icons img {
+        width: 23px;
+        height: 23px;
+        gap: 15px;
+    }
+
+    /* Move header title below icons */
+    .header-title {
+       padding-top: 10px;
+        text-align: left;
+        font-family: 'Lato';
+        font-weight: bold;
+        font-size: 0.70rem;
+    }
+
+    .search-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Moves icon to the right */
+        flex-grow: 1; /* Allows it to push other elements left */
+        cursor: pointer;
+        
+    }
+    
+    .search-container img {
+        height: 22px;
+        width: 22px;
+        color: #333; /* Adjust color if needed */
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        
+    }
+
+    .middle-layer {
+        order: -1; /* Moves the middle-layer to the top */
+    }
+
+    .live-match-demo,
+    .league-table-demo,
+    .news-update,
+    .header-slider,
+    .latest-match {
+        width: 100%;
+    }
+
+    .news-podcast, 
+    .latest-match, 
+    .leagueTable-text-cont, 
+    .league-table-demo,
+    .news-update {
+        display: none;
+    }
+
+    .header-slider {
+        width: 100%;
+        height: 250px;
+    }
+
+    
+
+    
+}
+
+
+
+@media screen and (max-width: 768px) { /* Mobile */
+    .content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .middle-layer {
+        order: -1; /* Moves the middle-layer to the top */
+    }
+
+    .news-podcast, 
+    .latest-match, 
+    .leagueTable-text-cont, 
+    .league-table-demo,
+    .news-update {
+        display: none;
+    }
+  
+    .live-match-demo,
+    .league-table-demo,
+    .news-update,
+    .header-slider,
+    .latest-match {
+        width: 100%;
+    }
+
+    
+    .predition-content {
+        margin-left: 10px;
+    }
+
+    .predit-selection {
+        gap: 25px;
+    }
+
+    .advert img {
+        max-height: 155px; 
+        width: 100%;
+      }
+
+      .slider-content {
+        display: flex;
+      flex-direction: row; /* Keep text and image in one line */
+      align-items: center;
+      justify-content: space-between;
+      max-height: 100px !important; /* Reduce height */
+      text-align: left;
+      width: 100%;
+      padding: 10px;
+      }
+  
+      .item-contnt {
+      flex: 1; /* Allow text to take up available space */
+      padding-right: 10px;
+      max-width: 60%; /* Restrict text width */
+      }
+  
+      .slider-content img {
+        max-width: 30%; /* Make image smaller */
+        height: 100px; /* Maintain aspect ratio */
+        object-fit: contain;
+        align-self: flex-end; /* Position image at the right */
+      }
+  
+      .slider-title {
+        font-size: 0.80rem; /* Reduce font size */
+        font-family: 'Lato';
+        font-weight: bold;
+      }
+  
+      .slider-time,
+      .slider-date,
+      .slider-country {
+        font-size: 0.7rem;
+        font-family: 'Lato';
+      }
+  
+      .slider-button {
+        padding: 8px 8px;
+        font-size: 0.7rem;
+        align-items: center;
+      }
+}
+

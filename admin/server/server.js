@@ -1,22 +1,15 @@
-require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
-const { User, Data } = require("../database/db.js");
-
+const { User, Data } = require("../database/db");  // ✅ Correct Import
+require("dotenv").config();
 
 const app = express();
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({ origin: "*", methods: ["GET", "POST"], allowedHeaders: ["Content-Type", "Authorization"] }));
+
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const users = [
     { username: "admin", password: "$2b$10$GjGWA1HRyM3nEd1blk/DD.sdCmes8IUQj1H9eIIAyD4lvesQ/4yTq", role: "super-admin" }, // Password: Admin@123
@@ -51,16 +44,14 @@ const verifyToken = (req, res, next) => {
 
 // 📌 Protected Admin Dashboard Route
 app.get("/admin-dashboard", verifyToken, (req, res) => {
-    console.log("User Data from Token:", req.user); // ✅ Log decoded token
+    console.log("User Data from Token:", req.user);
     if (req.user.role !== "super-admin") {
         return res.status(403).json({ message: "Access denied. Admins only." });
     }
     res.json({ message: "Welcome to Admin Dashboard" });
 });
 
-
-
-// Get Data for Visitors Dashboard
+// 📌 API Routes
 app.get("/data", async (req, res) => {
     try {
         const data = await Data.findOne();
@@ -70,7 +61,6 @@ app.get("/data", async (req, res) => {
     }
 });
 
-// Update Data from Admin Dashboard
 app.post("/update", async (req, res) => {
     try {
         const { team1, team2, league, image, headline } = req.body;
@@ -91,47 +81,5 @@ app.post("/update", async (req, res) => {
     }
 });
 
-
-// Admin Dashboard Script (admin-dashboard.js)
-document.getElementById("update-form").addEventListener("submit", async function (event) {
-    event.preventDefault();
-    const team1 = document.getElementById("team1").value;
-    const team2 = document.getElementById("team2").value;
-    const league = document.getElementById("league").value;
-    const image = document.getElementById("news-image").value;
-    const headline = document.getElementById("news-headline").value;
-
-    await fetch("http://localhost:5000/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ team1, team2, league, image, headline })
-    });
-    alert("Updated Successfully");
-});
-
-
-// Visitors Dashboard Script (visitors-dashboard.js)
-document.addEventListener("DOMContentLoaded", async function () {
-    try {
-        const response = await fetch("http://localhost:5000/data");
-        if (!response.ok) throw new Error("Failed to fetch data");
-        
-        const data = await response.json();
-        if (!data) return;
-
-        const teams = document.querySelectorAll(".live-match-demo .team");
-        if (teams.length === 2) {
-            teams[0].textContent = data.liveMatch?.team1 || "Team 1";
-            teams[1].textContent = data.liveMatch?.team2 || "Team 2";
-        }
-        document.querySelector(".game-leag").textContent = data.liveMatch?.league || "League Name";
-        document.querySelector(".news-image img").src = data.newsUpdate?.image || "default-news.jpg";
-        document.querySelector(".news-headline").textContent = data.newsUpdate?.headline || "Latest News Headline";
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
-});
-
-
-// Export `app` to use in `index.js`
+// ✅ Export Express App
 module.exports = app;

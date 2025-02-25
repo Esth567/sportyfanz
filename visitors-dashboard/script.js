@@ -14,9 +14,26 @@ document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 // Top scorer slider 
 document.addEventListener("DOMContentLoaded", () => {
   const players = document.querySelectorAll('.player-item');
-  if (players.length === 0) return; // Exit if no players exist
+  const dotsContainer = document.querySelector('.slider-dots');
+
+  if (players.length === 0 || !dotsContainer) return;
 
   let currentPlayer = 0;
+
+  // Create dots dynamically
+  players.forEach((_, index) => {
+      const dot = document.createElement('span');
+      dot.classList.add('dot');
+      if (index === 0) dot.classList.add('active-dot');
+      dotsContainer.appendChild(dot);
+  });
+
+  const dots = document.querySelectorAll('.dot');
+
+  function updateDots() {
+      dots.forEach(dot => dot.classList.remove('active-dot'));
+      dots[currentPlayer].classList.add('active-dot');
+  }
 
   function showNextPlayer() {
       players.forEach((player, index) => {
@@ -28,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
           current.classList.add('active', `player-${currentPlayer + 1}`);
       }
 
+      updateDots();
       currentPlayer = (currentPlayer + 1) % players.length;
   }
 
@@ -37,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// Initialize the carousel
+// middle hero banner header slider
 let currentIndex = 0;
 const slides = document.querySelectorAll(".slider-content");
 const totalSlides = slides.length;
@@ -63,6 +81,8 @@ function autoSlide() {
 // Start the slider
 showSlide(currentIndex);
 setInterval(autoSlide, 4000); // Change slides every 3 seconds
+
+
 
 
 // Sample Data for Matches (Including Match Dates)
@@ -169,7 +189,10 @@ function filterByDate() {
 
 // Automatically display 'Live' matches when the page loads
 window.onload = function () {
-    showMatches('live');
+  showMatches('live');
+
+  // Ensure the "Live" button is highlighted as active
+  document.querySelector('.category-btn').classList.add('active');
 };
 
 
@@ -292,10 +315,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to return to the news list view
     window.showNewsList = () => {
         newsDetailsView.style.display = "none";
-        textContSections.forEach((section) => (section.style.display = "block"));
+        textContSections.forEach((section) => {
+          section.style.display = "flex"; // Ensure flex display is restored
+          section.style.justifyContent = "space-between"; // Keep it inline
+          section.style.alignItems = "center"; // Align properly
+      });
         trendingNews.style.display = "block"; // Show Trending News
         updatesNews.style.display = "block"; // Show News Updates
         newsAdMiddle.style.display = "block"; // Show newsAd-middle again
+
+
+        //newsAd-middle retains its original flex layout
+        newsAdMiddle.style.display = "flex";
+        newsAdMiddle.style.flexDirection = "row"; // Ensure it stays in a row layout
+        newsAdMiddle.style.justifyContent = "space-between"; // Keep spacing
+        newsAdMiddle.style.alignItems = "center"; // Align properl
     };
 });
 
@@ -313,14 +347,14 @@ const leaguesData = {
     country: "England",
     teams: [
       { name: "Man United", logo: "assets/images/manuLogo.png", D: 3, L: 4, GA: 14, GD: 5, PTS: 13 },
-      { name: "Barcelona", logo: "assets/images/barcelonaLogo.png", D: 2, L: 1, GA: 20, GD: 10, PTS: 25 },
+      { name: "Barcelona", logo: "assets/images/barcelona-logo.png", D: 2, L: 1, GA: 20, GD: 10, PTS: 25 },
     ],
   },
   "La Liga": {
     logo: "assets/images/laliga-logo.png",
     country: "Spain",
     teams: [
-      { name: "Barcelona", logo: "assets/images/barcelonaLogo.png", D: 2, L: 1, GA: 18, GD: 15, PTS: 24 },
+      { name: "Barcelona", logo: "assets/images/barcelona-logo.png", D: 2, L: 1, GA: 18, GD: 15, PTS: 24 },
     ],
   },
   "Serie A": {
@@ -354,7 +388,7 @@ function generateTableHTML(teams) {
   let tableHTML = `
     <div class="table-headers">
       <span class="position-header">Pos</span>
-      <span class="team-name">Team</span>
+      <span class="team-name-header">Team</span>
       <span class="stat-header">D</span>
       <span class="stat-header">L</span>
       <span class="stat-header">GA</span>
@@ -370,7 +404,7 @@ function generateTableHTML(teams) {
         <span class="team-position">${String(index + 1).padStart(2, "0")}</span>
         <div class="team-infos">
           <img src="${team.logo}" alt="${team.name} Logo" class="team-logo">
-          <span class="team-name">${team.name}</span>
+          <span class="teamLeague-name">${team.name}</span>
         </div>
         <span class="team-stat">${team.D}</span>
         <span class="team-stat">${team.L}</span>
@@ -909,9 +943,11 @@ if (leagueMatches.length > 0) {
     const activeLeague = document.querySelector(".leagues-matches .league-info h3.active");
     const leagueName = activeLeague ? activeLeague.textContent : null;
 
+
     const buttons = document.querySelectorAll(".match-category-btn");
     buttons.forEach((btn) => btn.classList.remove("active"));
     event.target.classList.add("active");
+
 
     displayMatches(leagueName, category);
   };

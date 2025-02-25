@@ -81,6 +81,7 @@
             <h1>
                 Welcome to your <span class="highlight">Ultimate Sports Hub</span>
             </h1>
+          
         <div class="header-actions">
             <!-- Search Bar -->
             <div class="search-container">
@@ -104,12 +105,41 @@
     </div>
     <!-- Horizontal Line -->
     <div class="header-line"></div>
-   </div>
 
+    <!-- menu Header -->
+
+    <div class="menu-header-top">
+        <!-- Flex row container -->
+        <div class="header-row">
+           <div class="menu-logo">
+              <ion-icon name="menu-outline"></ion-icon>
+               <img src="assets/images/spfanzlogo.png" alt="Logo" class="logo">
+           </div>
+
+           <div class="header-actions">
+               <!-- Search Bar -->
+               <div class="search-container">
+                <img src="assets/icons/searchIcon.png" alt="search">
+               </div>
+               
+               <!-- Notification & Profile Icons -->
+               <div class="icons">
+                   <img src="assets/icons/BellSimple.png" alt="Bells">
+                   <img src="assets/icons/UserCircle.png" alt="UserCircle">
+               </div>
+           </div>
+       </div>
+
+       <!-- Heading moves below on small screens -->
+       <h1 class="header-title">
+           Welcome to your <span class="highlight">Ultimate Sports Hub</span>
+       </h1>
+   </div>
+   </div>
    
     <!-- Main Content -->
     <div class="content">
-        <div class="layer">        
+        <div class="layer">
             <div class="text-cont">
                 <h4 class="live-matches">Live Matches</h4>
                 <div class="more">
@@ -118,24 +148,28 @@
                 </div>
             </div>
             <div class="live-match-demo">
-                <div class="teams-time">
-                    <div class="team">
-                        <img src="assets/images/chelsea-logo.png" alt="Chelsea" class="chelsea-logo">
-                        Chealse
-                    </div>
-                    <div class="live-match-event">
-                     <h4 class="game-leag">Premier League</h4>
-                     <h2 class="vs-score">VS</h2>
-                    <div class="highlight-time">
-                        <img src="assets/icons/Ellipse 1.png" alt="Ellipse" class="Ellipse-logo">
-                        9:00</div>
-                </div>
-                    <div class="team">
-                        <img src="assets/images/leichester-logo.png" alt="leichester" class="leichester-logo">
-                        Leichester C
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div class="teams-time">
+                        <div class="team">
+                            <img src="assets/images/chelsea-logo.png" alt="Chelsea" class="chelsea-logo">
+                            Chelsea
+                        </div>
+                        <div class="live-match-event">
+                            <h4 class="game-leag">Premier League</h4>
+                            <h2 class="vs-score">VS</h2>
+                            <div class="highlight-time">
+                                <img src="assets/icons/Ellipse 1.png" alt="Ellipse" class="Ellipse-logo">
+                                9:00
+                            </div>
+                        </div>
+                        <div class="team">
+                            <img src="assets/images/leichester-logo.png" alt="Leichester" class="leichester-logo">
+                            Leichester C
+                        </div>
                     </div>
                 </div>
             </div>
+            
             <div class="leagueTable-text-cont">
                 <h4 class="live-matches">League Table</h4>
                 <div class="more">
@@ -146,7 +180,7 @@
             <div class="league-table-demo">
                 <h3 class="league-title">Premier League</h3>
                 <div class="table-header">
-                    <span class="team-header">Team</span>
+                    <span class="team-head">Team</span>
                     <span class="stats-header">D</span>
                     <span class="stats-header">L</span>
                     <span class="stats-header">GA</span>
@@ -156,7 +190,7 @@
                 <div class="team-row">
                     <div class="team-info">
                         <img src="assets/images/chelsea-logo.png" alt="Chelsea Logo" class="team-logo">
-                        <span class="team-name-header">Chelsea</span>
+                        <span class="teamName-header">Chelsea</span>
                     </div>
                     <span class="team-stats">5</span>
                     <span class="team-stats">2</span>
@@ -167,7 +201,7 @@
                 <div class="team-row">
                     <div class="team-info">
                         <img src="assets/images/manuLogo.png" alt="Man United Logo" class="team-logo">
-                        <span class="team-name-header">Man United</span>
+                        <span class="teamName-header">Man United</span>
                     </div>
                     <span class="team-stats">3</span>
                     <span class="team-stats">4</span>
@@ -178,7 +212,7 @@
                 <div class="team-row">
                     <div class="team-info">
                         <img src="assets/images/arsenalLogo.png" alt="Arsenal Logo" class="team-logo">
-                        <span class="team-name-header">Arsenal</span>
+                        <span class="teamName-header">Arsenal</span>
                     </div>
                     <span class="team-stats">6</span>
                     <span class="team-stats">1</span>
@@ -189,7 +223,7 @@
                 <div class="team-row">
                     <div class="team-info">
                         <img src="assets/images/juventus.png" alt="Juventus Logo" class="team-logo">
-                        <span class="team-name-header">Tottenham</span>
+                        <span class="teamName-header">Tottenham</span>
                     </div>
                     <span class="team-stats">2</span>
                     <span class="team-stats">5</span>
@@ -309,17 +343,7 @@
                   </div>
                   <img src="assets/images/lewandowski.png" alt="Robert Lewandowski">
                 </div>
-
-                 <!-- Banner 4 -->
-                 <div class="slider-content">
-                    <div class="item-contnt">
-                        <h2 class="slider-title">Exciting Offers Await!</h2>
-                        <p class="slider-description">Get 50% off on your first subscription.</p>
-                        <a href="#" class="slider-button"><ion-icon name="arrow-forward-outline"></ion-icon><span>Subscribe now</span></a>
-                    </div>
-                    <img src="assets/images/podcastimg.png" alt="Advert">
-                  </div>
-              </div>              
+           
               
           <!-- News and podcast section -->
           <div class="news-podcast">
@@ -391,6 +415,7 @@
             <div class="text-cont">
                 <h4 class="live-matches">Top Players</h4>
             </div>
+
             <div class="slider">
                         <!-- Player 1 -->
                    <div class="player-item">
@@ -429,12 +454,15 @@
                     <div class="team-name">Barcelona</div>
                     <div class="leagues">La Liga</div>
                 </div>
-                </div>                 
+                </div> 
+                
+                <!-- Slider Dots -->
+                <div class="slider-dots"></div>
                 </div>
 
-           <div class="advert">
-              <img src="assets/images/Ad.png" alt="advert-banner" class="advertise">
-           </div>
+                <div class="advert">
+                    <img src="assets/images/Ad.png" alt="advert-banner" class="advertise">
+                 </div>
            <div class="text-cont">
             <h4 class="live-matches">Predition for Today</h4>
             <div class="more">
@@ -462,10 +490,11 @@
                 </div>
             </div>
         </div>
-           <div class="advert">
+        <div class="advert">
             <img src="assets/images/Ad.png" alt="advert-banner" class="advertise">
          </div>
          </div>  
+         </div>
 
          <!-- Swiper JS -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>

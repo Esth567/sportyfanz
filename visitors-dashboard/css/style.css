@@ -70,6 +70,11 @@ body{
 
 }
 
+.toggle-icon .x-icon {
+    display: none;
+}
+
+
 .toggle-btn ion-icon {
     font-size: 1.4rem;
     color: #fff;
@@ -221,6 +226,10 @@ body{
     width: 100%;
 }
 
+.header .header-top .mobileMenu-logo {
+    display: none;
+}
+
 /* Search Bar */
 .search-container {
     position: relative;
@@ -228,6 +237,8 @@ body{
     width: 250px;
     
 }
+
+
 .search-bar {
     padding: 6px 12px 8px 35px;
     border-radius: 15px;
@@ -257,6 +268,10 @@ body{
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.search-container img {
+    display: none;
 }
 
 .icons img {
@@ -306,6 +321,8 @@ body{
 .signup-btn:hover .arrow-icon {
     transform: translateX(5px); /* Moves arrow slightly to the right on hover */
 }
+
+
 /* Welcome Message */
 .header-topbar h1 {
     font-size: 20px;
@@ -339,9 +356,7 @@ body{
     background: #ffffff1a;
 }
 
-.menu-header-top {
-    display: none;
-}
+
 
 /* Content Section */
 .content {
@@ -367,6 +382,9 @@ body{
 
 
 /* Layers 1*/
+.text-cont1,
+.text-cont2,
+.text-cont3,
 .text-cont{
     display: flex;
     padding-bottom: 15px;
@@ -375,11 +393,15 @@ body{
     width: 100%;
 }
 
+.text-cont1 h4,
+.text-cont2 h4,
+.text-cont3 h4,
 .text-cont h4 {
-    font-size: 0.75rem;
+    font-size: 0.80rem;
     font-family: 'Lato';
-    font-weight: 400;
+    font-weight: 500;
 }
+
 .live-matches {
     font-size: 0.85rem;
     font-family: 'Lato';
@@ -1344,7 +1366,7 @@ body{
     box-shadow: 0 0 5px rgba(255, 140, 0, 0.8);
 }
 
-
+.advertise1,
 .advertise {
     width: 100%;
     height: auto;
@@ -3031,10 +3053,30 @@ body{
     z-index: 999; /* Ensures it covers everything */
 }
 
+
+
 @media screen and (max-width: 1024px) { /* Tablet */
+/* Sidebar Container */
     .sidebar {
         display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100vh;
+        background: linear-gradient(to bottom, #1a2f4b 0%, #265a3f 50%, #70c172 100%);
+        color: #fff;
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+        transition: left 0.3s ease-in-out;
+        z-index: 1000;
     }
+
+    /* When active, make it visible */
+    .sidebar.active {
+        display: block;
+    }
+
 
     .body-container {
         width: 100%;
@@ -3043,83 +3085,81 @@ body{
 
     .header {
         width: 100%;
+        padding: 15px 10px;
+        
     }
 
-    .header-top {
-        display: none;
+    .header :is(.mobileMenu-logo, .menu .x-icon) {
+        display: block;
     }
 
-    .header-top h3 {
-        display: none;
+        /* Ensure header is flexed properly */
+   .header-topbar {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* Align items to the left */
+      width: 100%;
     }
 
-    .header-line {
-        display: none;
-    }
-
-    .signup-btn {
-        display: none;
-    }
-
-      /* Flex row for menu, logo, and header actions */
-      .header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .menu-logo {
+      /* Make sure the logo and menu icon are in a row */
+      .mobileMenu-logo {
         display: flex;
         align-items: center;
+        justify-content: flex-start; 
         gap: 10px;
     }
 
-    .menu-logo ion-icon {
-        width: 25px;
-        height: 25px;
+    .mobileMenu-logo img {
+        width: 140px; /* Consistent size */
+        height: 50px;
+        object-fit: contain; 
     }
 
-    .logo {
-        width: 120px;
+    
+
+    .header-topbar .mobileMenu-logo ion-icon {
+       font-size: 28px;
+       margin-top: -10px;
+    }
+
+    .icons {
+       margin-top: -50px;
         
+    }
+
+    .header-topbar h1 {
+        order: 2; /* Move it below */
+        width: 100%;
+        text-align: left;
+
     }
 
     .header-actions {
         display: flex;
         align-items: center;
         gap: 15px;
-        justify-content: space-between;
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    .header-top h3,
+    .header-line {
+        display: none;
     }
 
 
-    .icons img {
-        width: 23px;
-        height: 23px;
-        gap: 15px;
+    .signup-btn {
+        display: none;
     }
 
-    /* Move header title below icons */
-    .header-title {
-       padding-top: 10px;
-        text-align: left;
-        font-family: 'Lato';
-        font-weight: bold;
-        font-size: 0.70rem;
+    .search-container input {
+        display: none;
+
     }
 
-    .search-container {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end; /* Moves icon to the right */
-        flex-grow: 1; /* Allows it to push other elements left */
-        cursor: pointer;
-        
-    }
-    
-    .search-container img {
-        height: 22px;
-        width: 22px;
-        color: #333; /* Adjust color if needed */
+    .search-container ion-icon {
+        display: none;
+
     }
 
     .content {
@@ -3128,9 +3168,6 @@ body{
         
     }
 
-    .middle-layer {
-        order: -1; /* Moves the middle-layer to the top */
-    }
 
     .live-match-demo,
     .league-table-demo,
@@ -3139,45 +3176,83 @@ body{
     .latest-match {
         width: 100%;
     }
-
-    .news-podcast, 
-    .latest-match, 
-    .leagueTable-text-cont, 
-    .league-table-demo,
-    .news-update {
-        display: none;
+    
+    .middle-layer {
+        display: flex;
+        flex-direction: column;
     }
-
+   
     .header-slider {
         width: 100%;
         height: 250px;
     }
 
-    
 
-    
+
+    .header-slider { order: 1; }  /* First in mobile */
+    .text-cont { order: 2; }
+    .live-match-demo { order: 3; } /* Second */
+    .text-cont2 { order: 4; }
+    .slider { order: 5; }
+    .advert { order: 6; }
+    .text-cont3 { order: 7; } 
+    .predition-container { order: 8; } /* Fourth */
+    .leagueTable-text-cont { order: 9; }
+    .league-table-demo { order: 10; } /* Third */
+    .advert1 { order: 11; }
+    .news-podcast { order: 12; } /* Fifth (should be positioned after prediction container) */
+
+  
+    .highlight-time,
+     .game-leag,
+    .team {
+       font-size: 0.80rem;
+     }
+
+     .player-name,
+     .vs-score {
+        font-size: 1rem;
+     }
+
+     .slider {
+       width: 100%;
+       height: 120px;
+     }
+
+
+     .players-data {
+        margin-left: 15px;
+        margin-top: 10px;
+        padding-bottom: 10px;
+     }
+
+     .goals,
+     .team-name,
+     .leagues {
+        font-size: 0.80rem;
+     }
+
+   
+
 }
 
 
 
 @media screen and (max-width: 768px) { /* Mobile */
+     
     .content {
         display: flex;
         flex-direction: column;
     }
 
-    .middle-layer {
-        order: -1; /* Moves the middle-layer to the top */
-    }
-
-    .news-podcast, 
+    
     .latest-match, 
-    .leagueTable-text-cont, 
-    .league-table-demo,
     .news-update {
         display: none;
     }
   
+
+    .news-podcast,
     .live-match-demo,
     .league-table-demo,
     .news-update,
@@ -3196,51 +3271,20 @@ body{
     }
 
     .advert img {
-        max-height: 155px; 
+        max-height: 120px; 
         width: 100%;
       }
 
-      .slider-content {
-        display: flex;
-      flex-direction: row; /* Keep text and image in one line */
-      align-items: center;
-      justify-content: space-between;
-      max-height: 100px !important; /* Reduce height */
-      text-align: left;
-      width: 100%;
-      padding: 10px;
-      }
-  
-      .item-contnt {
-      flex: 1; /* Allow text to take up available space */
-      padding-right: 10px;
-      max-width: 60%; /* Restrict text width */
-      }
-  
-      .slider-content img {
-        max-width: 30%; /* Make image smaller */
-        height: 100px; /* Maintain aspect ratio */
-        object-fit: contain;
-        align-self: flex-end; /* Position image at the right */
-      }
-  
-      .slider-title {
-        font-size: 0.80rem; /* Reduce font size */
-        font-family: 'Lato';
-        font-weight: bold;
-      }
-  
-      .slider-time,
-      .slider-date,
-      .slider-country {
-        font-size: 0.7rem;
-        font-family: 'Lato';
-      }
-  
-      .slider-button {
-        padding: 8px 8px;
-        font-size: 0.7rem;
-        align-items: center;
-      }
+    .advert1 img {
+        max-height: 120px; 
+        width: 100%;
+    }
+
+
+
+    
+   
 }
+
+
 

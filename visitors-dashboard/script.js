@@ -1,5 +1,5 @@
 
-//sidebar toggle
+//sidebar toggle for web view
 function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");
     const container = document.querySelector('.body-container');
@@ -194,6 +194,143 @@ window.onload = function () {
   // Ensure the "Live" button is highlighted as active
   document.querySelector('.category-btn').classList.add('active');
 };
+
+
+// menu toggle button for sidebar for mobile view
+document.addEventListener("DOMContentLoaded", function () {
+  function updateSidebarVisibility() {
+      const sidebar = document.getElementById("sidebar");
+      const toggleBtn = document.querySelector(".toggle-btn");
+
+      if (window.innerWidth <= 1024) {
+          toggleBtn.style.display = "block"; // Show toggle button for mobile & tablet
+      } else {
+          toggleBtn.style.display = "none"; // Hide toggle button for web view
+          sidebar.classList.remove("collapsed"); // Ensure sidebar is fully visible on web
+      }
+  }
+
+  // Run on page load and on window resize
+  updateSidebarVisibility();
+  window.addEventListener("resize", updateSidebarVisibility);
+});
+
+
+// searchbar
+document.addEventListener("DOMContentLoaded", function () {
+  const searchContainer = document.querySelector(".search-container");
+  const searchBar = document.querySelector(".search-bar");
+
+  searchContainer.addEventListener("click", function () {
+      if (window.innerWidth <= 1024) {
+          searchBar.style.display = searchBar.style.display === "none" ? "block" : "none";
+      }
+  });
+});
+
+
+
+
+
+
+ // css code to restructure page layout for mobile and tablet view
+ document.addEventListener("DOMContentLoaded", function () {
+  function reorderElements() {
+      if (window.innerWidth <= 1024) {
+          const parent = document.querySelector(".content");
+
+          const headerSlider = document.querySelector(".header-slider");
+          const textCont = document.querySelector(".text-cont");
+          const liveMatchDemo = document.querySelector(".live-match-demo");
+          const textCont2 = document.querySelector(".text-cont2");
+          const slider = document.querySelector(".slider");
+          const advertPodcast = document.querySelector(".advert");
+          const textCont3 = document.querySelector(".text-cont3");
+          const predictionContainer = document.querySelector(".predition-container");
+          const leagueTabletextCont = document.querySelector(".leagueTable-text-cont");
+          const leagueTableDemo = document.querySelector(".league-table-demo");
+          const advert1Podcast = document.querySelector(".advert1");
+          const newsPodcast = document.querySelector(".news-podcast");
+
+         
+          // Clear parent to prevent duplicate appends
+          while (parent.firstChild) {
+              parent.removeChild(parent.firstChild);
+          }
+
+          // Append in the correct order
+          parent.appendChild(headerSlider);
+          parent.appendChild(textCont);
+          parent.appendChild(liveMatchDemo);
+          parent.appendChild(textCont2);
+          parent.appendChild(slider);
+          parent.appendChild(advertPodcast);
+          parent.appendChild(textCont3);
+          parent.appendChild(predictionContainer);
+          parent.appendChild(leagueTabletextCont);
+          parent.appendChild(leagueTableDemo);
+          parent.appendChild(advert1Podcast);
+          parent.appendChild(newsPodcast);
+      }
+  }
+
+  reorderElements();
+  window.addEventListener("resize", reorderElements);
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.innerWidth <= 1024) { // Apply only for mobile/tablet
+      let headerTopbar = document.querySelector(".header-topbar");
+      let mobileMenuLogo = document.querySelector(".mobileMenu-logo");
+      let h1 = document.querySelector(".header-topbar h1");
+
+      // Move h1 below mobileMenu-logo
+      if (mobileMenuLogo && h1) {
+          headerTopbar.insertBefore(h1, mobileMenuLogo.nextSibling);
+      }
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  let sidebar = document.getElementById("sidebar");
+  let menuIcon = document.querySelector(".mobileMenu-logo ion-icon");
+  let closeIcon = document.querySelector(".x-icon"); // Close button
+
+  function toggleSidebar() {
+      if (window.innerWidth <= 1024) { // Mobile & Tablet Only
+          sidebar.classList.toggle("active");
+
+          // Ensure sidebar is visible when active
+          if (sidebar.classList.contains("active")) {
+              sidebar.style.display = "block";
+          } else {
+              sidebar.style.display = "none";
+          }
+      }
+  }
+
+  // Open sidebar on menu icon click
+  menuIcon.addEventListener("click", toggleSidebar);
+
+  // Close sidebar on close icon click
+  closeIcon.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      sidebar.style.display = "none";
+  });
+
+  // Optional: Close sidebar when clicking outside of it
+  document.addEventListener("click", function (event) {
+      if (!sidebar.contains(event.target) && !menuIcon.contains(event.target)) {
+          sidebar.classList.remove("active");
+          sidebar.style.display = "none";
+      }
+  });
+});
+
+
+
+
 
 
 

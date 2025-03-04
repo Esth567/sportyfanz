@@ -19,7 +19,7 @@ body{
 
 /* Sidebar Container */
 .sidebar {
-    width: 200px;
+    width: 190px;
     height: 100vh;
     background: linear-gradient(to bottom, #1a2f4b 0%, #265a3f 50%, #70c172 100%);
     color: #fff;
@@ -32,7 +32,7 @@ body{
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
     margin: 0;
-    padding: 0;
+    padding: 5px;
     overflow: hidden;
     justify-content: space-between;
     z-index: 1000;
@@ -70,7 +70,7 @@ body{
 
 }
 
-.toggle-icon .x-icon {
+.toggle-icon .iconX {
     display: none;
 }
 
@@ -81,6 +81,7 @@ body{
     cursor: pointer;
     
 }
+
 
 /* Sidebar Icon */
 .icon img {
@@ -99,6 +100,7 @@ body{
     height: 100%; /* Full height of the sidebar */
     justify-content: space-between; 
     flex: 1;
+    margin-top: 10px;
 }
 
 .menu ul {
@@ -139,7 +141,7 @@ body{
 .menu ul li a {
     text-decoration: none;
     color: #fff;
-    font-size: 0.75rem;
+    font-size: 0.80rem;
     font-family: 'Lato';
     flex: 1;
 }
@@ -194,7 +196,7 @@ body{
 
 .body-container {
     flex: 1;
-    margin-left: 200px; /* Matches sidebar width */
+    margin-left: 190px; /* Matches sidebar width */
     display: flex;
     flex-direction: column;
     transition: margin-left 0.3s ease-in-out;
@@ -202,7 +204,7 @@ body{
 }
 
 .sidebar.collapsed ~ .body-container {
-    margin-left: 80px; /* Adjusted margin for collapsed sidebar */
+    margin-left: 60px; /* Adjusted margin for collapsed sidebar */
 }
 
 
@@ -215,7 +217,7 @@ body{
     background: #0A131F; /* Solid background color */
     color: white;
     z-index: 999; /* Ensure the header is above other elements */
-    padding: 20px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
 }
@@ -364,7 +366,7 @@ body{
     display: flex;
     justify-content: space-between;
     align-items: stretch; /* Ensure layers fill the height */
-    padding: 20px;
+    padding: 15px;
     gap: 10px;
     margin-top: 70px;
     height: calc(100vh - 150px);
@@ -397,13 +399,13 @@ body{
 .text-cont2 h4,
 .text-cont3 h4,
 .text-cont h4 {
-    font-size: 0.80rem;
+    font-size: 0.90rem;
     font-family: 'Lato';
     font-weight: 500;
 }
 
 .live-matches {
-    font-size: 0.85rem;
+    font-size: 0.90rem;
     font-family: 'Lato';
     font-weight: bold;
     color: #ffffff;
@@ -439,7 +441,6 @@ body{
     color: white;
     width: 100%;
     position: relative;
-    padding: 10px;
     border-radius: 15px;
     border: 1px solid #fbc12d8c;
 
@@ -807,7 +808,6 @@ body{
     background: #ffdf00;
     transform: scale(1.05);
 }
-
 
 
 /* News Podcast Container */
@@ -1333,8 +1333,8 @@ body{
 }
 /* Team Logo */
 .team-logo img {
-    width: 45px; /* Logo width */
-    height: 45px; /* Logo height */
+    width: 50px; /* Logo width */
+    height: 50px; /* Logo height */
     object-fit: contain; /* Maintain aspect ratio */
     border-radius: 50%; /* Circular logo */  
     margin-left: -5px;
@@ -1381,6 +1381,10 @@ body{
 
 
 /*------------------------------News css------------------------------------ */
+
+.newsMobileMenu-logo {
+    display: none;
+}
 
 /*top stories */
 .top-story {
@@ -1975,12 +1979,11 @@ body{
 
 .league-header {
     display: flex;
-    align-items: center; /* Align text and image vertically */
-    gap: 10px; /* Add spacing between the image and text */
-    color: white; /* Set text color to white */
-    font-size: 0.75rem; /* Adjust font size for the header */
-    margin-bottom: 8px; 
-    font-family: "Lato";
+    padding-bottom: 15px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
   }
 
   .league-header img.league-logo {
@@ -1989,6 +1992,47 @@ body{
     object-fit: contain; /* Ensure the logo maintains its aspect ratio */
     border-radius: 50%; /* Optional: Make the logo circular */
   }
+
+  .league-header .league-title {
+    font-size: 0.80rem;
+    font-family: 'Lato';
+    font-weight: bold;
+    text-align: left;
+    flex-grow: 1; /* Allows the title to take up remaining space */
+    text-align: left; /* Ensures it stays on the left */
+  }
+
+  .league-header .league-country {
+    font-size: 0.70rem;
+    font-family: 'Lato';
+    font-weight: 500;
+  }
+
+  .more-league {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+
+  }
+ 
+  .more-league a {
+    color: #fff;
+    font-size: 0.75rem;
+    font-family: 'Lato';
+    font-weight: 400;
+    color: #fff;
+    outline: none;
+    text-decoration: none;
+  
+  }
+  
+  .more-league ion-icon {
+      font-size: 0.75rem;
+      color: #fff;
+  }
+
 
 .leag-country {
     display: flex;
@@ -2015,8 +2059,8 @@ body{
   }
   
   .matches-time {
-    font-weight: 400;
-    font-size: 0.70rem;
+    font-weight: 500;
+    font-size: 0.75rem;
     margin-bottom: 8px;
 
   }
@@ -2037,19 +2081,22 @@ body{
   }
 
  .matches-team img {
-    width: 17px; /* Reduce the size of logos */
-    height: 17px;
+    width: 18px; /* Reduce the size of logos */
+    height: 18px;
     border-radius: 50%;
     object-fit: cover; /* Ensure logos maintain their aspect ratio */
  }
  .matches-team span {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 
 
-  .score {
-    font-size: 0.70rem;
+  .matches-scores {
+    font-size: 0.75rem;
     color: #fff;
+    font-family: 'Lato';
+    font-weight: 500;
+    gap: 15px;
   }
 
   .matches-datas {
@@ -2067,6 +2114,7 @@ body{
     width: 100%;
     background: #1b364ea2;
     padding: 10px;
+    border-radius: 10px;
   }
   
   .back-btn {
@@ -2221,26 +2269,20 @@ body{
 
   /* info styling */
 
-.info-match-container {
-    margin-bottom: -10px;
-    padding: 0;
-    margin: 0;
+  .info-match-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align content to the left */
 }
+
   /* Container to hold both left and right sections */
 .info-match-details {
     display: flex;
-    justify-content: space-between; /* Push left and right apart */
-    align-items: flex-start;
-    gap: 20px;
+    flex-direction: column;
+    align-items: flex-start; /* Ensures it stays left-aligned */
+    margin-top: 8px; /* Adds spacing below .info-teamNames */
 }
 
-/* Left Section: Teams, Date, and Time */
-.info-left {
-    flex: 1; /* Take equal space */
-    text-align: left;
-    font-size: 0.75rem;
-    font-weight: 300;
-}
 
 .info-teamNames {
     display: flex;
@@ -2251,16 +2293,42 @@ body{
     margin-bottom: 10px;
 }
 
-/* Right Section: GBR, Stadium, and Country */
-.info-right {
-    flex: 1;
+.infoMatch-details {
+    display: flex;
+    justify-content: flex-start; /* Push left and right apart */
+    align-items: center;
     text-align: left;
-    font-size: 0.75rem;
-    font-weight: 300;
-    margin-right: 70px;
-    margin-top: 25px;
-    
+    gap: 20px;
 }
+
+.info-match-details img {
+    margin-bottom: 10px;
+}
+
+.infoLeft-wing, .infoRight-wing {
+    display: flex;
+    flex-direction: column;
+}
+
+.infoRight-wing {
+    margin-right: 20px;
+}
+
+.infoLeft-wing p, .infoRight-wing p {
+    display: flex;
+    align-items: center; /* Aligns icon and text in the same line */
+    gap: 5px; /* Space between the icon and text */
+    margin: 0;
+    font-size: 0.75rem;
+    font-family: 'Lato';
+}
+
+.info-colorIcon {
+    width: 16px; /* Adjust icon size */
+    height: 16px;
+    object-fit: contain;
+}
+
 
 /* Ensure match title is centered */
 .info-match-container h3 {
@@ -2270,12 +2338,6 @@ body{
     font-weight: 300;
 }
 
-.info-colorIcon {
-    width: 12px;  /* Adjust size as needed */
-    height: 12px;
-    vertical-align: middle; /* Ensures proper alignment with text */
-    margin-right: 3px; /* Adds spacing between icon and text */
-}
 
 
 
@@ -2488,22 +2550,24 @@ body{
 /* Ensuring both team containers take full width */
 .lineup-home-players, .lineup-away-players {
     flex: 1; /* Make both take equal space */
-    margin-top: 20px;
+    margin-top: 10px;
     border-radius: 8px;
 }
 
-.lineup-players-names h5 {
+.lineup-players-names h4 {
     text-align: left;
     padding-top: 20px;
-    font-size: 0.75rem;
-    font-weight: 300;
+    font-size: 0.85rem;
+    font-family: 'Lato';
+    font-weight: 400;
 }
 
 .lineup-home-players h4, .lineup-away-players h4 {
     text-align: center;
     color: #fbc02d;
     margin-bottom: 10px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+    font-family: 'Lato';
     font-weight: 400;
 }
 
@@ -3055,6 +3119,18 @@ body{
 
 
 
+
+
+/* No animation for desktop */
+@media screen and (min-width: 1025px) {
+    .news-podcast {
+        display: flex !important; /* Ensures row layout */
+        transform: none !important;
+        flex-direction: row; 
+    }
+}
+
+
 @media screen and (max-width: 1024px) { /* Tablet */
 /* Sidebar Container */
     .sidebar {
@@ -3062,7 +3138,7 @@ body{
         position: fixed;
         top: 0;
         left: 0;
-        width: 250px;
+        width: 200px;
         height: 100vh;
         background: linear-gradient(to bottom, #1a2f4b 0%, #265a3f 50%, #70c172 100%);
         color: #fff;
@@ -3070,27 +3146,106 @@ body{
         border-bottom-left-radius: 20px;
         transition: left 0.3s ease-in-out;
         z-index: 1000;
+        padding: 15px;
+        
     }
 
-    /* When active, make it visible */
-    .sidebar.active {
+     .toggle-icon .icon {
+        display: none;
+     }
+
+     .toggle-icon .toggle-btn ion-icon {
+        display: none;
+     } 
+
+     .sidebar.active {
         display: block;
     }
 
+     /* Hide other icons except X when sidebar is open */
+     .sidebar.active .toggle-btn {
+        display: none;
+    }
+
+    
+    .stroke {
+        height: 2px;
+        width: 18%;
+        background: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+        position: relative;
+        margin-bottom: 10px; /* Spacing below the stroke */
+        margin-left: 10px;
+    }
+
+
+    .toggle-icon .iconX {
+        display: block !important;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        position: absolute;
+        left: 25px;
+        top: 33px;
+        z-index: 1001;
+    }
+    
+
+    .logout-section {
+        position: absolute;
+        bottom: 5px;
+        left: 0;
+        width: 100%;
+        text-align: left;
+        padding: 15px;
+    }
+
+    .logout-section ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .logout-section li {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .logout-section img {
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+
+    .logout-section a {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+    }
 
     .body-container {
         width: 100%;
         margin-left: 0;
     }
+    
 
     .header {
         width: 100%;
-        padding: 15px 10px;
+        padding: 30px 20px;
         
     }
 
-    .header :is(.mobileMenu-logo, .menu .x-icon) {
+    .header :is(.mobileMenu-logo, .menu .iconX ) {
         display: block;
+    }
+
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        justify-content: flex-end;
+        width: 100%;
     }
 
         /* Ensure header is flexed properly */
@@ -3102,45 +3257,63 @@ body{
     }
 
       /* Make sure the logo and menu icon are in a row */
-      .mobileMenu-logo {
+    .mobileMenu-logo {
         display: flex;
         align-items: center;
-        justify-content: flex-start; 
         gap: 10px;
     }
 
     .mobileMenu-logo img {
+        width: 107px; /* Adjust logo size */
+        height: auto;
+        object-fit: contain; 
+        margin-left: 7px;
+        margin-top: -5px;
+    }
+
+    .mobileMenu-logo ion-icon {
+        font-size: 27px;
+        cursor: pointer;
+        display: inline-block;
+    
+     }
+
+    .iconX {
         width: 140px; /* Consistent size */
         height: 50px;
         object-fit: contain; 
     }
 
-    
-
-    .header-topbar .mobileMenu-logo ion-icon {
-       font-size: 28px;
-       margin-top: -10px;
-    }
 
     .icons {
-       margin-top: -50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+       margin-top: -30px;
         
     }
 
-    .header-topbar h1 {
+    .iconSearch {
+       border: none; /* Remove any border */
+       padding: 6px;
+       width: 25px;
+       height: 25px;
+       gap: 10px;
+       border-radius: 50%; /* Circular shape */
+       background: linear-gradient(90deg, #1a2f4b3d 50%, #1b334d49 75.03%, #1b364e6e 100%);
+       transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .header .header-topbar h1 {
         order: 2; /* Move it below */
         width: 100%;
         text-align: left;
+        font-size: 1rem;
+        font-family: 'Lato';
+        margin-top: 10px;
 
     }
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        justify-content: flex-end;
-        width: 100%;
-    }
+   
 
     .header-top h3,
     .header-line {
@@ -3152,14 +3325,14 @@ body{
         display: none;
     }
 
+    .search-container ion-icon,
     .search-container input {
         display: none;
-
     }
 
-    .search-container ion-icon {
-        display: none;
-
+    .search-container img {
+        display: block;
+        right: 20px;
     }
 
     .content {
@@ -3232,7 +3405,232 @@ body{
         font-size: 0.80rem;
      }
 
+
+     .advert img {
+        max-height: 200px; 
+        width: 100%;
+      }
+
+    .advert1 img {
+        max-height: 200px; 
+        width: 100%;
+    }
+
+    .predition-content h4{
+        font-size: 0.85rem;
+    }
+    
+    .predit-selection .team-nam {
+        font-size: 0.90rem;
+    }
+    .predit-selection .Select-team {
+        font-size: 0.80rem;
+    }
+
+ 
+    .news-podcast-wrapper {
+        overflow: hidden; /* Prevents scrolling */
+        width: 100%;
+        position: relative;
+    }
+
+    .news-podcast {
+        display: flex;
+        width: 200%; /* Double width for sliding effect */
+        transition: transform 0.6s ease-in-out;
+    }
+
+    .top-stories, .podcast-updates {
+        width: 100%; /* Each section takes full viewport width */
+        flex-shrink: 0;
+    }
+
+
+
+    /*......news .....*/
+
+    body.news-page .middle-layer {
+        padding: 0; /* Removes padding */
+        margin: 0 auto; /* Centers content */
+    }
+
    
+   
+      /* Apply only to News Page using a unique class on body */
+      body.news-page .header-top h3,
+      body.news-page .header-top h1,
+      body.news-page .header-actions,
+      body.news-page .header-top h1,
+      body.news-page .header-top .mobileMenu-logo img ,
+      body.news-page .header-line {
+          display: none; /* Hide everything except menu icon, logo, and h2 */
+      }
+
+       /* Ensure mobileMenu-logo and h2 are visible */
+    body.news-page .header-top .mobileMenu-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Centers the items */
+        width: 100%;
+    }
+
+    body.news-page  .header-top .mobileMenu-logo h2 {
+        display: block;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    body.news-page .body-container .content > .layer:not(.middle-layer) {
+        display: none; /* Hide all layers except middle-layer */
+    }
+
+    body.news-page .newsAd-middle {
+        display: none;
+    }
+
+
+    .news-text-cont .news-headers {
+        font-size: 1rem;
+    }
+
+    .news-text-cont .see-more {
+        font-size: 0.85rem;
+    }
+
+    .news-infomat {
+        display: flex;
+        align-items: stretch; /* Ensures both children take full height */
+        gap: 10px; /* Adds spacing between image and text */
+        margin-bottom: 10px;
+    }
+    
+    .feature-img {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-height: 100%; /* Ensures it takes full height */
+    }
+
+    .feature-img img {
+        width: 100px;
+        height: 100%; /* Makes the image take the full height */
+        object-fit: cover; /* Ensures the image fills the container properly */
+    }
+    .news-messages {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Ensures content is spread evenly */
+    }
+
+    .news-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; 
+    }
+    
+    .news-messages .news-header {
+        font-size: 0.90rem;
+        font-weight: 500;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    
+    }
+
+    .news-messages .news-description {
+        margin-bottom: 5px; /* Adds spacing before the news-meta */
+        font-size: 0.75rem;
+        font-family: 'Lato';
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;    
+    
+    }
+
+    .news-time {
+        margin-top: 2px; 
+        text-align: left; 
+        font-size: 0.70rem;
+        margin-left: 1px;
+        
+    }
+
+    
+
+     /*......matches page .....*/
+
+     body.matches-page .middle-layer {
+        padding: 0; /* Removes padding */
+        margin: 0 auto; /* Centers content */
+    }
+
+
+    body.matches-page .header-top .mobileMenu-logo img,
+    body.matches-page .header-actions,
+    body.matches-page .header-top h1,
+    body.matches-page .layer,
+    body.matches-page .third-layer,
+    body.matches-page .text-cont
+    {
+        display: none;
+    }
+
+    body.matches-page .header-top .mobileMenu-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Centers the items */
+        width: 100%;
+    }
+
+    body.matches-page  .header-top .mobileMenu-logo h2 {
+        display: block;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    .info-teamNames,
+    .info-match-container h3 {
+        font-size: 1rem;
+        margin-top: 10px;
+        font-family: 'Lato';
+    }
+
+     .info-colorIcon {
+        margin-top: 10px;
+        font-size: 0.80rem;
+        font-family: 'Lato';
+    }
+
+    .infoLeft-wing p, .infoRight-wing p {
+        display: flex;
+        align-items: center; /* Aligns icon and text in the same line */
+        gap: 5px; /* Space between the icon and text */
+        margin: 0;
+        font-size: 0.85rem;
+        font-family: 'Lato';
+    }
+
+    .lineup-players-names h4,
+    .lineup-away-players h4,
+    .lineup-home-players h4 {
+        font-size: 1rem;
+    }
+
+    .lineup-away-players span,
+    .lineup-home-players span {
+        font-size: 0.80rem;
+    }
+
+    .tab-btn {
+        font-size: 0.75rem;
+   
+    
+      }
 
 }
 
@@ -3271,16 +3669,14 @@ body{
     }
 
     .advert img {
-        max-height: 120px; 
+        max-height: 160px; 
         width: 100%;
       }
 
     .advert1 img {
-        max-height: 120px; 
+        max-height: 160px; 
         width: 100%;
     }
-
-
 
     
    

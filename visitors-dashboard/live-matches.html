@@ -14,9 +14,13 @@
 <script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
 
 </head>
-<body>
+<body class="matches-page">
     <div class="sidebar" id="sidebar">
         <div class="toggle-icon">
+
+             <!-- X-icon for closing sidebar -->
+             <img src="assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
+             
             <div class="icon">
                 <img src="assets/images/spfanzlogo.png" alt="Logos" class="logos">
             </div>            
@@ -76,6 +80,11 @@
      <!-- Header -->
     <div class="header">
     <div class="header-top">
+        <div class="mobileMenu-logo">
+            <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleMobileSidebar()"></ion-icon>  
+             <img src="assets/images/Logo2.png" alt="Logo" class="logo">
+             <h2>Matches</h2>
+         </div>
         <h3>Dashboard / Home</h3>
         <div class="header-topbar">
             <h1>

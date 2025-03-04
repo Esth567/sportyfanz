@@ -253,11 +253,6 @@ document.addEventListener("DOMContentLoaded", function () {
           const newsPodcast = document.querySelector(".news-podcast");
 
          
-          // Clear parent to prevent duplicate appends
-          while (parent.firstChild) {
-              parent.removeChild(parent.firstChild);
-          }
-
           // Append in the correct order
           parent.appendChild(headerSlider);
           parent.appendChild(textCont);
@@ -292,12 +287,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+
+// toggle sidebar for mobile view
 document.addEventListener("DOMContentLoaded", function () {
+  const container = document.querySelector('.body-container');
   let sidebar = document.getElementById("sidebar");
   let menuIcon = document.querySelector(".mobileMenu-logo ion-icon");
-  let closeIcon = document.querySelector(".x-icon"); // Close button
+  let closeIcon = document.querySelector(".iconX"); // Close button
 
-  function toggleSidebar() {
+  function toggleMobileSidebar() {
       if (window.innerWidth <= 1024) { // Mobile & Tablet Only
           sidebar.classList.toggle("active");
 
@@ -311,7 +309,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Open sidebar on menu icon click
-  menuIcon.addEventListener("click", toggleSidebar);
+  if (menuIcon) { 
+    menuIcon.addEventListener("click", toggleMobileSidebar);
+}
+  
 
   // Close sidebar on close icon click
   closeIcon.addEventListener("click", () => {
@@ -327,6 +328,30 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   });
 });
+
+
+//news-podcast animation slider
+document.addEventListener("DOMContentLoaded", function () {
+  let currentIndex = 0;
+  const slider = document.querySelector(".news-podcast");
+
+  function slideNewsPodcast() {
+      if (window.innerWidth <= 1024) { // Mobile & Tablet Only
+          currentIndex = (currentIndex + 1) % 2; // Toggle between 0 and 1
+          slider.style.transform = `translateX(-${currentIndex * 100}%)`; // Slide left/right
+      } else {
+          // Reset position for desktop view
+          slider.style.transform = `translateX(0)`;
+      }
+  }
+
+  // Auto-slide every 5 seconds only on mobile & tablet
+  if (window.innerWidth <= 1024) {
+      setInterval(slideNewsPodcast, 5000);
+  }
+});
+
+
 
 
 
@@ -347,6 +372,8 @@ document.addEventListener("DOMContentLoaded", function () {
 function showInitialNews(sectionId) {
   const newsSection = document.getElementById(sectionId);
   const newsItems = newsSection.querySelectorAll(".news-infomat");
+  console.log(document.querySelector(".middle-layer").style.display);
+
 
   if (newsItems.length > 0) {
       newsItems.forEach((item, index) => {
@@ -355,7 +382,11 @@ function showInitialNews(sectionId) {
       newsSection.style.display = "flex"; // Set to flex to align with CSS
       newsSection.style.flexDirection = "column"; // Keep stacking format
   }
+  
 }
+
+document.querySelector(".middle-layer").style.display = "block";
+
 
 
 function toggleNews(section) {
@@ -697,39 +728,39 @@ const matchesData = {
 // Function to render matches for a specific league and category
 function displayMatches(leagueName = null, category = "live") {
   const allMatches = leagueName ? { [leagueName]: matchesData[leagueName] } : matchesData;
-  let matchesHTML = ""; // Start with an empty string
+  let matchesHTML = "";
 
   Object.keys(allMatches).forEach((league) => {
       const leagueCategoryMatches = allMatches[league]?.[category] || [];
-      
+      const isLimitedView = leagueCategoryMatches.length > 5; // Check if there are more than 5 matches
+
       if (leagueCategoryMatches.length) {
-          // Move league-header ABOVE matches-header
           matchesHTML += `
           <div class="league-header">
               <img src="assets/images/${league.toLowerCase().replace(/\s+/g, "-")}-logo.png" alt="${league} Logo" class="league-logo">
-               <h4 class="league-title">${league} <span class="league-country">${matchesData[league].country}</span></h4>
-          </div>`;
-    
-          
-           // Wrap matches-header and matches-items inside matches-header-cont
-          matchesHTML += `
-          <div class="matches-header-cont">
-              <div class="matches-header">
-                <div class="match-category-btn active" onclick="showMatches('live', event)">Live</div>
-                <div class="match-category-btn" onclick="showMatches('highlight', event)">Highlight</div>
-                <div class="match-category-btn" onclick="showMatches('upcoming', event)">Upcoming</div>
-                <div class="match-category-btn calendar">
-                  <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
-                  <input type="date" id="match-date" onchange="filterByDate()" style="display: none;" />
-                </div>
+              <h4 class="league-title">${league} <span class="league-country">${matchesData[league].country}</span></h4>
+              <div class="more-league" onclick="toggleLeagueMatches('${league}')">
+                  <ion-icon name="arrow-forward-outline"></ion-icon>
+                  <a href="#" id="toggle-${league}">${isLimitedView ? "See All" : "See Less"}</a>
               </div>
-              <div class="match-category-content">`;
+          </div>`;
 
+          matchesHTML += `<div class="matches-header-cont">
+              <div class="matches-header">
+                  <div class="match-category-btn active" onclick="showMatches('live', event)">Live</div>
+                  <div class="match-category-btn" onclick="showMatches('highlight', event)">Highlight</div>
+                  <div class="match-category-btn" onclick="showMatches('upcoming', event)">Upcoming</div>
+                  <div class="match-category-btn calendar">
+                      <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
+                      <input type="date" id="match-date" onchange="filterByDate()" style="display: none;" />
+                  </div>
+              </div>
+              <div class="match-category-content" id="matches-${league}" data-limited="true">`;
 
-            // Insert matches inside match-category-content
           leagueCategoryMatches.forEach((match, index) => {
+              const isHidden = isLimitedView && index >= 5 ? "style='display: none;'" : "";
               matchesHTML += `
-              <div class="matches-item" data-league="${league}" data-index="${index}" data-category="${category}">
+              <div class="matches-item" data-league="${league}" data-index="${index}" data-category="${category}" ${isHidden}>
                   <div class="matches-teams">
                       <div class="matches-time">${match.time}</div>
                       <div class="matches-datas">
@@ -749,7 +780,7 @@ function displayMatches(leagueName = null, category = "live") {
                   </div>
               </div>`;
           });
-          // Close match-category-content and matches-header-cont
+
           matchesHTML += `</div></div>`;
       } else {
           matchesHTML += `<p>No matches available for ${league} in ${category}.</p>`;
@@ -758,6 +789,25 @@ function displayMatches(leagueName = null, category = "live") {
 
   matchesContainer.innerHTML = matchesHTML;
 }
+
+// Toggle between showing all matches and limiting to 5
+function toggleLeagueMatches(league) {
+  const matchesContainer = document.getElementById(`matches-${league}`);
+  const toggleButton = document.getElementById(`toggle-${league}`);
+  const isLimited = matchesContainer.getAttribute("data-limited") === "true";
+
+  // Show or hide extra matches
+  matchesContainer.querySelectorAll(".matches-item").forEach((match, index) => {
+      match.style.display = isLimited && index >= 5 ? "flex" : "none";
+  });
+
+  // Update button text
+  toggleButton.textContent = isLimited ? "See Less" : "See All";
+
+  // Update attribute
+  matchesContainer.setAttribute("data-limited", isLimited ? "false" : "true");
+}
+
 
 
     // Event delegation for dynamically created match items
@@ -864,25 +914,28 @@ function getTabContent(tab, match) {
              <h3>Match Info</h3>
              <div class="info-match-details">
              <!-- Left Section: Teams, Time, and Date -->
-               <div class="info-left">
+              
                <div class="info-teamNames">
                <h4>${match.team1.name}</h4> vs <h4>${match.team2.name}</h4>
                </div>
-                <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.time}</p>
-                <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.date}</p>
-             </div>
 
               <!-- Right Section: GBR, Stadium, and Country -->
-          <div class="info-right">
-            <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon"></strong> ${match.gbr || "Not available"}</p>
-            <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong></strong> ${match.venue || "Not available"}, <strong></strong> ${match.country || "Not available"}</p>
-        </div>
+            <div class="infoMatch-details">
+              <div class="infoLeft-wing">
+                  <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.time}</p>
+                  <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.date}</p>
+               </div>
+               <div class="infoRight-wing">
+                  <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon"></strong> ${match.gbr || "Not available"}</p>
+                 <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong></strong> ${match.venue || "Not available"}, <strong></strong> ${match.country || "Not available"}</p>
+               </div>
+           </div>
         </div>
        </div>
 
 
             <div class="lineup-players-names">
-            <h5>Players</h5>
+            <h4>Players</h4>
             <div class="lineUp-cont">
             <div class="lineup-home-players">
                 <h4>${match.team1.name}</h4>

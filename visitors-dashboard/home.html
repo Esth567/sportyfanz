@@ -17,7 +17,8 @@
 <body>
     <div class="sidebar" id="sidebar">
         <div class="toggle-icon">
-            <img src="assets/icons/X.png" alt="X" class="x-icon">
+         <!-- X-icon for closing sidebar -->
+            <img src="assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
             
             <div class="icon">
                 <img src="assets/images/spfanzlogo.png" alt="Logos" class="logos">
@@ -81,8 +82,8 @@
         <h3>Dashboard / Home</h3>
         <div class="header-topbar">
             <div class="mobileMenu-logo">
-                <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleSidebar()"></ion-icon>  
-                 <img src="assets/images/spfanzlogo.png" alt="Logo" class="logo">
+                <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleMobileSidebar()"></ion-icon>  
+                 <img src="assets/images/Logo2.png" alt="Logo" class="logo">
              </div>
             <h1>
                 Welcome to your <span class="highlight">Ultimate Sports Hub</span>
@@ -91,14 +92,13 @@
         <div class="header-actions">
             <!-- Search Bar -->
             <div class="search-container">
-                <img src="assets/icons/searchIcon.png" alt="search">
                 <ion-icon name="arrow-forward-outline" class="search-icon"></ion-icon>
                 <input type="text" class="search-bar" placeholder="Search here...">
             </div>
             
             <!-- Notification Icon -->
             <div class="icons">
-                   
+                <img src="assets/icons/Vectorsearch.png" alt="search" class="iconSearch">
                 <img src="assets/icons/BellSimple.png" alt="Bells">
                 <!-- Settings Icon -->
                 <img src="assets/icons/UserCircle.png" alt="userCircle">
@@ -336,41 +336,44 @@
               </div>              
               
           <!-- News and podcast section -->
-          <div class="news-podcast">
-            <div class="top-stories">
-                <div class="text-cont">
-                    <h4 class="shortTop-story">Top Stories Today</h4>
-                    <div class="more">
-                        <ion-icon name="arrow-forward-outline"></ion-icon>
-                        <a href="news.html">View all</a>
+      <!-- News and podcast section -->
+<div class="news-podcast-wrapper">
+    <div class="news-podcast">
+        <div class="top-stories">
+            <div class="text-cont">
+                <h4 class="shortTop-story">Top Stories Today</h4>
+                <div class="more">
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                    <a href="news.html">View all</a>
+                </div>
+            </div>  
+            <div class="news-short-highlight">
+                <a href="news-page1.html" class="news-short-message">
+                    <div class="news-shortfeature-image">
+                        <img src="assets/images/AA1xMLFA.jpg" alt="Logos">
                     </div>
-                </div>  
-                <div class="news-short-highlight">
-                    <a href="news-page1.html" class="news-short-message">
-                            <div class="news-shortfeature-image">
-                                <img src="assets/images/AA1xMLFA.jpg" alt="Logos">
-                            </div>
-                            <h2 class="shortNews-header">Chesterfield transfers latest as Paul Cook talks incomings and outgoings</h2>
-                            <p class="shortNews-description">The Spireites have brought in four new signings this month in Janoi Donacien, Bim Pepple, Jack Sparkes and Kyle McFadzean, while Dilan Markanday and James Berry have departed.</p>
-                        </a>
+                    <h2 class="shortNews-header">Chesterfield transfers latest as Paul Cook talks incomings and outgoings</h2>
+                    <p class="shortNews-description">The Spireites have brought in four new signings...</p>
+                </a>
+                <a href="news-page2.html" class="news-short-message">
+                    <div class="news-shortfeature-image">
+                        <img src="assets/images/AA1xCf3d.jpg" alt="Logos" class="logos">
+                    </div>
+                    <h2 class="shortNews-header">Liverpool XI vs Ipswich...</h2>
+                    <p class="shortNews-description">The Reds are hosting the Tractor Boys...</p>
+                </a>
+            </div>
+        </div>
+        <div class="podcast-updates">
+            <div class="podcast-update-img">
+                <img src="assets/images/podcastimg.png" alt="">
+            </div>
+            <h5>Voices of the Game | Football</h5>
+            <h4>Podcast Coming Soon in May</h4>
+        </div>
+    </div>
+</div>
 
-                        <a href="news-page2.html" class="news-short-message">
-                            <div class="news-shortfeature-image">
-                                <img src="assets/images/AA1xCf3d.jpg" alt="Logos" class="logos">
-                            </div>
-                            <h2 class="shortNews-header">Liverpool XI vs Ipswich: Confirmed team news, predicted lineup and injury latest for Premier League</h2>
-                            <p class="shortNews-description">The Reds are hosting the Tractor Boys at Anfield and will be strong favourites to at least maintain their lead atop the Premier League table.</p>
-                        </a>
-                </div>
-            </div>
-            <div class="podcast-updates">
-                <div class="podcast-update-img">
-                    <img src="assets/images/podcastimg.png" alt="">
-                </div>
-                <h5>Voices of the Game|Football</h5>
-                <h4>Podcast Coming Soon in May</h4>
-            </div>
-          </div>
 
           <!--latest matches section-->
           <div class="latest-match">
@@ -463,6 +466,7 @@
             </div>
         </div>
         <div class="predition-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; height: px;">
             <div class="predition-content">
                 <h4>Who will win?</h4>
                 <div class="predit-selection">
@@ -480,6 +484,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
         <div class="advert1">

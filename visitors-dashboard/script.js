@@ -727,68 +727,69 @@ const matchesData = {
 
 // Function to render matches for a specific league and category
 function displayMatches(leagueName = null, category = "live") {
-  const allMatches = leagueName ? { [leagueName]: matchesData[leagueName] } : matchesData;
-  let matchesHTML = "";
+    const allMatches = leagueName ? { [leagueName]: matchesData[leagueName] } : matchesData;
+    let matchesHTML = "";
+  
+    Object.keys(allMatches).forEach((league) => {
+        const leagueCategoryMatches = allMatches[league]?.[category] || [];
+        const isLimitedView = leagueCategoryMatches.length > 5; // Check if there are more than 5 matches
+  
+        if (leagueCategoryMatches.length) {
+            matchesHTML += `
+            <div class="league-header">
+                <img src="assets/images/${league.toLowerCase().replace(/\s+/g, "-")}-logo.png" alt="${league} Logo" class="league-logo">
+                <h4 class="league-title">${league} <span class="league-country">${matchesData[league].country}</span></h4>
+                <div class="more-league" onclick="toggleLeagueMatches('${league}')">
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                    <a href="#" id="toggle-${league}">${isLimitedView ? "See All" : "See Less"}</a>
+                </div>
+            </div>`;
+  
+            matchesHTML += `<div class="matches-header-cont">
+                <div class="matches-header">
+                    <div class="match-category-btn active" onclick="showMatches('live', event)">Live</div>
+                    <div class="match-category-btn" onclick="showMatches('highlight', event)">Highlight</div>
+                    <div class="match-category-btn" onclick="showMatches('upcoming', event)">Upcoming</div>
+                    <div class="match-category-btn calendar">
+                        <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
+                        <input type="date" id="match-date" onchange="filterByDate()" style="display: none;" />
+                    </div>
+                </div>
+                <div class="match-category-content" id="matches-${league}" data-limited="true">`;
+  
+            leagueCategoryMatches.forEach((match, index) => {
+                const isHidden = isLimitedView && index >= 5 ? "style='display: none;'" : "";
+                matchesHTML += `
+                <div class="matches-item" data-league="${league}" data-index="${index}" data-category="${category}" ${isHidden}>
+                    <div class="matches-teams">
+                        <div class="matches-time">${match.time}</div>
+                        <div class="matches-datas">
+                            <div class="matches-team">
+                                <img src="${match.team1.logo}" alt="${match.team1.name} Logo">
+                                <span>${match.team1.name}</span>
+                            </div>
+                            <div class="matches-team">
+                                <img src="${match.team2.logo}" alt="${match.team2.name} Logo">
+                                <span>${match.team2.name}</span>
+                            </div>
+                        </div>
+                        <div class="matches-scores">
+                            <div class="score">${match.team1.score}</div>
+                            <div class="score">${match.team2.score}</div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+  
+            matchesHTML += `</div></div>`;
+        } else {
+            matchesHTML += `<p>No matches available for ${league} in ${category}.</p>`;
+        }
+    });
+  
+    matchesContainer.innerHTML = matchesHTML;
+  }
 
-  Object.keys(allMatches).forEach((league) => {
-      const leagueCategoryMatches = allMatches[league]?.[category] || [];
-      const isLimitedView = leagueCategoryMatches.length > 5; // Check if there are more than 5 matches
-
-      if (leagueCategoryMatches.length) {
-          matchesHTML += `
-          <div class="league-header">
-              <img src="assets/images/${league.toLowerCase().replace(/\s+/g, "-")}-logo.png" alt="${league} Logo" class="league-logo">
-              <h4 class="league-title">${league} <span class="league-country">${matchesData[league].country}</span></h4>
-              <div class="more-league" onclick="toggleLeagueMatches('${league}')">
-                  <ion-icon name="arrow-forward-outline"></ion-icon>
-                  <a href="#" id="toggle-${league}">${isLimitedView ? "See All" : "See Less"}</a>
-              </div>
-          </div>`;
-
-          matchesHTML += `<div class="matches-header-cont">
-              <div class="matches-header">
-                  <div class="match-category-btn active" onclick="showMatches('live', event)">Live</div>
-                  <div class="match-category-btn" onclick="showMatches('highlight', event)">Highlight</div>
-                  <div class="match-category-btn" onclick="showMatches('upcoming', event)">Upcoming</div>
-                  <div class="match-category-btn calendar">
-                      <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
-                      <input type="date" id="match-date" onchange="filterByDate()" style="display: none;" />
-                  </div>
-              </div>
-              <div class="match-category-content" id="matches-${league}" data-limited="true">`;
-
-          leagueCategoryMatches.forEach((match, index) => {
-              const isHidden = isLimitedView && index >= 5 ? "style='display: none;'" : "";
-              matchesHTML += `
-              <div class="matches-item" data-league="${league}" data-index="${index}" data-category="${category}" ${isHidden}>
-                  <div class="matches-teams">
-                      <div class="matches-time">${match.time}</div>
-                      <div class="matches-datas">
-                          <div class="matches-team">
-                              <img src="${match.team1.logo}" alt="${match.team1.name} Logo">
-                              <span>${match.team1.name}</span>
-                          </div>
-                          <div class="matches-team">
-                              <img src="${match.team2.logo}" alt="${match.team2.name} Logo">
-                              <span>${match.team2.name}</span>
-                          </div>
-                      </div>
-                      <div class="matches-scores">
-                          <div class="score">${match.team1.score}</div>
-                          <div class="score">${match.team2.score}</div>
-                      </div>
-                  </div>
-              </div>`;
-          });
-
-          matchesHTML += `</div></div>`;
-      } else {
-          matchesHTML += `<p>No matches available for ${league} in ${category}.</p>`;
-      }
-  });
-
-  matchesContainer.innerHTML = matchesHTML;
-}
 
 // Toggle between showing all matches and limiting to 5
 function toggleLeagueMatches(league) {
@@ -809,25 +810,9 @@ function toggleLeagueMatches(league) {
 }
 
 
-
-    // Event delegation for dynamically created match items
-    matchesContainer.addEventListener("click", function (event) {
-      const matchItem = event.target.closest(".matches-item");
-      if (!matchItem) return;
-  
-      const league = matchItem.dataset.league;
-      const index = parseInt(matchItem.dataset.index, 10);
-      const category = matchItem.dataset.category;
-  
-      displayLiveMatch(league, index, category);
-    });
-
-
-
     
  // Function to display live match details with tabs
-window.displayLiveMatch = function (league, matchIndex, category) {
-  
+ window.displayLiveMatch = function (league, matchIndex, category) {
   const match = matchesData[league]?.[category]?.[matchIndex];
 
   if (!match || !match.video) return;
@@ -863,7 +848,7 @@ window.displayLiveMatch = function (league, matchIndex, category) {
                   <button class="tab-btn" data-tab="lineups">Line-ups</button>
                   <button class="tab-btn" data-tab="h2h">H2H</button>
               </div>
-                <img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">
+              <img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">
               <div class="tab-content" id="tab-content">
                   ${getTabContent("info", match)}
               </div>
@@ -871,32 +856,31 @@ window.displayLiveMatch = function (league, matchIndex, category) {
       </div>
   `;
 
+  // Ensure sidebar is displayed when a live match is shown
+  document.querySelector(".sidebar").style.display = "block"; 
+
   // Add event listeners to the tabs
   document.querySelectorAll(".tab-btn").forEach(button => {
-    button.addEventListener("click", function () {
-        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-        this.classList.add("active");
+      button.addEventListener("click", function () {
+          document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+          this.classList.add("active");
 
-        const tabContentDiv = document.getElementById("tab-content");
-        if (!tabContentDiv) {
-            console.error("❌ ERROR: #tab-content div not found!");
-            return;
-        }
+          const tabContentDiv = document.getElementById("tab-content");
+          if (!tabContentDiv) {
+              console.error("❌ ERROR: #tab-content div not found!");
+              return;
+          }
 
-        // Render tab content first
-        tabContentDiv.innerHTML = getTabContent(this.dataset.tab, match);
+          tabContentDiv.innerHTML = getTabContent(this.dataset.tab, match);
 
-        // Generate formations after HTML is rendered
-        if (this.dataset.tab === "lineups") {
-            generateFormation(match.team1, "left");
-            generateFormation(match.team2, "right");
-        }
-    });
-});
-
-  
-
+          if (this.dataset.tab === "lineups") {
+              generateFormation(match.team1, "left");
+              generateFormation(match.team2, "right");
+          }
+      });
+  });
 };
+
 
 // Function to generate content for each tab
 function getTabContent(tab, match) {
@@ -969,14 +953,14 @@ function getTabContent(tab, match) {
             <div class="lineUpsteam-info">
                 <img src="${match.team1.logo}" alt="${match.team1.name}" class="lineUpsteam-logo">
                 <div class="team-formation">
-                <h4>${match.team1.name}</h4>
-                <h5>${match.team1.formation}</h5>
+                <h3>${match.team1.name}</h3>
+                <h4>${match.team1.formation}</h4>
                 </div>
             </div>
             <div class="lineUpsteam-info">
                 <div class="team-formation">
-                <h4>${match.team2.name}</h4>
-                <h3>${match.team2.formation}</h3>
+                <h3>${match.team2.name}</h3>
+                <h4>${match.team2.formation}</h4>
                 </div>
                 <img src="${match.team2.logo}" alt="${match.team2.name}" class="lineUpsteam-logo">
             </div>
@@ -998,7 +982,7 @@ function getTabContent(tab, match) {
            <div class="penalty-arc away-arc"></div>
         </div>
         <div class="lineup-players-names">
-            <h5>Players</h5>
+            <h4>Players</h4>
             <div class="lineUp-cont">
             <div class="lineup-home-players">
                 <h4>${match.team1.name}</h4>

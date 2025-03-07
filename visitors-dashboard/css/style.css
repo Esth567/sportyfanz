@@ -555,7 +555,7 @@ body{
 .team-head {
   font-size: 0.7rem;
   font-family: 'Lato';
-  font-weight: 200;
+  font-weight: 400;
 }
 
 /* Table Header and Rows as Grid */
@@ -592,11 +592,11 @@ body{
 .team-info .teamName-header{
     font-size: 0.7rem;
     font-family: 'Lato';
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex-grow: 1;
-    font-weight: 300; 
+    flex-grow: 1; 
 }
 
 
@@ -609,8 +609,8 @@ body{
 /* Stats Header and Team Stats (Aligned in Columns) */
 .team-stats {
     text-align: center;
-    font-size: 0.6rem;
-    font-weight: 400;
+    font-size: 0.7rem;
+    font-weight: 500;
     font-family: 'Lato';
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
@@ -620,7 +620,7 @@ body{
     font-weight: 400;
     font-size: 0.6rem;
     text-transform: uppercase;
-    color: #ffffff85;
+    color: #ffffffbd;
     text-align: center;
     font-family: 'Lato';
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
@@ -1458,10 +1458,10 @@ body{
 }
 
 .news-messages h2{
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     margin-bottom: 7px;
     word-spacing: 1.2px;  
-    font-weight: 500;
+    font-weight: bold;
     font-family: 'Lato';
 }
 
@@ -1918,16 +1918,16 @@ body{
     gap: 8px;
   }
   .match-category-btn {
-    color: #ffffffab;
+    color: #fff;
     border-radius: 20px;
     padding: 4px 10px;
-    background-color: #1f3750d2;
+    background-color: #1f3750;
     cursor: pointer;
     text-align: center;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.70rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     font-weight: 400;
     gap: 5px;
@@ -1979,11 +1979,9 @@ body{
 
 .league-header {
     display: flex;
-    padding-bottom: 15px;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 10px;
   }
 
   .league-header img.league-logo {
@@ -1994,18 +1992,19 @@ body{
   }
 
   .league-header .league-title {
-    font-size: 0.80rem;
+    font-size: 1rem;
+    margin-top: 10px;
     font-family: 'Lato';
     font-weight: bold;
     text-align: left;
     flex-grow: 1; /* Allows the title to take up remaining space */
-    text-align: left; /* Ensures it stays on the left */
+ 
   }
 
   .league-header .league-country {
-    font-size: 0.70rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .more-league {
@@ -2077,7 +2076,8 @@ body{
     display: flex;
     align-items: center; /* Ensures logo and name are horizontally aligned */
     gap: 8px;
-    font-size: 0.65rem;
+    font-family: 'Lato';
+    font-size: 0.75rem;
   }
 
  .matches-team img {
@@ -2086,9 +2086,6 @@ body{
     border-radius: 50%;
     object-fit: cover; /* Ensure logos maintain their aspect ratio */
  }
- .matches-team span {
-    font-size: 0.75rem;
-  }
 
 
   .matches-scores {
@@ -2096,7 +2093,6 @@ body{
     color: #fff;
     font-family: 'Lato';
     font-weight: 500;
-    gap: 15px;
   }
 
   .matches-datas {
@@ -2132,15 +2128,7 @@ body{
     background-color: #e03e00;
   }
 
-  .matches-team {
-    flex: 1;
-    text-align: center;
-    font-size: 0.70rem;
-    word-break: keep-all;
-    overflow: hidden;
-    white-space: nowrap;
 
-  }
 
   .live-match-team {
     display: flex;
@@ -2152,19 +2140,18 @@ body{
   }
 
   .live-match-team span {
-    font-size: 0.70rem;
+    font-size: 1rem;
+    font-family: 'Lato';
     margin-top: 2px;
   }
 
-  .match-time-scores span {
-    font-size: 0.7rem;
-  }
-
+ 
   .live-match-team img {
     width: 30px;
     height: 30px;
     object-fit: cover;
   }
+
  .live-match-datas {
      display: flex;
      align-items: center;
@@ -2182,10 +2169,24 @@ body{
     align-items: center;
     font-size: 18px;
     font-weight: bold;
+    gap: 3px;
   }
+
+  .match-time-scores h3 {
+   font-weight: 300;
+    font-family: 'Lato'
+  }
+
+
+  .match-time-scores span {
+    font-size: 0.7rem;
+    font-family: 'Lato'
+  }
+
   
  .scores {
-    font-size: 1rem;
+    font-size: 0.85rem;
+    font-family: 'Lato';
     font-weight: bold;
     padding: 2px;
 
@@ -2193,9 +2194,13 @@ body{
 
 .live-match-time {
     font-size: 0.60rem;
+    font-family: 'Lato';
     color: lightgray;
   }
   
+  .live-match-time img {
+    font-size: 0.5rem;
+  }
 
 .live-match-scores {
     display: flex;
@@ -2203,7 +2208,7 @@ body{
 }
 
 .league-name {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-weight: 200;
  
   }
@@ -2236,8 +2241,9 @@ body{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.70rem;
-    font-weight: 400;
+    font-size: 0.80rem;
+    font-family: 'Lato';
+    font-weight: 500;
     gap: 5px;
     border: none;
 
@@ -2288,17 +2294,17 @@ body{
     display: flex;
     flex-direction: row;
     gap: 5px;
-    font-size: 0.80rem;
-    font-weight: 300;
+    font-size: 0.85rem;
+    font-family: 'Lato';
+    font-weight: bold;
     margin-bottom: 10px;
 }
 
 .infoMatch-details {
     display: flex;
     justify-content: flex-start; /* Push left and right apart */
-    align-items: center;
-    text-align: left;
     gap: 20px;
+    width: 100%;
 }
 
 .info-match-details img {
@@ -2308,33 +2314,34 @@ body{
 .infoLeft-wing, .infoRight-wing {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
 }
 
 .infoRight-wing {
-    margin-right: 20px;
+    margin-left: auto; /* Pushes it to the right */
 }
+
 
 .infoLeft-wing p, .infoRight-wing p {
     display: flex;
-    align-items: center; /* Aligns icon and text in the same line */
-    gap: 5px; /* Space between the icon and text */
+    gap: 5px;
     margin: 0;
     font-size: 0.75rem;
     font-family: 'Lato';
 }
 
 .info-colorIcon {
-    width: 16px; /* Adjust icon size */
-    height: 16px;
+    width: 11px;  /* Decrease from 16px to 12px */
+    height: 11px; /* Keep it proportional */
     object-fit: contain;
 }
-
 
 /* Ensure match title is centered */
 .info-match-container h3 {
     text-align: left;
     margin-bottom: 10px;
-    font-size: 0.70rem;
+    font-size: 0.80rem;
+    font-family: 'Lato';
     font-weight: 300;
 }
 
@@ -2359,31 +2366,24 @@ body{
 }
 
 .lineUpsteam-logo {
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
     object-fit: cover;
 }
 
-.team-formation h4{
-    font-size: 0.75rem;
+.team-formation h3{
+    font-size: 0.85rem;
+    font-family: 'Lato';
     font-weight: bold;
 }
 
-.team-formation h5{
-    font-size: 0.70rem;
-    font-weight: 200;
+.team-formation h4{
+    font-size: 0.80rem;
+    font-family: 'Lato';
+    font-weight: 300;
     margin-left: -12px;
     margin-top: 2px;
 }
-
-.team-formation h3{
-    font-size: 0.70rem;
-    font-weight: 200;
-    margin-left: -12px;
-    margin-top: 2px;
-    text-align: right;
-}
-
   
 
 /* Main field styling */
@@ -2392,7 +2392,7 @@ body{
 /* ⚽ Horizontal Football Field */
 .field {
     position: relative;
-    width: 34vw;
+    width: 100%;
     max-width: 754.86px;
     height: 280px;
     background-color: green;
@@ -2566,7 +2566,7 @@ body{
     text-align: center;
     color: #fbc02d;
     margin-bottom: 10px;
-    font-size: 0.85rem;
+    font-size: 0.90rem;
     font-family: 'Lato';
     font-weight: 400;
 }
@@ -2591,16 +2591,18 @@ body{
 .listed-player-number {
     flex: 0 0 40px; 
     text-align: center;
-    font-size: 0.70rem;
-    font-weight: 300;
+    font-size: 0.85rem;
+    font-family: 'Lato';
+    font-weight: 400;
     margin-left: -10px;
 }
 
 .listed-player-name{
     flex: 1;
     text-align: left;
-    font-weight: 300;
-    font-size: 0.70rem;
+    font-weight: 400;
+    font-family: 'Lato';
+    font-size: 0.75rem;
     color: white;
     
 }
@@ -2613,9 +2615,15 @@ body{
     display: flex;
     flex-direction: row;
     gap: 10px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+    font-family: 'Lato';
+    align-items: center;
+    font-weight: 400;
 }
 
+.h2h-header h3 {
+    color: #28a745;
+}
 
 /* Horizontal Line */
 .h2h-header-line {
@@ -2633,12 +2641,13 @@ body{
 }
 
 /* 🏆 League Name */
-.league-title {
+.h2h-league .league-title {
     display: flex;
     flex-direction: column;
     text-align: left;
-    font-size: 0.75rem;
-    font-weight: bold;
+    font-size: 0.85rem;
+    font-family: 'Lato';
+    font-weight: 500;
     margin-top: 5px;
     margin-bottom: 5px;
     gap: 2px;
@@ -2646,9 +2655,10 @@ body{
 }
 
 /* 🌍 League Country Styling */
-.league-country {
-    font-size: 0.70rem;
-    color: white;
+.h2h-league .league-country {
+    font-size: 0.80rem;
+    font-family: 'Lato';
+    color: #ffffffcb;
     font-weight: 300;
     margin-top: -2px;
 }
@@ -2682,7 +2692,8 @@ body{
     align-items: flex-start;
     gap: 5px;
     font-size: 0.60rem;
-    font-weight: 300;
+    font-family: 'Lato';
+    font-weight: 400;
     color: white;
     padding-left: 10px;
 }
@@ -2712,15 +2723,17 @@ body{
 
 /* 🏷️ Team Names */
 .h2h-team-name {
-    font-size: 0.70rem;
+    font-size: 0.75rem;
+    font-family: 'Lato';
     color: white;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 /* ⚽ Scores */
 .h2h-matches-scores {
-    font-size: 1rem;
-    font-weight: bold;
+    font-size: 0.75rem;
+    font-family: 'Lato';
+    font-weight: 400;
     color: white;
     text-align: center;
 }
@@ -3593,6 +3606,7 @@ body{
         flex-grow: 1;
     }
 
+    .lineup-players-names h4,
     .info-teamNames,
     .info-match-container h3 {
         font-size: 1rem;
@@ -3600,37 +3614,11 @@ body{
         font-family: 'Lato';
     }
 
-     .info-colorIcon {
-        margin-top: 10px;
-        font-size: 0.80rem;
+    .matches-team span{
         font-family: 'Lato';
-    }
-
-    .infoLeft-wing p, .infoRight-wing p {
-        display: flex;
-        align-items: center; /* Aligns icon and text in the same line */
-        gap: 5px; /* Space between the icon and text */
-        margin: 0;
-        font-size: 0.85rem;
-        font-family: 'Lato';
-    }
-
-    .lineup-players-names h4,
-    .lineup-away-players h4,
-    .lineup-home-players h4 {
         font-size: 1rem;
-    }
-
-    .lineup-away-players span,
-    .lineup-home-players span {
-        font-size: 0.80rem;
-    }
-
-    .tab-btn {
-        font-size: 0.75rem;
-   
-    
       }
+
 
 }
 

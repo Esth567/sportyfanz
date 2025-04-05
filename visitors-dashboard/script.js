@@ -12,6 +12,75 @@ function toggleSidebar() {
 document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 
 
+//
+document.addEventListener("DOMContentLoaded", function () {
+    const match = {
+        teamA: "Chelsea",
+        teamB: "Leichester",
+        logoA: "assets/images/chelsea-logo.png",
+        logoB: "assets/images/leichester-logo.png",
+        startTime: "09:00", // Match start time in HH:mm
+        currentScore: "1 - 0",
+        leagueLookup: {
+            "Chelsea": "Premier League",
+            "Manchester City": "Premier League",
+            "Leichester": "Championship",
+            "Barcelona": "La Liga",
+            "Bayern Munich": "Bundesliga",
+            "Napoli": "Serie A"
+        }
+    };
+
+    const vsScore = document.querySelector(".vs-score");
+    const highlightTime = document.querySelector(".highlight-time");
+    const gameLeague = document.querySelector(".game-leag");
+    const ellipseLogo = document.querySelector(".Ellipse-logo");
+
+    const teamNames = document.querySelectorAll(".team");
+
+    let teamA = teamNames[0].textContent.trim();
+    let teamB = teamNames[1].textContent.trim();
+
+    // Detect and update league
+    if (match.leagueLookup[teamA]) {
+        gameLeague.textContent = match.leagueLookup[teamA];
+    }
+
+    function getMinutesSinceStart(startTime) {
+        const [hour, minute] = startTime.split(":").map(Number);
+        const start = new Date();
+        start.setHours(hour, minute, 0, 0);
+
+        const now = new Date();
+        const diffMs = now - start;
+
+        return Math.floor(diffMs / 60000); // minutes
+    }
+
+    function updateMatchStatus() {
+        const now = new Date();
+        const [startHour, startMinute] = match.startTime.split(":").map(Number);
+        const matchStart = new Date();
+        matchStart.setHours(startHour, startMinute, 0, 0);
+
+        if (now >= matchStart) {
+            // Match has started
+            vsScore.textContent = match.currentScore;
+            highlightTime.querySelector("img").src = "assets/icons/green-ellipse.png";
+            highlightTime.childNodes[1].nodeValue = " " + getMinutesSinceStart(match.startTime) + "'";
+        } else {
+            // Match yet to start
+            vsScore.textContent = "VS";
+            highlightTime.querySelector("img").src = "assets/icons/Ellipse 1.png";
+            highlightTime.childNodes[1].nodeValue = " " + match.startTime;
+        }
+    }
+
+    updateMatchStatus();
+    setInterval(updateMatchStatus, 60000); // Update every minute
+});
+
+
 
 // Top scorer slider 
 
@@ -232,24 +301,90 @@ setInterval(autoSlide, 4000); // Change slides every 3 seconds
 
 
 
-// Sample Data for Matches (Including Match Dates)
-const matchesData = {
-    live: [
-        { team1: 'Chelsea', team2: 'Arsenal', time: '5:45pm', country: 'England', date: '2025-01-21', logo1: 'assets/images/chelsea-logo.png', logo2: 'assets/images/arsenalLogo.png' },
-        { team1: 'Man U', team2: 'Liverpool', time: '6:30pm', country: 'England', date: '2025-01-22', logo1: 'assets/images/manuLogo.png', logo2: 'assets/images/liverpoolLogo.png' }
-    ],
-    highlight: [
-        { team1: 'Bayern Munich', team2: 'Barcelona', time: '4:00pm', country: 'Germany', date: '2025-01-20', logo1: 'assets/images/bayern-logo.png', logo2: 'assets/images/barcelona-logo.png' },
-        { team1: 'PSG', team2: 'Juventus', time: '6:00pm', country: 'France', date: '2025-01-23', logo1: 'assets/images/psg-logo.png', logo2: 'assets/images/juventus.png' }
-    ],
-    upcoming: [
-        { team1: 'Real Madrid', team2: 'Sevilla', time: '8:00pm', country: 'Spain', date: '2025-01-24', logo1: 'assets/images/real-madrid.png', logo2: 'assets/images/sevilla.png' },
-        { team1: 'AC Milan', team2: 'Napoli', time: '9:00pm', country: 'Italy', date: '2025-01-25', logo1: 'assets/images/ac-milan.png', logo2: 'assets/images/napoli.png' }
-    ]
+
+// Function to get today's date or a date offset by days (formatted as YYYY-MM-DD)
+function getTodayDate(offset = 0) {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split("T")[0];
+}
+
+
+// Declare matchesData as a global object
+const matchData = {
+    live: [],
+    highlight: [],
+    upcoming: []
 };
 
+
+// Fetch Matches Data Dynamically
+async function fetchMatchesData() {
+    try {
+        const response = await fetch(
+            `https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-7)}&to=${getTodayDate()}&APIkey=${APIkey}`
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("API Response:", data); // Debugging log
+        console.log("First match object:", data[0]); // Check available properties
+
+        if (!Array.isArray(data)) {
+            console.error("Unexpected API response:", data);
+            return;
+        }
+
+        const now = new Date();
+
+        matchData.live = data.filter(match => String(match.match_live) === "1" && match.match_status !== "Finished");
+        matchData.highlight = data.filter(match => match.match_status === "Finished" || match.match_status === "FT");
+        matchData.upcoming = data.filter(match => {
+            const matchDateTime = new Date(`${match.match_date} ${match.match_time}`);
+            return (!match.match_status || match.match_status === "Not Started" || match.match_status === "Scheduled") && matchDateTime > now;
+        });
+
+        showMatches('live');
+    } catch (error) {
+        console.error('Error fetching match data:', error);
+    }
+}
+
+
+// Automatically display 'Live' matches when the page loads
+document.addEventListener("DOMContentLoaded", function () {
+    // Ensure the matches container exists
+    const matchContainer = document.getElementById('matches-container');
+    if (!matchContainer) {
+        console.error("Error: matches-container element not found.");
+        return;
+    }
+
+    // Fetch match data and display live matches first
+    fetchMatchesData();
+
+    // Select and highlight the "Live" button after the DOM has loaded
+    setTimeout(() => {
+        const liveButton = document.querySelector('.category-btn[data-category="live"]');
+        if (liveButton) {
+            liveButton.classList.add("active");
+        } else {
+            console.error("Live category button not found.");
+        }
+    }, 300); // Delay ensures HTML is fully loaded
+});
+
+
 // Function to Show Matches Based on Category
-function showMatches(category, event) {
+function showMatches(category, event = null) {
+    if (!matchData[category]) {
+        console.error(`Category '${category}' does not exist.`);
+        return;
+    }
+
     const buttons = document.querySelectorAll('.category-btn');
     buttons.forEach(button => button.classList.remove('active'));
 
@@ -261,62 +396,105 @@ function showMatches(category, event) {
     const container = document.getElementById('matches-container');
     container.innerHTML = '';
 
-    const matches = matchesData[category];
+    const matches = matchData[category].slice(0, 10); // Limit to 10 matches
 
-    if (matches && matches.length > 0) {
-        matches.forEach(match => createMatchCard(container, match));
+    if (matches.length > 0) {
+        matches.forEach((match, index) => createMatchCard(container, match, category, index));
     } else {
         container.innerHTML = `<p>No matches available</p>`;
     }
 }
 
+
 // Function to Create a Match Card
-function createMatchCard(container, match, league, matchIndex, category) {
-  const matchCard = document.createElement('div');
-  matchCard.classList.add('match-card');
+function createMatchCard(container, match, category, matchIndex) {
+    const team1 = match.match_hometeam_name || "Unknown Team";
+    const team2 = match.match_awayteam_name || "Unknown Team";
+    const logo1 = match.team_home_badge || "assets/icons/default-logo.png";
+    const logo2 = match.team_away_badge || "assets/icons/default-logo.png";
+    const matchTime = match.match_time || "Time TBA";
+    const country = match.country_name || "Unknown Country";
+    const score1 = match.match_hometeam_score || "0";
+    const score2 = match.match_awayteam_score || "0";
+    let matchMinute = match.match_status || matchTime;
 
-  matchCard.innerHTML = `
-      <div class="match-details">
-          <div class="match-info">
-              <div class="Matchteam">
-                  <img src="${match.logo1}" alt="${match.team1}">
-                  <span>${match.team1}</span>
-              </div>
-                  
-              <h5>vs</h5>
+    let matchStatusDisplay = "";
+    let scoreDisplay = "";
 
-              <div class="Matchteam">
-                  <img src="${match.logo2}" alt="${match.team2}">
-                  <span>${match.team2}</span>                   
-              </div>
-          </div>
-          <div class="match-time">
-              <img src="assets/icons/clock.png" alt="Clock">
-              ${match.time}
-          </div>
-          <div class="match-country">
-              <img src="assets/icons/map-pin.png" alt="Map">
-              ${match.country}
-          </div>
-          <button class="view-details-btn" data-league="${league}" data-index="${matchIndex}" data-category="${category}">
-              <img src="assets/icons/arrow-up.png" alt="Arrow-up">
-              View Details
-          </button>
-      </div>
-  `;
+    if (category === "highlight") {
+        matchStatusDisplay = `<h5>FT</h5>`;
+        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+    }
 
-  // Append card to container
-  container.appendChild(matchCard);
+    if (category === "live") {
+        let matchMinuteText = match.match_status === "Halftime" ? "HT" : `${match.match_status}'`;
+        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`; // Score between the teams
+    }
 
-  // Select the button inside the newly created match card
-  const viewDetailsBtn = matchCard.querySelector('.view-details-btn');
-  
-  // Ensure the event listener is attached
-  viewDetailsBtn.addEventListener('click', function () {
-      console.log(`Clicked: ${match.team1} vs ${match.team2}`); // Debugging log
-      displayLiveMatch(league, matchIndex, category);
-  });
+    if (category === "upcoming") {
+        matchStatusDisplay = `<h5>vs</h5>`; // Show "vs" for upcoming matches
+    }
+
+    const matchCard = document.createElement('div');
+    matchCard.classList.add('match-card');
+
+    matchCard.innerHTML = `
+        <div class="match-details">
+            <div class="match-info">
+                <div class="Matchteam">
+                    <img src="${logo1}" alt="${team1}">
+                    <span>${team1}</span>
+                </div>
+
+                <!-- Display only score for live category -->
+                ${category === "live" ? scoreDisplay : ""}
+                
+                <!-- Display match status and score for highlight -->
+                ${category === "highlight" ? `
+                    <div class="match-status" style="display: flex; flex-direction: column;">
+                        ${matchStatusDisplay}
+                        ${scoreDisplay}
+                    </div>
+                ` : ""}
+
+                 <!-- Display matchStatusDisplay (vs) for upcoming -->
+                ${category === "upcoming" ? matchStatusDisplay : ""}
+
+
+                <div class="Matchteam">
+                    <img src="${logo2}" alt="${team2}">
+                    <span>${team2}</span>                 
+                </div>
+            </div>
+
+            <div class="match-time">
+                <img src="assets/icons/clock.png" alt="Clock">
+                ${category === "live" ? `${matchMinute}'` : matchTime}
+            </div>
+            <div class="match-country">
+                <img src="assets/icons/map-pin.png" alt="Map">
+                ${country}
+            </div>
+            <button class="view-details-btn" data-category="${category}" data-index="${matchIndex}">
+                <img src="assets/icons/arrow-up.png" alt="Arrow-up">
+                View Details
+            </button>
+        </div>
+    `;
+
+    // Append card to container
+    container.appendChild(matchCard);
+
+    // Select the button inside the newly created match card
+    const viewDetailsBtn = matchCard.querySelector('.view-details-btn');
+
+    // Ensure the event listener is attached
+    viewDetailsBtn.addEventListener('click', function () {
+        console.log(`Clicked: ${team1} vs ${team2}`);
+        displayLiveMatch(category, matchIndex);
+    });
 }
+
 
 // Function to Filter Matches by Date
 function filterByDate() {
@@ -328,24 +506,23 @@ function filterByDate() {
     const filteredMatches = allMatches.filter(match => match.date === selectedDate);
 
     if (filteredMatches.length > 0) {
-        filteredMatches.forEach(match => createMatchCard(container, match));
+        filteredMatches.slice(0, 10).forEach((match, index) => createMatchCard(container, match, "filtered", index));
     } else {
         container.innerHTML = `<p>No matches found for this date</p>`;
     }
 }
 
-// Automatically display 'Live' matches when the page loads
-window.onload = function () {
-    showMatches('live');
-
-    // Ensure the "Live" button is highlighted as active
-    const liveButton = document.querySelector('.category-btn');
-    if (liveButton) {
-        liveButton.classList.add('active');
-    } else {
-        console.error("Live category button not found.");
-    }
-};
+// Attach event listeners to category buttons
+document.querySelectorAll('.category-btn').forEach(button => {
+    button.addEventListener('click', function (event) {
+        const category = event.currentTarget.getAttribute('data-category');
+        if (!category) {
+            console.error("Category not found on button.");
+            return;
+        }
+        showMatches(category, event);
+    });
+});
 
 
 // menu toggle button for sidebar for mobile view
@@ -839,7 +1016,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /*............................live match page........................*/
 
-
+    
 // List of leagues to display
 const leaguesSelected = {
     "Premier League": { league_id: 152, country: "England" },
@@ -857,8 +1034,14 @@ const leaguesSelected = {
 fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
   .then(response => response.json())
   .then(leagues => {
-    const matchesContainer = document.querySelector(".matches-live-ongoing");
-    matchesContainer.innerHTML = ""; // Clear existing content
+    const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
+
+    if (!liveMatchesContainer) {
+        console.error("Error: .matches-live-ongoing container not found.");
+        return;
+    }
+
+    liveMatchesContainer.innerHTML = ""; // Clear existing content
 
     leagues.forEach(league => {
       // Check if the league is in the selected list
@@ -887,7 +1070,7 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
           displayMatches(league.league_name, "live");
         });
 
-        matchesContainer.appendChild(leagueElement);
+        liveMatchesContainer.appendChild(leagueElement);
       }
     });
   })
@@ -895,229 +1078,248 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
 
 
 
-  //function to fetch
-  document.addEventListener("DOMContentLoaded", function () {
-    const matchesContainer = document.querySelector(".matches");
 
-    if (!matchesContainer) {
-        console.error("Error: .matches container not found.");
+  // Function to fetch matches
+    function socketsLive() {
+        if (typeof APIkey === "undefined" || !APIkey) {
+            console.error("❌ ERROR: APIkey is not defined! WebSocket connection failed.");
+            return;
+        }
+       
+        var socket = new WebSocket('wss://wss.apifootball.com/livescore?APIkey=' + APIkey + '&timezone=+03:00');
+    
+        console.log('Connecting...');
+        socket.onopen = function () {
+            console.log('Connected to WebSocket');
+        };
+    
+        socket.onmessage = function (e) {
+            try {
+                if (e.data.startsWith("{") || e.data.startsWith("[")) {
+                    console.log("🔵 Received Data:", e.data);  // ✅ Log raw API response
+                    let data = JSON.parse(e.data);
+                    updateMatches(data); 
+                } else {
+                    console.log("Received non-JSON message:", e.data);
+                }
+            } catch (error) {
+                console.error("❌ JSON Parsing Error:", error, "Received Data:", e.data);
+            }
+        };        
+        
+        socket.onclose = function(){
+            socket = null;
+            setTimeout(socketsLive, 5000);
+        };
+        
+    }
+
+    socketsLive();
+    
+
+  
+
+    let matchesData = {};
+
+
+// Process and Display Matches
+// Process and Display Matches
+function updateMatches(matches) {
+    console.log("⚽ Raw Matches Data:", matches);  // ✅ Log all matches received
+
+    if (!matchesData.live) matchesData.live = []; // ✅ Ensure live matches exist
+
+    matches.forEach(newMatch => {  // ✅ Fix undefined variable
+        let matchIndex = matchesData.live.findIndex(m => m.match_id === newMatch.match_id);
+        
+        if (matchIndex !== -1) {
+            // ✅ Update the existing match score
+            matchesData.live[matchIndex].match_hometeam_score = newMatch.match_hometeam_score;
+            matchesData.live[matchIndex].match_awayteam_score = newMatch.match_awayteam_score;
+            matchesData.live[matchIndex].match_status = newMatch.match_status;
+        } else {
+            // ✅ Add new match if not in the list
+            matchesData.live.push(newMatch);
+        }
+    });
+
+    let highlightMatches = matches.filter(match => {
+        let status = match.match_status?.trim().toLowerCase() || "";
+        let statusNum = parseInt(status); // Convert to number if possible
+        console.log(`🏆 Match ID: ${match.match_id} - Status: ${status}`);
+    
+        return status === "ft" || status === "finished" || status.includes("after") || status.includes("pen") || 
+               (!isNaN(statusNum) && statusNum >= 90);  // ✅ Consider numeric full-time values
+    });
+
+    let upcomingMatches = matches.filter(match => {
+        let status = match.match_status?.trim().toLowerCase() || "";
+        let now = new Date(); // Current time
+        let matchDateTime = match.match_date && match.match_time ? new Date(`${match.match_date} ${match.match_time}`) : null;
+    
+        console.log(`⏳ Match ID: ${match.match_id} - Status: ${status} - DateTime: ${matchDateTime}`);
+    
+        return matchDateTime &&
+               matchDateTime > now &&  // Match is in the future
+               matchDateTime.toDateString() === now.toDateString() && // Match is today
+               (!status || status.includes("not started") || status.includes("scheduled") || 
+                status.includes("tba") || status.includes("ns") || status === "0" || status === "");
+    });
+    
+    console.log("✅ Highlight Matches Found:", highlightMatches);
+    console.log("✅ Upcoming Matches Found:", upcomingMatches);
+
+    matchesData = {
+        live: matches.filter(match => {
+            let statusNum = parseInt(match.match_status) || 0; 
+            return statusNum > 0 && statusNum < 90;
+        }),
+        highlight: highlightMatches,
+        upcoming: upcomingMatches
+    };
+
+    renderMatches(matchesData, "live");
+}
+
+
+
+
+// Display Matches
+function renderMatches(matchesData, category) {
+    let matchesContainer = document.querySelector(".matches");
+    let selectedMatches = matchesData[category];
+
+    if (!selectedMatches || selectedMatches.length === 0) {
+        matchesContainer.innerHTML = "<p>No matches available.</p>";
         return;
     }
 
-    async function fetchMatches() {
-        try {
-            const response = await fetch(
-                `https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-7)}&to=${getTodayDate()}&APIkey=${APIkey}`
-            );
-            const data = await response.json();
-
-            if (!Array.isArray(data)) {
-                console.error("Unexpected API response:", data);
-                return [];
-            }
-            return data;
-        } catch (error) {
-            console.error("Error fetching matches:", error);
-            return [];
+    let groupedMatches = selectedMatches.reduce((acc, match) => {
+        let leagueKey = match.league_id || "Unknown League";
+        if (!acc[leagueKey]) {
+            acc[leagueKey] = {
+                league: match.league_name,
+                country: match.country_name,
+                league_logo: match.league_logo,
+                matches: [],
+            };
         }
-    }
+        acc[leagueKey].matches.push(match);
+        return acc;
+    }, {});
 
-    function getTodayDate(offset = 0) {
-        const date = new Date();
-        date.setDate(date.getDate() + offset);
-        return date.toISOString().split("T")[0];
-    }
+    let matchesHTML = "";
+    let firstLeague = true;
 
-    function categorizeMatches(matches) {
-        const now = new Date();
+    Object.values(groupedMatches).forEach(league => {
+        matchesHTML += `
+        <div class="league-header">
+            <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
+            <div class="league-titleCountry">
+                <h4 class="league-title">${league.league}</h4>
+                <span class="league-country">${league.country}</span>
+            </div>
+        </div>
+        <div class="league-container ${firstLeague ? "first-league" : "other-league"}">`;
 
-        return {
-            live: matches.filter(match => match.match_live === "1" && match.match_status !== "Finished"),
-            highlight: matches.filter(match => match.match_status === "Finished" || match.match_status === "FT"),
-            upcoming: matches.filter(match => {
-                const matchDateTime = new Date(`${match.match_date} ${match.match_time}`);
-                return (!match.match_status || match.match_status === "Not Started" || match.match_status === "Scheduled") && matchDateTime > now;
-            }),
-        };
-    }
-
-    async function displayMatches(category = "live") {
-
-        const matches = await fetchMatches();
-        if (matches.length === 0) return;
-
-        const categorizedMatches = categorizeMatches(matches);
-        const selectedMatches = categorizedMatches[category];
-
-        if (!selectedMatches || selectedMatches.length === 0) {
-            matchesContainer.innerHTML = "<p>No matches available.</p>";
-            return;
-        }
-
-        const groupedMatches = selectedMatches.reduce((acc, match) => {
-            const leagueKey = match.league_id || "Unknown League";
-            if (!acc[leagueKey]) {
-                acc[leagueKey] = {
-                    league: match.league_name,
-                    country: match.country_name,
-                    league_logo: match.league_logo,
-                    matches: [],
-                };
-            }
-            acc[leagueKey].matches.push(match);
-            return acc;
-        }, {});
-
-        let matchesHTML = "";
-        let firstLeague = true; 
-
-        Object.values(groupedMatches).forEach(league => {
+        if (firstLeague) {
             matchesHTML += `
-            <div class="league-header">
-                <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
-                    <div class="league-titleCountry">
-                        <h4 class="league-title">${league.league}</h4>
-                        <span class="league-country">${league.country}</span>
+            <div class="matches-header">
+                <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="renderMatches(matchesData, 'live')">Live</div>
+                <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="renderMatches(matchesData, 'highlight')">Highlight</div>
+                <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="renderMatches(matchesData, 'upcoming')">Upcoming</div>
+            </div>`;
+            firstLeague = false;
+        }
+
+        matchesHTML += `<div class="match-category-content">`;
+
+        league.matches.forEach(match => {
+            let matchTimeDisplay = category === "highlight" ? "FT" : match.match_status || match.match_time;
+
+            matchesHTML += `
+            <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
+                <div class="matches-teams">
+                    <div class="matches-time">${matchTimeDisplay}</div>
+                    <div class="matches-datas">
+                        <div class="matches-team">
+                            <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
+                            <span>${match.match_hometeam_name}</span>
+                        </div>
+                        <div class="matches-team">
+                            <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
+                            <span>${match.match_awayteam_name}</span>
+                        </div>
                     </div>
-                    <div class="more-league" onclick="toggleLeagueMatches('${league.league}')">
-                        <ion-icon name="arrow-forward-outline"></ion-icon>
-                        <a href="#" id="toggle-${league.league}">See All</a>
+                    <div class="matches-scores">
+                        <div class="score">${match.match_hometeam_score ?? "-"}</div>
+                        <div class="score">${match.match_awayteam_score ?? "-"}</div>
                     </div>
                 </div>
-            <div class="league-container ${firstLeague ? "first-league" : "other-league"}">
-                `;
-
-            if (firstLeague) {
-                matchesHTML += `
-                <div class="matches-header">
-                    <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="showMatch('live', event)">Live</div>
-                    <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="showMatch('highlight', event)">Highlight</div>
-                    <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="showMatch('upcoming', event)">Upcoming</div>
-                    <div class="match-category-btn calendar" onclick="toggleCalendar()">
-                        <ion-icon name="calendar-outline"></ion-icon>
-                        <input type="date" id="match-date" onchange="filterByDate()" style="display: none;">
-                    </div>
-                </div>`;
-                firstLeague = false;
-            }
-
-            matchesHTML += `<div class="match-category-content" id="matches-${league.league}" data-limited="true">`;
-
-            league.matches.forEach((match, index) => {
-                let matchTimeDisplay = match.match_time;
-                if (category === "highlight") {
-                    matchTimeDisplay = `FT`;
-                } else if (category === "live") {
-                    matchTimeDisplay = match.match_status === "Half Time" ? "HT" : `${match.match_status}'`;
-                }
-
-                matchesHTML += `
-                <div class="matches-item" style="display: ${index < 10 ? "flex" : "none"};">
-                    <div class="matches-teams">
-                        <div class="matches-time">${matchTimeDisplay}</div>
-                        <div class="matches-datas">
-                            <div class="matches-team">
-                                <img src="${match.team_home_badge || 'assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
-                                <span>${match.match_hometeam_name}</span>
-                            </div>
-                            <div class="matches-team">
-                                <img src="${match.team_away_badge || 'assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
-                                <span>${match.match_awayteam_name}</span>
-                            </div>
-                        </div>
-                        <div class="matches-scores">
-                            <div class="score">${match.match_hometeam_score ?? "-"}</div>
-                            <div class="score">${match.match_awayteam_score ?? "-"}</div>
-                        </div>
-                    </div>
-                </div>`;
-            });
-
-            matchesHTML += `</div></div>`; 
+            </div>`;
         });
 
-        matchesContainer.innerHTML = matchesHTML || "<p>No matches available.</p>";
+        matchesHTML += `</div></div>`;
+    });
+
+    matchesContainer.innerHTML = matchesHTML;
+}
+
+
+// Function to fetch match video
+async function fetchMatchVideo(matchId) {
+    try {
+        let response = await fetch(`https://apiv3.apifootball.com/?action=get_videos&match_id=${matchId}&APIkey=${APIkey}`);
+        let data = await response.json();
+
+        console.log("🎥 Video Data:", data);
+
+        if (Array.isArray(data) && data.length > 0) {
+            return data[0].video_url; // Assuming the first video is the main highlight
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("❌ Error fetching match video:", error);
+        return null;
     }
-    
+}
 
-    window.showMatch = async function (category, event = null) {
-        const buttons = document.querySelectorAll(".match-category-btn");
-        buttons.forEach(btn => btn.classList.remove("active"));
-    
-        if (event && event.target) {
-            event.target.classList.add("active");
-            event.target.classList.add("loading"); // Add spinning effect
-        }
-    
-        await displayMatches(category);
-    
-        if (event && event.target) {
-            event.target.classList.remove("loading"); // Remove spinning effect after loading
-        }
-    };
-    
+// Function to display match details with video
+async function displayLiveMatch(matchId, category) {
+    if (!matchesData[category] || matchesData[category].length === 0) {
+        console.error(`No matches found for category: ${category}`);
+        return;
+    }
 
-    window.toggleLeagueMatches = function (league) {
-        const matchesContainer = document.getElementById(`matches-${league}`);
-        const toggleButton = document.getElementById(`toggle-${league}`);
-        const isLimited = matchesContainer.getAttribute("data-limited") === "true";
+    let match = matchesData[category].find(m => m.match_id === matchId);
+    if (!match) {
+        console.error(`Match with ID ${matchId} not found in ${category}`);
+        return;
+    }
 
-        matchesContainer.querySelectorAll(".matches-item").forEach((match, index) => {
-            match.style.display = isLimited && index >= 10 ? "flex" : "none";
-        });
+    let videoUrl = await fetchMatchVideo(matchId); // Fetch video URL
 
-        toggleButton.textContent = isLimited ? "See Less" : "See All";
-        matchesContainer.setAttribute("data-limited", isLimited ? "false" : "true");
-    };
-
-    window.toggleCalendar = function () {
-        const calendarInput = document.getElementById("match-date");
-        calendarInput.style.display = calendarInput.style.display === "none" ? "block" : "none";
-    };
-
-    window.filterByDate = function () {
-        const selectedDate = document.getElementById("match-date").value;
-        if (selectedDate) {
-            displayMatches("live");
-        }
-    };
-
-    displayMatches();
-});
-
-      
-   // Function to display live match details with tabs
-   window.displayLiveMatch = function (league, matchIndex, category) {
-    const match = matchesData[league]?.[category]?.[matchIndex];
-  
-    if (!match || !match.video) return;
-  
+    let matchesContainer = document.querySelector(".matches");
     matchesContainer.innerHTML = `
-        <div class="live-match">
-            <iframe width="100%" height="250px" style="border-radius: 10px;" src="${match.video}" frameborder="0" allowfullscreen></iframe>
-  
-            <div class="live-match-teams">
-                <div class="live-match-datas">
-                    <div class="live-match-team">
-                        <img src="${match.team1.logo}" alt="${match.team1.name} Logo">
-                        <span>${match.team1.name}</span>
-                    </div>
-                    <div class="match-time-scores">
-                        <h3 class="league-name">${league}</h3>  
-                        <div class="scores">${match.team1.score} - ${match.team2.score}</div>  
-                        <div class="live-match-time">
-                            <img src="assets/icons/Ellipse 1.png" alt="Ellipse" class="Ellipse-logo">
-                            <span>${match.time}</span>
-                        </div>
-                    </div>
-                    <div class="live-match-team">
-                        <img src="${match.team2.logo}" alt="${match.team2.name} Logo">
-                        <span>${match.team2.name}</span>
-                    </div>
-                </div>                
+    <div class="live-match">
+        <iframe width="100%" height="250px" src="${videoUrl || ''}" frameborder="0" allowfullscreen></iframe>
+        <div class="live-match-teams">
+            <div class="live-match-team">
+                <img src="${match.team_home_badge || 'assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
+                <span>${match.match_hometeam_name}</span>
             </div>
-  
-            <div class="live-match-info">
+            <div class="match-time-scores">
+                <h3 class="league-name">${match.league_name}</h3>
+                <div class="scores">${match.match_hometeam_score ?? '-'} - ${match.match_awayteam_score ?? '-'}</div>
+                <div class="live-match-time">${match.match_status}</div>
+            </div>
+            <div class="live-match-team">
+                <img src="${match.team_away_badge || 'assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
+                <span>${match.match_awayteam_name}</span>
+            </div>
+        </div>
+         <div class="live-match-info">
                 <div class="match-tabs">
                     <button class="tab-btn active" data-tab="info">Info</button>
                     <button class="tab-btn" data-tab="lineups">Line-ups</button>
@@ -1128,14 +1330,11 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
                     ${getTabContent("info", match)}
                 </div>
             </div>
-        </div>
-    `;
-  
-    // Ensure sidebar is displayed when a live match is shown
-    document.querySelector(".sidebar").style.display = "block"; 
-  
-    // Add event listeners to the tabs
-    document.querySelectorAll(".tab-btn").forEach(button => {
+    </div>`
+    ;
+
+     // Add event listeners to the tabs
+     document.querySelectorAll(".tab-btn").forEach(button => {
         button.addEventListener("click", function () {
             document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
             this.classList.add("active");
@@ -1149,198 +1348,257 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
             tabContentDiv.innerHTML = getTabContent(this.dataset.tab, match);
   
             if (this.dataset.tab === "lineups") {
-                generateFormation(match.team1, "left");
-                generateFormation(match.team2, "right");
+                generateFormation(match.match_hometeam_name, "left");
+                generateFormation(match.match_awayteam_name, "right");
             }
         });
     });
-  };
+}
+
   
-  
-  // Function to generate content for each tab
-  function getTabContent(tab, match) {
-    if (!match) {
-        console.error("Match data is missing");
-        return "<p>Match data unavailable.</p>";
-    }
-  
-    console.log(`Generating content for tab: ${tab}`, match); // Debugging log
-  
+
+// Function to update tab content dynamically
+function getTabContent(tab, match) {
+    console.log("Match Data:", match);
+    console.log("Home Team Lineup:", match.lineup?.home?.starting_lineups);
+    console.log("Away Team Lineup:", match.lineup?.away?.starting_lineups);
+
     switch (tab) {
         case "info":
             return `
-            <div class="info-match-container">
-               <h3>Match Info</h3>
-               <div class="info-match-details">
-               <!-- Left Section: Teams, Time, and Date -->
-                
-                 <div class="info-teamNames">
-                 <h4>${match.team1.name}</h4> vs <h4>${match.team2.name}</h4>
-                 </div>
-  
-                <!-- Right Section: GBR, Stadium, and Country -->
-              <div class="infoMatch-details">
-                <div class="infoLeft-wing">
-                    <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.time}</p>
-                    <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.date}</p>
-                 </div>
-                 <div class="infoRight-wing">
-                    <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon"></strong> ${match.gbr || "Not available"}</p>
-                   <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong></strong> ${match.venue || "Not available"}, <strong></strong> ${match.country || "Not available"}</p>
-                 </div>
-             </div>
-          </div>
-         </div>
-  
-  
-              <div class="lineup-players-names">
-              <h4>Players</h4>
-              <div class="lineUp-cont">
-              <div class="lineup-home-players">
-                  <h4>${match.team1.name}</h4>
-                  <ul>
-                      ${match.team1.lineup.map(player => `
-                          <li>
-                              <span class="listed-player-number">${player.number}</span>
-                              <span class="listed-player-name">${player.name}</span>
-                          </li>
-                      `).join("")}
-                  </ul>
-              </div>
-              <div class="lineup-away-players">
-                  <h4>${match.team2.name}</h4>
-                  <ul>
-                      ${match.team2.lineup.map(player => `
-                          <li>
-                              <span class="listed-player-number">${player.number}</span>
-                              <span class="listed-player-name">${player.name}</span>
-                          </li>
-                      `).join("")}
-                  </ul>
-              </div>
-          </div>
+                <div class="info-match-container">
+                    <h3>Match Info</h3>
+                    <div class="info-teamNames">
+                        <h4>${match.match_hometeam_name}</h4> vs <h4>${match.match_awayteam_name}</h4>
+                    </div>
+                    <div class="infoMatch-details">
+                        <div class="infoLeft-wing">
+                            <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.match_time}</p>
+                            <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
+                        </div>
+                        <div class="infoRight-wing">
+                            <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon"></strong> ${match.venue_name || "Not available"}</p>
+                            <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lineup-players-names">
+                    <h4>Players</h4>
+                    <div class="lineUp-cont">
+                        <div class="lineup-home-players">
+                            <h4>${match.match_hometeam_name}</h4>
+                            <ul>
+                                ${
+                                    match.lineup?.home?.starting_lineups?.length 
+                                    ? match.lineup.home.starting_lineups.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No lineup available</p>"
+                                }
+                            </ul>
+                            <h4>Substitutes</h4>
+                            <ul>
+                                ${
+                                    match.lineup?.home?.substitutes?.length 
+                                    ? match.lineup.home.substitutes.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No substitutes available</p>"
+                                }
+                            </ul>
+                        </div>
+                        <div class="lineup-away-players">
+                            <h4>${match.match_awayteam_name}</h4>
+                            <ul>
+                                ${
+                                    match.lineup?.away?.starting_lineups?.length 
+                                    ? match.lineup.away.starting_lineups.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No lineup available</p>"
+                                }
+                            </ul>
+                            <h4>Substitutes</h4>
+                            <ul>
+                                ${
+                                    match.lineup?.away?.substitutes?.length 
+                                    ? match.lineup.away.substitutes.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No substitutes available</p>"
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             `;
-  
-  
+
             case "lineups":
-      return `
-          <div class="lineUpsteams-container">
-              <div class="lineUpsteam-info">
-                  <img src="${match.team1.logo}" alt="${match.team1.name}" class="lineUpsteam-logo">
-                  <div class="team-formation">
-                  <h3>${match.team1.name}</h3>
-                  <h4>${match.team1.formation}</h4>
-                  </div>
-              </div>
-              <div class="lineUpsteam-info">
-                  <div class="team-formation">
-                  <h3>${match.team2.name}</h3>
-                  <h4>${match.team2.formation}</h4>
-                  </div>
-                  <img src="${match.team2.logo}" alt="${match.team2.name}" class="lineUpsteam-logo">
-              </div>
-          </div>
-           <div id="football-field" class="field">
-              <div class="goalpost home-goalpost"></div>
-              <div class="penalty-box home-box"></div>
-              <div class="penalty-arc home-arc"></div>
+                return `
+                <div class="lineUpsteams-container">
+                    <div class="lineUpsteam-info">
+                        <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="lineUpsteam-logo">
+                        <div class="team-formation">
+                            <h3>${match.match_hometeam_name}</h3>
+                            <h4>${match.match_hometeam_system || "Unknown Formation"}</h4>
+                        </div>
+                    </div>
+                    <div class="lineUpsteam-info">
+                        <div class="team-formation">
+                            <h3>${match.match_awayteam_name}</h3>
+                            <h4>${match.match_awayteam_system || "Unknown Formation"}</h4>
+                        </div>
+                        <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="lineUpsteam-logo">
+                    </div>
+                </div>
+
+                  <div id="football-field" class="field">
+                   <div class="goalpost home-goalpost"></div>
+                  <div class="penalty-box home-box"></div>
+                 <div class="penalty-arc home-arc"></div>
           
-              <div id="home-formation" class="formation-area"></div>
+                 <div id="home-formation" class="formation-area"></div>
   
-              <div class="center-circle"></div>
-             <div class="center-line"></div>
+                 <div class="center-circle"></div>
+                <div class="center-line"></div>
   
-             <div id="away-formation" class="formation-area"></div>
+                <div id="away-formation" class="formation-area"></div>
   
-             <div class="goalpost away-goalpost"></div>
-             <div class="penalty-box away-box"></div>
-             <div class="penalty-arc away-arc"></div>
-          </div>
-          <div class="lineup-players-names">
-              <h4>Players</h4>
-              <div class="lineUp-cont">
-              <div class="lineup-home-players">
-                  <h4>${match.team1.name}</h4>
-                  <ul>
-                      ${match.team1.lineup.map(player => `
-                          <li>
-                              <span class="listed-player-number">${player.number}</span>
-                              <span class="listed-player-name">${player.name}</span>
-                          </li>
-                      `).join("")}
-                  </ul>
+                <div class="goalpost away-goalpost"></div>
+               <div class="penalty-box away-box"></div>
+                <div class="penalty-arc away-arc"></div>
               </div>
-              <div class="lineup-away-players">
-                  <h4>${match.team2.name}</h4>
-                  <ul>
-                      ${match.team2.lineup.map(player => `
-                          <li>
-                              <span class="listed-player-number">${player.number}</span>
-                              <span class="listed-player-name">${player.name}</span>
-                          </li>
-                      `).join("")}
-                  </ul>
-              </div>
-          </div>
-      `;
-  
+            
+                <div class="lineup-players-names">
+                    <h4>Players</h4>
+                    <div class="lineUp-cont">
+                        <div class="lineup-home-players">
+                            <h4>${match.match_hometeam_name}</h4>
+                            <ul>
+                                ${match.lineup?.home?.starting_lineups?.length 
+                                    ? match.lineup.home.starting_lineups.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No lineup available</p>"
+                                }
+                            </ul>
+                            <h4>Substitutes</h4>
+                            <ul>
+                                ${match.lineup?.home?.substitutes?.length 
+                                    ? match.lineup.home.substitutes.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No substitutes available</p>"
+                                }
+                            </ul>
+                        </div>
+
+            
+                        <div class="lineup-away-players">
+                            <h4>${match.match_awayteam_name}</h4>
+                            <ul>
+                                ${match.lineup?.away?.starting_lineups?.length 
+                                    ? match.lineup.away.starting_lineups.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No lineup available</p>"
+                                }
+                            </ul>
+                            <h4>Substitutes</h4>
+                            <ul>
+                                ${match.lineup?.away?.substitutes?.length 
+                                    ? match.lineup.away.substitutes.map(player => `
+                                        <li>
+                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                                        </li>
+                                    `).join("")
+                                    : "<p>No substitutes available</p>"
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                `;
+            
+        
+                case "h2h":
+                    return `
+                     <div class="h2h-header">
+                        <h3>H2H</h3>
+                        <h4>${match.team1.name}</h4>
+                         <h4>${match.team2.name}</h4>
+                       </div>
+                        <!-- Horizontal Line -->
+                       <div class="h2h-header-line"></div>
           
+                       <!-- h2h matches -->
+                          <div class="h2h-matches-container">
+                           ${
+                           Object.keys(matchesData).map(league => `
+                        <div class="h2h-league">
+                          <h4 class="league-title">${league} <span class="league-country">${matchesData[league].country}</span></h4>
           
-        case "h2h":
-            return `
-             <div class="h2h-header">
-                <h3>H2H</h3>
-                <h4>${match.team1.name}</h4>
-                 <h4>${match.team2.name}</h4>
-               </div>
-                <!-- Horizontal Line -->
-               <div class="h2h-header-line"></div>
-  
-               <!-- h2h matches -->
-                  <div class="h2h-matches-container">
-                   ${
-                   Object.keys(matchesData).map(league => `
-                <div class="h2h-league">
-                  <h4 class="league-title">${league} <span class="league-country">${matchesData[league].country}</span></h4>
-  
-                  ${matchesData[league].live.map(game => `
-                      <div class="h2h-match">
-                          <div class="h2h-time">
-                              <span class="match-time">${game.time}</span>
-                              <span class="match-ft">FT</span>
-                          </div>
-                          <div class="h2h-right">
-                          <div class="h2h-team-data">
-                              <div class="h2h-team">
-                                  <img src="${game.team1.logo}" alt="${game.team1.name}" class="h2h-logo">
-                                  <span class="h2h-team-name">${game.team1.name}</span>
+                          ${matchesData[league].live.map(game => `
+                              <div class="h2h-match">
+                                  <div class="h2h-time">
+                                      <span class="match-time">${game.time}</span>
+                                      <span class="match-ft">FT</span>
+                                  </div>
+                                  <div class="h2h-right">
+                                  <div class="h2h-team-data">
+                                      <div class="h2h-team">
+                                          <img src="${game.team1.logo}" alt="${game.team1.name}" class="h2h-logo">
+                                          <span class="h2h-team-name">${game.team1.name}</span>
+                                      </div>
+                                      
+                                      <div class="h2h-team">
+                                         <img src="${game.team2.logo}" alt="${game.team2.name}" class="h2h-logo">
+                                          <span class="h2h-team-name">${game.team2.name}</span>                                
+                                      </div>
+                                      </div>
+                                       <div class="h2h-matches-scores">
+                                        <div class="score">${match.team1.score}</div>
+                                        <div class="score">${match.team2.score}</div>
+                                       </div>
+          
+                                  </div>
                               </div>
-                              
-                              <div class="h2h-team">
-                                 <img src="${game.team2.logo}" alt="${game.team2.name}" class="h2h-logo">
-                                  <span class="h2h-team-name">${game.team2.name}</span>                                
-                              </div>
-                              </div>
-                               <div class="h2h-matches-scores">
-                                <div class="score">${match.team1.score}</div>
-                                <div class="score">${match.team2.score}</div>
-                               </div>
-  
-                          </div>
+                          `).join("")}
                       </div>
-                  `).join("")}
-              </div>
-          `).join("")
-      }
-                  </div>
-                
-            `;
-  
+                  `).join("")
+              }
+                          </div>
+                        
+                    `;
+        
         default:
-            return "<p>No data available</p>";
+            return "<p>No data available.</p>";
     }
-  }
-  
+}
+
   
   
   // Function to switch tabs

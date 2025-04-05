@@ -384,9 +384,7 @@ body{
 
 
 /* Layers 1*/
-.text-cont1,
-.text-cont2,
-.text-cont3,
+
 .text-cont{
     display: flex;
     padding-bottom: 15px;
@@ -395,11 +393,8 @@ body{
     width: 100%;
 }
 
-.text-cont1 h4,
-.text-cont2 h4,
-.text-cont3 h4,
 .text-cont h4 {
-    font-size: 0.90rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     font-weight: 500;
 }
@@ -1032,8 +1027,10 @@ body{
 }
 .match-card {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
+    text-align: center;
     background-color: #1a2f4bad;
     color: white;
     padding: 5px;
@@ -1050,20 +1047,18 @@ body{
 
 .match-info {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 50px;
+    gap: 40px;
 }
 /* Team Names */
 .Matchteam {
     font-size: 0.70rem;
     font-family: 'Lato';
     font-weight: normal;
-    align-items: center;
-    text-align: center;
-    margin: 0 5px; /* Add space between "team1" and "vs team2" */
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: 3px;
 
 }
 
@@ -1077,22 +1072,23 @@ body{
     align-items: center;
     background: #fff;
     color: #1A2F4B;
-    text-decoration: none;
-    padding: 3px 12px;
+    padding: 3px 10px;
     border-radius: 15px;
-    margin-top: 15px;
-    font-size: 0.67rem;
+    font-size: 0.60rem;
     font-family: 'Lato';
+    border: none;
    
 }
 
 .Matchteam img {
-    width: 20px; /* Reduce the size of logos */
-    height: 20px;
+    width: 18px; /* Reduce the size of logos */
+    height: 18px;
     object-fit: cover;
    
 }
 
+.match-status,
+.match-score,
 .match-time,
 .match-country {
     align-items: center;
@@ -1101,7 +1097,7 @@ body{
     font-family: 'Lato';
     font-weight: 300;
     display: flex;
-    gap: 2px;
+    gap: 5px;
 }
 
 .match-time img,
@@ -1111,6 +1107,16 @@ body{
     object-fit: cover;
 }
 
+.match-status,
+.match-score {
+    display: flex;
+    flex-direction: column; /* Stack score and match status vertically for highlight */
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-family: 'Lato';
+    font-weight: bold;
+}
 
 
 
@@ -1318,12 +1324,18 @@ body{
     box-shadow: 0 0 5px rgba(255, 140, 0, 0.8);
 }
 
-.advertise1,
-.advertise {
+.advert {
     width: 100%;
-    height: auto;
+    height: 200px;
+    text-align: center;
+    color: #ffffff7a;
+    font-family: 'Lato';
+    font-weight: 400;
+    font-size: 0.7rem;
     margin-top: 20px;
+    border-radius: 8px;
     padding-bottom: 20px;
+    border: 1px solid #c4c4c434;
 }
 
 

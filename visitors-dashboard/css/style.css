@@ -438,6 +438,7 @@ body{
     position: relative;
     border-radius: 15px;
     border: 1px solid #fbc12d8c;
+    padding: 8px;
 
 }
 .game-leag {
@@ -453,6 +454,7 @@ body{
     text-align: center;
     margin-left: 10px;
     padding-right: 10px;
+    gap: 3px;
 }
 .vs-score {
     font-size: 0.85rem;
@@ -469,15 +471,12 @@ body{
     width: 100%;
     padding-top: 5px;
     margin-bottom: 5px;
-    
-    
-
 }
 
 .team {
     flex: 1;
     text-align: center;
-    font-size: 0.60rem;
+    font-size: 0.70rem;
     font-family: 'Lato';
     word-break: keep-all;
     overflow: hidden;
@@ -497,12 +496,12 @@ body{
 .highlight-time {
     font-size: 10px;
     font-family: 'Lato';
-    font-weight: 300;
+    font-weight: 400;
     color: white;
 }
 .highlight-time img{
-   width: 6px;
-   height: 6px;
+   width: 7px;
+   height: 7px;
 }
 
 /* League Table Container */

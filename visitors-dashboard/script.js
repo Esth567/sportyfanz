@@ -12,74 +12,104 @@ function toggleSidebar() {
 document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 
 
-//
+//display matches for live-match-demo
 document.addEventListener("DOMContentLoaded", function () {
-    const match = {
-        teamA: "Chelsea",
-        teamB: "Leichester",
-        logoA: "assets/images/chelsea-logo.png",
-        logoB: "assets/images/leichester-logo.png",
-        startTime: "09:00", // Match start time in HH:mm
-        currentScore: "1 - 0",
-        leagueLookup: {
-            "Chelsea": "Premier League",
-            "Manchester City": "Premier League",
-            "Leichester": "Championship",
-            "Barcelona": "La Liga",
-            "Bayern Munich": "Bundesliga",
-            "Napoli": "Serie A"
-        }
-    };
+    const liveMatchContainer = document.querySelector(".live-match-demo");
 
-    const vsScore = document.querySelector(".vs-score");
-    const highlightTime = document.querySelector(".highlight-time");
-    const gameLeague = document.querySelector(".game-leag");
-    const ellipseLogo = document.querySelector(".Ellipse-logo");
+    const from = new Date().toISOString().split('T')[0]; // today's date
+    const to = from;
+    const leagueIDs = ["152", "302", "207", "168", "175"]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
+    const bigTeams = ["Chelsea", "Barcelona", "Bayern Munich", "Manchester City", "Real Madrid", "Arsenal", "Liverpool", "Napoli", "PSG", "AC Milan"];
 
-    const teamNames = document.querySelectorAll(".team");
-
-    let teamA = teamNames[0].textContent.trim();
-    let teamB = teamNames[1].textContent.trim();
-
-    // Detect and update league
-    if (match.leagueLookup[teamA]) {
-        gameLeague.textContent = match.leagueLookup[teamA];
+    function getMinutesSince(start) {
+        const now = new Date();
+        const startDate = new Date(start.replace(" ", "T"));
+        return Math.floor((now - startDate) / 60000);
     }
 
-    function getMinutesSinceStart(startTime) {
-        const [hour, minute] = startTime.split(":").map(Number);
-        const start = new Date();
-        start.setHours(hour, minute, 0, 0);
-
-        const now = new Date();
-        const diffMs = now - start;
-
-        return Math.floor(diffMs / 60000); // minutes
-    }
-
-    function updateMatchStatus() {
-        const now = new Date();
-        const [startHour, startMinute] = match.startTime.split(":").map(Number);
-        const matchStart = new Date();
-        matchStart.setHours(startHour, startMinute, 0, 0);
-
-        if (now >= matchStart) {
-            // Match has started
-            vsScore.textContent = match.currentScore;
-            highlightTime.querySelector("img").src = "assets/icons/green-ellipse.png";
-            highlightTime.childNodes[1].nodeValue = " " + getMinutesSinceStart(match.startTime) + "'";
+    function createMatchHTML(match) {
+        const homeTeam = match.match_hometeam_name;
+        const awayTeam = match.match_awayteam_name;
+        const homeLogo = match.team_home_badge;
+        const awayLogo = match.team_away_badge;
+        const league = match.league_name;
+        const startTime = match.match_time;
+        const matchStatus = match.match_status;
+        const homeScore = match.match_hometeam_score;
+        const awayScore = match.match_awayteam_score;
+    
+        const isFinished = matchStatus === "Finished" || matchStatus === "FT";
+        const hasStarted = matchStatus !== "" && matchStatus !== "Not Started";
+        const isLive = !isNaN(parseInt(matchStatus));
+    
+        const displayScore = hasStarted ? `${homeScore} - ${awayScore}` : "VS";
+        let displayTime, ellipseImg;
+    
+        if (isFinished) {
+            displayTime = "FT";
+            ellipseImg = "assets/icons/Ellipse 1.png"; // or change to default if you prefer
+        } else if (hasStarted) {
+            displayTime = `${getMinutesSince(match.match_date + " " + startTime)}'`;
+            ellipseImg = "assets/icons/Ellipse 1.png";
         } else {
-            // Match yet to start
-            vsScore.textContent = "VS";
-            highlightTime.querySelector("img").src = "assets/icons/Ellipse 1.png";
-            highlightTime.childNodes[1].nodeValue = " " + match.startTime;
+            displayTime = startTime;
+            ellipseImg = "assets/icons/Ellipse2.png";
+        }
+    
+        return `
+        <div class="teams-time">
+            <div class="team">
+                <img src="${homeLogo}" alt="${homeTeam}">
+                ${homeTeam}
+            </div>
+            <div class="live-match-event">
+                <h4 class="game-leag">${league}</h4>
+                <h2 class="vs-score">${displayScore}</h2>
+                <div class="highlight-time">
+                    <img src="${ellipseImg}" alt="Ellipse" class="Ellipse-logo">
+                    ${displayTime}
+                </div>
+            </div>
+            <div class="team">
+                <img src="${awayLogo}" alt="${awayTeam}">
+                ${awayTeam}
+            </div>
+        </div> 
+        `;
+    }
+    
+
+    async function loadMatches() {
+        try {
+            for (let id of leagueIDs) {
+                const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&APIkey=${APIkey}`;
+                const res = await fetch(url);
+                const matches = await res.json();
+
+                const keyMatches = matches.filter(match =>
+                    bigTeams.includes(match.match_hometeam_name) || bigTeams.includes(match.match_awayteam_name)
+                );
+
+                if (keyMatches.length > 0) {
+                    const html = createMatchHTML(keyMatches[0]);
+                    liveMatchContainer.innerHTML = html;
+                    return;
+                }
+            }
+
+            // If no key match found
+            liveMatchContainer.innerHTML = `<div class="teams-time"><div class="team">No top match today</div></div>`;
+        } catch (err) {
+            console.error("Error loading matches:", err);
         }
     }
 
-    updateMatchStatus();
-    setInterval(updateMatchStatus, 60000); // Update every minute
-});
+    // Initial load
+    loadMatches();
 
+    // Refresh every 60 seconds
+    setInterval(loadMatches, 60000);
+});
 
 
 // Top scorer slider 

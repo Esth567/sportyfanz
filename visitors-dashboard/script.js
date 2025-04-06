@@ -1494,22 +1494,23 @@ function getTabContent(tab, match) {
                     </div>
                 </div>
 
-                  <div id="football-field" class="field">
+                 <div id="football-field" class="field">
                    <div class="goalpost home-goalpost"></div>
-                  <div class="penalty-box home-box"></div>
-                 <div class="penalty-arc home-arc"></div>
-          
-                 <div id="home-formation" class="formation-area"></div>
+                   <div class="penalty-box home-box"></div>
+                   <div class="penalty-arc home-arc"></div>
   
-                 <div class="center-circle"></div>
-                <div class="center-line"></div>
-  
-                <div id="away-formation" class="formation-area"></div>
-  
-                <div class="goalpost away-goalpost"></div>
-               <div class="penalty-box away-box"></div>
-                <div class="penalty-arc away-arc"></div>
-              </div>
+                   <div id="home-formation" class="formation-area"></div>
+
+                   <div class="center-circle"></div>
+                    <div class="center-line"></div>
+
+                   <div id="away-formation" class="formation-area"></div>
+
+                    <div class="goalpost away-goalpost"></div>
+                   <div class="penalty-box away-box"></div>
+                  <div class="penalty-arc away-arc"></div>
+                 </div>
+
             
                 <div class="lineup-players-names">
                     <h4>Players</h4>
@@ -1655,75 +1656,74 @@ async function fetchH2HData(firstTeamId, secondTeamId, APIkey) {
   
   
   
-  
-  function generateFormation(team, side) {
-    const containerId = side === "left" ? "home-formation" : "away-formation";
-    let container = document.getElementById(containerId);
-  
-    if (!container) {
-        console.error(`❌ ERROR: Element with ID "${containerId}" not found.`);
-        return;
-    }
-  
-    container.innerHTML = ""; // Clear previous content
-  
-    let formation = team.formation.split("-").map(Number);
-    let fieldWidth = container.clientWidth || 900;
-    let fieldHeight = container.clientHeight || 500;
-    let centerX = fieldWidth / 2;
-    let centerCircleRadius = 50; // Adjust if needed
-    let rowSpacing = fieldHeight / (formation.length + 1); // Reduce gap
-    let colSpacing = fieldWidth / (formation.length + 1);
-  
-    let jerseyNumber = 1;
-    let playerClass = side === "left" ? "home-player" : "away-player";
-    
-  
-    // ✅ Goalkeeper positioned correctly on goal line
-    let goalkeeper = document.createElement("div");
-    goalkeeper.classList.add("player", "goalkeeper", playerClass);
-    goalkeeper.textContent = jerseyNumber++;
-  
-    goalkeeper.style.top = "50%";
-    goalkeeper.style.left = side === "left" ? "35px" : "calc(100% - 35px)";
-    goalkeeper.style.transform = "translate(-50%, -50%)";
-    container.appendChild(goalkeeper);
-  
-    let topOffset = 80; // Less vertical gap
-  
-    // ✅ Positioning Defenders to Attackers
-    for (let rowIndex = 0; rowIndex < formation.length; rowIndex++) {
-        let numPlayers = formation[rowIndex];
-        let rowTop = topOffset + rowIndex * rowSpacing;
-        let colLeft = side === "left"
-            ? 90 + rowIndex * colSpacing
-            : fieldWidth - (90 + rowIndex * colSpacing);
-  
-        for (let i = 0; i < numPlayers; i++) {
-            let player = document.createElement("div");
-            player.classList.add("player", playerClass);
-            player.textContent = jerseyNumber++;
-  
-            if (rowIndex === formation.length - 1) {
-                // ✅ Forwards placed **on the center circle line, within their half**
-                let safeCenterX = side === "left"
-                    ? centerX - centerCircleRadius - 10
-                    : centerX + centerCircleRadius + 10;
-  
-                player.style.left = `${safeCenterX}px`;
-                player.style.top = "50%"; // Exactly on the center circle line
-            } else {
-                player.style.left = `${colLeft}px`;
-                player.style.top = `${(i + 1) * (100 / (numPlayers + 1))}%`;
-            }
-  
-            container.appendChild(player);
-        }
-    }
-  }
-  
+  //This fetches the home and away players
+  async function renderLineup(match) {
+    const homePlayers = match.lineup?.home?.starting_lineups || [];
+    const awayPlayers = match.lineup?.away?.starting_lineups || [];
+    const homeFormation = match.match_hometeam_system.split('-');  // Assuming 4-4-2 or similar formation
+    const awayFormation = match.match_awayteam_system.split('-');
+
+    const homeFormationPositions = generatePositions(homeFormation, "home");
+    const awayFormationPositions = generatePositions(awayFormation, "away");
+
+    const homeFormationDiv = document.getElementById("home-formation");
+    const awayFormationDiv = document.getElementById("away-formation");
+
+    homePlayers.forEach((player, index) => {
+        const position = homeFormationPositions[index];
+        const playerElement = createPlayerElement(player, position);
+        homeFormationDiv.appendChild(playerElement);
+    });
+
+    awayPlayers.forEach((player, index) => {
+        const position = awayFormationPositions[index];
+        const playerElement = createPlayerElement(player, position);
+        awayFormationDiv.appendChild(playerElement);
+    });
+}
 
 
+//This function takes the formation
+  function generatePositions(formation, side) {
+    // Adjust these based on the formation, for example:
+    const positions = [];
+    const fieldWidth = 800;
+    const fieldHeight = 400;
+
+    // Example for a 4-4-2 formation
+    if (formation[0] == "4") {
+        // Defenders
+        positions.push({ top: fieldHeight * 0.1, left: side === "home" ? fieldWidth * 0.1 : fieldWidth * 0.9 });
+        positions.push({ top: fieldHeight * 0.1, left: side === "home" ? fieldWidth * 0.3 : fieldWidth * 0.7 });
+        positions.push({ top: fieldHeight * 0.2, left: side === "home" ? fieldWidth * 0.2 : fieldWidth * 0.8 });
+        positions.push({ top: fieldHeight * 0.2, left: side === "home" ? fieldWidth * 0.4 : fieldWidth * 0.6 });
+
+        // Midfielders
+        positions.push({ top: fieldHeight * 0.5, left: side === "home" ? fieldWidth * 0.2 : fieldWidth * 0.8 });
+        positions.push({ top: fieldHeight * 0.5, left: side === "home" ? fieldWidth * 0.4 : fieldWidth * 0.6 });
+        positions.push({ top: fieldHeight * 0.5, left: side === "home" ? fieldWidth * 0.6 : fieldWidth * 0.4 });
+        positions.push({ top: fieldHeight * 0.5, left: side === "home" ? fieldWidth * 0.8 : fieldWidth * 0.2 });
+
+        // Attackers
+        positions.push({ top: fieldHeight * 0.8, left: side === "home" ? fieldWidth * 0.3 : fieldWidth * 0.7 });
+        positions.push({ top: fieldHeight * 0.8, left: side === "home" ? fieldWidth * 0.5 : fieldWidth * 0.5 });
+    }
+
+    return positions;
+}
+
+  //function to create players
+  function createPlayerElement(player, position) {
+    const playerDiv = document.createElement("div");
+    playerDiv.classList.add("player");
+    playerDiv.style.top = `${position.top}px`;
+    playerDiv.style.left = `${position.left}px`;
+    playerDiv.innerHTML = `
+        <img src="${player.lineup_player_image}" alt="${player.lineup_player}">
+        <p>${player.lineup_player}</p>
+    `;
+    return playerDiv;
+}
 
 
 

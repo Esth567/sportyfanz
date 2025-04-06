@@ -21,6 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const leagueIDs = ["152", "302", "207", "168", "175"]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
     const bigTeams = ["Chelsea", "Barcelona", "Bayern Munich", "Manchester City", "Real Madrid", "Arsenal", "Liverpool", "Napoli", "PSG", "AC Milan"];
 
+    let matchesList = []; // Store all matches for the day
+    let currentMatchIndex = 0; // Track the current match being displayed
+
     function getMinutesSince(start) {
         const now = new Date();
         const startDate = new Date(start.replace(" ", "T"));
@@ -77,10 +80,11 @@ document.addEventListener("DOMContentLoaded", function () {
         </div> 
         `;
     }
-    
 
     async function loadMatches() {
         try {
+            matchesList = []; // Reset matches list
+
             for (let id of leagueIDs) {
                 const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&APIkey=${APIkey}`;
                 const res = await fetch(url);
@@ -90,30 +94,56 @@ document.addEventListener("DOMContentLoaded", function () {
                     bigTeams.includes(match.match_hometeam_name) || bigTeams.includes(match.match_awayteam_name)
                 );
 
-                if (keyMatches.length > 0) {
-                    const html = createMatchHTML(keyMatches[0]);
-                    liveMatchContainer.innerHTML = html;
-                    return;
-                }
+                matchesList = [...matchesList, ...keyMatches];
             }
 
-            // If no key match found
-            liveMatchContainer.innerHTML = `<div class="teams-time"><div class="team">No top match today</div></div>`;
+            // Sort matches by start time
+            matchesList.sort((a, b) => {
+                const aTime = new Date(a.match_date + " " + a.match_time);
+                const bTime = new Date(b.match_date + " " + b.match_time);
+                return aTime - bTime;
+            });
+
+            // Show first match
+            if (matchesList.length > 0) {
+                displayNextMatch();
+            } else {
+                liveMatchContainer.innerHTML = `<div class="teams-time"><div class="team">No top match today</div></div>`;
+            }
         } catch (err) {
             console.error("Error loading matches:", err);
         }
     }
 
+    function displayNextMatch() {
+        const match = matchesList[currentMatchIndex];
+        const html = createMatchHTML(match);
+        liveMatchContainer.innerHTML = html;
+
+        // Check if the current match is finished or has started
+        const matchStatus = match.match_status;
+        const isFinished = matchStatus === "Finished" || matchStatus === "FT";
+
+        if (isFinished) {
+            currentMatchIndex++; // Move to the next match
+            if (currentMatchIndex < matchesList.length) {
+                // Set a delay to switch to the next match
+                setTimeout(displayNextMatch, 10000); // Wait for 10 seconds (adjust as needed)
+            }
+        } else {
+            // If not finished, keep refreshing until the match ends
+            setTimeout(displayNextMatch, 60000); // Refresh every minute
+        }
+    }
+
     // Initial load
     loadMatches();
-
-    // Refresh every 60 seconds
-    setInterval(loadMatches, 60000);
 });
 
 
-// Top scorer slider 
 
+// Top scorer slider 
+// Top scorer slider
 const leagueIds = {
     Bundesliga: 195,
     NPFL: 302,
@@ -122,6 +152,21 @@ const leagueIds = {
     PremierLeague: 152,
     LaLiga: 302
 };
+
+
+// Example of player images mapping (make sure to use the correct player names and image filenames)
+const playerImageMap = {
+    "R. Lewandowski": "Lewandowski.png",
+    "O. Dembele": "Dembele.png",
+    "A. Alipour": "Alipour.png",
+    "M. Retegui": "neymar.jpg",
+    "Mohammed Salah": "Salah.png",
+    // Add more players here...
+};
+
+// Fallback image if the player's image is not found in the map
+const fallbackImage = "assets/images/default-player.png";
+
 
 async function fetchTopScorers() {
     try {
@@ -151,7 +196,7 @@ async function fetchTopScorers() {
             const topScorer = data[0]; // Get the top scorer
 
             const playerName = topScorer.player_name || "Unknown Player";
-            const playerImage = topScorer.player_image || "assets/images/default-player.png";
+            const playerImage = getLocalPlayerImage(playerName);  // Fetch image from local mapping
             const goals = topScorer.goals || "0";
             const teamName = topScorer.team_name || "Unknown Team";
 
@@ -162,7 +207,7 @@ async function fetchTopScorers() {
 
             playerItem.innerHTML = `
                 <div class="player-image">
-                    <img src="${playerImage}" alt="${playerName}" onerror="this.src='assets/images/default-player.png'">
+                    <img src="${playerImage}" alt="${playerName}" onerror="this.src='${fallbackImage}'">
                 </div>
                 <div class="players-data">
                     <div class="player-name">${playerName}</div>
@@ -195,6 +240,21 @@ async function fetchTopScorers() {
         console.error("Error fetching top scorers:", error);
     }
 }
+
+// Fetch player image from local assets using the player name
+function getLocalPlayerImage(playerName) {
+    // Check if the player's image exists in the map
+    const playerImage = playerImageMap[playerName];
+
+    // If the image is found, return the path, otherwise use the fallback image
+    if (playerImage) {
+        return `assets/images/${playerImage}`;
+    } else {
+        return fallbackImage; // Return fallback if player image is not found
+    }
+}
+
+
 
 // Slider functionality
 let currentPlayer = 0;
@@ -230,6 +290,7 @@ function setActiveSlide(index) {
 
 // Fetch top scorers on page load
 document.addEventListener("DOMContentLoaded", fetchTopScorers);
+
 
 
 
@@ -426,7 +487,7 @@ function showMatches(category, event = null) {
     const container = document.getElementById('matches-container');
     container.innerHTML = '';
 
-    const matches = matchData[category].slice(0, 10); // Limit to 10 matches
+    const matches = matchData[category].slice(0, 5); // Limit to 5 matches
 
     if (matches.length > 0) {
         matches.forEach((match, index) => createMatchCard(container, match, category, index));
@@ -524,6 +585,8 @@ function createMatchCard(container, match, category, matchIndex) {
         displayLiveMatch(category, matchIndex);
     });
 }
+
+
 
 
 // Function to Filter Matches by Date
@@ -1060,7 +1123,26 @@ const leaguesSelected = {
     "Africa Cup of Nations Qualification": { league_id: null, country: "intl" }
 };
 
-// Fetch leagues from API
+// Add this function to display matches based on the selected league
+function displayMatches(leagueName, category) {
+    const leagueData = leaguesSelected[leagueName];
+    if (!leagueData) {
+        console.error(`League data for ${leagueName} not found.`);
+        return;
+    }
+
+    // Get the matches for the specific league from matchesData
+    let selectedMatches = matchesData[category] || [];
+    let filteredMatches = selectedMatches.filter(match => match.league_id === leagueData.league_id);
+
+    console.log(`Display Matches for League: ${leagueName}, Category: ${category}`);
+    console.log("Matches Data for category", category, filteredMatches);
+    
+    // Render the matches
+    renderMatches(filteredMatches, category, leagueName);
+}
+
+// fetch league names
 fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
   .then(response => response.json())
   .then(leagues => {
@@ -1074,10 +1156,13 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
     liveMatchesContainer.innerHTML = ""; // Clear existing content
 
     leagues.forEach(league => {
-      // Check if the league is in the selected list
-      if (leaguesSelected[league.league_name] && leaguesSelected[league.league_name].country === league.country_name) {
+      const leagueName = league.league_name.trim();
+      const leagueCountry = league.country_name.trim().toLowerCase();
+
+      // Check if the league is in the selected list and country matches
+      if (leaguesSelected[leagueName] && leaguesSelected[leagueName].country.toLowerCase() === leagueCountry) {
         // Assign correct league ID dynamically
-        leaguesSelected[league.league_name].league_id = league.league_id; 
+        leaguesSelected[leagueName].league_id = league.league_id; 
 
         const leagueElement = document.createElement("div");
         leagueElement.classList.add("leagues-matches");
@@ -1109,49 +1194,42 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
 
 
 
+
   // Function to fetch matches
-    function socketsLive() {
-        if (typeof APIkey === "undefined" || !APIkey) {
-            console.error("❌ ERROR: APIkey is not defined! WebSocket connection failed.");
-            return;
-        }
-       
-        var socket = new WebSocket('wss://wss.apifootball.com/livescore?APIkey=' + APIkey + '&timezone=+03:00');
-    
-        console.log('Connecting...');
-        socket.onopen = function () {
-            console.log('Connected to WebSocket');
-        };
-    
-        socket.onmessage = function (e) {
-            try {
-                if (e.data.startsWith("{") || e.data.startsWith("[")) {
-                    console.log("🔵 Received Data:", e.data);  // ✅ Log raw API response
-                    let data = JSON.parse(e.data);
-                    updateMatches(data); 
-                } else {
-                    console.log("Received non-JSON message:", e.data);
-                }
-            } catch (error) {
-                console.error("❌ JSON Parsing Error:", error, "Received Data:", e.data);
-            }
-        };        
-        
-        socket.onclose = function(){
-            socket = null;
-            setTimeout(socketsLive, 5000);
-        };
-        
+// Function to fetch matches
+function socketsLive() {
+    if (typeof APIkey === "undefined" || !APIkey) {
+        console.error("❌ ERROR: APIkey is not defined! WebSocket connection failed.");
+        return;
     }
 
-    socketsLive();
-    
+    var socket = new WebSocket('wss://wss.apifootball.com/livescore?APIkey=' + APIkey + '&timezone=+03:00');
 
-  
+    console.log('Connecting...');
+    socket.onopen = function () {
+        console.log('Connected to WebSocket');
+    };
 
-    let matchesData = {};
+    socket.onmessage = function (e) {
+        try {
+            if (e.data.startsWith("{") || e.data.startsWith("[")) {
+                console.log("Received Data:", e.data);  // Log the WebSocket response
+                let data = JSON.parse(e.data);
+                updateMatches(data);
+            } else {
+                console.log("Received non-JSON message:", e.data);
+            }
+        } catch (error) {
+            console.error("Error parsing WebSocket data:", error);
+        }
+    };
+}
 
+socketsLive();
 
+let matchesData = {};
+
+// Process and Display Matches
 // Process and Display Matches
 function updateMatches(matches) {
     console.log("⚽ Raw Matches Data:", matches);  // ✅ Log all matches received
@@ -1160,7 +1238,7 @@ function updateMatches(matches) {
 
     matches.forEach(newMatch => {  // ✅ Fix undefined variable
         let matchIndex = matchesData.live.findIndex(m => m.match_id === newMatch.match_id);
-        
+
         if (matchIndex !== -1) {
             // ✅ Update the existing match score
             matchesData.live[matchIndex].match_hometeam_score = newMatch.match_hometeam_score;
@@ -1172,29 +1250,35 @@ function updateMatches(matches) {
         }
     });
 
+    console.log("Updated matchesData.live:", matchesData.live); // Check the live matches data
+
+    // Filter Highlight Matches (Ended)
     let highlightMatches = matches.filter(match => {
         let status = match.match_status?.trim().toLowerCase() || "";
-        let statusNum = parseInt(status); // Convert to number if possible
-        console.log(`🏆 Match ID: ${match.match_id} - Status: ${status}`);
-    
-        return status === "ft" || status === "finished" || status.includes("after") || status.includes("pen") || 
-               (!isNaN(statusNum) && statusNum >= 90);  // ✅ Consider numeric full-time values
+        let now = new Date(); // Get the current date to compare with match date
+        let matchDateTime = match.match_date && match.match_time ? new Date(`${match.match_date} ${match.match_time}`) : null;
+
+        // Ensure we're checking finished matches and they are from today
+        let isFinished = status === "ft" || status === "finished" || status.includes("after") || status.includes("pen") || 
+                         (parseInt(status) >= 90); // Also consider numeric values for full-time (90+ minutes)
+                         
+        // If the match is finished and the date is today, include it in highlights
+        return isFinished && matchDateTime && matchDateTime.toDateString() === now.toDateString();
     });
 
+    // Filter Upcoming Matches (Matches not live and starting in the future)
     let upcomingMatches = matches.filter(match => {
         let status = match.match_status?.trim().toLowerCase() || "";
         let now = new Date(); // Current time
         let matchDateTime = match.match_date && match.match_time ? new Date(`${match.match_date} ${match.match_time}`) : null;
-    
-        console.log(`⏳ Match ID: ${match.match_id} - Status: ${status} - DateTime: ${matchDateTime}`);
-    
-        return matchDateTime &&
-               matchDateTime > now &&  // Match is in the future
-               matchDateTime.toDateString() === now.toDateString() && // Match is today
-               (!status || status.includes("not started") || status.includes("scheduled") || 
-                status.includes("tba") || status.includes("ns") || status === "0" || status === "");
+
+        // A match should be considered "upcoming" if:
+        // 1. The match is in the future (its date/time is after the current time)
+        // 2. The match is not live (status does not indicate the match is ongoing)
+        return matchDateTime && matchDateTime > now && 
+               (status === "not started" || status === "scheduled" || status === "ns" || status === "" || status === "0");
     });
-    
+
     console.log("✅ Highlight Matches Found:", highlightMatches);
     console.log("✅ Upcoming Matches Found:", upcomingMatches);
 
@@ -1207,10 +1291,9 @@ function updateMatches(matches) {
         upcoming: upcomingMatches
     };
 
-    renderMatches(matchesData, "live");
+    console.log("Final matchesData:", matchesData); // Verify final matchesData object
+    renderMatches(matchesData, "live"); // Render the upcoming matches
 }
-
-
 
 
 // Display Matches
@@ -1294,8 +1377,7 @@ function renderMatches(matchesData, category) {
     matchesContainer.innerHTML = matchesHTML;
 }
 
-
-// Function to fetch match video
+// Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
     try {
         let response = await fetch(`https://apiv3.apifootball.com/?action=get_videos&match_id=${matchId}&APIkey=${APIkey}`);
@@ -1313,6 +1395,7 @@ async function fetchMatchVideo(matchId) {
         return null;
     }
 }
+
 
 // Function to display match details with video
 async function displayLiveMatch(matchId, category) {

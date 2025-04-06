@@ -384,7 +384,8 @@ body{
 
 
 /* Layers 1*/
-
+.text-cont3,
+.text-cont2,
 .text-cont{
     display: flex;
     padding-bottom: 15px;
@@ -393,6 +394,8 @@ body{
     width: 100%;
 }
 
+.text-cont3 h4,
+.text-cont2 h4,
 .text-cont h4 {
     font-size: 0.75rem;
     font-family: 'Lato';
@@ -442,7 +445,7 @@ body{
 
 }
 .game-leag {
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     font-weight: 400;
     font-family: 'lato';
     color: #f4f6f698;
@@ -476,11 +479,12 @@ body{
 .team {
     flex: 1;
     text-align: center;
-    font-size: 0.70rem;
+    font-size: 0.68rem;
     font-family: 'Lato';
     word-break: keep-all;
     overflow: hidden;
     white-space: nowrap;
+    padding: 5px;
   
 }
 
@@ -1155,6 +1159,7 @@ body{
     background: linear-gradient(to bottom, #244537 40%, #1b364e 80%);
     border-radius: 10px;
     border: 1px solid #ffc107a2;
+    margin-bottom: 15px;
 }
 
 /* Player Image */
@@ -1162,8 +1167,7 @@ body{
     height: 80px;
     width: 80px; /* Adjust size as needed */
     object-fit: cover; /* Ensures the image maintains aspect ratio */
-    border-radius: 50%; /* Makes the image circular */
-    
+    transition: opacity 0.3s ease; /* Smooth transition for opacity */
 }
 
 
@@ -1253,6 +1257,7 @@ body{
     width: 100%;
     padding: 10px;
     border-radius: 10px; 
+    margin-bottom: 15px;
 }
 
 .predition-content h4{
@@ -1331,10 +1336,10 @@ body{
     font-family: 'Lato';
     font-weight: 400;
     font-size: 0.7rem;
-    margin-top: 20px;
+    padding-top: 5px;
     border-radius: 8px;
-    padding-bottom: 20px;
-    border: 1px solid #c4c4c434;
+    margin-bottom: 20px;
+    border: 1px solid #c4c4c41c;
 }
 
 

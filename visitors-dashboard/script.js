@@ -1153,7 +1153,6 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
 
 
 // Process and Display Matches
-// Process and Display Matches
 function updateMatches(matches) {
     console.log("⚽ Raw Matches Data:", matches);  // ✅ Log all matches received
 
@@ -1575,57 +1574,70 @@ function getTabContent(tab, match) {
             
         
                 case "h2h":
-                    return `
-                     <div class="h2h-header">
-                        <h3>H2H</h3>
-                        <h4>${match.team1.name}</h4>
-                         <h4>${match.team2.name}</h4>
-                       </div>
-                        <!-- Horizontal Line -->
-                       <div class="h2h-header-line"></div>
-          
-                       <!-- h2h matches -->
-                          <div class="h2h-matches-container">
-                           ${
-                           Object.keys(matchesData).map(league => `
-                        <div class="h2h-league">
-                          <h4 class="league-title">${league} <span class="league-country">${matchesData[league].country}</span></h4>
-          
-                          ${matchesData[league].live.map(game => `
-                              <div class="h2h-match">
-                                  <div class="h2h-time">
-                                      <span class="match-time">${game.time}</span>
-                                      <span class="match-ft">FT</span>
-                                  </div>
-                                  <div class="h2h-right">
-                                  <div class="h2h-team-data">
-                                      <div class="h2h-team">
-                                          <img src="${game.team1.logo}" alt="${game.team1.name}" class="h2h-logo">
-                                          <span class="h2h-team-name">${game.team1.name}</span>
-                                      </div>
-                                      
-                                      <div class="h2h-team">
-                                         <img src="${game.team2.logo}" alt="${game.team2.name}" class="h2h-logo">
-                                          <span class="h2h-team-name">${game.team2.name}</span>                                
-                                      </div>
-                                      </div>
-                                       <div class="h2h-matches-scores">
-                                        <div class="score">${match.team1.score}</div>
-                                        <div class="score">${match.team2.score}</div>
-                                       </div>
-          
-                                  </div>
-                              </div>
-                          `).join("")}
-                      </div>
-                  `).join("")
-              }
-                          </div>
-                        
-                    `;
-        
+                return `
+                  <div class="h2h-header">
+                  <h3>H2H</h3>
+                  <h4>${match.match_hometeam_name}</h4>
+                  <h4>${match.match_awayteam_name}</h4>
+                </div>
+                 <div class="h2h-header-line"></div>
+                 <div class="h2h-matches-container" id="h2h-matches">Loading head-to-head matches...</div>
+               `;
+
         default:
             return "<p>No data available.</p>";
+    }
+}
+
+
+async function renderH2HMatches(match, APIkey) {
+    const firstTeamId = match.match_hometeam_id;
+    const secondTeamId = match.match_awayteam_id;
+
+    const h2hData = await fetchH2HData(firstTeamId, secondTeamId, APIkey);
+    const h2hContainer = document.getElementById("h2h-matches");
+
+    if (!h2hData || h2hData.length === 0) {
+        h2hContainer.innerHTML = "<p>No head-to-head data available.</p>";
+        return;
+    }
+
+    h2hContainer.innerHTML = h2hData.map(game => `
+        <div class="h2h-match">
+            <div class="h2h-time">
+                <span class="match-time">${game.match_date}</span>
+                <span class="match-ft">${game.match_status === "Finished" ? "FT" : game.match_status}</span>
+            </div>
+            <div class="h2h-right">
+                <div class="h2h-team-data">
+                    <div class="h2h-team">
+                        <img src="${game.team_home_badge}" alt="${game.match_hometeam_name}" class="h2h-logo">
+                        <span class="h2h-team-name">${game.match_hometeam_name}</span>
+                    </div>
+                    <div class="h2h-team">
+                        <img src="${game.team_away_badge}" alt="${game.match_awayteam_name}" class="h2h-logo">
+                        <span class="h2h-team-name">${game.match_awayteam_name}</span>
+                    </div>
+                </div>
+                <div class="h2h-matches-scores">
+                    <div class="score">${game.match_hometeam_score}</div>
+                    <div class="score">${game.match_awayteam_score}</div>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+
+
+async function fetchH2HData(firstTeamId, secondTeamId, APIkey) {
+    try {
+        const response = await fetch(`https://apiv3.apifootball.com/?action=get_H2H&firstTeamId=${firstTeamId}&secondTeamId=${secondTeamId}&APIkey=${APIkey}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching H2H data:", error);
+        return [];
     }
 }
 

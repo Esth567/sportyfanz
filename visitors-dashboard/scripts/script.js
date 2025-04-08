@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const leagueIDs = ["152", "302", "207", "168", "175"]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
     const bigTeams = ["Chelsea", "Barcelona", "Bayern Munich", "Manchester City", "Real Madrid", "Arsenal", "Liverpool", "Napoli", "PSG", "AC Milan", "Leicester City", "Newcastle United"];
 
-    let matchesList = [...matchesList, ...matches]; // Store all matches for the day
+    let matchesList = []; // Store matches for the day
     let currentMatchIndex = 0; // Track the current match being displayed
 
     function getMinutesSince(start) {
@@ -40,14 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const matchStatus = match.match_status;
         const homeScore = match.match_hometeam_score;
         const awayScore = match.match_awayteam_score;
-    
+
         const isFinished = matchStatus === "Finished" || matchStatus === "FT";
         const hasStarted = matchStatus !== "" && matchStatus !== "Not Started";
         const isLive = !isNaN(parseInt(matchStatus));
-    
+
         const displayScore = hasStarted ? `${homeScore} - ${awayScore}` : "VS";
         let displayTime, ellipseImg;
-    
+
         if (isFinished) {
             displayTime = "FT";
             ellipseImg = "assets/icons/Ellipse 1.png"; // or change to default if you prefer
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
             displayTime = startTime;
             ellipseImg = "assets/icons/Ellipse2.png";
         }
-    
+
         return `
         <div class="teams-time">
             <div class="team">
@@ -88,14 +88,28 @@ document.addEventListener("DOMContentLoaded", function () {
             for (let id of leagueIDs) {
                 const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&APIkey=${APIkey}`;
                 const res = await fetch(url);
-                const matches = await res.json();
-                console.log(matches);
+                const data = await res.json();
 
-                const keyMatches = matches.filter(match =>
-                    bigTeams.includes(match.match_hometeam_name) || bigTeams.includes(match.match_awayteam_name)
-                );
+                console.log('API Response:', data); // Log the response to inspect the structure
 
-                matchesList = [...matchesList, ...keyMatches];
+                // Handle the error if no events are found
+                if (data.error) {
+                    console.error('API Error:', data.message);
+                    liveMatchContainer.innerHTML = `<div class="team">No events found.</div>`;
+                    return;
+                }
+
+                // Handle object responses correctly
+                if (data && data.hasOwnProperty('events')) {
+                    const matches = data.events; // Assuming 'events' contains the array of matches
+                    const keyMatches = matches.filter(match =>
+                        bigTeams.includes(match.match_hometeam_name) || bigTeams.includes(match.match_awayteam_name)
+                    );
+
+                    matchesList = [...matchesList, ...keyMatches];
+                } else {
+                    console.error('Expected "events" property, but received:', data);
+                }
             }
 
             // Sort matches by start time
@@ -105,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return aTime - bTime;
             });
 
-            // Show first match
+            // If no matches, show last available match (if any)
             if (matchesList.length > 0) {
                 displayNextMatch();
             } else {
@@ -113,11 +127,18 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (err) {
             console.error("Error loading matches:", err);
+            liveMatchContainer.innerHTML = `<div class="team">Error loading matches. Please try again later.</div>`;
         }
     }
 
     function displayNextMatch() {
-        const match = matchesList[currentMatchIndex];
+        if (matchesList.length === 0) {
+            liveMatchContainer.innerHTML = "<div class='team'>No matches available.</div>";
+            return;
+        }
+
+        // Display the last match played or the current match if one exists
+        const match = matchesList[matchesList.length - 1];
         const html = createMatchHTML(match);
         liveMatchContainer.innerHTML = html;
 
@@ -125,10 +146,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const matchStatus = match.match_status;
         const isFinished = matchStatus === "Finished" || matchStatus === "FT";
 
+        // If the match is finished, keep showing it until a new one is available
         if (isFinished) {
             currentMatchIndex++; // Move to the next match
             if (currentMatchIndex < matchesList.length) {
-                // Set a delay to switch to the next match
+                // If new match is available, set a delay to switch to the next match
                 setTimeout(displayNextMatch, 10000); // Wait for 10 seconds (adjust as needed)
             }
         } else {
@@ -140,6 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initial load
     loadMatches();
 });
+
 
 
 

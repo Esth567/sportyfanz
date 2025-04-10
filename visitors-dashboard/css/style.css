@@ -1042,18 +1042,20 @@ body{
 }
 
 .match-details {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto;
     align-items: center;
     width: 100%;
+    gap: 5px;
 }
 
 .match-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 40px;
+
 }
+
 /* Team Names */
 .Matchteam {
     font-size: 0.70rem;
@@ -1061,7 +1063,7 @@ body{
     font-weight: normal;
     display: flex;
     flex-direction: row;
-    gap: 3px;
+
 
 }
 
@@ -1075,12 +1077,13 @@ body{
     align-items: center;
     background: #fff;
     color: #1A2F4B;
-    padding: 3px 10px;
+    padding: 2px 4px;
     border-radius: 15px;
     font-size: 0.60rem;
     font-family: 'Lato';
     border: none;
-   
+    min-width: fit-content;
+    white-space: nowrap;
 }
 
 .Matchteam img {
@@ -1090,18 +1093,54 @@ body{
    
 }
 
-.match-status,
-.match-score,
+.hidden {
+    display: none !important;
+}
+
+.match-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 80px; /* adjust as needed */
+    text-align: center;
+    flex: unset;
+
+}
+
+
+.match-status-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    font-family: 'Lato';
+    min-width: 45px;
+}
+
+
+
 .match-time,
 .match-country {
+    display: flex;
     align-items: center;
-    text-align: center;
+    gap: 5px; /* Controls spacing between icon and text */
     font-size: 0.7rem;
     font-family: 'Lato';
     font-weight: 300;
-    display: flex;
-    gap: 5px;
+    text-align: center;
 }
+
+.match-meta {
+    display: flex;
+    flex-direction: row;
+    gap: 10px; /* Reduce spacing between time and country */
+    align-items: center;
+    justify-content: center;
+}
+
 
 .match-time img,
 .match-country img{
@@ -2423,7 +2462,7 @@ body{
     font-weight: 300;
     margin-left: -12px;
     margin-top: 2px;
-}
+}  
   
 
 /* Main field styling */

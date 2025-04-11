@@ -13,26 +13,22 @@ const leaguesSelected = {
 
 function displayMatches(leagueName, category) {
     const leagueData = leaguesSelected[leagueName];
-    if (!leagueData) {
-        console.error(`League data for ${leagueName} not found.`);
+    if (!leagueData || !leagueData.league_id) {
+        console.warn(`❗ League ID missing for: ${leagueName}`);
         return;
     }
 
-    // Get the matches for the specific league from matchesData
     let selectedMatches = matchesData[category] || [];
-    console.log(`Matches data for category '${category}':`, selectedMatches);
-
-    // Filter matches based on league_id
     let filteredMatches = selectedMatches.filter(match => match.league_id === leagueData.league_id);
-    console.log(`Filtered Matches for League: ${leagueName}, Category: ${category}:`, filteredMatches);
 
-    // Render the matches if available
     if (filteredMatches.length > 0) {
         fetchMatches(filteredMatches, category, leagueName);
     } else {
         console.log(`No matches found for League: ${leagueName}, Category: ${category}`);
+        document.querySelector(".matches").innerHTML = `<p>No matches available for ${leagueName}.</p>`;
     }
 }
+
 
 
 // Fetch leagues and update the DOM
@@ -82,8 +78,13 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
         liveMatchesContainer.appendChild(leagueElement);
       }
     });
+
+    // ✅ Now fetch matches AFTER all league_id values are set
+    fetchMatches();
+
   })
   .catch(error => console.error("Error fetching leagues:", error));
+
 
 
 

@@ -264,6 +264,35 @@
               </div>              
               
 
+                <!--latest matches section-->
+          <div class="latest-match">
+            <div class="text-cont">
+              <h4 class="shortTop-story">Latest Matches</h4>
+              <div class="more">
+                  <ion-icon name="arrow-forward-outline"></ion-icon>
+                  <a href="live-matches.html">View all</a>
+              </div>
+          </div>
+          <div class="match-latest">
+              <!-- Match Header with Buttons -->
+              <div class="match-header">
+                  <div class="category-btn active" data-category="live" onclick="showMatches('live', event)">Live</div>
+                  <div class="category-btn" data-category="highlight" onclick="showMatches('highlight', event)">Highlight</div>
+                  <div class="category-btn" data-category="upcoming" onclick="showMatches('upcoming', event)">Upcoming</div>                
+                  <!-- Calendar Button -->
+                  <div class="category-btn calendar">
+                      <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
+                      <input type="date" id="match-date" onchange="filterByDate()" style="display: none;" />
+                  </div>
+              </div>
+          
+              <!-- Matches Container -->
+              <div class="matches-container" id="matches-container">
+                  <!-- Dynamic Match Category Content will be injected here -->
+              </div>
+          </div>        
+          </div>  
+
       <!-- News and podcast section -->
 <div class="news-podcast-wrapper">
     <div class="news-podcast">
@@ -302,35 +331,6 @@
     </div>
 </div>
 
-
-          <!--latest matches section-->
-          <div class="latest-match">
-          <div class="text-cont">
-            <h4 class="shortTop-story">Latest Matches</h4>
-            <div class="more">
-                <ion-icon name="arrow-forward-outline"></ion-icon>
-                <a href="live-matches.html">View all</a>
-            </div>
-        </div>
-        <div class="match-latest">
-            <!-- Match Header with Buttons -->
-            <div class="match-header">
-                <div class="category-btn active" data-category="live" onclick="showMatches('live', event)">Live</div>
-                <div class="category-btn" data-category="highlight" onclick="showMatches('highlight', event)">Highlight</div>
-                <div class="category-btn" data-category="upcoming" onclick="showMatches('upcoming', event)">Upcoming</div>                
-                <!-- Calendar Button -->
-                <div class="category-btn calendar">
-                    <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
-                    <input type="date" id="match-date" onchange="filterByDate()" style="display: none;" />
-                </div>
-            </div>
-        
-            <!-- Matches Container -->
-            <div class="matches-container" id="matches-container">
-                <!-- Dynamic Match Category Content will be injected here -->
-            </div>
-        </div>        
-        </div>  
         </div>
      
         <div class="layer third-layer"> 

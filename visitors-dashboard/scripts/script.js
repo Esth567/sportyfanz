@@ -1,5 +1,5 @@
 
-const APIkey = '5608a27e503ab17161c376b5bcbb93d5c562096975dd23f37bb95f3d845ee99c';
+const APIkey = '79a10ed77db61595671f9c4daf940c2b32cea3b1cf12d1b848ed581dd11f1a4b';
 
 //sidebar toggle for web view
 function toggleSidebar() {
@@ -183,13 +183,11 @@ const playerImageMap = {
     "R. Lewandowski": "Lewandowski.png",
     "O. Dembele": "Dembele.png",
     "A. Alipour": "Alipour.png",
-    "M. Retegui": "neymar.jpg",
-    "Mohammed Salah": "Salah.png",
+    "M. Retegui": "M.Retegui.png",
+    "Mohammed Salah": "Mohammed.png",
     // Add more players here...
 };
 
-// Fallback image if the player's image is not found in the map
-const fallbackImage = "assets/images/default-player.png";
 
 
 async function fetchTopScorers() {
@@ -231,7 +229,7 @@ async function fetchTopScorers() {
 
             playerItem.innerHTML = `
                 <div class="player-image">
-                    <img src="${playerImage}" alt="${playerName}" onerror="this.src='${fallbackImage}'">
+                    <img src="${playerImage}" alt="${playerName}">
                 </div>
                 <div class="players-data">
                     <div class="player-name">${playerName}</div>
@@ -267,15 +265,7 @@ async function fetchTopScorers() {
 
 // Fetch player image from local assets using the player name
 function getLocalPlayerImage(playerName) {
-    // Check if the player's image exists in the map
-    const playerImage = playerImageMap[playerName];
-
-    // If the image is found, return the path, otherwise use the fallback image
-    if (playerImage) {
-        return `assets/images/${playerImage}`;
-    } else {
-        return fallbackImage; // Return fallback if player image is not found
-    }
+    return playerImageMap[playerName] ? `assets/images/${playerImageMap[playerName]}` : null;
 }
 
 
@@ -1276,221 +1266,6 @@ document.addEventListener("DOMContentLoaded", () => {
         newsAdMiddle.style.alignItems = "center"; // Align properl
     };
 });
-
-
-
-
-
-
-/*...........................................League table page........................................... */
-
-
-// List of leagues to display 
-const selectedLeagues = {
-    "Premier League": { league_id: 152, country: "England" }, 
-    "La Liga": { league_id: null, country: "Spain" },
-    "Serie A": { league_id: null, country: "Italy" },
-    "NPFL": { league_id: null, country: "Nigeria" },
-    "Bundesliga": { league_id: null, country: "Germany" }
-};
-
-// Fetch the league names
-document.addEventListener("DOMContentLoaded", function () {
-    const leaguesContainer = document.querySelector(".leagues-country");
-
-    // Ensure the element exists before proceeding
-    if (!leaguesContainer) {
-        console.error("Error: Element '.leagues-country' not found. Check your HTML structure.");
-        return;
-    }
-
-    // Fetch the league names
-    async function fetchLeagues() {
-        try {
-            const response = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
-            const leagues = await response.json();
-            leaguesContainer.innerHTML = ""; // Clear existing content
-
-            let firstLeagueId = null;
-
-            // Loop through API response and match selected leagues by BOTH name & country
-            leagues.forEach(league => {
-                Object.entries(selectedLeagues).forEach(([leagueName, leagueInfo]) => {
-                    if (league.league_name === leagueName && league.country_name === leagueInfo.country) {
-                        selectedLeagues[leagueName].league_id = league.league_id; // Assign correct league ID
-
-                        const leagueElement = document.createElement("div");
-                        leagueElement.classList.add("leagueNames");
-                        leagueElement.innerHTML = `
-                            <div class="leag-count">
-                                <img src="${league.league_logo || 'assets/images/default-logo.png'}" alt="${league.league_name} Logo">
-                                <div class="league-info">
-                                    <h3>${league.league_name}</h3>
-                                    <p>${league.country_name}</p>                    
-                                </div>
-                            </div>
-                            <div class="arrow-direct">
-                                <img src="assets/icons/Arrow - Right 2.png" alt="Arrow">
-                            </div>
-                        `;
-
-                        // Click event to fetch and display league table
-                        leagueElement.addEventListener("click", () => {
-                            updateLeagueTable(league.league_name, league.league_id);
-                        });
-
-                        leaguesContainer.appendChild(leagueElement);
-
-                        // Set Premier League (England) as the default league to load
-                        if (league.league_name === "Premier League" && league.country_name === "England") {
-                            firstLeagueId = league.league_id;
-                        }
-                    }
-                });
-            });
-
-            // Load the Premier League table by default on page load
-            if (firstLeagueId) {
-                updateLeagueTable("Premier League", firstLeagueId);
-            }
-
-        } catch (error) {
-            console.error("Error fetching leagues:", error);
-        }
-    }
-
-    fetchLeagues(); // Fetch leagues only after confirming the element exists
-});
-
-
-
- // Get the elements
- function updateLeagueTable(leagueName, leagueId) {
-    fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${leagueId}&APIkey=${APIkey}`)
-        .then(response => response.json())
-        .then(leagueData => {
-            const middleLayer = document.querySelector(".middle-layer");
-
-            if (!Array.isArray(leagueData) || leagueData.length === 0) {
-                middleLayer.innerHTML = `<p>No data available for ${leagueName}</p>`;
-                return;
-            }
-
-            // Display only the first 10 initially
-            const initialData = leagueData.slice(0, 10);
-
-            // Generate table HTML
-            let tableHTML = generateTableHTML(initialData);
-
-            // Display league standings
-            middleLayer.innerHTML = `
-                <div class="league-table">
-                    <div class="league-headers">           
-                        <img src="${leagueData[0].league_logo || 'assets/images/default-logo.png'}" alt="${leagueName} Logo" class="league-logo">
-                        <div class="league-details">
-                            <h3 class="league-name">${leagueName}</h3>
-                            <p class="league-country">${leagueData[0].country_name}</p>
-                        </div>
-                        <div class="more-league-table">
-                            <ion-icon name="arrow-forward-outline"></ion-icon>
-                            <span class="see-more-text">See More</span>
-                        </div>
-                    </div>
-                    <div class="league-tables-details">
-                        ${tableHTML}
-                    </div>
-                </div>
-            `;
-
-            // Event listener for See More / See Less
-            const seeMoreButton = document.querySelector(".more-league-table");
-            let expanded = false;
-
-            seeMoreButton.addEventListener("click", (event) => {
-                event.stopPropagation(); // Prevent sidebar from closing
-                expanded = !expanded;
-                const leagueTablesDetails = document.querySelector(".league-tables-details");
-
-                if (expanded) {
-                    leagueTablesDetails.innerHTML = generateTableHTML(leagueData);
-                    seeMoreButton.querySelector(".see-more-text").textContent = "See Less";
-                    seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-back-outline");
-                } else {
-                    leagueTablesDetails.innerHTML = generateTableHTML(initialData);
-                    seeMoreButton.querySelector(".see-more-text").textContent = "See More";
-                    seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-forward-outline");
-                }
-            });
-        })
-        .catch(error => console.error("Error fetching league table:", error));
-}
-
-// Prevent sidebar from collapsing when clicking .leag-count or .more-league-table
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".leag-count, .more-league-table").forEach(element => {
-        element.addEventListener("click", (event) => {
-            event.stopPropagation(); // Stop the click from affecting the sidebar
-        });
-    });
-});
-
-
- 
- // Helper function to generate league table
- function generateTableHTML(teams) {
-     teams.sort((a, b) => b.overall_league_PTS - a.overall_league_PTS);
- 
-     let tableHTML = `
-         <div class="table-headers">
-             <span class="position-header">Pos</span>
-             <span class="team-name-header">Team</span>
-             <span class="stat-header">P</span>
-             <span class="stat-header">W</span>
-             <span class="stat-header">D</span>
-             <span class="stat-header">L</span>
-             <span class="stat-header">PTS</span>
-         </div>
-     `;
- 
-     teams.forEach((team, index) => {
-         tableHTML += `
-             <div class="team-rows">
-                 <span class="team-position">${index + 1}</span>
-                 <div class="team-infos">
-                     <img src="${team.team_badge || 'assets/images/default-team-logo.png'}" alt="${team.team_name} Logo" class="team-logo">
-                     <span class="teamLeague-name">${team.team_name}</span>
-                 </div>
-                 <span class="team-stat">${team.overall_league_payed}</span>
-                 <span class="team-stat">${team.overall_league_W}</span>
-                 <span class="team-stat">${team.overall_league_D}</span>
-                 <span class="team-stat">${team.overall_league_L}</span>
-                 <span class="team-stat">${team.overall_league_PTS}</span>
-             </div>
-         `;
-     });
- 
-     return tableHTML;
- }
- 
-
-  
-
-
-
-
-/*............................live match page........................*/
-
-
-
-
-
-
-
-
-
-
-
-/*...........................predition page................................*/
 
 
 

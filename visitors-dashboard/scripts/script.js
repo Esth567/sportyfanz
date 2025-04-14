@@ -979,6 +979,87 @@ document.querySelectorAll('.category-btn').forEach(button => {
 });
 
 
+
+//function for predition-container for middly layer
+
+const from = new Date().toISOString().split('T')[0];
+const to = from;
+
+const bigTeams = [
+  "Man U", "Manchester United", "Chelsea", "Real Madrid", "Barcelona",
+  "Juventus", "Bayern Munich", "PSG", "Liverpool", "Arsenal"
+];
+
+const topLeagues = ["Premier League", "La Liga", "Serie A", "Bundesliga"];
+
+const predictionContainer = document.querySelector('.predition-container');
+
+fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${to}&APIkey=${APIkey}`)
+  .then(res => res.json())
+  .then(predictions => {
+    const filteredMatches = predictions.filter(match => {
+      const home = match.match_hometeam_name;
+      const away = match.match_awayteam_name;
+      const league = match.league_name;
+
+      return (
+        topLeagues.includes(league) &&
+        (bigTeams.some(team => home.includes(team) || away.includes(team)))
+      );
+    });
+
+    if (filteredMatches.length === 0) {
+      predictionContainer.innerHTML = "<p>No hot match predictions today.</p>";
+      return;
+    }
+
+    // Multiple match swipe setup
+    predictionContainer.innerHTML = `
+      <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
+        ${filteredMatches.map(match => {
+          const home = match.match_hometeam_name;
+          const away = match.match_awayteam_name;
+          const homeLogo = match.team_home_badge || 'assets/images/default-logo.png';
+          const awayLogo = match.team_away_badge || 'assets/images/default-logo.png';
+
+          const homePrediction = match.prob_HW || "0%";
+          const drawPrediction = match.prob_D || "0%";
+          const awayPrediction = match.prob_AW || "0%";
+
+          return `
+            <div class="predition-content">
+              <h4>Who will win?</h4>
+              <div class="predit-selection">
+                <div class="team-nam">${home}
+                  <div class="team-logo">
+                    <img src="${homeLogo}" alt="${home}">
+                    <div class="prediction-number">${homePrediction}</div>
+                  </div>
+                </div>
+                <div class="Select-team">Draw
+                  <input type="text" class="score-input" value="${drawPrediction}" readonly>
+                </div>
+                <div class="team-nam">${away}
+                  <div class="team-logo">
+                    <img src="${awayLogo}" alt="${away}">
+                    <div class="prediction-number">${awayPrediction}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  })
+  .catch(err => {
+    console.error("Prediction fetch failed:", err);
+    predictionContainer.innerHTML = "<p>Error fetching predictions.</p>";
+  });
+
+
+
+
 // menu toggle button for sidebar for mobile view
 document.addEventListener("DOMContentLoaded", function () {
   function updateSidebarVisibility() {
@@ -1010,8 +1091,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   });
 });
-
-
 
 
 

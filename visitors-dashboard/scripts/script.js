@@ -1267,6 +1267,37 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 });
 
+//new header and description
+async function loadNews() {
+  const res = await fetch('http://localhost:3000/api/news');
+  const data = await res.json();
+
+  const trendingContainer = document.getElementById('trending-news');
+  const updatesContainer = document.getElementById('updates-news');
+
+  trendingContainer.style.display = 'block';
+  updatesContainer.style.display = 'block';
+
+  const generateNewsHTML = (item) => `
+    <div class="news-infomat">
+      <div class="feature-img">
+        <img src="${item.image}" alt="Logos">
+      </div>
+      <div class="news-messages">
+        <h2 class="news-header">${item.title}</h2>
+        <div class="news-meta">
+          <p class="news-description">${item.summary}</p>
+          <p class="news-time" data-posted="${item.pubDate}"></p>
+        </div>
+      </div>
+    </div>`;
+
+  trendingContainer.innerHTML = data.slice(0, 1).map(generateNewsHTML).join('');
+  updatesContainer.innerHTML = data.slice(1).map(generateNewsHTML).join('');
+}
+
+loadNews();
+
 
 
 

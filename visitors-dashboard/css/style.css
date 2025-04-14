@@ -1342,30 +1342,17 @@ body{
     margin-top: -5px;
 }
 
-/* Score Input */
-.score-input {
-    padding: 3px 3px;
-    border: 1px solid #ffc1077c;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-family: 'Lato';
+ .prediction-number {
+    font-size: 12px;
     text-align: center;
-    outline: none;
-    width: 60px; /* Adjust as needed */
-    gap: 10px;
-    margin-left: 10px;
-}
+    color: #555;
+    margin-top: 4px;
+  }
 
-.score-input::placeholder {
-    font-size: 12px; /* Adjust to preferred size */
-    color: #888; /* Optional: Change color for better visibility */
-    opacity: 1; /* Ensure full visibility */
-}
+  .prediction-swiper::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for swipe */
+  }
 
-.score-input:focus {
-    border-color: #ff8c00;
-    box-shadow: 0 0 5px rgba(255, 140, 0, 0.8);
-}
 
 .advert {
     width: 100%;

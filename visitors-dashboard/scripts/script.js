@@ -1057,13 +1057,7 @@ function fetchOddsUntilMatchFound() {
                     </div>
                     <div class="prediction-number">${odd1}</div>
                   </div>
-                  <div class="Select-team">
-                    <span>Draw</span>
-                    <div class="team-logo">
-                      <img src="assets/images/neutral-ball.png" alt="Draw">
-                    </div>
-                    <div class="prediction-number">${oddX}</div>
-                  </div>
+                  
                   <div class="team-nam">
                     <span>${match.away}</span>
                     <div class="team-logo">

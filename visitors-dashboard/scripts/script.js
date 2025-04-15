@@ -1003,35 +1003,45 @@ function fetchOddsUntilMatchFound() {
 
   fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${from}&to=${to}&APIkey=${APIkey}`)
     .then(res => res.json())
-    .then(data => {
-      // Filter matches where both teams are from bigTeams
-      const bigMatches = data.filter(match => {
-        const home = match.match_hometeam_name;
-        const away = match.match_awayteam_name;
-
-        return bigTeams.some(team => home.includes(team)) &&
-               bigTeams.some(team => away.includes(team));
-      });
-
-      if (bigMatches.length === 0 && offset < 7) {
+    .then(async oddsData => {
+      if (!Array.isArray(oddsData) || oddsData.length === 0) {
         offset++;
-        fetchOddsUntilMatchFound(); // Try the next date
+        if (offset <= 7) fetchOddsUntilMatchFound();
+        else predictionContainer.innerHTML = "<p>No big team matches with odds available.</p>";
         return;
       }
 
+      // Fetch match details via get_events for team names
+      const eventRes = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`);
+      const eventsData = await eventRes.json();
+
+      const enrichedMatches = oddsData.map(oddMatch => {
+        const eventDetails = eventsData.find(ev => ev.match_id === oddMatch.match_id);
+        if (!eventDetails) return null;
+        return {
+          ...oddMatch,
+          home: eventDetails.match_hometeam_name,
+          away: eventDetails.match_awayteam_name,
+          homeLogo: eventDetails.team_home_badge,
+          awayLogo: eventDetails.team_away_badge,
+        };
+      }).filter(Boolean);
+
+      const bigMatches = enrichedMatches.filter(match =>
+        bigTeams.some(team => match.home?.includes(team)) &&
+        bigTeams.some(team => match.away?.includes(team))
+      );
+
       if (bigMatches.length === 0) {
-        predictionContainer.innerHTML = "<p>No big team matches with odds available.</p>";
+        offset++;
+        if (offset <= 7) fetchOddsUntilMatchFound();
+        else predictionContainer.innerHTML = "<p>No big team matches with odds available.</p>";
         return;
       }
 
       predictionContainer.innerHTML = `
         <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
           ${bigMatches.map(match => {
-            const home = match.match_hometeam_name;
-            const away = match.match_awayteam_name;
-            const homeLogo = match.team_home_badge || 'assets/images/default-logo.png';
-            const awayLogo = match.team_away_badge || 'assets/images/default-logo.png';
-
             const odd1 = match.odd_1 || "-";
             const oddX = match.odd_x || "-";
             const odd2 = match.odd_2 || "-";
@@ -1041,16 +1051,23 @@ function fetchOddsUntilMatchFound() {
                 <h4>Who will win?</h4>
                 <div class="predit-selection">
                   <div class="team-nam">
-                    <span>${home}</span>
+                    <span>${match.home}</span>
                     <div class="team-logo">
-                      <img src="${homeLogo}" alt="${home}">
+                      <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
                     </div>
                     <div class="prediction-number">${odd1}</div>
                   </div>
-                  <div class="team-nam">
-                    <span>${away}</span>
+                  <div class="Select-team">
+                    <span>Draw</span>
                     <div class="team-logo">
-                      <img src="${awayLogo}" alt="${away}">
+                      <img src="assets/images/neutral-ball.png" alt="Draw">
+                    </div>
+                    <div class="prediction-number">${oddX}</div>
+                  </div>
+                  <div class="team-nam">
+                    <span>${match.away}</span>
+                    <div class="team-logo">
+                      <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
                     </div>
                     <div class="prediction-number">${odd2}</div>
                   </div>
@@ -1068,6 +1085,7 @@ function fetchOddsUntilMatchFound() {
 }
 
 fetchOddsUntilMatchFound();
+
 
 
 // menu toggle button for sidebar for mobile view

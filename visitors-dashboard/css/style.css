@@ -1334,8 +1334,8 @@ body{
 }
 /* Team Logo */
 .team-logo img {
-    width: 50px; /* Logo width */
-    height: 50px; /* Logo height */
+    width: 40px; /* Logo width */
+    height: 40px; /* Logo height */
     object-fit: contain; /* Maintain aspect ratio */
     border-radius: 50%; /* Circular logo */  
     margin-left: -5px;

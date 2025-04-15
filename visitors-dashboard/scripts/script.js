@@ -1013,7 +1013,7 @@ fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${t
       return;
     }
 
-    // Multiple match swipe setup
+    // Swipe container with flex row layout
     predictionContainer.innerHTML = `
       <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
         ${filteredMatches.map(match => {
@@ -1030,17 +1030,26 @@ fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${t
             <div class="predition-content">
               <h4>Who will win?</h4>
               <div class="predit-selection">
-                <div class="team-nam">${home}
+                <div class="team-nam">
+                  <span>${home}</span>
                   <div class="team-logo">
                     <img src="${homeLogo}" alt="${home}">
-                    <div class="prediction-number">${homePrediction}</div>
                   </div>
+                  <div class="prediction-number">${homePrediction}</div>
                 </div>
-                <div class="team-nam">${away}
+                <div class="Select-team">
+                  <span>Draw</span>
+                  <div class="team-logo">
+                    <img src="assets/images/neutral-ball.png" alt="Draw">
+                  </div>
+                  <div class="prediction-number">${drawPrediction}</div>
+                </div>
+                <div class="team-nam">
+                  <span>${away}</span>
                   <div class="team-logo">
                     <img src="${awayLogo}" alt="${away}">
-                    <div class="prediction-number">${awayPrediction}</div>
                   </div>
+                  <div class="prediction-number">${awayPrediction}</div>
                 </div>
               </div>
             </div>
@@ -1053,6 +1062,7 @@ fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${t
     console.error("Prediction fetch failed:", err);
     predictionContainer.innerHTML = "<p>Error fetching predictions.</p>";
   });
+
 
 
 

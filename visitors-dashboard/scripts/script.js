@@ -1036,9 +1036,6 @@ fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${t
                     <div class="prediction-number">${homePrediction}</div>
                   </div>
                 </div>
-                <div class="Select-team">Draw
-                  <input type="text" class="score-input" value="${drawPrediction}" readonly>
-                </div>
                 <div class="team-nam">${away}
                   <div class="team-logo">
                     <img src="${awayLogo}" alt="${away}">

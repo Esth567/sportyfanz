@@ -1011,7 +1011,6 @@ function fetchOddsUntilMatchFound() {
         return;
       }
 
-      // Fetch match details via get_events for team names
       const eventRes = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`);
       const eventsData = await eventRes.json();
 
@@ -1027,12 +1026,21 @@ function fetchOddsUntilMatchFound() {
         };
       }).filter(Boolean);
 
-      const bigMatches = enrichedMatches.filter(match =>
-        bigTeams.some(team => match.home?.includes(team)) &&
-        bigTeams.some(team => match.away?.includes(team))
-      );
+      const uniqueMatches = [];
+      const seenMatchIds = new Set();
 
-      if (bigMatches.length === 0) {
+      enrichedMatches.forEach(match => {
+        if (
+          bigTeams.some(team => match.home?.includes(team)) &&
+          bigTeams.some(team => match.away?.includes(team)) &&
+          !seenMatchIds.has(match.match_id)
+        ) {
+          seenMatchIds.add(match.match_id);
+          uniqueMatches.push(match);
+        }
+      });
+
+      if (uniqueMatches.length === 0) {
         offset++;
         if (offset <= 7) fetchOddsUntilMatchFound();
         else predictionContainer.innerHTML = "<p>No big team matches with odds available.</p>";
@@ -1041,9 +1049,8 @@ function fetchOddsUntilMatchFound() {
 
       predictionContainer.innerHTML = `
         <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
-          ${bigMatches.map(match => {
+          ${uniqueMatches.map(match => {
             const odd1 = match.odd_1 || "-";
-            const oddX = match.odd_x || "-";
             const odd2 = match.odd_2 || "-";
 
             return `
@@ -1057,7 +1064,6 @@ function fetchOddsUntilMatchFound() {
                     </div>
                     <div class="prediction-number">${odd1}</div>
                   </div>
-                  
                   <div class="team-nam">
                     <span>${match.away}</span>
                     <div class="team-logo">
@@ -1079,6 +1085,7 @@ function fetchOddsUntilMatchFound() {
 }
 
 fetchOddsUntilMatchFound();
+
 
 
 

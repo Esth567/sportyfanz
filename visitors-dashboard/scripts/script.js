@@ -982,79 +982,92 @@ document.querySelectorAll('.category-btn').forEach(button => {
 
 //function for predition-container for middly layer
 
-const from = new Date().toISOString().split('T')[0];
-const to = from;
-
 const bigTeams = [
   "Man U", "Manchester United", "Chelsea", "Real Madrid", "Barcelona",
   "Juventus", "Bayern Munich", "PSG", "Liverpool", "Arsenal"
 ];
 
-const topLeagues = ["Premier League", "La Liga", "Serie A", "Bundesliga"];
-
 const predictionContainer = document.querySelector('.predition-container');
 
-fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${to}&APIkey=${APIkey}`)
-  .then(res => res.json())
-  .then(predictions => {
-    const filteredMatches = predictions.filter(match => {
-      const home = match.match_hometeam_name;
-      const away = match.match_awayteam_name;
+function getDateString(offsetDays = 0) {
+  const date = new Date();
+  date.setDate(date.getDate() + offsetDays);
+  return date.toISOString().split('T')[0];
+}
 
-      // Only show matches where both teams are from bigTeams
-      return bigTeams.some(team => home.includes(team)) &&
-             bigTeams.some(team => away.includes(team));
-    });
+let offset = 0;
 
-    if (filteredMatches.length === 0) {
-      predictionContainer.innerHTML = "<p>No big team match predictions today.</p>";
-      return;
-    }
+function fetchOddsUntilMatchFound() {
+  const from = getDateString(offset);
+  const to = from;
 
-    // Multiple match swipe setup
-    predictionContainer.innerHTML = `
-      <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
-        ${filteredMatches.map(match => {
-          const home = match.match_hometeam_name;
-          const away = match.match_awayteam_name;
-          const homeLogo = match.team_home_badge || 'assets/images/default-logo.png';
-          const awayLogo = match.team_away_badge || 'assets/images/default-logo.png';
+  fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${from}&to=${to}&APIkey=${APIkey}`)
+    .then(res => res.json())
+    .then(data => {
+      // Filter matches where both teams are from bigTeams
+      const bigMatches = data.filter(match => {
+        const home = match.match_hometeam_name;
+        const away = match.match_awayteam_name;
 
-          const homePrediction = match.prob_HW || "0%";
-          const drawPrediction = match.prob_D || "0%";
-          const awayPrediction = match.prob_AW || "0%";
+        return bigTeams.some(team => home.includes(team)) &&
+               bigTeams.some(team => away.includes(team));
+      });
 
-          return `
-            <div class="predition-content">
-              <h4>Who will win?</h4>
-              <div class="predit-selection">
-                <div class="team-nam">
-                  <span>${home}</span>
-                  <div class="team-logo">
-                    <img src="${homeLogo}" alt="${home}">
+      if (bigMatches.length === 0 && offset < 7) {
+        offset++;
+        fetchOddsUntilMatchFound(); // Try the next date
+        return;
+      }
+
+      if (bigMatches.length === 0) {
+        predictionContainer.innerHTML = "<p>No big team matches with odds available.</p>";
+        return;
+      }
+
+      predictionContainer.innerHTML = `
+        <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
+          ${bigMatches.map(match => {
+            const home = match.match_hometeam_name;
+            const away = match.match_awayteam_name;
+            const homeLogo = match.team_home_badge || 'assets/images/default-logo.png';
+            const awayLogo = match.team_away_badge || 'assets/images/default-logo.png';
+
+            const odd1 = match.odd_1 || "-";
+            const oddX = match.odd_x || "-";
+            const odd2 = match.odd_2 || "-";
+
+            return `
+              <div class="predition-content">
+                <h4>Who will win?</h4>
+                <div class="predit-selection">
+                  <div class="team-nam">
+                    <span>${home}</span>
+                    <div class="team-logo">
+                      <img src="${homeLogo}" alt="${home}">
+                    </div>
+                    <div class="prediction-number">${odd1}</div>
                   </div>
-                  <div class="prediction-number">${homePrediction}</div>
-                </div>
-                <div class="team-nam">
-                  <span>${away}</span>
-                  <div class="team-logo">
-                    <img src="${awayLogo}" alt="${away}">
+                  <div class="team-nam">
+                    <span>${away}</span>
+                    <div class="team-logo">
+                      <img src="${awayLogo}" alt="${away}">
+                    </div>
+                    <div class="prediction-number">${odd2}</div>
                   </div>
-                  <div class="prediction-number">${awayPrediction}</div>
                 </div>
               </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    `;
-  })
-  .catch(err => {
-    console.error("Prediction fetch failed:", err);
-    predictionContainer.innerHTML = "<p>Error fetching predictions.</p>";
-  });
+            `;
+          }).join('')}
+        </div>
+      `;
+    })
+    .catch(err => {
+      console.error("Odds fetch failed:", err);
+      predictionContainer.innerHTML = "<p>Error fetching match odds.</p>";
+    });
+}
 
-
+fetchOddsUntilMatchFound();
 
 
 // menu toggle button for sidebar for mobile view

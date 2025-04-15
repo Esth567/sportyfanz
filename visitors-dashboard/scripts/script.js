@@ -1000,20 +1000,18 @@ fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${t
     const filteredMatches = predictions.filter(match => {
       const home = match.match_hometeam_name;
       const away = match.match_awayteam_name;
-      const league = match.league_name;
 
-      return (
-        topLeagues.includes(league) &&
-        (bigTeams.some(team => home.includes(team) || away.includes(team)))
-      );
+      // Only show matches where both teams are from bigTeams
+      return bigTeams.some(team => home.includes(team)) &&
+             bigTeams.some(team => away.includes(team));
     });
 
     if (filteredMatches.length === 0) {
-      predictionContainer.innerHTML = "<p>No hot match predictions today.</p>";
+      predictionContainer.innerHTML = "<p>No big team match predictions today.</p>";
       return;
     }
 
-    // Swipe container with flex row layout
+    // Multiple match swipe setup
     predictionContainer.innerHTML = `
       <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
         ${filteredMatches.map(match => {
@@ -1037,13 +1035,6 @@ fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${t
                   </div>
                   <div class="prediction-number">${homePrediction}</div>
                 </div>
-                <div class="Select-team">
-                  <span>Draw</span>
-                  <div class="team-logo">
-                    <img src="assets/images/neutral-ball.png" alt="Draw">
-                  </div>
-                  <div class="prediction-number">${drawPrediction}</div>
-                </div>
                 <div class="team-nam">
                   <span>${away}</span>
                   <div class="team-logo">
@@ -1062,7 +1053,6 @@ fetch(`https://apiv3.apifootball.com/?action=get_predictions&from=${from}&to=${t
     console.error("Prediction fetch failed:", err);
     predictionContainer.innerHTML = "<p>Error fetching predictions.</p>";
   });
-
 
 
 

@@ -387,6 +387,8 @@ async function displayLiveMatch(matchId, category) {
                     <button class="tab-btn active" data-tab="info">Info</button>
                     <button class="tab-btn" data-tab="lineups">Line-ups</button>
                     <button class="tab-btn" data-tab="h2h">H2H</button>
+                    <button class="tab-btn" data-tab="statistics">Statistics</button>
+                    <button class="tab-btn" data-tab="standing">Standing</button>
                 </div>
                 <img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">
                 <div class="tab-content" id="tab-content">
@@ -420,6 +422,8 @@ async function displayLiveMatch(matchId, category) {
                     <button class="tab-btn active" data-tab="info">Info</button>
                     <button class="tab-btn" data-tab="lineups">Line-ups</button>
                     <button class="tab-btn" data-tab="h2h">H2H</button>
+                    <button class="tab-btn" data-tab="statistics">Statistics</button>
+                    <button class="tab-btn" data-tab="standing">Standing</button>
                 </div>
                 <img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">
                 <div class="tab-content" id="tab-content">
@@ -654,6 +658,30 @@ function getTabContent(tab, match) {
                  <div class="h2h-header-line"></div>
                  <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
                `;
+
+               case "statistics":
+                return `
+                  <div class="statistics-data">
+                  <h3>statistics</h3>
+                </div>
+                 <div class="h2h-header-line"></div>
+                 <div class="h2h-matches-container" id="h2h-matches">
+                  <h4>${match.match_hometeam_name}</h4>
+                  <h4>${match.match_awayteam_name}</h4>
+                 </div>
+               `;
+
+               case "standing":
+                return `
+                  <div class="standing-data">
+                  <h3>H2H</h3>
+                  <h4>${match.match_hometeam_name}</h4>
+                  <h4>${match.match_awayteam_name}</h4>
+                </div>
+                 <div class="h2h-header-line"></div>
+                 <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
+               `;
+
 
         default:
             return "<p>No data available.</p>";

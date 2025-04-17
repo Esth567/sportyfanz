@@ -660,16 +660,47 @@ function getTabContent(tab, match) {
                `;
 
                case "statistics":
+                const stats = match.statistics || [];
+                const statIcons = {
+                    "Shots Total": "🎯",
+                    "Shots On Goal": "🥅",
+                    "Shots Off Goal": "🚫",
+                    "Shots Blocked": "🛡️",
+                    "Shots Inside Box": "📦",
+                    "Shots Outside Box": "📤",
+                    "Fouls": "⚠️",
+                    "Corners": "🚩",
+                    "Offsides": "⛳",
+                    "Ball Possession": "🕑",
+                    "Yellow Cards": "🟨",
+                    "Saves": "🧤",
+                    "Passes Total": "🔁",
+                    "Passes Accurate": "✅"
+                };
+            
+                const statsHTML = stats.map(stat => `
+                  <div class="stat-row">
+                    <div class="stat-icon">${statIcons[stat.type] || "📊"}</div>
+                    <div class="stat-type">${stat.type}</div>
+                    <div class="stat-home">${stat.home}</div>
+                    <div class="stat-away">${stat.away}</div>
+                  </div>
+                `).join("");
+            
                 return `
                   <div class="statistics-data">
-                  <h3>statistics</h3>
-                </div>
-                 <div class="h2h-header-line"></div>
-                 <div class="h2h-matches-container" id="h2h-matches">
-                  <h4>${match.match_hometeam_name}</h4>
-                  <h4>${match.match_awayteam_name}</h4>
-                 </div>
-               `;
+                    <h3>Statistics</h3>
+                    <div class="h2h-header-line"></div>
+                    <div class="h2h-matches-container stats-compare">
+                      <div class="team-name">${match.match_hometeam_name}</div>
+                      <div class="team-name">${match.match_awayteam_name}</div>
+                    </div>
+                    <div class="statistics-list">
+                      ${statsHTML}
+                    </div>
+                  </div>
+                `;
+            
 
                case "standing":
                 return `

@@ -2834,6 +2834,50 @@ body{
 }
 
 
+.statistics-data {
+    padding: 1rem;
+  }
+  
+  .h2h-matches-container.stats-compare {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .statistics-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #ccc;
+    padding: 6px 0;
+  }
+  
+  .stat-icon {
+    width: 25px;
+    text-align: center;
+  }
+  
+  .stat-type {
+    flex: 2;
+    text-align: left;
+    padding-left: 5px;
+  }
+  
+  .stat-home,
+  .stat-away {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+
   
 
 

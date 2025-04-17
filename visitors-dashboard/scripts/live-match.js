@@ -548,16 +548,18 @@ function getTabContent(tab, match, APIkey) {
                 </div>
             `;
 
-        case "h2h":
-            return `
-                <div class="h2h-header">
-                    <h3>H2H</h3>
-                    <h4>${match.match_hometeam_name}</h4>
-                    <h4>${match.match_awayteam_name}</h4>
-                </div>
-                <div class="h2h-header-line"></div>
-                <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
-            `;
+            case "h2h":
+                // 🔄 Dynamically fetch H2H data
+                loadH2HData(match, APIkey);
+                return `
+                    <div class="h2h-header">
+                        <h3>H2H</h3>
+                        <h4>${match.match_hometeam_name}</h4>
+                        <h4>${match.match_awayteam_name}</h4>
+                    </div>
+                    <div class="h2h-header-line"></div>
+                    <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
+                `;
 
             case "statistics":
                 // Trigger statistics loading before returning the UI container
@@ -577,16 +579,17 @@ function getTabContent(tab, match, APIkey) {
                     </div>
                 `;
 
-        case "standing":
-            return `
-                <div class="standing-data">
-                    <h3>Standing</h3>
-                    <h4>${match.match_hometeam_name}</h4>
-                    <h4>${match.match_awayteam_name}</h4>
-                </div>
-                <div class="h2h-header-line"></div>
-                <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
-            `;
+                case "standing":
+                    // 🔄 Load standing and highlight teams
+                    loadStandings(match, APIkey);
+                    return `
+                        <div class="standing-data">
+                            <h3>Standings</h3>
+                            <div class="standings-table-container" id="standings-table">
+                                <p>Loading standings...</p>
+                            </div>
+                        </div>
+                    `;
 
 
         default:
@@ -638,65 +641,55 @@ async function loadMatchStatistics(match_id, APIkey, match) {
 
 
 
-  
-
-
-async function renderH2HMatches(match, APIkey) {
-    const firstTeamId = match.match_hometeam_id;
-    const secondTeamId = match.match_awayteam_id;
-
-    const h2hContainer = document.getElementById("h2h-matches");
-    
-    // Set initial message before fetching
-    h2hContainer.innerHTML = "Fetching data...";
-
-    // Fetch data from API
-    const h2hData = await fetchH2HData(firstTeamId, secondTeamId, APIkey);
-
-    // If no data or API returns empty array, show 'No data available'
-    if (!Array.isArray(h2hData) || h2hData.length === 0) {
-        h2hContainer.innerHTML = "<p>No head-to-head data available.</p>";
-        return;
-    }
-
-    // Otherwise, render the fetched H2H data
-    h2hContainer.innerHTML = h2hData.map(game => `
-        <div class="h2h-match">
-            <div class="h2h-time">
-                <span class="match-time">${game.match_date}</span>
-                <span class="match-ft">${game.match_status === "Finished" ? "FT" : game.match_status}</span>
-            </div>
-            <div class="h2h-right">
-                <div class="h2h-team-data">
-                    <div class="h2h-team">
-                        <img src="${game.team_home_badge}" alt="${game.match_hometeam_name}" class="h2h-logo">
-                        <span class="h2h-team-name">${game.match_hometeam_name}</span>
-                    </div>
-                    <div class="h2h-team">
-                        <img src="${game.team_away_badge}" alt="${game.match_awayteam_name}" class="h2h-logo">
-                        <span class="h2h-team-name">${game.match_awayteam_name}</span>
-                    </div>
-                </div>
-                <div class="h2h-matches-scores">
-                    <div class="score">${game.match_hometeam_score}</div>
-                    <div class="score">${game.match_awayteam_score}</div>
-                </div>
-            </div>
-        </div>
-    `).join("");
-}
-
-
-async function fetchH2HData(firstTeamId, secondTeamId, APIkey) {
+//function to load h2h
+async function loadH2HData(match, APIkey) {
     try {
-        const response = await fetch(`https://apiv3.apifootball.com/?action=get_H2H&firstTeamId=${firstTeamId}&secondTeamId=${secondTeamId}&APIkey=${APIkey}`);
+        const response = await fetch(`https://apiv3.apifootball.com/?action=get_H2H&firstTeam=${match.match_hometeam_name}&secondTeam=${match.match_awayteam_name}&APIkey=${APIkey}`);
         const data = await response.json();
-        return data;
+
+        const html = data?.length
+            ? data.map(m => `
+                <div class="h2h-match-row">
+                    <span>${m.match_date}</span> - 
+                    <strong>${m.match_hometeam_name} ${m.match_hometeam_score} - ${m.match_awayteam_score} ${m.match_awayteam_name}</strong>
+                </div>`).join("")
+            : "<p>No recent head-to-head matches found.</p>";
+
+        document.getElementById("h2h-matches").innerHTML = html;
     } catch (error) {
-        console.error("Error fetching H2H data:", error);
-        return [];
+        console.error("Failed to load H2H data:", error);
+        document.getElementById("h2h-matches").innerHTML = "<p>Error loading H2H data.</p>";
     }
 }
+
+
+async function loadStandings(match, APIkey) {
+    try {
+        const response = await fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${match.league_id}&APIkey=${APIkey}`);
+        const data = await response.json();
+
+        const html = data.map(team => {
+            const isHome = team.team_name === match.match_hometeam_name;
+            const isAway = team.team_name === match.match_awayteam_name;
+            const highlightClass = isHome || isAway ? "highlight-team" : "";
+
+            return `
+                <div class="standing-row ${highlightClass}">
+                    <span>${team.overall_league_position}</span>
+                    <span>${team.team_name}</span>
+                    <span>Pts: ${team.overall_league_PTS}</span>
+                </div>
+            `;
+        }).join("");
+
+        document.getElementById("standings-table").innerHTML = html;
+    } catch (error) {
+        console.error("Failed to load standings:", error);
+        document.getElementById("standings-table").innerHTML = "<p>Error loading standings.</p>";
+    }
+}
+
+
 
   
   

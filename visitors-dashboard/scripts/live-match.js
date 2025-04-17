@@ -464,15 +464,23 @@ async function displayLiveMatch(matchId, category) {
   
 
 // Function to update tab content dynamically
-function getTabContent(tab, match) {
- 
+function getTabContent(tab, match, APIkey) {
+    const renderPlayers = (players) =>
+        players?.length
+            ? players.map(player => `
+                <li>
+                    <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                    <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                </li>`).join("")
+            : `<li><em>No data available</em></li>`;
+
     switch (tab) {
         case "info":
             return `
                 <div class="info-match-container">
                     <h3>Match Info</h3>
                     <div class="info-teamNames">
-                        <h4>${match.match_hometeam_name}</h4> <span>vs</span> <h4>${match.match_awayteam_name}</h4>
+                        <h4>${match.match_hometeam_name}</h4><span>vs</span><h4>${match.match_awayteam_name}</h4>
                     </div>
                     <div class="infoMatch-details">
                         <div class="infoLeft-wing">
@@ -480,77 +488,15 @@ function getTabContent(tab, match) {
                             <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
                         </div>
                         <div class="infoRight-wing">
-                            <p><strong><img src="assets/icons/gprIcon.png"  class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
+                            <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
                             <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lineup-players-names">
-                    <h4>Players</h4>
-                    <div class="lineUp-cont">
-                        <div class="lineup-home-players">
-                            <h4>${match.match_hometeam_name}</h4>
-                            <ul>
-                                ${
-                                    match.lineup?.home?.starting_lineups?.length 
-                                    ? match.lineup.home.starting_lineups.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : "<p>No lineup available</p>"
-                                }
-                            </ul>
-                            <h4>Substitutes</h4>
-                            <ul>
-                                ${
-                                    match.lineup?.home?.substitutes?.length 
-                                    ? match.lineup.home.substitutes.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : "<p>No substitutes available</p>"
-                                }
-                            </ul>
-                        </div>
-                        <div class="lineup-away-players">
-                            <h4>${match.match_awayteam_name}</h4>
-                            <ul>
-                                ${
-                                    match.lineup?.away?.starting_lineups?.length 
-                                    ? match.lineup.away.starting_lineups.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : "<p>No lineup available</p>"
-                                }
-                            </ul>
-                            <h4>Substitutes</h4>
-                            <ul>
-                                ${
-                                    match.lineup?.away?.substitutes?.length 
-                                    ? match.lineup.away.substitutes.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : "<p>No substitutes available</p>"
-                                }
-                            </ul>
                         </div>
                     </div>
                 </div>
             `;
 
-            case "lineups":
-                return `
+        case "lineups":
+            return `
                 <div class="lineUpsteams-container">
                     <div class="lineUpsteam-info">
                         <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="lineUpsteam-logo">
@@ -568,124 +514,78 @@ function getTabContent(tab, match) {
                     </div>
                 </div>
 
-                 <div id="football-field" class="field">
-                   <div class="goalpost home-goalpost"></div>
-                   <div class="penalty-box home-box"></div>
-                   <div class="penalty-arc home-arc"></div>
-  
-                   <div id="home-formation" class="formation-area"></div>
-
-                   <div class="center-circle"></div>
+                <div id="football-field" class="field">
+                    <div class="goalpost home-goalpost"></div>
+                    <div class="penalty-box home-box"></div>
+                    <div class="penalty-arc home-arc"></div>
+                    <div id="home-formation" class="formation-area"></div>
+                    <div class="center-circle"></div>
                     <div class="center-line"></div>
-
-                   <div id="away-formation" class="formation-area"></div>
-
+                    <div id="away-formation" class="formation-area"></div>
                     <div class="goalpost away-goalpost"></div>
-                   <div class="penalty-box away-box"></div>
-                  <div class="penalty-arc away-arc"></div>
-                 </div>
+                    <div class="penalty-box away-box"></div>
+                    <div class="penalty-arc away-arc"></div>
+                </div>
 
-            
                 <div class="lineup-players-names">
                     <h4>Players</h4>
                     <div class="lineUp-cont">
                         <div class="lineup-home-players">
                             <h4>${match.match_hometeam_name}</h4>
-                            <ul>
-                                ${match.lineup?.home?.starting_lineups?.length 
-                                    ? match.lineup.home.starting_lineups.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : '<li><em>No lineup available</em></li>'
-                                }
-                            </ul>
+                            <ul>${renderPlayers(match.lineup?.home?.starting_lineups)}</ul>
                             <h4>Substitutes</h4>
-                            <ul>
-                                ${match.lineup?.home?.substitutes?.length 
-                                    ? match.lineup.home.substitutes.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : "<p>No substitutes available</p>"
-                                }
-                            </ul>
+                            <ul>${renderPlayers(match.lineup?.home?.substitutes)}</ul>
+                            <ul>${renderPlayers(match.lineup?.home?.coaches)}</ul>
                         </div>
-
-            
                         <div class="lineup-away-players">
                             <h4>${match.match_awayteam_name}</h4>
-                            <ul>
-                                ${match.lineup?.away?.starting_lineups?.length 
-                                    ? match.lineup.away.starting_lineups.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : "<p>No lineup available</p>"
-                                }
-                            </ul>
+                            <ul>${renderPlayers(match.lineup?.away?.starting_lineups)}</ul>
                             <h4>Substitutes</h4>
-                            <ul>
-                                ${match.lineup?.away?.substitutes?.length 
-                                    ? match.lineup.away.substitutes.map(player => `
-                                        <li>
-                                            <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                                            <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                                        </li>
-                                    `).join("")
-                                    : "<p>No substitutes available</p>"
-                                }
-                            </ul>
+                            <ul>${renderPlayers(match.lineup?.away?.substitutes)}</ul>
+                            <ul>${renderPlayers(match.lineup?.away?.coaches)}</ul>
                         </div>
                     </div>
                 </div>
+            `;
+
+        case "h2h":
+            return `
+                <div class="h2h-header">
+                    <h3>H2H</h3>
+                    <h4>${match.match_hometeam_name}</h4>
+                    <h4>${match.match_awayteam_name}</h4>
+                </div>
+                <div class="h2h-header-line"></div>
+                <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
+            `;
+
+            case "statistics":
+                // Trigger statistics loading before returning the UI container
+                loadMatchStatistics(match.match_id, APIkey, match);
+                return `
+                    <div class="statistics-container">
+                        <h3>Match Statistics</h3>
+                        <div class="stat-header">
+                            <h4>${match.match_hometeam_name}</h4>
+                            <span>vs</span>
+                            <h4>${match.match_awayteam_name}</h4>
+                        </div>
+                        <div class="statistics-list">
+                            <p>Loading statistics...</p>
+                        </div>
+                    </div>
                 `;
-            
-        
-                case "h2h":
-                return `
-                  <div class="h2h-header">
-                  <h3>H2H</h3>
-                  <h4>${match.match_hometeam_name}</h4>
-                  <h4>${match.match_awayteam_name}</h4>
-                </div>
-                 <div class="h2h-header-line"></div>
-                 <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
-               `;
 
-              
-                
-            
-               case "statistics":
-               return `
-                 <div class="statistics-data">
-                 <h3>Statistics</h3>
-                 <div class="h2h-header-line"></div>
-                 <div class="statistics-container stats-compare">
-                 <div class="team-name">${match.match_hometeam_name}</div>
-                 <div class="team-name">${match.match_awayteam_name}</div>
+        case "standing":
+            return `
+                <div class="standing-data">
+                    <h3>Standing</h3>
+                    <h4>${match.match_hometeam_name}</h4>
+                    <h4>${match.match_awayteam_name}</h4>
                 </div>
-              <div class="statistics-list" id="stats-placeholder">Loading...</div>
-             </div>
-             `;
-
-
-               case "standing":
-                return `
-                  <div class="standing-data">
-                  <h3>H2H</h3>
-                  <h4>${match.match_hometeam_name}</h4>
-                  <h4>${match.match_awayteam_name}</h4>
-                </div>
-                 <div class="h2h-header-line"></div>
-                 <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
-               `;
+                <div class="h2h-header-line"></div>
+                <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
+            `;
 
 
         default:
@@ -694,41 +594,48 @@ function getTabContent(tab, match) {
 }
 
 
-//function to render statistic
- async function loadMatchStatistics(match_id, APIkey) {
-  const response = await fetch(`https://apiv3.apifootball.com/?action=get_statistics&match_id=${match_id}&APIkey=${APIkey}`);
-  const data = await response.json();
+//function to load statistic
+async function loadMatchStatistics(match_id, APIkey, match) {
+    try {
+        const response = await fetch(`https://apiv3.apifootball.com/?action=get_statistics&match_id=${match_id}&APIkey=${APIkey}`);
+        const data = await response.json();
+        const stats = data[match_id]?.statistics || [];
 
-  const statData = data[match_id]?.statistics || [];
+        const statIcons = {
+            "Shots Total": "🎯",
+            "Shots On Goal": "🥅",
+            "Shots Off Goal": "🚫",
+            "Shots Blocked": "🛡️",
+            "Shots Inside Box": "📦",
+            "Shots Outside Box": "📤",
+            "Fouls": "⚠️",
+            "Corners": "🚩",
+            "Offsides": "⛳",
+            "Ball Possession": "🕑",
+            "Yellow Cards": "🟨",
+            "Saves": "🧤",
+            "Passes Total": "🔁",
+            "Passes Accurate": "✅"
+        };
 
-  const statIcons = {
-    "Shots Total": "🎯",
-    "Shots On Goal": "🥅",
-    "Shots Off Goal": "🚫",
-    "Shots Blocked": "🛡️",
-    "Shots Inside Box": "📦",
-    "Shots Outside Box": "📤",
-    "Fouls": "⚠️",
-    "Corners": "🚩",
-    "Offsides": "⛳",
-    "Ball Possession": "🕑",
-    "Yellow Cards": "🟨",
-    "Saves": "🧤",
-    "Passes Total": "🔁",
-    "Passes Accurate": "✅"
-  };
+        const statsHTML = stats.map(stat => `
+            <div class="stat-comparison-row">
+                <div class="stat-home">${stat.home}</div>
+                <div class="stat-icon">${statIcons[stat.type] || "📊"}</div>
+                <div class="stat-away">${stat.away}</div>
+                <div class="stat-label">${stat.type}</div>
+            </div>
+        `).join("");
 
-  const statsHTML = statData.map(stat => `
-    <div class="stat-comparison-row">
-      <div class="stat-home">${stat.home}</div>
-      <div class="stat-icon">${statIcons[stat.type] || "📊"}</div>
-      <div class="stat-away">${stat.away}</div>
-      <div class="stat-label">${stat.type}</div>
-    </div>
-  `).join("");
+        document.querySelector('.statistics-list').innerHTML = statsHTML;
 
-  document.getElementById("stats-placeholder").innerHTML = statsHTML;
+    } catch (error) {
+        console.error("Failed to load statistics:", error);
+        document.querySelector('.statistics-list').innerHTML = `<p>Error loading statistics</p>`;
+    }
 }
+
+
 
   
 

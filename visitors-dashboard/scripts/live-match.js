@@ -591,7 +591,7 @@ function getTabContent(tab, match, APIkey) {
                         <div class="standing-header">
                             <h3>Standings</h3>                          
                             <div class="standings-table-container" id="standings-table">
-                                 <div class="spinner" id="standing-spinner"></div>
+                                 <div class="spinner" id="standing-spinner" style="display: none;"></div>
                             </div>
                         </div>
                     `;
@@ -627,7 +627,7 @@ async function loadMatchStatistics(match_id, APIkey, match) {
                 <div class="stat-label">${stat.type}</div>
             </div>
         `).join("");
-        
+
         document.querySelector(".statistics-list").innerHTML = statsHTML;
         document.getElementById("statistics-spinner").style.display = "none";
 

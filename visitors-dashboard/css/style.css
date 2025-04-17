@@ -2845,37 +2845,44 @@ body{
     font-weight: bold;
   }
   
+  .stats-compare {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
   .statistics-list {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 1rem;
   }
   
-  .stat-row {
+  .stat-comparison-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px dashed #ccc;
-    padding: 6px 0;
   }
   
-  .stat-icon {
-    width: 25px;
-    text-align: center;
-  }
-  
-  .stat-type {
-    flex: 2;
-    text-align: left;
-    padding-left: 5px;
-  }
-  
-  .stat-home,
-  .stat-away {
+  .stat-home, .stat-away {
     flex: 1;
     text-align: center;
     font-weight: 600;
   }
+  
+  .stat-icon {
+    width: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  
+  .stat-label {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 2px;
+  }
+  
   
 
   

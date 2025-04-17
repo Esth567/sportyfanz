@@ -425,7 +425,9 @@ async function displayLiveMatch(matchId, category) {
                     <button class="tab-btn" data-tab="statistics">Statistics</button>
                     <button class="tab-btn" data-tab="standing">Standing</button>
                 </div>
-                <div class="ad5-logo"></div>
+                <div class="ad5-logo">
+                 <h5>Advertisement</h5>
+                </div>
                 <div class="tab-content" id="tab-content">
                     ${getTabContent("info", match)}
                 </div>

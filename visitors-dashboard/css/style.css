@@ -2834,6 +2834,10 @@ body{
     text-align: center;
 }
 
+.h2h-match-row {
+    padding: 6px 12px;
+    border-bottom: 1px solid #eee;
+}
 
 .statistics-data {
     padding: 1rem;
@@ -2859,11 +2863,14 @@ body{
     gap: 1rem;
   }
   
+
   .stat-comparison-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    display: grid;
+    grid-template-columns: 1fr 30px 1fr auto;
+    gap: 10px;
+    padding: 4px 8px;
+    border-bottom: 1px solid #ccc;
+}
   
   .stat-home, .stat-away {
     flex: 1;
@@ -2885,10 +2892,6 @@ body{
   }
   
 
-  .highlight-team {
-    background: #ffe08a;
-    font-weight: bold;
-}
 
 .standing-row {
     display: flex;
@@ -2897,18 +2900,46 @@ body{
     border-bottom: 1px solid #ddd;
 }
 
-.h2h-match-row {
-    padding: 6px 12px;
-    border-bottom: 1px solid #eee;
-}
 
-.stat-comparison-row {
-    display: grid;
-    grid-template-columns: 1fr 30px 1fr auto;
-    gap: 10px;
-    padding: 4px 8px;
-    border-bottom: 1px solid #ccc;
+.spinner {
+    border: 4px solid #eee;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .filter-buttons {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .filter-buttons button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .standing-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .standing-table th, .standing-table td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+  }
+
+  .highlight-team {
+    background: #ffe08a;
+    font-weight: bold;
 }
+  
 
   
 

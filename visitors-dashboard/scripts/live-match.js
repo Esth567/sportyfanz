@@ -552,16 +552,20 @@ function getTabContent(tab, match, APIkey) {
 
             case "h2h":
                 // 🔄 Dynamically fetch H2H data
-                loadH2HData(match, APIkey);
                 return `
                     <div class="h2h-header">
                         <h3>H2H</h3>
                         <h4>${match.match_hometeam_name}</h4>
                         <h4>${match.match_awayteam_name}</h4>
-                    </div>
-                    <div class="h2h-header-line"></div>
-                    <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
-                `;
+                         <div class="filter-buttons">
+                          <button onclick="loadH2HData('${match.match_id}', '${APIkey}', 5)">Last 5 Matches</button>
+                          <button onclick="loadH2HData('${match.match_id}', '${APIkey}', 'all')">All Matches</button>
+                          </div>
+                      </div>
+                      <div class="h2h-header-line"></div>
+                      <div class="spinner" id="h2h-spinner"></div>
+                     <div class="h2h-matches-container" id="h2h-matches"></div>
+                   `;
 
             case "statistics":
                 // Trigger statistics loading before returning the UI container
@@ -575,9 +579,8 @@ function getTabContent(tab, match, APIkey) {
                             <span>vs</span>
                             <h4>${match.match_awayteam_name}</h4>
                         </div>
-                        <div class="statistics-list">
-                            <p>Loading statistics...</p>
-                        </div>
+                         <div class="spinner" id="statistics-spinner"></div>
+                        <div class="statistics-list"></div>
                     </div>
                 `;
 
@@ -585,10 +588,10 @@ function getTabContent(tab, match, APIkey) {
                     // 🔄 Load standing and highlight teams
                     loadStandings(match, APIkey);
                     return `
-                        <div class="standing-data">
-                            <h3>Standings</h3>
+                        <div class="standing-header">
+                            <h3>Standings</h3>                          
                             <div class="standings-table-container" id="standings-table">
-                                <p>Loading standings...</p>
+                                 <div class="spinner" id="standing-spinner"></div>
                             </div>
                         </div>
                     `;
@@ -606,6 +609,8 @@ async function loadMatchStatistics(match_id, APIkey, match) {
         const response = await fetch(`https://apiv3.apifootball.com/?action=get_statistics&match_id=${match_id}&APIkey=${APIkey}`);
         const data = await response.json();
         const stats = data[match_id]?.statistics || [];
+        document.getElementById("statistics-spinner").style.display = "block";
+        document.querySelector(".statistics-list").innerHTML = "";
 
         const statIcons = {
             "Shots Total": "🎯", "Shots On Goal": "🥅", "Shots Off Goal": "🚫", "Shots Blocked": "🛡️",
@@ -622,6 +627,9 @@ async function loadMatchStatistics(match_id, APIkey, match) {
                 <div class="stat-label">${stat.type}</div>
             </div>
         `).join("");
+        
+        document.querySelector(".statistics-list").innerHTML = statsHTML;
+        document.getElementById("statistics-spinner").style.display = "none";
 
         document.querySelector('.statistics-list').innerHTML = statsHTML;
     } catch (error) {
@@ -634,25 +642,34 @@ async function loadMatchStatistics(match_id, APIkey, match) {
 
 
 //function to load h2h
-async function loadH2HData(match, APIkey) {
+
+async function loadH2HData(match_id, APIkey, limit) {
+    document.getElementById('h2h-spinner').style.display = 'block';
+    document.getElementById('h2h-matches').innerHTML = '';
+
     try {
-        const response = await fetch(`https://apiv3.apifootball.com/?action=get_H2H&firstTeam=${match.match_hometeam_name}&secondTeam=${match.match_awayteam_name}&APIkey=${APIkey}`);
+        const response = await fetch(`https://apiv3.apifootball.com/?action=get_H2H&match_id=${match_id}&APIkey=${APIkey}`);
         const data = await response.json();
 
-        const html = data?.length
-            ? data.slice(0, 5).map(m => `
-                <div class="h2h-match-row">
-                    <span>${m.match_date}</span> - 
-                    <strong>${m.match_hometeam_name} ${m.match_hometeam_score} - ${m.match_awayteam_score} ${m.match_awayteam_name}</strong>
-                </div>`).join("")
-            : "<p>No recent head-to-head matches found.</p>";
+        let matches = data?.[0]?.h2h || [];
+        if (limit !== 'all') {
+            matches = matches.slice(0, limit);
+        }
 
-        document.getElementById("h2h-matches").innerHTML = html;
+        const html = matches.map(match => `
+            <div class="h2h-match">
+                <p>${match.match_date} - ${match.match_hometeam_name} ${match.match_hometeam_score} : ${match.match_awayteam_score} ${match.match_awayteam_name}</p>
+            </div>
+        `).join("");
+
+        document.getElementById('h2h-matches').innerHTML = html || "<p>No H2H data available</p>";
     } catch (error) {
-        console.error("H2H Error:", error);
-        document.getElementById("h2h-matches").innerHTML = "<p>Error loading H2H data.</p>";
+        document.getElementById('h2h-matches').innerHTML = "<p>Error fetching H2H data</p>";
+    } finally {
+        document.getElementById('h2h-spinner').style.display = 'none';
     }
 }
+
 
 
 
@@ -661,6 +678,27 @@ async function loadStandings(match, APIkey) {
     try {
         const response = await fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${match.league_id}&APIkey=${APIkey}`);
         const data = await response.json();
+
+        const tableHTML = `
+            <table class="standing-table">
+                <thead>
+                    <tr><th>Pos</th><th>Team</th><th>W</th><th>D</th><th>L</th><th>Pts</th></tr>
+                </thead>
+                <tbody>
+                    ${standings.map(team => `
+                        <tr class="${[hometeam, awayteam].includes(team.team_name) ? 'highlight-team' : ''}">
+                            <td>${team.overall_league_position}</td>
+                            <td>${team.team_name}</td>
+                            <td>${team.overall_league_W}</td>
+                            <td>${team.overall_league_D}</td>
+                            <td>${team.overall_league_L}</td>
+                            <td>${team.overall_league_PTS}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        `;
+
 
         const html = data.map(team => {
             const isHome = team.team_name === match.match_hometeam_name;
@@ -676,10 +714,12 @@ async function loadStandings(match, APIkey) {
             `;
         }).join("");
 
-        document.getElementById("standings-table").innerHTML = html;
-    } catch (error) {
-        console.error("Standings Error:", error);
-        document.getElementById("standings-table").innerHTML = "<p>Error loading standings.</p>";
+
+        document.getElementById("standing-table").innerHTML = tableHTML;
+    } catch (err) {
+        document.getElementById("standing-table").innerHTML = "<p>Error loading standings</p>";
+    } finally {
+        document.getElementById("standing-spinner").style.display = "none";
     }
 }
 

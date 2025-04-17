@@ -565,7 +565,8 @@ function getTabContent(tab, match, APIkey) {
                 return `
                     <div class="statistics-container">
                         <h3>Match Statistics</h3>
-                        <div class="stat-header">
+                        <div class="h2h-header-line"></div>
+                        <div class="statisticTeam-name">
                             <h4>${match.match_hometeam_name}</h4>
                             <span>vs</span>
                             <h4>${match.match_awayteam_name}</h4>

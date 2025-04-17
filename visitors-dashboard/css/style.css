@@ -2838,7 +2838,7 @@ body{
     padding: 1rem;
   }
   
-  .h2h-matches-container.stats-compare {
+  .statisticTeam-name {
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;

@@ -2884,12 +2884,17 @@ body{
     margin-top: 2px;
   }
   
-  
-  .highlight-team {
+
+.highlight-team {
     background-color: #ffe08a;
     font-weight: bold;
 }
-
+.standing-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    border-bottom: 1px solid #ddd;
+}
 
   
 

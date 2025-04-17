@@ -608,20 +608,10 @@ async function loadMatchStatistics(match_id, APIkey, match) {
         const stats = data[match_id]?.statistics || [];
 
         const statIcons = {
-            "Shots Total": "🎯",
-            "Shots On Goal": "🥅",
-            "Shots Off Goal": "🚫",
-            "Shots Blocked": "🛡️",
-            "Shots Inside Box": "📦",
-            "Shots Outside Box": "📤",
-            "Fouls": "⚠️",
-            "Corners": "🚩",
-            "Offsides": "⛳",
-            "Ball Possession": "🕑",
-            "Yellow Cards": "🟨",
-            "Saves": "🧤",
-            "Passes Total": "🔁",
-            "Passes Accurate": "✅"
+            "Shots Total": "🎯", "Shots On Goal": "🥅", "Shots Off Goal": "🚫", "Shots Blocked": "🛡️",
+            "Shots Inside Box": "📦", "Shots Outside Box": "📤", "Fouls": "⚠️", "Corners": "🚩",
+            "Offsides": "⛳", "Ball Possession": "🕑", "Yellow Cards": "🟨", "Saves": "🧤",
+            "Passes Total": "🔁", "Passes Accurate": "✅"
         };
 
         const statsHTML = stats.map(stat => `
@@ -634,12 +624,11 @@ async function loadMatchStatistics(match_id, APIkey, match) {
         `).join("");
 
         document.querySelector('.statistics-list').innerHTML = statsHTML;
-
     } catch (error) {
         console.error("Failed to load statistics:", error);
-        document.querySelector('.statistics-list').innerHTML = `<p>Error loading statistics</p>`;
     }
 }
+
 
 
 

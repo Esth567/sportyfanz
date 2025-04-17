@@ -472,7 +472,7 @@ function getTabContent(tab, match) {
                 <div class="info-match-container">
                     <h3>Match Info</h3>
                     <div class="info-teamNames">
-                        <h4>${match.match_hometeam_name}</h4> vs <h4>${match.match_awayteam_name}</h4>
+                        <h4>${match.match_hometeam_name}</h4> <span>vs</span> <h4>${match.match_awayteam_name}</h4>
                     </div>
                     <div class="infoMatch-details">
                         <div class="infoLeft-wing">
@@ -480,7 +480,7 @@ function getTabContent(tab, match) {
                             <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
                         </div>
                         <div class="infoRight-wing">
-                            <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon"></strong> ${match.venue_name || "Not available"}</p>
+                            <p><strong><img src="assets/icons/gprIcon.png"  class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
                             <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
                         </div>
                     </div>
@@ -599,7 +599,7 @@ function getTabContent(tab, match) {
                                             <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
                                         </li>
                                     `).join("")
-                                    : "<p>No lineup available</p>"
+                                    : '<li><em>No lineup available</em></li>'
                                 }
                             </ul>
                             <h4>Substitutes</h4>
@@ -659,48 +659,22 @@ function getTabContent(tab, match) {
                  <div class="h2h-matches-container" id="h2h-matches">Fetching data...</div>
                `;
 
+              
+                
+            
                case "statistics":
-                const stats = match.statistics || [];
-                const statIcons = {
-                    "Shots Total": "🎯",
-                    "Shots On Goal": "🥅",
-                    "Shots Off Goal": "🚫",
-                    "Shots Blocked": "🛡️",
-                    "Shots Inside Box": "📦",
-                    "Shots Outside Box": "📤",
-                    "Fouls": "⚠️",
-                    "Corners": "🚩",
-                    "Offsides": "⛳",
-                    "Ball Possession": "🕑",
-                    "Yellow Cards": "🟨",
-                    "Saves": "🧤",
-                    "Passes Total": "🔁",
-                    "Passes Accurate": "✅"
-                };
-            
-                const statsHTML = stats.map(stat => `
-                  <div class="stat-row">
-                    <div class="stat-icon">${statIcons[stat.type] || "📊"}</div>
-                    <div class="stat-type">${stat.type}</div>
-                    <div class="stat-home">${stat.home}</div>
-                    <div class="stat-away">${stat.away}</div>
-                  </div>
-                `).join("");
-            
-                return `
-                  <div class="statistics-data">
-                    <h3>Statistics</h3>
-                    <div class="h2h-header-line"></div>
-                    <div class="h2h-matches-container stats-compare">
-                      <div class="team-name">${match.match_hometeam_name}</div>
-                      <div class="team-name">${match.match_awayteam_name}</div>
-                    </div>
-                    <div class="statistics-list">
-                      ${statsHTML}
-                    </div>
-                  </div>
-                `;
-            
+               return `
+                 <div class="statistics-data">
+                 <h3>Statistics</h3>
+                 <div class="h2h-header-line"></div>
+                 <div class="statistics-container stats-compare">
+                 <div class="team-name">${match.match_hometeam_name}</div>
+                 <div class="team-name">${match.match_awayteam_name}</div>
+                </div>
+              <div class="statistics-list" id="stats-placeholder">Loading...</div>
+             </div>
+             `;
+
 
                case "standing":
                 return `
@@ -718,6 +692,45 @@ function getTabContent(tab, match) {
             return "<p>No data available.</p>";
     }
 }
+
+
+//function to render statistic
+ async function loadMatchStatistics(match_id, APIkey) {
+  const response = await fetch(`https://apiv3.apifootball.com/?action=get_statistics&match_id=${match_id}&APIkey=${APIkey}`);
+  const data = await response.json();
+
+  const statData = data[match_id]?.statistics || [];
+
+  const statIcons = {
+    "Shots Total": "🎯",
+    "Shots On Goal": "🥅",
+    "Shots Off Goal": "🚫",
+    "Shots Blocked": "🛡️",
+    "Shots Inside Box": "📦",
+    "Shots Outside Box": "📤",
+    "Fouls": "⚠️",
+    "Corners": "🚩",
+    "Offsides": "⛳",
+    "Ball Possession": "🕑",
+    "Yellow Cards": "🟨",
+    "Saves": "🧤",
+    "Passes Total": "🔁",
+    "Passes Accurate": "✅"
+  };
+
+  const statsHTML = statData.map(stat => `
+    <div class="stat-comparison-row">
+      <div class="stat-home">${stat.home}</div>
+      <div class="stat-icon">${statIcons[stat.type] || "📊"}</div>
+      <div class="stat-away">${stat.away}</div>
+      <div class="stat-label">${stat.type}</div>
+    </div>
+  `).join("");
+
+  document.getElementById("stats-placeholder").innerHTML = statsHTML;
+}
+
+  
 
 
 async function renderH2HMatches(match, APIkey) {

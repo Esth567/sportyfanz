@@ -2885,15 +2885,29 @@ body{
   }
   
 
-.highlight-team {
-    background-color: #ffe08a;
+  .highlight-team {
+    background: #ffe08a;
     font-weight: bold;
 }
+
 .standing-row {
     display: flex;
     justify-content: space-between;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-bottom: 1px solid #ddd;
+}
+
+.h2h-match-row {
+    padding: 6px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 30px 1fr auto;
+    gap: 10px;
+    padding: 4px 8px;
+    border-bottom: 1px solid #ccc;
 }
 
   

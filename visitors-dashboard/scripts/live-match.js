@@ -451,7 +451,7 @@ async function displayLiveMatch(matchId, category) {
     
             if (this.dataset.tab === "h2h") {
                 // Fetch and render H2H data
-                renderH2HMatches(match, APIkey);
+                loadH2HData(match, APIkey);
             }
     
             if (this.dataset.tab === "lineups") {
@@ -625,9 +625,10 @@ async function loadMatchStatistics(match_id, APIkey, match) {
 
         document.querySelector('.statistics-list').innerHTML = statsHTML;
     } catch (error) {
-        console.error("Failed to load statistics:", error);
+        console.error("Statistics Error:", error);
     }
 }
+
 
 
 
@@ -639,7 +640,7 @@ async function loadH2HData(match, APIkey) {
         const data = await response.json();
 
         const html = data?.length
-            ? data.map(m => `
+            ? data.slice(0, 5).map(m => `
                 <div class="h2h-match-row">
                     <span>${m.match_date}</span> - 
                     <strong>${m.match_hometeam_name} ${m.match_hometeam_score} - ${m.match_awayteam_score} ${m.match_awayteam_name}</strong>
@@ -648,12 +649,14 @@ async function loadH2HData(match, APIkey) {
 
         document.getElementById("h2h-matches").innerHTML = html;
     } catch (error) {
-        console.error("Failed to load H2H data:", error);
+        console.error("H2H Error:", error);
         document.getElementById("h2h-matches").innerHTML = "<p>Error loading H2H data.</p>";
     }
 }
 
 
+
+//function to load standings
 async function loadStandings(match, APIkey) {
     try {
         const response = await fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${match.league_id}&APIkey=${APIkey}`);
@@ -675,7 +678,7 @@ async function loadStandings(match, APIkey) {
 
         document.getElementById("standings-table").innerHTML = html;
     } catch (error) {
-        console.error("Failed to load standings:", error);
+        console.error("Standings Error:", error);
         document.getElementById("standings-table").innerHTML = "<p>Error loading standings.</p>";
     }
 }

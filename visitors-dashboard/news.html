@@ -12,7 +12,7 @@
     
 
 <!--linking link.tss-->
-<script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
 
 </head>
 <body class="news-page">
@@ -34,7 +34,7 @@
         <ul>
             <li>
                 <img src="assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
-                <a href="home.html">Dashboard</a>
+                <a href="index.html">Dashboard</a>
             </li>
             <li>
                 <img src="assets/icons/Newspaper.png" alt="News paper" class="newspaper">
@@ -150,21 +150,7 @@
                 </div>
             </div>
             
-            <div class="top-story" id="trending-news" style="display: none;">
-                <div class="news-infomat">
-                    <div class="feature-img">
-                        <img src="assets/images/AA1xMLFA.jpg" alt="Logos" class="feature-img-ankle">
-                    </div>
-                    <div class="news-messages">
-                        <h2 class="news-header">Salah Commits to Liverpool Future with Long-Term Contract Extension</h2>
-                        <div class="news-meta">
-                            <p class="news-description">The Spireites have brought in four new signings this month in Janoi Donacien, Bim Pepple, Jack Sparkes and Kyle McFadzean, while Dilan Markanday and James Berry have departed.</p>
-                            <p class="news-time" data-posted="2025-01-25T12:00:00Z"></p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Additional News Infomat Entries Here -->
-            </div>
+            <div class="top-story" id="trending-news" style="display: none;"></div>
             
             <!-- newsAd-middle content -->
             <div class="newsAd-middle">
@@ -240,33 +226,7 @@
                 </div>
             </div>
             
-            <div class="top-story" id="updates-news" style="display: none;">
-                <div class="news-infomat">
-                    <div class="feature-img">
-                        <img src="assets/images/AA1xMLFA.jpg" alt="Logos">
-                    </div>
-                    <div class="news-messages">
-                        <h2 class="news-header">Chesterfield transfers latest as Paul Cook talks incomings and outgoings</h2>
-                        <div class="news-meta">
-                            <p class="news-description">The Spireites have brought in four new signings this month in Janoi Donacien, Bim Pepple, Jack Sparkes and Kyle McFadzean, while Dilan Markanday and James Berry have departed.</p>
-                            <p class="news-time" data-posted="2025-01-25T12:00:00Z"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="news-infomat">
-                    <div class="feature-img">
-                        <img src="assets/images/AA1xMLFA.jpg" alt="Logos">
-                    </div>
-                    <div class="news-messages">
-                        <h2 class="news-header">Chesterfield transfers latest as Paul Cook talks incomings and outgoings</h2>
-                        <div class="news-meta">
-                            <p class="news-description">The Spireites have brought in four new signings this month in Janoi Donacien, Bim Pepple, Jack Sparkes and Kyle McFadzean, while Dilan Markanday and James Berry have departed.</p>
-                            <p class="news-time" data-posted="2025-01-25T12:00:00Z"></p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Additional News Infomat Entries Here -->                 
-            </div>
+            <div class="top-story" id="updates-news" style="display: none;"></div>
                <!-- Detailed News View -->
 <div id="news-details-view" style="display: none;">
     <div class="see-more" id="back-button" onclick="showNewsList()">
@@ -299,26 +259,7 @@
                 <a href="prediction.html">View all</a>
             </div>
         </div>
-         <div class="predition-container">
-            <div class="predition-content">
-                <h4>Who will win?</h4>
-                <div class="predit-selection">
-                    <div class="team-nam">Chelsea
-                        <div class="team-logo">
-                            <img src="assets/images/chelsea-logo.png" alt="">
-                        </div>
-                    </div>
-                    <div class="Select-team">Enter score
-                        <input type="number" class="score-input" placeholder="Draw">
-                    </div>
-                    <div class="team-nam">Leicester C
-                        <div class="team-logo">
-                            <img src="assets/images/leichester-logo.png" alt="Leicester Logo">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+         <div class="predition-container"></div>
         <div class="advert">
             <h5>Advertisement</h5>
          </div>
@@ -329,5 +270,7 @@
 
          <!--linking custome script-->
 <script src="scripts/script.js"></script>
+<script src="scripts/news.js"></script>
+
 </body>
 </html>

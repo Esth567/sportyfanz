@@ -107,6 +107,8 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
         fetchMatches();
     });
 
+
+//function to fetch matches
 async function fetchMatches() {
     try {
         const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-7)}&to=${getTodayDate(7)}&APIkey=${APIkey}`);
@@ -117,6 +119,8 @@ async function fetchMatches() {
         console.error("Fetch error:", error);
     }
 }
+
+
 
 function updateMatches(matches) {
     matchesData.live = [];
@@ -136,8 +140,13 @@ function updateMatches(matches) {
 
         const isLive = parseInt(status) > 0 && parseInt(status) < 90;
 
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(now.getDate() - 7);
+
         if (isLive) matchesData.live.push(match);
-        if (isFinished && matchDateTime.toDateString() === todayStr) matchesData.highlight.push(match);
+        if (isFinished && matchDateTime >= oneWeekAgo) {
+            matchesData.highlight.push(match);
+        }
         if (isFinished) matchesData.allHighlights.push(match);
         if (isUpcoming) matchesData.upcoming.push(match);
         
@@ -145,6 +154,7 @@ function updateMatches(matches) {
 
     renderMatches(matchesData, "live");
 }
+
 
 function renderMatches(matchesData, category, leagues = []) {
     const matchesContainer = document.querySelector(".matches");
@@ -322,6 +332,11 @@ function toggleCalendar() {
     dateInput.style.display = (dateInput.style.display === "none" || !dateInput.style.display) ? "block" : "none";
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    fetchMatches();
+});
+
+
 // Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
     try {
@@ -352,91 +367,74 @@ async function displayLiveMatch(matchId, category) {
 
     let match = matchesData[category].find(m => m.match_id === matchId);
 
+    // Fallback to allHighlights for highlight category
+    if (!match && category === "highlight") {
+        match = matchesData.allHighlights.find(m => m.match_id === matchId);
+    }
+
     if (!match) {
         console.error(`Match with ID ${matchId} not found in ${category}`);
+        document.querySelector(".match-detail").innerHTML = `
+            <div class="no-video">
+                <p>Match details not found.</p>
+            </div>`;
         return;
     }
 
-    let videoUrl = await fetchMatchVideo(matchId); // Fetch video URL
+    let videoUrl = await fetchMatchVideo(matchId);
+    console.log("🎥 Video Data:", videoUrl);
 
     let matchesContainer = document.querySelector(".matches");
-     if (videoUrl) {
-        matchesContainer.innerHTML = `
-        <div class="live-match">
-            <iframe width="100%" height="300px" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>
-            <div class="live-match-teams">
-                <div class="live-match-team">
-                    <img src="${match.team_home_badge || 'assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
-                    <span>${match.match_hometeam_name}</span>
-                </div>
-                <div class="match-time-scores">
-                    <h3 class="league-name">${match.league_name}</h3>
-                    <div class="scores">${match.match_hometeam_score ?? '-'} - ${match.match_awayteam_score ?? '-'}</div>
-                     <div class="live-match-status">
-                       <img src="${ellipseImg}" alt="Match Status Icon" class="match-status-icon">
-                        <div class="live-match-time">${match.match_status}</div> 
-                    </div>
-                </div>
-                <div class="live-match-team">
-                    <img src="${match.team_away_badge || 'assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
-                    <span>${match.match_awayteam_name}</span>
-                </div>
-            </div>
-            <div class="live-match-info">
-                <div class="match-tabs">
-                    <button class="tab-btn active" data-tab="info">Info</button>
-                    <button class="tab-btn" data-tab="lineups">Line-ups</button>
-                    <button class="tab-btn" data-tab="h2h">H2H</button>
-                    <button class="tab-btn" data-tab="statistics">Statistics</button>
-                    <button class="tab-btn" data-tab="standing">Standing</button>
-                </div>
-                <img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">
-                <div class="tab-content" id="tab-content">
-                    ${getTabContent("info", match)}
-                </div>
-            </div>
-        </div>`;
-    } else {
-        matchesContainer.innerHTML = `
-        <div class="live-match">
-            <div class="no-video-message">
-                No video available for the match.
-            </div>
-            <div class="live-match-teams">
-                <div class="live-match-team">
-                    <img src="${match.team_home_badge || 'assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
-                    <span>${match.match_hometeam_name}</span>
-                </div>
-                <div class="match-time-scores">
-                    <h3 class="league-name">${match.league_name}</h3>
-                    <div class="scores">${match.match_hometeam_score ?? '-'} - ${match.match_awayteam_score ?? '-'}</div>
-                    <div class="live-match-time">${match.match_status}</div>
-                </div>
-                <div class="live-match-team">
-                    <img src="${match.team_away_badge || 'assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
-                    <span>${match.match_awayteam_name}</span>
-                </div>
-            </div>
-            <div class="live-match-info">
-                <div class="match-tabs">
-                    <button class="tab-btn active" data-tab="info">Info</button>
-                    <button class="tab-btn" data-tab="lineups">Line-ups</button>
-                    <button class="tab-btn" data-tab="h2h">H2H</button>
-                    <button class="tab-btn" data-tab="statistics">Statistics</button>
-                    <button class="tab-btn" data-tab="standing">Standing</button>
-                </div>
-                <div class="ad5-logo">
-                 <h5>Advertisement</h5>
-                </div>
-                <div class="tab-content" id="tab-content">
-                    ${getTabContent("info", match)}
-                </div>
-            </div>
-        </div>`;
-    }
 
-     // Add event listeners to the tabs
-     document.querySelectorAll(".tab-btn").forEach(button => {
+    const teamHTML = `
+        <div class="live-match-team">
+            <img src="${match.team_home_badge || 'assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
+            <span>${match.match_hometeam_name}</span>
+        </div>
+        <div class="match-time-scores">
+            <h3 class="league-name">${match.league_name}</h3>
+            <div class="scores">${match.match_hometeam_score ?? '-'} - ${match.match_awayteam_score ?? '-'}</div>
+            <div class="live-match-status">
+            ${match.match_status === "LIVE" 
+                ? `<div class="match-status-icon"></div>` 
+                : `<div class="match-status-icon"></div>`}
+              
+                <div class="live-match-time">${match.match_status}</div>
+            </div>
+        </div>
+        <div class="live-match-team">
+            <img src="${match.team_away_badge || 'assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
+            <span>${match.match_awayteam_name}</span>
+        </div>`;
+
+    const tabHTML = `
+        <div class="match-tabs">
+            <button class="tab-btn active" data-tab="info">Info</button>
+            <button class="tab-btn" data-tab="lineups">Line-ups</button>
+            <button class="tab-btn" data-tab="h2h">H2H</button>
+            <button class="tab-btn" data-tab="statistics">Statistics</button>
+            <button class="tab-btn" data-tab="standing">Standing</button>
+        </div>`;
+
+    const adHTML = `<img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">`;
+
+    const contentHTML = `
+        <div class="live-match-info">
+            ${tabHTML}
+            ${adHTML}
+            <div class="tab-content" id="tab-content">${getTabContent("info", match)}</div>
+        </div>`;
+
+    matchesContainer.innerHTML = `
+        <div class="live-match">
+            ${videoUrl ? `<iframe width="100%" height="313" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>` 
+            : `<div class="no-video-message">No video available for the match.</div>`}
+            <div class="live-match-teams">${teamHTML}</div>
+            ${contentHTML}
+        </div>`;
+
+    // Attach tab click events
+    document.querySelectorAll(".tab-btn").forEach(button => {
         button.addEventListener("click", function () {
             document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
             this.classList.add("active");
@@ -447,160 +445,178 @@ async function displayLiveMatch(matchId, category) {
                 return;
             }
     
-            tabContentDiv.innerHTML = getTabContent(this.dataset.tab, match);
+            // ✅ Pass APIkey to getTabContent
+            const tab = this.dataset.tab;
+            tabContentDiv.innerHTML = getTabContent(tab, match, APIkey);
     
-            if (this.dataset.tab === "h2h") {
-                // Fetch and render H2H data
-                loadH2HData(match, APIkey);
+            // ✅ Remove this, because H2H is now loaded inside getTabContent
+          if (tab === "h2h") {
+                loadH2HData(match.match_id, APIkey, 5);
             }
     
-            if (this.dataset.tab === "lineups") {
+            if (tab === "lineups") {
                 generatePositions(match.match_hometeam_name, "left");
                 generatePositions(match.match_awayteam_name, "right");
-                renderLineup(match); // Make sure this is called for rendering the players
+                renderLineup(match);
             }
         });
-    });    
+    });
+    
+    
+
+      // Inject CSS spinner animation if not already present
+      if (!document.getElementById("spinner-style")) {
+        const spinnerStyle = document.createElement("style");
+        spinnerStyle.id = "spinner-style";
+        spinnerStyle.innerHTML = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }`;
+        document.head.appendChild(spinnerStyle);
+    }
 }
 
   
 
-// Function to update tab content dynamically
-function getTabContent(tab, match, APIkey) {
-    const renderPlayers = (players) =>
-        players?.length
-            ? players.map(player => `
-                <li>
-                    <span class="listed-player-number">${player.lineup_number || "-"}</span>
-                    <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
-                </li>`).join("")
-            : `<li><em>No data available</em></li>`;
+    // Function to update tab content dynamically
+    function getTabContent(tab, match, APIkey) {
+        const renderPlayers = (players) =>
+            players?.length
+                ? players.map(player => `
+                    <li>
+                        <span class="listed-player-number">${player.lineup_number || "-"}</span>
+                        <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
+                    </li>`).join("")
+                : `<li><em>No data available</em></li>`;
 
-    switch (tab) {
-        case "info":
-            return `
-                <div class="info-match-container">
-                    <h3>Match Info</h3>
-                    <div class="info-teamNames">
-                        <h4>${match.match_hometeam_name}</h4><span>vs</span><h4>${match.match_awayteam_name}</h4>
-                    </div>
-                    <div class="infoMatch-details">
-                        <div class="infoLeft-wing">
-                            <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.match_time}</p>
-                            <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
-                        </div>
-                        <div class="infoRight-wing">
-                            <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
-                            <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-        case "lineups":
-            return `
-                <div class="lineUpsteams-container">
-                    <div class="lineUpsteam-info">
-                        <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="lineUpsteam-logo">
-                        <div class="team-formation">
-                            <h3>${match.match_hometeam_name}</h3>
-                            <h4>${match.match_hometeam_system || "Unknown Formation"}</h4>
-                        </div>
-                    </div>
-                    <div class="lineUpsteam-info">
-                        <div class="team-formation">
-                            <h3>${match.match_awayteam_name}</h3>
-                            <h4>${match.match_awayteam_system || "Unknown Formation"}</h4>
-                        </div>
-                        <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="lineUpsteam-logo">
-                    </div>
-                </div>
-
-                <div id="football-field" class="field">
-                    <div class="goalpost home-goalpost"></div>
-                    <div class="penalty-box home-box"></div>
-                    <div class="penalty-arc home-arc"></div>
-                    <div id="home-formation" class="formation-area"></div>
-                    <div class="center-circle"></div>
-                    <div class="center-line"></div>
-                    <div id="away-formation" class="formation-area"></div>
-                    <div class="goalpost away-goalpost"></div>
-                    <div class="penalty-box away-box"></div>
-                    <div class="penalty-arc away-arc"></div>
-                </div>
-
-                <div class="lineup-players-names">
-                    <h4>Players</h4>
-                    <div class="lineUp-cont">
-                        <div class="lineup-home-players">
-                            <h4>${match.match_hometeam_name}</h4>
-                            <ul>${renderPlayers(match.lineup?.home?.starting_lineups)}</ul>
-                            <h4>Substitutes</h4>
-                            <ul>${renderPlayers(match.lineup?.home?.substitutes)}</ul>
-                            <ul>${renderPlayers(match.lineup?.home?.coaches)}</ul>
-                        </div>
-                        <div class="lineup-away-players">
-                            <h4>${match.match_awayteam_name}</h4>
-                            <ul>${renderPlayers(match.lineup?.away?.starting_lineups)}</ul>
-                            <h4>Substitutes</h4>
-                            <ul>${renderPlayers(match.lineup?.away?.substitutes)}</ul>
-                            <ul>${renderPlayers(match.lineup?.away?.coaches)}</ul>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            case "h2h":
-                // 🔄 Dynamically fetch H2H data
+        switch (tab) {
+            case "info":
                 return `
-                    <div class="h2h-header">
-                        <h3>H2H</h3>
-                        <h4>${match.match_hometeam_name}</h4>
-                        <h4>${match.match_awayteam_name}</h4>
-                         <div class="filter-buttons">
-                          <button onclick="loadH2HData('${match.match_id}', '${APIkey}', 5)">Last 5 Matches</button>
-                          <button onclick="loadH2HData('${match.match_id}', '${APIkey}', 'all')">All Matches</button>
-                          </div>
-                      </div>
-                      <div class="h2h-header-line"></div>
-                      <div class="spinner" id="h2h-spinner"></div>
-                     <div class="h2h-matches-container" id="h2h-matches"></div>
-                   `;
-
-            case "statistics":
-                // Trigger statistics loading before returning the UI container
-                loadMatchStatistics(match.match_id, APIkey, match);
-                return `
-                    <div class="statistics-container">
-                        <h3>Match Statistics</h3>
-                        <div class="h2h-header-line"></div>
-                        <div class="statisticTeam-name">
-                            <h4>${match.match_hometeam_name}</h4>
-                            <span>vs</span>
-                            <h4>${match.match_awayteam_name}</h4>
+                    <div class="info-match-container">
+                        <h3>Match Info</h3>
+                        <div class="info-teamNames">
+                            <h4>${match.match_hometeam_name}</h4><span>vs</span><h4>${match.match_awayteam_name}</h4>
                         </div>
-                         <div class="spinner" id="statistics-spinner"></div>
-                        <div class="statistics-list"></div>
+                        <div class="infoMatch-details">
+                            <div class="infoLeft-wing">
+                                <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.match_time}</p>
+                                <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
+                            </div>
+                            <div class="infoRight-wing">
+                                <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
+                                <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
+                            </div>
+                        </div>
                     </div>
                 `;
 
-                case "standing":
-                    // 🔄 Load standing and highlight teams
-                    loadStandings(match, APIkey);
-                    return `
-                        <div class="standing-header">
-                            <h3>Standings</h3>                          
-                            <div class="standings-table-container" id="standings-table">
-                                 <div class="spinner" id="standing-spinner" style="display: none;"></div>
+            case "lineups":
+                return `
+                    <div class="lineUpsteams-container">
+                        <div class="lineUpsteam-info">
+                            <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="lineUpsteam-logo">
+                            <div class="team-formation">
+                                <h3>${match.match_hometeam_name}</h3>
+                                <h4>${match.match_hometeam_system || "Unknown Formation"}</h4>
                             </div>
+                        </div>
+                        <div class="lineUpsteam-info">
+                            <div class="team-formation">
+                                <h3>${match.match_awayteam_name}</h3>
+                                <h4>${match.match_awayteam_system || "Unknown Formation"}</h4>
+                            </div>
+                            <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="lineUpsteam-logo">
+                        </div>
+                    </div>
+
+                    <div id="football-field" class="field">
+                        <div class="goalpost home-goalpost"></div>
+                        <div class="penalty-box home-box"></div>
+                        <div class="penalty-arc home-arc"></div>
+                        <div id="home-formation" class="formation-area"></div>
+                        <div class="center-circle"></div>
+                        <div class="center-line"></div>
+                        <div id="away-formation" class="formation-area"></div>
+                        <div class="goalpost away-goalpost"></div>
+                        <div class="penalty-box away-box"></div>
+                        <div class="penalty-arc away-arc"></div>
+                    </div>
+
+                    <div class="lineup-players-names">
+                        <h4>Players</h4>
+                        <div class="lineUp-cont">
+                            <div class="lineup-home-players">
+                                <h4>${match.match_hometeam_name}</h4>
+                                <ul>${renderPlayers(match.lineup?.home?.starting_lineups)}</ul>
+                                <h4>Substitutes</h4>
+                                <ul>${renderPlayers(match.lineup?.home?.substitutes)}</ul>
+                                <ul>${renderPlayers(match.lineup?.home?.coaches)}</ul>
+                            </div>
+                            <div class="lineup-away-players">
+                                <h4>${match.match_awayteam_name}</h4>
+                                <ul>${renderPlayers(match.lineup?.away?.starting_lineups)}</ul>
+                                <h4>Substitutes</h4>
+                                <ul>${renderPlayers(match.lineup?.away?.substitutes)}</ul>
+                                <ul>${renderPlayers(match.lineup?.away?.coaches)}</ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                case "h2h":
+                    // 🔄 Dynamically fetch H2H data
+                    console.log("📦 Full match object for H2H:", match);
+
+                    // Fetch H2H using team names, not match ID
+                    if (match.match_hometeam_name && match.match_awayteam_name) {
+                        setTimeout(() => loadH2HData(APIkey, match.match_hometeam_name, match.match_awayteam_name, 10), 0);
+                    }
+
+                    return `
+                     <div class="h2h-header">
+                       <h3>H2H</h3>
+                       <h4>${match.match_hometeam_name}</h4>
+                       <h4>${match.match_awayteam_name}</h4>
+                      </div>
+                      <div class="h2h-header-line"></div>
+                       <div class="spinner" id="h2h-spinner"></div>
+                      <div class="h2h-matches-container" id="h2h-matches"></div>
+                   `;
+
+                case "statistics":
+                    // Trigger statistics loading before returning the UI container
+                    loadMatchStatistics(match.match_id, APIkey, match);
+                    return `
+                        <div class="statistics-container">
+                            <h3>Match Statistics</h3>
+                            <div class="h2h-header-line"></div>
+                            <div class="statisticTeam-name">
+                                <h4>${match.match_hometeam_name}</h4>
+                                <span>vs</span>
+                                <h4>${match.match_awayteam_name}</h4>
+                            </div>
+                            <div class="spinner" id="statistics-spinner"></div>
+                            <div class="statistics-list"></div>
                         </div>
                     `;
 
+                    case "standing":
+        // 🔄 Load standing and highlight teams
+        setTimeout(() => loadStandings(match, APIkey), 0); 
+        return `
+            <div class="standing-header">                         
+                <div class="standings-wrapper">
+                    <div class="spinner" id="standing-spinner"></div>
+                    <div class="standings-table-container" id="standing-table"></div>
+                </div>
+            </div>
+        `;
 
-        default:
-            return "<p>No data available.</p>";
+            default:
+                return "<p>No data available.</p>";
+        }
     }
-}
 
 
 //function to load statistic
@@ -622,11 +638,14 @@ async function loadMatchStatistics(match_id, APIkey, match) {
         const statsHTML = stats.map(stat => `
             <div class="stat-comparison-row">
                 <div class="stat-home">${stat.home}</div>
-                <div class="stat-icon">${statIcons[stat.type] || "📊"}</div>
+                <div class="stat-label">
+                    ${statIcons[stat.type] || "📊"} ${stat.type}
+                </div>
                 <div class="stat-away">${stat.away}</div>
-                <div class="stat-label">${stat.type}</div>
             </div>
-        `).join("");
+          `).join("");
+          
+          
 
         document.querySelector(".statistics-list").innerHTML = statsHTML;
         document.getElementById("statistics-spinner").style.display = "none";
@@ -639,94 +658,144 @@ async function loadMatchStatistics(match_id, APIkey, match) {
 
 
 
-
-
 //function to load h2h
+async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
+    const spinner = document.getElementById('h2h-spinner');
+    const container = document.getElementById('h2h-matches');
 
-async function loadH2HData(match_id, APIkey, limit) {
-    document.getElementById('h2h-spinner').style.display = 'block';
-    document.getElementById('h2h-matches').innerHTML = '';
+    if (!spinner || !container) return;
+
+    spinner.style.display = 'block';
+    container.innerHTML = '';
+
+    if (!APIkey) {
+        console.error("❌ Missing API Key");
+        container.innerHTML = `<p style="color:red;">Missing API Key.</p>`;
+        spinner.style.display = 'none';
+        return;
+    }
+    
+    if (!homeTeam || !awayTeam) {
+        console.error("❌ Missing team names for H2H");
+        container.innerHTML = `<p style="color:red;">Missing team names.</p>`;
+        spinner.style.display = 'none';
+        return;
+    }
+
+    const fromYear = new Date().getFullYear() - 2; // 2 years back
+    const fromDate = `${fromYear}-01-01`;
+    const toDate = `${new Date().getFullYear()}-12-31`;
+
+    const url = `https://apiv3.apifootball.com/?action=get_H2H&firstTeam=${encodeURIComponent(homeTeam)}&secondTeam=${encodeURIComponent(awayTeam)}&from=${fromDate}&to=${toDate}&APIkey=${APIkey}`;
+   
 
     try {
-        const response = await fetch(`https://apiv3.apifootball.com/?action=get_H2H&match_id=${match_id}&APIkey=${APIkey}`);
+        const response = await fetch(url);
         const data = await response.json();
+        console.log("📥 H2H API Response:", data);
 
-        let matches = data?.[0]?.h2h || [];
-        if (limit !== 'all') {
-            matches = matches.slice(0, limit);
+        if (data.error) {
+            container.innerHTML = `<p style="color:red;">API Error: ${data.error}</p>`;
+            return;
         }
 
-        const html = matches.map(match => `
-            <div class="h2h-match">
-                <p>${match.match_date} - ${match.match_hometeam_name} ${match.match_hometeam_score} : ${match.match_awayteam_score} ${match.match_awayteam_name}</p>
+
+        const matches = data?.h2h || [];
+
+
+        if (!matches.length) {
+            container.innerHTML = `<p>No H2H data available</p>`;
+            return;
+        }
+
+        const filtered = matches.slice(0, limit);
+
+        container.innerHTML = filtered.map(match => `
+            <div class="h2h-match-card">
+                <p><strong>${match.match_date}</strong> - ${match.match_hometeam_name} ${match.match_hometeam_score} : ${match.match_awayteam_score} ${match.match_awayteam_name}</p>
             </div>
         `).join("");
 
-        document.getElementById('h2h-matches').innerHTML = html || "<p>No H2H data available</p>";
-    } catch (error) {
-        document.getElementById('h2h-matches').innerHTML = "<p>Error fetching H2H data</p>";
-    } finally {
-        document.getElementById('h2h-spinner').style.display = 'none';
-    }
-}
-
-
-
-
-//function to load standings
-async function loadStandings(match, APIkey) {
-    try {
-        const response = await fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${match.league_id}&APIkey=${APIkey}`);
-        const data = await response.json();
-
-        const tableHTML = `
-            <table class="standing-table">
-                <thead>
-                    <tr><th>Pos</th><th>Team</th><th>W</th><th>D</th><th>L</th><th>Pts</th></tr>
-                </thead>
-                <tbody>
-                    ${standings.map(team => `
-                        <tr class="${[hometeam, awayteam].includes(team.team_name) ? 'highlight-team' : ''}">
-                            <td>${team.overall_league_position}</td>
-                            <td>${team.team_name}</td>
-                            <td>${team.overall_league_W}</td>
-                            <td>${team.overall_league_D}</td>
-                            <td>${team.overall_league_L}</td>
-                            <td>${team.overall_league_PTS}</td>
-                        </tr>
-                    `).join("")}
-                </tbody>
-            </table>
-        `;
-
-
-        const html = data.map(team => {
-            const isHome = team.team_name === match.match_hometeam_name;
-            const isAway = team.team_name === match.match_awayteam_name;
-            const highlightClass = isHome || isAway ? "highlight-team" : "";
-
-            return `
-                <div class="standing-row ${highlightClass}">
-                    <span>${team.overall_league_position}</span>
-                    <span>${team.team_name}</span>
-                    <span>Pts: ${team.overall_league_PTS}</span>
-                </div>
-            `;
-        }).join("");
-
-
-        document.getElementById("standing-table").innerHTML = tableHTML;
     } catch (err) {
-        document.getElementById("standing-table").innerHTML = "<p>Error loading standings</p>";
+        console.error("❌ H2H fetch error:", err);
+        container.innerHTML = `<p style="color:red;">Error fetching H2H data.</p>`;
     } finally {
-        document.getElementById("standing-spinner").style.display = "none";
+        spinner.style.display = 'none';
+        console.log("✅ H2H load complete");
     }
 }
 
 
 
-  
-  
+
+    //function to load standings
+    async function loadStandings(match, APIkey) {
+        const tableContainer = document.getElementById("standing-table");
+        const spinner = document.getElementById("standing-spinner");
+    
+        if (!tableContainer) {
+            console.error("❌ #standing-table element not found in DOM.");
+            return;
+        }
+    
+        try {
+            spinner.style.display = "block";
+    
+            const response = await fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${match.league_id}&APIkey=${APIkey}`);
+            const data = await response.json();
+    
+            const tableHTML = `
+                <table class="standing-table">
+                    <thead>
+                        <tr>
+                            <th>Pos</th><th>Team</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(team => {
+                            const isHome = team.team_name === match.match_hometeam_name;
+                            const isAway = team.team_name === match.match_awayteam_name;
+                            const highlightTeam = isHome || isAway ? 'highlight-team' : '';
+    
+                            // Determine class for position coloring only
+                            const pos = parseInt(team.overall_league_position);
+                            let posClass = '';
+                            if (pos >= 1 && pos <= 4) posClass = 'ucl';
+                            else if (pos >= 5 && pos <= 6) posClass = 'uel';
+                            else if (pos >= data.length - 2) posClass = 'relegated';
+    
+                            return `
+                                <tr class="${highlightTeam}">
+                                    <td class="pos-cell ${posClass}">${team.overall_league_position}</td>
+                                    <td>${team.team_name}</td>
+                                    <td>${team.overall_league_payed}</td>
+                                    <td>${team.overall_league_W}</td>
+                                    <td>${team.overall_league_D}</td>
+                                    <td>${team.overall_league_L}</td>
+                                    <td>${team.overall_league_GF}</td>
+                                    <td>${team.overall_league_GA}</td>
+                                    <td>${team.overall_league_GF - team.overall_league_GA}</td>
+                                    <td>${team.overall_league_PTS}</td>
+                                </tr>
+                            `;
+                        }).join("")}
+                    </tbody>
+                </table>
+            `;
+    
+            tableContainer.innerHTML = tableHTML;
+    
+        } catch (err) {
+            tableContainer.innerHTML = "<p>Error loading standings</p>";
+            console.error("Standings fetch error:", err);
+        } finally {
+            spinner.style.display = "none";
+        }
+    }
+    
+
+
+
   // Function to switch tabs
   window.showTab = function (tab, league, matchIndex, category) {
       const match = matchesData[league]?.[category]?.[matchIndex];
@@ -817,6 +886,7 @@ function generatePositions(formation, side) {
 
     return playerDiv;
 }
+
 
 
 

@@ -81,45 +81,34 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
     }
 
+ 
     async function loadMatches() {
         try {
             matchesList = []; // Reset matches list
-
+    
             for (let id of leagueIDs) {
                 const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&APIkey=${APIkey}`;
                 const res = await fetch(url);
                 const data = await res.json();
-
+    
                 console.log('API Response:', data); // Log the response to inspect the structure
-
-                // Handle the error if no events are found
-                if (data.error) {
-                    console.error('API Error:', data.message);
-                    liveMatchContainer.innerHTML = `<div class="team">No events found.</div>`;
-                    return;
-                }
-
-                // Handle object responses correctly
-                if (data && data.hasOwnProperty('events')) {
-                    const matches = data.events; // Assuming 'events' contains the array of matches
-                    const keyMatches = matches.filter(match =>
+    
+                if (Array.isArray(data)) {
+                    const keyMatches = data.filter(match =>
                         bigTeams.includes(match.match_hometeam_name) || bigTeams.includes(match.match_awayteam_name)
                     );
-
                     matchesList = [...matchesList, ...keyMatches];
                 } else {
-                    console.error('Expected "events" property, but received:', data);
+                    console.error('Expected array but received:', data);
                 }
             }
-
-            // Sort matches by start time
+    
             matchesList.sort((a, b) => {
                 const aTime = new Date(a.match_date + " " + a.match_time);
                 const bTime = new Date(b.match_date + " " + b.match_time);
                 return aTime - bTime;
             });
-
-            // If no matches, show last available match (if any)
+    
             if (matchesList.length > 0) {
                 displayNextMatch();
             } else {
@@ -130,7 +119,9 @@ document.addEventListener("DOMContentLoaded", function () {
             liveMatchContainer.innerHTML = `<div class="team">Error loading matches. Please try again later.</div>`;
         }
     }
+    
 
+    //function to display the matches
     function displayNextMatch() {
         if (matchesList.length === 0) {
             liveMatchContainer.innerHTML = "<div class='team'>No matches available.</div>";
@@ -181,8 +172,8 @@ const leagueIds = {
 // Example of player images mapping (make sure to use the correct player names and image filenames)
 const playerImageMap = {
     "R. Lewandowski": "Lewandowski.png",
-    "O. Dembele": "Dembele.png",
-    "A. Alipour": "Alipour.png",
+    "O. Dembele": "o.dembele.png",
+    "A. Alipour": "alipour.png",
     "M. Retegui": "M.Retegui.png",
     "Mohammed Salah": "Mohammed.png",
     // Add more players here...
@@ -982,38 +973,69 @@ document.querySelectorAll('.category-btn').forEach(button => {
 
 //function for predition-container for middly layer
 
+let offset = 0;
+
+function getDateString(offset = 0) {
+  const date = new Date();
+  date.setDate(date.getDate() + offset);
+  return date.toISOString().split('T')[0];
+}
+
+
 const bigTeams = [
   "Man U", "Manchester United", "Chelsea", "Real Madrid", "Barcelona",
   "Juventus", "Bayern Munich", "PSG", "Liverpool", "Arsenal"
 ];
 
-const predictionContainer = document.querySelector('.predition-container');
+function isBigTeamMatch(match) {
+    return bigTeams.some(team =>
+      match.home.toLowerCase().includes(team.toLowerCase()) ||
+      match.away.toLowerCase().includes(team.toLowerCase())
+    );
+  }
+  
+  function isRealisticOdds(match) {
+    const odd1 = parseFloat(match.odd_1);
+    const odd2 = parseFloat(match.odd_2);
+    return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
+  }
+  
 
-function getDateString(offsetDays = 0) {
-  const date = new Date();
-  date.setDate(date.getDate() + offsetDays);
-  return date.toISOString().split('T')[0];
-}
+  document.addEventListener("DOMContentLoaded", () => {
+    const predictionContainer = document.querySelector('.prediction-container');
+    if (predictionContainer) {
+      fetchOddsUntilMatchFound(predictionContainer);
+    }
+  });
+  
 
-let offset = 0;
-
-function fetchOddsUntilMatchFound() {
-  const from = getDateString(offset);
-  const to = from;
-
-  fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${from}&to=${to}&APIkey=${APIkey}`)
-    .then(res => res.json())
-    .then(async oddsData => {
+function getConfidenceBadge(odd1, odd2) {
+    const diff = Math.abs(odd1 - odd2);
+    if (diff <= 0.3) return "🔥 Balanced";
+    return "🧊 One-sided";
+  }
+  
+  
+  async function fetchOddsUntilMatchFound(predictionContainer) {
+    const from = getDateString(offset);
+    const to = from;
+  
+    try {
+      const [oddsRes, eventsRes] = await Promise.all([
+        fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${from}&to=${to}&APIkey=${APIkey}`),
+        fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`)
+      ]);
+  
+      const oddsData = await oddsRes.json();
+      const eventsData = await eventsRes.json();
+  
       if (!Array.isArray(oddsData) || oddsData.length === 0) {
         offset++;
-        if (offset <= 7) fetchOddsUntilMatchFound();
-        else predictionContainer.innerHTML = "<p>No big team matches with odds available.</p>";
-        return;
+        return offset <= 7
+          ? fetchOddsUntilMatchFound(predictionContainer)
+          : predictionContainer.innerHTML = "<p>No competitive matches with odds available.</p>";
       }
-
-      const eventRes = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`);
-      const eventsData = await eventRes.json();
-
+  
       const enrichedMatches = oddsData.map(oddMatch => {
         const eventDetails = eventsData.find(ev => ev.match_id === oddMatch.match_id);
         if (!eventDetails) return null;
@@ -1025,66 +1047,53 @@ function fetchOddsUntilMatchFound() {
           awayLogo: eventDetails.team_away_badge,
         };
       }).filter(Boolean);
-
-      const uniqueMatches = [];
-      const seenMatchIds = new Set();
-
-      enrichedMatches.forEach(match => {
-        if (
-          bigTeams.some(team => match.home?.includes(team)) &&
-          bigTeams.some(team => match.away?.includes(team)) &&
-          !seenMatchIds.has(match.match_id)
-        ) {
-          seenMatchIds.add(match.match_id);
-          uniqueMatches.push(match);
-        }
-      });
-
-      if (uniqueMatches.length === 0) {
+  
+      const competitiveMatches = enrichedMatches.filter(match =>
+        isBigTeamMatch(match) && isRealisticOdds(match)
+      ).slice(0, 3);
+  
+      if (competitiveMatches.length === 0) {
         offset++;
-        if (offset <= 7) fetchOddsUntilMatchFound();
-        else predictionContainer.innerHTML = "<p>No big team matches with odds available.</p>";
-        return;
+        return offset <= 7
+          ? fetchOddsUntilMatchFound(predictionContainer)
+          : predictionContainer.innerHTML = "<p>No competitive matches with trustworthy odds found.</p>";
       }
-
+  
       predictionContainer.innerHTML = `
-        <div class="prediction-swiper" style="display:flex; overflow-x:auto; gap: 20px;">
-          ${uniqueMatches.map(match => {
-            const odd1 = match.odd_1 || "-";
-            const odd2 = match.odd_2 || "-";
-
-            return `
-              <div class="predition-content">
-                <h4>Who will win?</h4>
-                <div class="predit-selection">
-                  <div class="team-nam">
-                    <span>${match.home}</span>
-                    <div class="team-logo">
-                      <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
-                    </div>
-                    <div class="prediction-number">${odd1}</div>
+        ${competitiveMatches.map(match => {
+          const odd1 = parseFloat(match.odd_1);
+          const odd2 = parseFloat(match.odd_2);
+          const badge = getConfidenceBadge(odd1, odd2);
+          return `
+            <div class="predition-content">
+              <h4>🔥 Clash Confidence</h4>
+              <div class="predit-selection">
+                <div class="team-nam">
+                  <span>${match.home}</span>
+                  <div class="team-logo">
+                    <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
                   </div>
-                  <div class="team-nam">
-                    <span>${match.away}</span>
-                    <div class="team-logo">
-                      <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
-                    </div>
-                    <div class="prediction-number">${odd2}</div>
+                  <div class="prediction-number">${match.odd_1}</div>
+                </div>
+                <div class="team-nam">
+                  <span>${match.away}</span>
+                  <div class="team-logo">
+                    <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
                   </div>
+                  <div class="prediction-number">${match.odd_2}</div>
                 </div>
               </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-    })
-    .catch(err => {
-      console.error("Odds fetch failed:", err);
-      predictionContainer.innerHTML = "<p>Error fetching match odds.</p>";
-    });
-}
-
-fetchOddsUntilMatchFound();
+            </div>
+          `;
+        })[0]}`;
+    } catch (err) {
+      console.error("Prediction fetch error:", err);
+      if (predictionContainer) {
+        predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
+      }
+    }
+  }
+  
 
 
 
@@ -1231,180 +1240,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
-
-
-/*----------------------------news paage-----------------------------------*/
-
-document.addEventListener("DOMContentLoaded", function () {
-  showInitialNews("trending-news");
-  showInitialNews("updates-news");
-  updateRelativeTime();
-});
-
-// Function to display the first 5 news items on page load
-function showInitialNews(sectionId) {
-  const newsSection = document.getElementById(sectionId);
-  const newsItems = newsSection.querySelectorAll(".news-infomat");
-  console.log(document.querySelector(".middle-layer").style.display);
-
-
-  if (newsItems.length > 0) {
-      newsItems.forEach((item, index) => {
-          item.style.display = index < 5 ? "flex" : "none"; // Ensure flex layout remains intact
-      });
-      newsSection.style.display = "flex"; // Set to flex to align with CSS
-      newsSection.style.flexDirection = "column"; // Keep stacking format
-  }
-  
-}
-
-document.querySelector(".middle-layer").style.display = "block";
-
-
-
-function toggleNews(section) {
-  const newsSection = document.getElementById(section + "-news");
-  const seeMoreText = document.getElementById(section + "-text");
-  const icon = document.querySelector(`#${section} .see-more ion-icon`);
-  const newsItems = newsSection.querySelectorAll(".news-infomat");
-
-  if (seeMoreText.innerText === "See more") {
-      newsItems.forEach(item => item.style.display = "block"); // Show all
-      seeMoreText.innerText = "See less";
-      icon.name = "caret-up-outline"; // Change to caret up icon
-  } else {
-      newsItems.forEach((item, index) => {
-          item.style.display = index < 5 ? "block" : "none"; // Show first 5, hide rest
-      });
-      seeMoreText.innerText = "See more";
-      icon.name = "caret-down-outline"; // Change to caret down icon
-  }
-}
-
-
-
-// Function to calculate and display the relative time
-function updateRelativeTime() {
-  const timeElements = document.querySelectorAll(".news-time");
-  const now = new Date();
-
-  timeElements.forEach((timeElement) => {
-      const postedTime = new Date(timeElement.dataset.posted);
-      const timeDifference = Math.floor((now - postedTime) / 1000); // Difference in seconds
-
-      let timeText;
-      if (timeDifference < 60) {
-          timeText = `${timeDifference} seconds ago`;
-      } else if (timeDifference < 3600) {
-          const minutes = Math.floor(timeDifference / 60);
-          timeText = `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-      } else if (timeDifference < 86400) {
-          const hours = Math.floor(timeDifference / 3600);
-          timeText = `${hours} hour${hours > 1 ? "s" : ""} ago`;
-      } else {
-          const days = Math.floor(timeDifference / 86400);
-          timeText = `${days} day${days > 1 ? "s" : ""} ago`;
-      }
-
-      timeElement.textContent = timeText;
-  });
-}
-
-// Update relative time every 30 seconds
-setInterval(updateRelativeTime, 30000);
-
-
- // Function to show the detailed view 
-document.addEventListener("DOMContentLoaded", () => {
-    const newsMessages = document.querySelectorAll(".news-messages");
-    const trendingNews = document.querySelector("#trending-news");
-    const updatesNews = document.querySelector("#updates-news");
-    const textContSections = document.querySelectorAll(".news-text-cont");
-    const newsDetailsView = document.querySelector("#news-details-view");
-    const newsDetailContent = document.querySelector("#news-detail-content");
-    const newsAdMiddle = document.querySelector(".newsAd-middle"); // Select the newsAd-middle section
-
-    
-    // Function to show the detailed view of a specific news item
-    newsMessages.forEach((message) => {
-        message.addEventListener("click", () => {
-            // Get the news content
-            const newsHeader = message.querySelector(".news-header").textContent;
-            const newsDescription = message.querySelector(".news-description").textContent;
-            const newsTime = message.querySelector(".news-time").textContent;
-            const newsImage = message
-                .closest(".news-infomat")
-                .querySelector(".feature-img img").src;
-
-            // Populate the details view
-            newsDetailContent.innerHTML = `
-            <h2>${newsHeader}</h2>
-                <p><small>${newsTime}</small></p>
-                <img src="${newsImage}" alt="News Image" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 10px; margin-bottom: 20px;">
-                <p>${newsDescription}</p>
-            `;
-
-            // Hide both news sections and text-cont sections, then show the detailed view
-            trendingNews.style.display = "none";
-            updatesNews.style.display = "none";
-            textContSections.forEach((section) => (section.style.display = "none"));
-            newsAdMiddle.style.display = "none"; // Hide newsAd-middle
-            newsDetailsView.style.display = "block";
-        });
-    });
-
-    // Function to return to the news list view
-    window.showNewsList = () => {
-        newsDetailsView.style.display = "none";
-        textContSections.forEach((section) => {
-          section.style.display = "flex"; // Ensure flex display is restored
-          section.style.justifyContent = "space-between"; // Keep it inline
-          section.style.alignItems = "center"; // Align properly
-      });
-        trendingNews.style.display = "block"; // Show Trending News
-        updatesNews.style.display = "block"; // Show News Updates
-        newsAdMiddle.style.display = "block"; // Show newsAd-middle again
-
-
-        //newsAd-middle retains its original flex layout
-        newsAdMiddle.style.display = "flex";
-        newsAdMiddle.style.flexDirection = "row"; // Ensure it stays in a row layout
-        newsAdMiddle.style.justifyContent = "space-between"; // Keep spacing
-        newsAdMiddle.style.alignItems = "center"; // Align properl
-    };
-});
-
-//new header and description
-async function loadNews() {
-  const res = await fetch('http://localhost:3000/api/news');
-  const data = await res.json();
-
-  const trendingContainer = document.getElementById('trending-news');
-  const updatesContainer = document.getElementById('updates-news');
-
-  trendingContainer.style.display = 'block';
-  updatesContainer.style.display = 'block';
-
-  const generateNewsHTML = (item) => `
-    <div class="news-infomat">
-      <div class="feature-img">
-        <img src="${item.image}" alt="Logos">
-      </div>
-      <div class="news-messages">
-        <h2 class="news-header">${item.title}</h2>
-        <div class="news-meta">
-          <p class="news-description">${item.summary}</p>
-          <p class="news-time" data-posted="${item.pubDate}"></p>
-        </div>
-      </div>
-    </div>`;
-
-  trendingContainer.innerHTML = data.slice(0, 1).map(generateNewsHTML).join('');
-  updatesContainer.innerHTML = data.slice(1).map(generateNewsHTML).join('');
-}
-
-loadNews();
 
 
 

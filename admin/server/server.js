@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const { User, Data } = require("../database/db");  // ✅ Correct Import
 require("dotenv").config();
+const fetch = require('node-fetch');
 
 const app = express();
 app.use(bodyParser.json());
@@ -81,5 +82,18 @@ app.post("/update", async (req, res) => {
     }
 });
 
+app.get('/api/news', async (req, res) => {
+    try {
+      const response = await axios.post('http://localhost:5001/summarize', {
+        rss_url: 'https://www.espn.com/espn/rss/news'
+      });
+  
+      res.json(response.data);
+    } catch (err) {
+      console.error("Node proxy failed:", err.message);
+      res.status(500).json({ error: 'Summarizer failed' });
+    }
+  });
+  
 // ✅ Export Express App
 module.exports = app;

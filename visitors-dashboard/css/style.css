@@ -506,6 +506,38 @@ body{
    height: 7px;
 }
 
+.blink-green {
+    color: #00cc00;
+    font-weight: bold;
+    animation: blink 1s step-start infinite;
+  }
+  
+  .blink-orange {
+    color: #FFA500;
+    font-weight: bold;
+    animation: blink 1s step-start infinite;
+  }
+  
+  .blink-purple {
+    color: #9933FF;
+    font-weight: bold;
+    animation: blink 1s step-start infinite;
+  }
+  
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  
+  .fulltime-text,
+  .halftime-text,
+  .live-time {
+    font-weight: bold;
+  }
+  
+  
+
 
 
 /* League Table Container */

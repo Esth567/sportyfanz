@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h2 class="vs-score">${displayScore}</h2>
                 <div class="highlight-time">
                     <img src="${ellipseImg}" alt="Ellipse" class="Ellipse-logo">
-                     ${displayScore}
+                     ${displayTime}
                 </div>
             </div>
             <div class="team">

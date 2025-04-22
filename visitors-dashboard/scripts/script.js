@@ -105,9 +105,10 @@ document.addEventListener("DOMContentLoaded", function () {
     
         return `
         <div class="match-top-timer">
-         ${isFinished ? '<span class="fulltime-text blink-purple">FT</span>' :
-           hasStarted ? `<span class="live-time blink-green">${getMinutesSince(match.match_date, startTime)}'</span>` :
-           `<div class="countdown-container" data-date="${match.match_date}" data-time="${startTime}"></div>`}
+         <img src="assets/icons/clock.png" alt="Clock">
+           ${category === "live" 
+             ? `<span class="display-time">${matchMinute}'</span><span class="countdown-container" data-date="${match.match_date}" data-time="${match.match_time}"></span>` 
+          : matchTime}
          </div>
 
         <div class="teams-time">

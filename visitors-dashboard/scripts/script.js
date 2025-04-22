@@ -96,8 +96,13 @@ document.addEventListener("DOMContentLoaded", function () {
             ellipseImg = "assets/icons/Ellipse 1.png";
         } else {
             // For upcoming match – setup countdown container
-            displayTime = `<span class="countdown" data-date="${match.match_date}" data-time="${startTime}">Loading...</span>`;
-            ellipseImg = "assets/icons/Ellipse2.png";
+            displayTime = `
+            <span class="countdown" data-date="${match.match_date}" data-time="${startTime}" data-start="${match.match_time}">
+              Loading...
+            </span>
+            <img src="assets/icons/Ellipse2.png" alt="Ellipse" class="Ellipse-logo">
+          `;
+          
         }
     
         return `
@@ -179,37 +184,70 @@ document.addEventListener("DOMContentLoaded", function () {
         currentMatchIndex = (currentMatchIndex + 1) % matchesList.length;
     
         // Cycle every 10 seconds (or however long you want)
-        setTimeout(displayNextMatch, 10000);
+        setTimeout(() => {
+            // Stop countdown update for current match
+            document.querySelectorAll('.countdown').forEach(el => {
+                el.remove(); // Clean up the old countdown element
+            });
+        
+            displayNextMatch();
+        }, 10000);
+        
     }
     
 
     function startCountdownUpdater() {
         setInterval(() => {
-            document.querySelectorAll('.countdown').forEach(el => {
-                const date = el.getAttribute('data-date');
-                const time = el.getAttribute('data-time');
+            const countdownEl = document.querySelector('.countdown, .live-time');
+            if (!countdownEl) return;
     
-                const [hh, mm] = time.split(':').map(Number);
-                const utcStart = new Date(date);
-                utcStart.setUTCHours(hh);
-                utcStart.setUTCMinutes(mm);
-                utcStart.setUTCSeconds(0);
+            const date = countdownEl.getAttribute('data-date');
+            const time = countdownEl.getAttribute('data-time');
     
-                const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
-                const now = new Date();
-                const diffMs = localStart - now;
+            const [hh, mm] = time.split(':').map(Number);
+            const utcStart = new Date(date);
+            utcStart.setUTCHours(hh);
+            utcStart.setUTCMinutes(mm);
+            utcStart.setUTCSeconds(0);
     
-                if (diffMs <= 0) {
-                    el.innerText = "Kickoff!";
-                } else {
-                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-                    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-                    el.innerText = `Countdown: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                }
-            });
+            const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
+            const now = new Date();
+            const diffMs = localStart - now;
+            const diffMin = getMinutesSince(date, time);
+    
+            // Transition logic
+            if (diffMs > 0 && countdownEl.classList.contains('countdown')) {
+                // Countdown before kickoff
+                const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+                countdownEl.innerText = `Countdown: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } 
+            else if (diffMin >= 0 && diffMin < 45) {
+                // 1st Half Live
+                countdownEl.outerHTML = `<span class="live-time blink-green">${diffMin}'</span>
+                    <img src="assets/icons/Ellipse 1.png" alt="Live" class="Ellipse-logo">`;
+            } 
+            else if (diffMin >= 45 && diffMin < 60) {
+                // Halftime
+                countdownEl.outerHTML = `<span class="halftime-text blink-orange">HT</span>
+                    <img src="assets/icons/EllipseHT.png" alt="HT" class="Ellipse-logo">`;
+            } 
+            else if (diffMin >= 60 && diffMin < 95) {
+                // 2nd Half
+                const secondHalfMin = diffMin - 15; // Halftime assumed 15 min
+                countdownEl.outerHTML = `<span class="live-time blink-green">${secondHalfMin}'</span>
+                    <img src="assets/icons/Ellipse 1.png" alt="Live" class="Ellipse-logo">`;
+            } 
+            else if (diffMin >= 95) {
+                // Fulltime
+                countdownEl.outerHTML = `<span class="fulltime-text blink-purple">FT</span>
+                    <img src="assets/icons/EllipseFT.png" alt="FT" class="Ellipse-logo">`;
+            }
         }, 1000);
     }
+    
+    
     
 
     // Initial load

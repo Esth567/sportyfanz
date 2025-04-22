@@ -506,6 +506,10 @@ body{
    height: 7px;
 }
 
+.live-blink {
+    animation: blink 1s infinite;
+}
+
 .blink-green {
     color: #00cc00;
     font-weight: bold;

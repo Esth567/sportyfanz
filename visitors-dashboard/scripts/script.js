@@ -268,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
             else if (diffMin >= 45 && diffMin < 60) {
                 // Halftime
                 countdownEl.outerHTML = `<span class="halftime-text blink-orange">HT</span>
-                    <img src="assets/icons/EllipseHT.png" alt="HT" class="Ellipse-logo">`;
+                    <img src="assets/icons/Ellipse2.png" alt="HT" class="Ellipse-logo">`;
             } 
             else if (diffMin >= 60 && diffMin < 95) {
                 // 2nd Half
@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
             else if (diffMin >= 95) {
                 // Fulltime
                 countdownEl.outerHTML = `<span class="fulltime-text blink-purple">FT</span>
-                    <img src="assets/icons/EllipseFT.png" alt="FT" class="Ellipse-logo">`;
+                    <img src="assets/icons/Ellipse2.png" alt="FT" class="Ellipse-logo">`;
             }
         }, 1000);
     }

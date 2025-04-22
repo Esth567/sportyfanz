@@ -241,58 +241,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function startCountdownUpdater() {
         setInterval(() => {
-            const countdownEl = document.querySelector('.countdown, .live-time');
-            if (!countdownEl) return;
+            document.querySelectorAll('.countdown-container').forEach(countdownEl => {
+                const date = countdownEl.getAttribute('data-date');
+                const time = countdownEl.getAttribute('data-time');
     
-            const date = countdownEl.getAttribute('data-date');
-            const time = countdownEl.getAttribute('data-time');
+                const [hh, mm] = time.split(':').map(Number);
+                const utcStart = new Date(date);
+                utcStart.setUTCHours(hh);
+                utcStart.setUTCMinutes(mm);
+                utcStart.setUTCSeconds(0);
     
-            const [hh, mm] = time.split(':').map(Number);
-            const utcStart = new Date(date);
-            utcStart.setUTCHours(hh);
-            utcStart.setUTCMinutes(mm);
-            utcStart.setUTCSeconds(0);
+                const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
+                const now = new Date();
+                const diffMs = localStart - now;
+                const minutesIn = getMinutesSince(date, time);
     
-            const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
-            const now = new Date();
-            const diffMs = localStart - now;
-            const diffMin = getMinutesSince(date, time);
+                const parent = countdownEl.parentElement;
+                const displaySpan = parent.querySelector('.display-time');
     
-            // Transition logic
-            if (diffMs > 0 && countdownEl.classList.contains('countdown')) {
-                // Countdown before kickoff
-                const hours = Math.floor(diffMs / (1000 * 60 * 60));
-                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-                countdownEl.innerText = `Countdown: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            } 
-            else if (diffMin >= 0 && diffMin < 45) {
-                // 1st Half Live
-                countdownEl.outerHTML = `<span class="live-time blink-green">${diffMin}'</span>
-                    <img src="assets/icons/Ellipse 1.png" alt="Live" class="Ellipse-logo">`;
-            } 
-            else if (diffMin >= 45 && diffMin < 60) {
-                // Halftime
-                countdownEl.outerHTML = `<span class="halftime-text blink-orange">HT</span>
-                    <img src="assets/icons/EllipseHT.png" alt="HT" class="Ellipse-logo">`;
-            } 
-            else if (diffMin >= 60 && diffMin < 95) {
-                // 2nd Half
-                const secondHalfMin = diffMin - 15; // Halftime assumed 15 min
-                countdownEl.outerHTML = `<span class="live-time blink-green">${secondHalfMin}'</span>
-                    <img src="assets/icons/Ellipse 1.png" alt="Live" class="Ellipse-logo">`;
-            } 
-            else if (diffMin >= 95) {
-                // Fulltime
-                countdownEl.outerHTML = `<span class="fulltime-text blink-purple">FT</span>
-                    <img src="assets/icons/EllipseFT.png" alt="FT" class="Ellipse-logo">`;
-            }
-        }, 1000);
+                if (diffMs <= 0) {
+                    // Match has started
+                    if (minutesIn >= 90) {
+                        displaySpan.innerText = "FT";
+                    } else if (minutesIn >= 45 && minutesIn < 60) {
+                        displaySpan.innerText = "HT";
+                    } else {
+                        displaySpan.innerText = `${minutesIn}'`;
+                        displaySpan.classList.add("live-blink");
+                    }
+    
+                    countdownEl.innerText = "";
+                } else {
+                    // Match not started — update countdown every second
+                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+    
+                    countdownEl.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }
+            });
+        }, 1000); // Real-time second updates
     }
     
-    
-    
-
     // Initial load
     loadMatches();
     startCountdownUpdater();

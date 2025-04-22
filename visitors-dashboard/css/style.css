@@ -538,14 +538,6 @@ body{
 }
 
 
-  .countdown-container {
-    position: absolute;
-    top: 5px;
-    left: 10px;
-    font-size: 12px;
-    color: #fff;
-}
-
 .live-blink {
     color: red;
     animation: blink 1s infinite;

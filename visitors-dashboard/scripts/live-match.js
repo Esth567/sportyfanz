@@ -144,9 +144,18 @@ function updateMatches(matches) {
         oneWeekAgo.setDate(now.getDate() - 7);
 
         if (isLive) matchesData.live.push(match);
+
         if (isFinished && matchDateTime >= oneWeekAgo) {
             matchesData.highlight.push(match);
         }
+        
+        // Sort highlights by date descending (recent first)
+        matchesData.highlight.sort((a, b) => {
+            const dateA = new Date(`${a.match_date}T${a.match_time}`);
+            const dateB = new Date(`${b.match_date}T${b.match_time}`);
+            return dateB - dateA;
+        });
+        
         if (isFinished) matchesData.allHighlights.push(match);
         if (isUpcoming) matchesData.upcoming.push(match);
         
@@ -266,14 +275,23 @@ function renderMatches(matchesData, category, leagues = []) {
             league.matches.forEach(match => {
                 const matchDate = new Date(`${match.match_date}T${match.match_time}`);
                 const matchDay = matchDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                const matchTime = category === "highlight" ? "FT" : match.match_status || match.match_time;
+
+                let matchTimeDisplay;
+                if (category === "highlight") {
+                  matchTimeDisplay = "FT";
+               } else if (parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90) {
+                 matchTimeDisplay = match.match_status + "'";
+               } else {
+                 matchTimeDisplay = matchDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+               }
+
 
                 html += `
                 <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
                     <div class="matches-teams">
                         <div class="matches-time">
-                            <div class="match-date">${matchDay}</div>
-                            <div>${matchTime}</div>
+                        ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
+                         <div>${matchTimeDisplay}</div>
                         </div>
                         <div class="matches-datas">
                             <div class="matches-team">
@@ -455,10 +473,9 @@ async function displayLiveMatch(matchId, category) {
             }
     
             if (tab === "lineups") {
-                generatePositions(match.match_hometeam_name, "left");
-                generatePositions(match.match_awayteam_name, "right");
-                renderLineup(match);
-            }
+                // Only render formation after the tab is active
+                generateFormation(match.match_id);
+              }
         });
     });
     
@@ -530,18 +547,21 @@ async function displayLiveMatch(matchId, category) {
                         </div>
                     </div>
 
-                    <div id="football-field" class="field">
-                        <div class="goalpost home-goalpost"></div>
-                        <div class="penalty-box home-box"></div>
-                        <div class="penalty-arc home-arc"></div>
-                        <div id="home-formation" class="formation-area"></div>
-                        <div class="center-circle"></div>
-                        <div class="center-line"></div>
-                        <div id="away-formation" class="formation-area"></div>
-                        <div class="goalpost away-goalpost"></div>
-                        <div class="penalty-box away-box"></div>
-                        <div class="penalty-arc away-arc"></div>
-                    </div>
+            
+                    <div class="football-field">
+  <div class="goal goal-left"></div>
+  <div class="penalty-box penalty-left"></div>
+  
+  <div class="lineup" id="lineup">
+    <div class="team home-team" id="home-lineup"></div>
+    <div class="midline"></div>
+    <div class="team away-team" id="away-lineup"></div>
+  </div>
+  
+  <div class="penalty-box penalty-right"></div>
+  <div class="goal goal-right"></div>
+</div>
+
 
                     <div class="lineup-players-names">
                         <h4>Players</h4>
@@ -793,100 +813,69 @@ async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
         }
     }
     
-
-
-
-  // Function to switch tabs
-  window.showTab = function (tab, league, matchIndex, category) {
-      const match = matchesData[league]?.[category]?.[matchIndex];
-      if (!match) return;
-  
-      const tabContent = document.getElementById("tab-content");
-      tabContent.innerHTML = generateTabContent(tab, match);
-  };
-  
   
   
   
   //This fetches the home and away players
-  async function renderLineup(match) {
-    const homePlayers = match.lineup?.home?.starting_lineups || [];
-    const awayPlayers = match.lineup?.away?.starting_lineups || [];
+  function generateFormation(homeFormation = "4-2-3-1", awayFormation = "4-3-3") {
+  const homeContainer = document.getElementById("home-lineup");
+  const awayContainer = document.getElementById("away-lineup");
+  homeContainer.innerHTML = "";
+  awayContainer.innerHTML = "";
 
-    console.log("Rendering lineup...");
-    console.log("Home Players:", homePlayers);
-    console.log("Away Players:", awayPlayers);
+  const homeArray = homeFormation.split("-").map(Number);
+  const awayArray = awayFormation.split("-").map(Number);
 
-    const homeFormation = match.match_hometeam_system?.split("-") || ["4", "4", "2"];
-    const awayFormation = match.match_awayteam_system?.split("-") || ["4", "4", "2"];
+  // Generate home team (left)
+  homeArray.forEach(players => {
+    const line = document.createElement("div");
+    line.classList.add("line");
+    for (let i = 0; i < players; i++) {
+      const player = document.createElement("div");
+      player.classList.add("player", "home-player");
+      player.textContent = i + 1;
+      line.appendChild(player);
+    }
+    homeContainer.appendChild(line);
+  });
 
-    const homeFormationDiv = document.getElementById("home-formation");
-    const awayFormationDiv = document.getElementById("away-formation");
+  // Add home goalkeeper
+  const homeGKLine = document.createElement("div");
+  homeGKLine.classList.add("line");
+  const homeGK = document.createElement("div");
+  homeGK.classList.add("player", "home-player");
+  homeGK.textContent = "GK";
+  homeGKLine.appendChild(homeGK);
+  homeContainer.insertBefore(homeGKLine, homeContainer.firstChild);
 
-    homeFormationDiv.innerHTML = "";
-    awayFormationDiv.innerHTML = "";
+  // Generate away team (right) - reversed order
+  awayArray.forEach(players => {
+    const line = document.createElement("div");
+    line.classList.add("line");
+    for (let i = 0; i < players; i++) {
+      const player = document.createElement("div");
+      player.classList.add("player", "away-player");
+      player.textContent = i + 1;
+      line.appendChild(player);
+    }
+    awayContainer.prepend(line); // reversed for mirror effect
+  });
 
-    const homePositions = generatePositions(homeFormation, "home");
-    const awayPositions = generatePositions(awayFormation, "away");
-
-
-    homePlayers.forEach((player, index) => {
-        const position = homePositions[index];
-        if (position) {
-            const playerEl = createPlayerElement(player, position);
-            homeFormationDiv.appendChild(playerEl);
-        }
-    });
-
-    awayPlayers.forEach((player, index) => {
-        const position = awayPositions[index];
-        if (position) {
-            const playerEl = createPlayerElement(player, position);
-            awayFormationDiv.appendChild(playerEl);
-        }
-    });
+  // Add away goalkeeper
+  const awayGKLine = document.createElement("div");
+  awayGKLine.classList.add("line");
+  const awayGK = document.createElement("div");
+  awayGK.classList.add("player", "away-player");
+  awayGK.textContent = "GK";
+  awayGKLine.appendChild(awayGK);
+  awayContainer.appendChild(awayGKLine);
 }
 
+// Example usage:
+generateFormation("4-2-3-1", "4-3-3");
 
-
-//This function takes the formation
-function generatePositions(formation, side) {
-    const positions = [];
-    const rows = formation.map(num => parseInt(num, 10));
-    const rowHeight = 60;
-    const colSpacing = 80;
-    const topOffset = side === "home" ? 50 : 400;
-
-    rows.forEach((playersInRow, rowIndex) => {
-        const y = topOffset + rowIndex * rowHeight;
-        const spacing = 100 / (playersInRow + 1);
-        for (let i = 0; i < playersInRow; i++) {
-            const x = spacing * (i + 1);
-            positions.push({ top: y, left: x + "%" });
-        }
-    });
-
-    return positions;
-}
-
-
-  //function to create players
-  function createPlayerElement(player, position) {
-    const playerDiv = document.createElement("div");
-    playerDiv.classList.add("player");
-
-    playerDiv.style.position = "absolute";
-    playerDiv.style.top = `${position.top}px`;
-    playerDiv.style.left = `${position.left}px`;
-
-    playerDiv.innerHTML = `
-        <img src="${player.lineup_player_image || ''}" alt="${player.lineup_player}" />
-        <p>${player.lineup_player}</p>
-    `;
-
-    return playerDiv;
-}
-
+  
+  
 
 
 

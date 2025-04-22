@@ -441,7 +441,7 @@ body{
     position: relative;
     border-radius: 15px;
     border: 1px solid #fbc12d8c;
-    padding: 8px;
+    padding: 10px;
 
 }
 .game-leag {
@@ -455,8 +455,6 @@ body{
     display: flex;
     flex-direction: column;
     text-align: center;
-    margin-left: 10px;
-    padding-right: 10px;
     gap: 3px;
 }
 .vs-score {
@@ -464,7 +462,6 @@ body{
     font-family: 'Lato';
     font-weight: bold;
     color: #70c172;
-    padding: 2px;
 
 }
 .teams-time {
@@ -474,12 +471,13 @@ body{
     width: 100%;
     padding-top: 5px;
     margin-bottom: 5px;
+    margin-right: 10px;
 }
 
 .team {
     flex: 1;
     text-align: center;
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-family: 'Lato';
     word-break: keep-all;
     overflow: hidden;
@@ -1297,6 +1295,7 @@ body{
     color: #222;
     width: 100%;
     max-width: 400px;
+    margin-bottom: 20px;
   }
 
 .predition-content h4{
@@ -1566,7 +1565,30 @@ body{
     color: #70c172; /* Optional: Change text color on hover */
 }
 
-
+.shimmer {
+    background: linear-gradient(to right, #eeeeee 0%, #dddddd 20%, #eeeeee 40%, #eeeeee 100%);
+    background-size: 1000px 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 4px;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+  }
+  
+  .shimmer-title {
+    height: 20px;
+    width: 70%;
+    margin-bottom: 8px;
+  }
+  
+  .shimmer-description {
+    height: 14px;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+  
 
 
 .live-games {
@@ -2542,25 +2564,26 @@ body{
 .field {
     position: relative;
     width: 100%;
-    max-width: 754.86px;;  /* Adjust to the field width */
-    height: 280px; /* Adjust to the field height */
-    background-color: green;
-    border: 2px solid white; /* Optional for a better look */
-}
-
-/* ➖ Center Line */
-.center-line {
+    max-width: 800px;
+    height: 300px;
+    background: #228B22;
+    border: 2px solid white;
+    margin: 20px auto;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  /* Center Line & Circle */
+  .center-line {
     position: absolute;
-    width: 2px;
     height: 100%;
-    background-color: white;
-    top: 0;
+    width: 2px;
+    background: white;
     left: 50%;
-}
-
-
-/* 🔴 Center Circle */
-.center-circle {
+    top: 0;
+  }
+  
+  .center-circle {
     position: absolute;
     width: 100px;
     height: 100px;
@@ -2569,58 +2592,89 @@ body{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-
-/* Formation areas for both teams */
-.formation-area {
+  }
+  
+  /* Goals */
+  .goalpost {
     position: absolute;
-    width: 100%;
-    height: 100%;
-}
-
-/* Player styling */
-.player {
+    width: 50px;
+    height: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .left-goalpost {
+    left: 0;
+  }
+  
+  .right-goalpost {
+    right: 0;
+  }
+  
+  /* Penalty Boxes */
+  .penalty-box {
     position: absolute;
-    width: 30px; /* Adjust size of the player */
-    height: 30px;
-    background-color: red !important; /* Placeholder color for player */
+    width: 100px;
+    height: 200px;
+    border: 2px solid white;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .left-box {
+    left: 0;
+  }
+  
+  .right-box {
+    right: 0;
+  }
+  
+  /* Penalty Arcs */
+  .penalty-arc {
+    position: absolute;
+    width: 60px;
+    height: 50px;
+    border: 2px solid white;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .left-arc {
+    left: 100px;
+    border-left: none;
+  }
+  
+  .right-arc {
+    right: 100px;
+    border-right: none;
+  }
+  
+  /* Players */
+  .player {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: white;
+    color: black;
     border-radius: 50%;
     text-align: center;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transform: translate(-50%, -50%);
-    
-}
-
-.player img {
+    line-height: 26px;
+    font-size: 12px;
+    border: 1px solid #000;
+  }
+  
+  .formation-container {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-}
-
-/* Additional field elements like goalposts, penalty box, etc. */
-.goalpost, .penalty-box, .penalty-arc {
-    position: absolute;
-    border: 2px solid white;
-    
-}
+  }
+  
 
 
-/* Example for goalposts */
-.goalpost {
-    width: 20px;
-    height: 100px;
-    top: 50%;
-    left: 5%; /* For home goal */
-    transform: translateY(-50%);
-}
 
-.goalpost.away-goalpost {
-    left: 95%; /* For away goal */
-}
 
 
 

@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const axios = require('axios');
+const xml2js = require('xml2js');
 const { User, Data } = require("../database/db");  // ✅ Correct Import
 require("dotenv").config();
 const fetch = require('node-fetch');
@@ -82,18 +84,29 @@ app.post("/update", async (req, res) => {
     }
 });
 
+// Example RSS feed (Sky Sports Football News)
+const RSS_URL = 'https://www.skysports.com/rss/12040';
+
 app.get('/api/news', async (req, res) => {
-    try {
-      const response = await axios.post('http://localhost:5001/summarize', {
-        rss_url: 'https://www.espn.com/espn/rss/news'
-      });
-  
-      res.json(response.data);
-    } catch (err) {
-      console.error("Node proxy failed:", err.message);
-      res.status(500).json({ error: 'Summarizer failed' });
-    }
-  });
+  try {
+    const response = await axios.get(RSS_URL);
+    const xml = response.data;
+
+    xml2js.parseString(xml, (err, result) => {
+      if (err) return res.status(500).json({ error: 'Failed to parse XML' });
+
+      const items = result.rss.channel[0].item;
+      const news = items.map(item => ({
+        title: item.title[0],
+        description: item.description[0],
+      }));
+
+      res.json(news);
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch news' });
+  }
+});
   
 // ✅ Export Express App
 module.exports = app;

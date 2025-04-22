@@ -18,22 +18,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const from = new Date().toISOString().split('T')[0]; // today's date
     const to = from;
-    const leagueIDs = ["152", "302", "207", "168", "175"]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
-    const bigTeams = ["Chelsea", "Barcelona", "Bayern Munich", "Manchester City", "Real Madrid", "Arsenal", "Liverpool", "Napoli", "PSG", "AC Milan", "Leicester City", "Newcastle United"];
+    const leagueIDs = ["3", "152", "302", "207", "168", "175"]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
+    const bigTeams = ["Chelsea", "Barcelona", "Bayern Munich", "Manchecter United", "Manchester City", "Real Madrid", "Arsenal", "Liverpool", "Napoli", "PSG", "AC Milan", "Leicester City", "Newcastle United"];
 
     let matchesList = []; // Store matches for the day
     let currentMatchIndex = 0; // Track the current match being displayed
 
-    function getMinutesSince(matchDate, matchTime) {
-        const now = new Date(); // local time
-        const matchStartUTC = new Date(`${matchDate}T${matchTime}Z`); // force UTC parse
     
-        const diff = Math.floor((now.getTime() - matchStartUTC.getTime()) / 60000);
-        return diff > 0 ? diff : 0; // prevent negatives
+    function formatTo12Hour(timeStr) {
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours, 10);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12 || 12;
+        return `${hour}:${minutes} ${ampm}`;
     }
     
-    
-
     function createMatchHTML(match) {
         const homeTeam = match.match_hometeam_name;
         const awayTeam = match.match_awayteam_name;
@@ -44,25 +43,25 @@ document.addEventListener("DOMContentLoaded", function () {
         const matchStatus = match.match_status;
         const homeScore = match.match_hometeam_score;
         const awayScore = match.match_awayteam_score;
-
+    
         const isFinished = matchStatus === "Finished" || matchStatus === "FT";
         const hasStarted = matchStatus !== "" && matchStatus !== "Not Started";
         const isLive = !isNaN(parseInt(matchStatus));
-
+    
         const displayScore = hasStarted ? `${homeScore} - ${awayScore}` : "VS";
         let displayTime, ellipseImg;
-
+    
         if (isFinished) {
             displayTime = "FT";
-            ellipseImg = "assets/icons/Ellipse 1.png"; // or change to default if you prefer
+            ellipseImg = "assets/icons/Ellipse 1.png";
         } else if (hasStarted) {
             displayTime = `${getMinutesSince(match.match_date, startTime)}'`;
             ellipseImg = "assets/icons/Ellipse 1.png";
         } else {
-            displayTime = startTime;
+            displayTime = formatTo12Hour(startTime); // 👈 Show 12hr format
             ellipseImg = "assets/icons/Ellipse2.png";
         }
-
+    
         return `
         <div class="teams-time">
             <div class="team">
@@ -84,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </div> 
         `;
     }
+    
 
  
     async function loadMatches() {

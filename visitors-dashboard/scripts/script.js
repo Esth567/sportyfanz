@@ -214,6 +214,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initial load
     loadMatches();
+    startCountdownUpdater();
+
 });
 
 

@@ -530,6 +530,11 @@ body{
   }
 
 
+  .match-top-timer {
+  padding-top: 5px;
+  margin-bottom: 5px;
+}
+
 
   .countdown-container {
     position: absolute;
@@ -540,7 +545,6 @@ body{
     padding: 4px 4px;
     border-radius: 4px;
     background-color: rgba(0,0,0,0.6);
-    z-index: 10;
 }
 
 .live-blink {

@@ -24,14 +24,45 @@ document.addEventListener("DOMContentLoaded", function () {
     let matchesList = []; // Store matches for the day
     let currentMatchIndex = 0; // Track the current match being displayed
 
+    function getMinutesSince(matchDate, matchTime) {
+        const [hours, minutes] = matchTime.split(':').map(Number);
+    
+        // Construct UTC datetime from matchDate + matchTime
+        const matchUTC = new Date(matchDate);
+        matchUTC.setUTCHours(hours);
+        matchUTC.setUTCMinutes(minutes);
+        matchUTC.setUTCSeconds(0);
+    
+        // Convert to local time by applying the inverse of the timezone offset
+        const matchLocal = new Date(matchUTC.getTime() + (matchUTC.getTimezoneOffset() * -60000));
+        const now = new Date();
+    
+        const diff = Math.floor((now - matchLocal) / 60000); // in minutes
+        return diff > 0 ? diff : 0;
+    }
+    
     
     function formatTo12Hour(timeStr) {
-        const [hours, minutes] = timeStr.split(':');
-        let hour = parseInt(hours, 10);
-        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const [hours, minutes] = timeStr.split(':').map(Number);
+    
+        // Create a UTC date from today + time
+        const utcDate = new Date();
+        utcDate.setUTCHours(hours);
+        utcDate.setUTCMinutes(minutes);
+        utcDate.setUTCSeconds(0);
+    
+        // Convert to local time
+        const localDate = new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * -60000));
+    
+        let hour = localDate.getHours();
+        const ampm = hour >= 12 ? "PM" : "AM";
         hour = hour % 12 || 12;
-        return `${hour}:${minutes} ${ampm}`;
+    
+        const paddedMinutes = String(localDate.getMinutes()).padStart(2, '0');
+        return `${hour}:${paddedMinutes} ${ampm}`;
     }
+    
+    
     
     function createMatchHTML(match) {
         const homeTeam = match.match_hometeam_name;
@@ -49,7 +80,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const isLive = !isNaN(parseInt(matchStatus));
     
         const displayScore = hasStarted ? `${homeScore} - ${awayScore}` : "VS";
-        let displayTime, ellipseImg;
+    
+        // Format to local readable time
+        const formattedStart = formatTo12Hour(startTime);
+    
+        // Determine displayTime placeholder
+        let displayTime = "";
+        let ellipseImg = "";
     
         if (isFinished) {
             displayTime = "FT";
@@ -58,7 +95,8 @@ document.addEventListener("DOMContentLoaded", function () {
             displayTime = `${getMinutesSince(match.match_date, startTime)}'`;
             ellipseImg = "assets/icons/Ellipse 1.png";
         } else {
-            displayTime = formatTo12Hour(startTime); // 👈 Show 12hr format
+            // For upcoming match – setup countdown container
+            displayTime = `<span class="countdown" data-date="${match.match_date}" data-time="${startTime}">Loading...</span>`;
             ellipseImg = "assets/icons/Ellipse2.png";
         }
     
@@ -83,6 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </div> 
         `;
     }
+    
     
 
  
@@ -141,6 +180,35 @@ document.addEventListener("DOMContentLoaded", function () {
     
         // Cycle every 10 seconds (or however long you want)
         setTimeout(displayNextMatch, 10000);
+    }
+    
+
+    function startCountdownUpdater() {
+        setInterval(() => {
+            document.querySelectorAll('.countdown').forEach(el => {
+                const date = el.getAttribute('data-date');
+                const time = el.getAttribute('data-time');
+    
+                const [hh, mm] = time.split(':').map(Number);
+                const utcStart = new Date(date);
+                utcStart.setUTCHours(hh);
+                utcStart.setUTCMinutes(mm);
+                utcStart.setUTCSeconds(0);
+    
+                const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
+                const now = new Date();
+                const diffMs = localStart - now;
+    
+                if (diffMs <= 0) {
+                    el.innerText = "Kickoff!";
+                } else {
+                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+                    el.innerText = `Countdown: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }
+            });
+        }, 1000);
     }
     
 

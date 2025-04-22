@@ -97,11 +97,9 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             // For upcoming match – setup countdown container
             displayTime = `
-            <span class="countdown" data-date="${match.match_date}" data-time="${startTime}" data-start="${match.match_time}">
-              Loading...
-            </span>
-            <img src="assets/icons/Ellipse2.png" alt="Ellipse" class="Ellipse-logo">
-          `;
+                <div class="countdown-container" data-date="${match.match_date}" data-time="${startTime}"></div>
+               <span class="display-time">${formattedStart}</span>
+              `;
           
         }
     
@@ -186,9 +184,48 @@ document.addEventListener("DOMContentLoaded", function () {
         // Cycle every 10 seconds (or however long you want)
         setTimeout(() => {
             // Stop countdown update for current match
-            document.querySelectorAll('.countdown').forEach(el => {
-                el.remove(); // Clean up the old countdown element
+            document.querySelectorAll('.countdown-container').forEach(el => {
+                const date = el.getAttribute('data-date');
+                const time = el.getAttribute('data-time');
+            
+                const [hh, mm] = time.split(':').map(Number);
+                const utcStart = new Date(date);
+                utcStart.setUTCHours(hh);
+                utcStart.setUTCMinutes(mm);
+                utcStart.setUTCSeconds(0);
+            
+                const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
+                const now = new Date();
+                const diffMs = localStart - now;
+            
+                const parent = el.parentElement;
+                const displaySpan = parent.querySelector('.display-time');
+            
+                if (diffMs <= 0) {
+                    // match has started
+                    const minutesIn = Math.floor((now - localStart) / 60000);
+            
+                    if (minutesIn >= 45 && minutesIn < 60) {
+                        displaySpan.innerText = "HT";
+                    } else if (minutesIn >= 90) {
+                        displaySpan.innerText = "FT";
+                    } else {
+                        displaySpan.innerText = `${minutesIn}'`;
+                        displaySpan.classList.add("live-blink"); // blink effect
+                    }
+            
+                    el.innerText = ""; // hide countdown
+                } else {
+                    // match hasn't started yet
+                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+            
+                    el.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    displaySpan.innerText = formatTo12Hour(time); // fallback in case not loaded
+                }
             });
+            
         
             displayNextMatch();
         }, 10000);

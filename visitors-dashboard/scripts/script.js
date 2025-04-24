@@ -1106,171 +1106,165 @@ document.querySelectorAll('.category-btn').forEach(button => {
 
 
 //function for predition-container in middly layer
-let offset = 0;
-
 function getDateString(offset = 0) {
-  const date = new Date();
-  date.setDate(date.getDate() + offset);
-  return date.toISOString().split('T')[0];
-}
-
-
-const bigTeams = [
-  "Man U", "Manchester United", "Chelsea", "Real Madrid", "Barcelona",
-  "Juventus", "Bayern Munich", "PSG", "Liverpool", "Arsenal"
-];
-
-const bigLeagues = [
-  "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League"
-];
-
-function isBigTeamMatch(match) {
-  return bigTeams.some(team =>
-    match.home.toLowerCase().includes(team.toLowerCase()) ||
-    match.away.toLowerCase().includes(team.toLowerCase())
-  );
-}
-
-function isRealisticOdds(match) {
-  const odd1 = parseFloat(match.odd_1);
-  const odd2 = parseFloat(match.odd_2);
-  return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
-}
-
-function getConfidenceBadge(odd1, odd2) {
-  const diff = Math.abs(odd1 - odd2);
-  return diff <= 0.3 ? "🔥 Balanced" : "🧊 One-sided";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const predictionContainer = document.querySelector('.prediction-container');
-  if (predictionContainer) {
-    fetchOddsUntilMatchFound(predictionContainer);
-    setInterval(updateLiveTimers, 60000);
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split('T')[0];
   }
-});
-
-function updateLiveTimers() {
-  const now = new Date();
-  document.querySelectorAll('.live-timer').forEach(span => {
-    const startTime = span.dataset.start;
-    const matchTime = new Date(`${getDateString(offset)} ${startTime}`);
-    const diff = Math.floor((now - matchTime) / 60000);
-
-    if (diff >= 0 && diff <= 120) {
-      span.textContent = `${diff}'`;
-    } else if (diff > 120) {
-      span.textContent = "FT";
-    } else {
-      span.textContent = startTime;
-    }
-  });
-}
-
-async function fetchOddsUntilMatchFound(predictionContainer) {
-  const from = getDateString(offset);
-  const to = from;
-
-  try {
-    const [oddsRes, eventsRes] = await Promise.all([
-      fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${from}&to=${to}&APIkey=${APIkey}`),
-      fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`)
-    ]);
-
-    const oddsData = await oddsRes.json();
-    const eventsData = await eventsRes.json();
-
-    if (!Array.isArray(oddsData) || oddsData.length === 0) {
-      offset++;
-      return offset <= 7
-        ? fetchOddsUntilMatchFound(predictionContainer)
-        : predictionContainer.innerHTML = "<p>No competitive matches with odds available.</p>";
-    }
-
-    const enrichedMatches = oddsData.map(oddMatch => {
-      const eventDetails = eventsData.find(ev => ev.match_id === oddMatch.match_id);
-      if (!eventDetails) return null;
-      return {
-        ...oddMatch,
-        home: eventDetails.match_hometeam_name,
-        away: eventDetails.match_awayteam_name,
-        homeLogo: eventDetails.team_home_badge,
-        awayLogo: eventDetails.team_away_badge,
-        time: eventDetails.match_time,
-        league_name: eventDetails.league_name,
-        score: eventDetails.match_hometeam_score + " - " + eventDetails.match_awayteam_score
-      };
-    }).filter(Boolean);
-
-    const competitiveMatches = enrichedMatches.filter(match =>
-      isBigTeamMatch(match) &&
-      isRealisticOdds(match) &&
-      bigLeagues.includes(match.league_name)
+  
+  const bigTeams = [
+    "Manchester City", "Manchester United", "Chelsea", "Real Madrid", "Barcelona",
+    "Juventus", "Bayern Munich", "PSG", "Liverpool", "Arsenal"
+  ];
+  
+  const bigLeagues = [
+    "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1"
+  ];
+  
+  function isBigTeamMatch(match) {
+    return bigTeams.some(team =>
+      match.home.toLowerCase().includes(team.toLowerCase()) ||
+      match.away.toLowerCase().includes(team.toLowerCase())
     );
-
-    if (competitiveMatches.length === 0) {
-      offset++;
-      return offset <= 7
-        ? fetchOddsUntilMatchFound(predictionContainer)
-        : predictionContainer.innerHTML = "<p>No competitive matches with trustworthy odds found.</p>";
-    }
-
-    startPredictionSlider(predictionContainer, competitiveMatches);
-
-  } catch (err) {
-    console.error("Prediction fetch error:", err);
-    predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
   }
-}
-
-let predictionIndex = 0;
-
-function startPredictionSlider(predictionContainer, matches) {
-  function showSlide() {
-    const match = matches[predictionIndex];
+  
+  function isRealisticOdds(match) {
     const odd1 = parseFloat(match.odd_1);
     const odd2 = parseFloat(match.odd_2);
-    const badge = getConfidenceBadge(odd1, odd2);
-
-    predictionContainer.innerHTML = `
-      <div class="predition-content">
-        <h4>${badge} Clash Confidence</h4>
-        <div class="predit-selection">
-          <div class="team-nam">
-            <span>${match.home}</span>
-            <div class="team-logo">
-              <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
-            </div>
-            <div class="prediction-number">${match.odd_1}</div>
-          </div>
-
-          <div class="score-status">
-            <div class="match-score">${match.score}</div>
-            <span class="live-timer" data-start="${match.time}">${match.time}</span>
-          </div>
-
-          <div class="team-nam">
-            <span>${match.away}</span>
-            <div class="team-logo">
-              <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
-            </div>
-            <div class="prediction-number">${match.odd_2}</div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    updateLiveTimers();
-    predictionIndex = (predictionIndex + 1) % matches.length;
-    setTimeout(showSlide, 10000); // slide every 10s
+    return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
   }
-
-  showSlide(); // initial call
-}
-
-
+  
+  function getConfidenceBadge(odd1, odd2) {
+    const diff = Math.abs(odd1 - odd2);
+    return diff <= 0.3 ? "🔥 Balanced" : "🧊 One-sided";
+  }
+  
+  document.addEventListener("DOMContentLoaded", () => {
+    const predictionContainer = document.querySelector('.prediction-container');
+    if (predictionContainer) {
+      fetchTodayPredictions(predictionContainer);
+      setInterval(updateLiveTimers, 60000);
+    }
+  });
+  
+  function updateLiveTimers() {
+    const now = new Date();
+    document.querySelectorAll('.live-timer').forEach(span => {
+      const startTime = span.dataset.start;
+      const matchTime = new Date(`${getDateString(0)} ${startTime}`);
+      const diff = Math.floor((now - matchTime) / 60000);
+  
+      if (diff >= 0 && diff <= 120) {
+        span.textContent = `${diff}'`;
+      } else if (diff > 120) {
+        span.textContent = "FT";
+      } else {
+        span.textContent = startTime;
+      }
+    });
+  }
+  
+  async function fetchTodayPredictions(predictionContainer) {
+    const today = getDateString(0);
+  
+    try {
+      const [oddsRes, eventsRes] = await Promise.all([
+        fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${today}&to=${today}&APIkey=${APIkey}`),
+        fetch(`https://apiv3.apifootball.com/?action=get_events&from=${today}&to=${today}&APIkey=${APIkey}`)
+      ]);
+  
+      const oddsData = await oddsRes.json();
+      const eventsData = await eventsRes.json();
+  
+      if (!Array.isArray(oddsData) || !Array.isArray(eventsData)) {
+        predictionContainer.innerHTML = "<p>Unable to load prediction data.</p>";
+        return;
+      }
+  
+      const enrichedMatches = oddsData.map(oddMatch => {
+        const eventDetails = eventsData.find(ev => ev.match_id === oddMatch.match_id);
+        if (!eventDetails) return null;
+  
+        return {
+          ...oddMatch,
+          home: eventDetails.match_hometeam_name,
+          away: eventDetails.match_awayteam_name,
+          homeLogo: eventDetails.team_home_badge,
+          awayLogo: eventDetails.team_away_badge,
+          time: eventDetails.match_time,
+          league_name: eventDetails.league_name,
+          score: `${eventDetails.match_hometeam_score} - ${eventDetails.match_awayteam_score}`,
+          odd_1: parseFloat(oddMatch.odd_1),
+          odd_2: parseFloat(oddMatch.odd_2)
+        };
+      }).filter(Boolean);
+  
+      const competitiveMatches = enrichedMatches.filter(match =>
+        isBigTeamMatch(match) &&
+        isRealisticOdds(match) &&
+        bigLeagues.includes(match.league_name.trim())
+      );
+  
+      if (competitiveMatches.length === 0) {
+        predictionContainer.innerHTML = "<p>No big matches with reliable odds today.</p>";
+        return;
+      }
+  
+      showSlide(predictionContainer, competitiveMatches);
+    } catch (err) {
+      console.error("Prediction fetch error:", err);
+      predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
+    }
+  }
+  
+  let predictionIndex = 0;
+  
+  
+    function showSlide(predictionContainer, matches) {
+        predictionContainer.classList.remove('fade-in'); // Reset fade
+        setTimeout(() => {
+          const match = matches[predictionIndex];
+          const odd1 = parseFloat(match.odd_1);
+          const odd2 = parseFloat(match.odd_2);
+          const badge = getConfidenceBadge(odd1, odd2);
+      
+          predictionContainer.innerHTML = `
+            <div class="predition-content">
+              <h4>${badge} Clash Confidence</h4>
+              <div class="predit-selection">
+                <div class="team-nam">
+                  <span>${match.home}</span>
+                  <div class="team-logo">
+                    <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
+                  </div>
+                  <div class="prediction-number">${match.odd_1}</div>
+                </div>
+      
+                <div class="score-status">
+                  <div class="match-score">${match.score}</div>
+                  <span class="live-timer" data-start="${match.time}">${match.time}</span>
+                </div>
+      
+                <div class="team-nam">
+                  <span>${match.away}</span>
+                  <div class="team-logo">
+                    <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
+                  </div>
+                  <div class="prediction-number">${match.odd_2}</div>
+                </div>
+              </div>
+            </div>
+          `;
+      
+          updateLiveTimers();
+          predictionContainer.classList.add('fade-in'); // Trigger fade-in
+          predictionIndex = (predictionIndex + 1) % matches.length;
+        }, 100); // small delay to allow fade-out
+      }
+      
   
 
+  
 
 
 // menu toggle button for sidebar for mobile view

@@ -1217,11 +1217,11 @@ function getDateString(offset = 0) {
         const match = matches[predictionIndex];
         const odd1 = parseFloat(match.odd_1);
         const odd2 = parseFloat(match.odd_2);
-        const badge = getConfidenceBadge(odd1, odd2);
+        
   
         predictionContainer.innerHTML = `
           <div class="predition-content">
-            <h4>${badge} Clash Confidence</h4>
+            <h4>Who do you think will win</h4>
             <div class="predit-selection">
               <div class="team-nam">
                 <span>${match.home}</span>

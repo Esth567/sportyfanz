@@ -435,7 +435,7 @@ document.addEventListener("DOMContentLoaded", fetchTopScorers);
 
 
 
-//league table for 4 team beased on ranking
+//league table for 5 team beased on ranking
 const leagueId = 152;
 
 async function fetchTopFourStandings() {
@@ -453,9 +453,9 @@ async function fetchTopFourStandings() {
         }
 
         // Extract top 4 teams
-        const topFourTeams = data.slice(0, 4);
+        const topFourTeams = data.slice(0, 5);
 
-        // Generate HTML for the top 4 teams
+        // Generate HTML for the top 5 teams
         let tableHTML = `
             <h3 class="league-title">${topFourTeams[0].league_name}</h3>
             <div class="table-header">

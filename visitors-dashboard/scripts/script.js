@@ -1221,50 +1221,53 @@ function getDateString(offset = 0) {
   
   function startPredictionSlider(predictionContainer, matches) {
     function showSlide() {
-        predictionContainer.classList.remove('fade-in'); // Reset fade
-        setTimeout(() => {
-          const match = matches[predictionIndex];
-          const odd1 = parseFloat(match.odd_1);
-          const odd2 = parseFloat(match.odd_2);
-          const badge = getConfidenceBadge(odd1, odd2);
-      
-          predictionContainer.innerHTML = `
-            <div class="predition-content">
-              <h4>${badge} Clash Confidence</h4>
-              <div class="predit-selection">
-                <div class="team-nam">
-                  <span>${match.home}</span>
-                  <div class="team-logo">
-                    <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
-                  </div>
-                  <div class="prediction-number">${match.odd_1}</div>
+      // Fade out
+      predictionContainer.classList.remove('fade-in');
+  
+      setTimeout(() => {
+        const match = matches[predictionIndex];
+        const odd1 = parseFloat(match.odd_1);
+        const odd2 = parseFloat(match.odd_2);
+        const badge = getConfidenceBadge(odd1, odd2);
+  
+        predictionContainer.innerHTML = `
+          <div class="predition-content">
+            <h4>${badge} Clash Confidence</h4>
+            <div class="predit-selection">
+              <div class="team-nam">
+                <span>${match.home}</span>
+                <div class="team-logo">
+                  <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
                 </div>
-      
-                <div class="score-status">
-                  <div class="match-score">${match.score}</div>
-                  <span class="live-timer" data-start="${match.time}">${match.time}</span>
+                <div class="prediction-number">${match.odd_1}</div>
+              </div>
+  
+              <div class="score-status">
+                <div class="match-score">${match.score}</div>
+                <span class="live-timer" data-start="${match.time}">${match.time}</span>
+              </div>
+  
+              <div class="team-nam">
+                <span>${match.away}</span>
+                <div class="team-logo">
+                  <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
                 </div>
-      
-                <div class="team-nam">
-                  <span>${match.away}</span>
-                  <div class="team-logo">
-                    <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
-                  </div>
-                  <div class="prediction-number">${match.odd_2}</div>
-                </div>
+                <div class="prediction-number">${match.odd_2}</div>
               </div>
             </div>
-          `;
-      
-          updateLiveTimers();
-          predictionContainer.classList.add('fade-in'); // Trigger fade-in
-          predictionIndex = (predictionIndex + 1) % matches.length;
-        }, 100); // small delay to allow fade-out
-      }
-      
+          </div>
+        `;
   
-    showSlide(); // initial call
+        updateLiveTimers();
+        predictionContainer.classList.add('fade-in'); // Fade in
+        predictionIndex = (predictionIndex + 1) % matches.length;
+      }, 200); // Give time for fade-out to finish
+    }
+  
+    showSlide(); // Show first slide immediately
+    setInterval(showSlide, 10000); // Change every 10 seconds
   }
+  
   
 
   

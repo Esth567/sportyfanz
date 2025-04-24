@@ -1136,24 +1136,43 @@ function getDateString(offset = 0) {
     }
   });
   
-  function updateLiveTimers() {
+  
+  // Function to get the user's local timezone
+function getUserTimezone() {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+  
+  // Function to convert match time to the user's timezone
+  function convertMatchTimeToLocalTime(matchTime) {
+    const userTimezone = getUserTimezone();
+    const matchDate = new Date(`${getDateString(0)} ${matchTime}`);
+  
+    // Convert the match date to the user's timezone
+    return matchDate.toLocaleString('en-US', { timeZone: userTimezone, hour12: false });
+  }
+  
+  // Update the live timers with timezone-aware match time
+function updateLiveTimers() {
     const now = new Date();
     document.querySelectorAll('.live-timer').forEach(span => {
       const startTime = span.dataset.start;
-      const matchTime = new Date(`${getDateString(0)} ${startTime}`);
-      const diff = Math.floor((now - matchTime) / 60000);
+      const matchTime = convertMatchTimeToLocalTime(startTime);
+      const matchDate = new Date(matchTime);
+      const diff = Math.floor((now - matchDate) / 60000); // Time difference in minutes
   
       if (diff >= 0 && diff <= 120) {
         span.textContent = `${diff}'`;
       } else if (diff > 120) {
         span.textContent = "FT";
       } else {
-        span.textContent = startTime;
+        span.textContent = matchTime; // Show the local time for upcoming matches
       }
     });
   }
   
-  async function fetchTodayPredictions(predictionContainer) {
+
+// Fetch and display predictions as before
+async function fetchTodayPredictions(predictionContainer) {
     const today = getDateString(0);
   
     try {
@@ -1192,7 +1211,6 @@ function getDateString(offset = 0) {
         isRealisticOdds(match) &&
         bigLeagues.map(l => l.toLowerCase()).includes(match.league_name.trim().toLowerCase())
       );
-      
   
       if (competitiveMatches.length === 0) {
         predictionContainer.innerHTML = "<p>No big matches with reliable odds today.</p>";
@@ -1232,6 +1250,7 @@ function getDateString(offset = 0) {
               </div>
   
               <div class="score-status">
+              <div class="match-leagueName">${match.league_name}</div>
                 <div class="match-score">${match.score}</div>
                 <span class="live-timer" data-start="${match.time}">${match.time}</span>
               </div>

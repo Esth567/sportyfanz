@@ -1126,9 +1126,9 @@ body{
         justify-content: center;
         background: #fff;
         color: #1A2F4B;
-        padding: 4px 10px;
+        padding: 8px 10px;
         border-radius: 15px;
-        font-size: 0.60rem;
+        font-size: 0.50rem;
         font-family: 'Lato';
         font-weight: bold;
         border: none;
@@ -1198,6 +1198,7 @@ body{
         font-size: 0.8rem;
         font-family: 'Lato';
         font-weight: bold;
+        margin-right: 10px;
     }
 
 

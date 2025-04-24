@@ -1098,7 +1098,7 @@ body{
 
     .match-details {
         display: grid;
-        grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1fr auto;
+        grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr 1fr auto;
         align-items: center;
         width: 100%;
         gap: 5px;
@@ -1130,7 +1130,7 @@ body{
         border-radius: 15px;
         font-size: 0.60rem;
         font-family: 'Lato';
-        font-weight: 'bold';
+        font-weight: bold;
         border: none;
         min-width: fit-content;
     }
@@ -1166,7 +1166,7 @@ body{
     .match-country {
         display: flex;
         align-items: center;
-        gap: 5px; /* Controls spacing between icon and text */
+        gap: 5px; 
         font-size: 0.7rem;
         font-family: 'Lato';
         font-weight: 300;
@@ -1175,10 +1175,9 @@ body{
 
     .match-meta {
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
-        gap: 4px;
+        flex-direction: row; /* Ensures the meta items are in a row */
+        align-items: center;
+        gap: 8px; /* Adjusts space between time and country */
     }
     
 

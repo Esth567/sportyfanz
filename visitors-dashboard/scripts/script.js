@@ -1112,21 +1112,13 @@ function getDateString(offset = 0) {
     return date.toISOString().split('T')[0];
   }
   
-  const bigTeams = [
-    "Manchester City", "Manchester United", "Chelsea", "Real Madrid", "Barcelona",
-    "Juventus", "Bayern Munich", "PSG", "Liverpool", "Arsenal"
-  ];
+ 
   
   const bigLeagues = [
-    "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1"
+    "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1", "Ligue 2"
   ];
   
-  function isBigTeamMatch(match) {
-    return bigTeams.some(team =>
-      match.home.toLowerCase().includes(team.toLowerCase()) ||
-      match.away.toLowerCase().includes(team.toLowerCase())
-    );
-  }
+ 
   
   function isRealisticOdds(match) {
     const odd1 = parseFloat(match.odd_1);
@@ -1134,10 +1126,7 @@ function getDateString(offset = 0) {
     return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
   }
   
-  function getConfidenceBadge(odd1, odd2) {
-    const diff = Math.abs(odd1 - odd2);
-    return diff <= 0.3 ? "🔥 Balanced" : "🧊 One-sided";
-  }
+  
   
   document.addEventListener("DOMContentLoaded", () => {
     const predictionContainer = document.querySelector('.prediction-container');
@@ -1200,10 +1189,10 @@ function getDateString(offset = 0) {
       }).filter(Boolean);
   
       const competitiveMatches = enrichedMatches.filter(match =>
-        isBigTeamMatch(match) &&
         isRealisticOdds(match) &&
-        bigLeagues.includes(match.league_name.trim())
+        bigLeagues.map(l => l.toLowerCase()).includes(match.league_name.trim().toLowerCase())
       );
+      
   
       if (competitiveMatches.length === 0) {
         predictionContainer.innerHTML = "<p>No big matches with reliable odds today.</p>";

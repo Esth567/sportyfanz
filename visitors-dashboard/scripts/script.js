@@ -637,6 +637,7 @@ function showMatches(category, event = null) {
 
 
 // Function to Create a Match Card
+// Function to Create a Match Card
 function createMatchCard(container, match, category, matchIndex) {
     const team1 = match.match_hometeam_name || "Unknown Team";
     const team2 = match.match_awayteam_name || "Unknown Team";
@@ -695,17 +696,16 @@ function createMatchCard(container, match, category, matchIndex) {
         </div>
 
         <!-- Column 4 & 5 wrapped together -->
-      <div class="match-meta">
-        <div class="match-time">
-          <img src="assets/icons/clock.png" alt="Clock">
-          ${category === "live" ? `${matchMinute}'` : matchTime}
+        <div class="match-meta">
+            <div class="match-time">
+                <img src="assets/icons/clock.png" alt="Clock">
+                ${category === "live" ? `${matchMinute}'` : matchTime}
+            </div>
+            <div class="match-country">
+                <img src="assets/icons/map-pin.png" alt="Map">
+                ${country}
+            </div>
         </div>
-       <div class="match-country">
-          <img src="assets/icons/map-pin.png" alt="Map">
-          ${country}
-       </div>
-       </div>
-
 
         <!-- Column 6: View Details Button -->
         <button class="view-details-btn" data-category="${category}" data-index="${matchIndex}">
@@ -713,11 +713,10 @@ function createMatchCard(container, match, category, matchIndex) {
             View Details
         </button>
     </div>
-`;
-
+    `;
 
     // Append card to container
-    container.appendChild(matchCard);  
+    container.appendChild(matchCard);
 
     // Select the button inside the newly created match card
     const viewDetailsBtn = matchCard.querySelector('.view-details-btn');
@@ -726,8 +725,9 @@ function createMatchCard(container, match, category, matchIndex) {
     viewDetailsBtn.addEventListener('click', function () {
         console.log(`Clicked: ${team1} vs ${team2}`);
         displayLiveMatch(match.match_id, category);
-    });   
+    });
 }
+
 
 
 
@@ -1107,20 +1107,19 @@ document.querySelectorAll('.category-btn').forEach(button => {
 
 //function for predition-container in middly layer
 
-  const bigLeagues = [
+  // List of big leagues
+const bigLeagues = [
     "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1", "Ligue 2"
   ];
   
- 
-  
+  // Function to check if odds are realistic
   function isRealisticOdds(match) {
     const odd1 = parseFloat(match.odd_1);
     const odd2 = parseFloat(match.odd_2);
     return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
   }
   
-  
-  
+  // Listen for DOMContentLoaded to fetch predictions
   document.addEventListener("DOMContentLoaded", () => {
     const predictionContainer = document.querySelector('.prediction-container');
     if (predictionContainer) {
@@ -1129,23 +1128,22 @@ document.querySelectorAll('.category-btn').forEach(button => {
     }
   });
   
-  
-  // Function to get the user's local timezone
-function getUserTimezone() {
+  // Get the user's local timezone
+  function getUserTimezone() {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }
   
-  // Function to convert match time to the user's timezone
+  // Convert match time to user's local time zone
   function convertMatchTimeToLocalTime(matchTime) {
     const userTimezone = getUserTimezone();
     const matchDate = new Date(`${getDateString(0)} ${matchTime}`);
   
-    // Convert the match date to the user's timezone
+    // Convert the match date to the user's local timezone
     return matchDate.toLocaleString('en-US', { timeZone: userTimezone, hour12: false });
   }
-
-  // Update the live timers with timezone-aware match time
-function updateLiveTimers() {
+  
+  // Update live timers with timezone-aware match time
+  function updateLiveTimers() {
     const now = new Date();
     document.querySelectorAll('.live-timer').forEach(span => {
       const startTime = span.dataset.start;
@@ -1163,9 +1161,8 @@ function updateLiveTimers() {
     });
   }
   
-
-// Fetch and display predictions as before
-async function fetchTodayPredictions(predictionContainer) {
+  // Fetch and display predictions as before
+  async function fetchTodayPredictions(predictionContainer) {
     const today = getDateString(0);
   
     try {
@@ -1193,7 +1190,7 @@ async function fetchTodayPredictions(predictionContainer) {
           homeLogo: eventDetails.team_home_badge,
           awayLogo: eventDetails.team_away_badge,
           time: eventDetails.match_time,
-          league_name: eventDetails.league_name,
+          league_name: eventDetails.league_name === "Premier League" ? "England" : eventDetails.league_name, // Update to show "England"
           score: `${eventDetails.match_hometeam_score} - ${eventDetails.match_awayteam_score}`,
           odd_1: parseFloat(oddMatch.odd_1),
           odd_2: parseFloat(oddMatch.odd_2)
@@ -1228,7 +1225,6 @@ async function fetchTodayPredictions(predictionContainer) {
         const match = matches[predictionIndex];
         const odd1 = parseFloat(match.odd_1);
         const odd2 = parseFloat(match.odd_2);
-        
   
         predictionContainer.innerHTML = `
           <div class="predition-content">
@@ -1243,7 +1239,7 @@ async function fetchTodayPredictions(predictionContainer) {
               </div>
   
               <div class="score-status">
-              <div class="match-leagueName">${match.league_name}</div>
+                <div class="match-leagueName">${match.league_name}</div>
                 <div class="match-score">${match.score}</div>
                 <span class="live-timer" data-start="${match.time}">${match.time}</span>
               </div>

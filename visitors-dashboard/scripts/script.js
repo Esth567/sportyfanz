@@ -1249,9 +1249,9 @@ function getDateString(offsetDays = 0) {
                 <div class="prediction-number">${match.odd_1}</div>
               </div>
   
-              <div class="score-status">
-                <div class="match-leagueName">${match.league_name}</div>
-                <div class="match-score">${match.score}</div>
+              <div class="preditScore-status">
+                <h4 class="match-leagueName">${match.league_name}</h4>
+                <h4 class="match-score">${match.score}</h4>
                 <span class="live-timer" data-start="${match.time}">${match.time}</span>
               </div>
   

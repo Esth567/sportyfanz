@@ -1100,16 +1100,10 @@ body{
 .match-details {
     display: grid;
     grid-template-columns: auto auto auto auto auto auto;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     gap: 5px;
-}
-
-.match-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
 }
 
 /* Team Names */
@@ -1119,6 +1113,7 @@ body{
     font-weight: normal;
     display: flex;
     flex-direction: row;
+    text-align: left;
 
 
 }

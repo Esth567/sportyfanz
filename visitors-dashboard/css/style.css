@@ -1057,6 +1057,10 @@ body{
     border: 1px solid #244537;
 }
 
+#match-date:focus {
+    opacity: 1;
+}
+
 #match-date::-webkit-calendar-picker-indicator {
     color: #244537;
     cursor: pointer;
@@ -1081,18 +1085,8 @@ body{
     flex-direction: column;
     gap: 20px;
 }
-#match-date {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    cursor: pointer;
-}
 
-#match-date:focus {
-    opacity: 1;
-}
+
 .match-card {
     display: flex;
     flex-direction: column;

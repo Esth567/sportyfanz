@@ -672,7 +672,7 @@ body{
 /* Stats Header and Team Stats (Aligned in Columns) */
 .team-stats {
     text-align: center;
-    font-size: 0.5rem;
+    font-size: 0.6rem;
     font-weight: 500;
     font-family: 'Lato';
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
@@ -1088,10 +1088,6 @@ body{
 
 .match-card {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    text-align: center;
     background-color: #1a2f4bad;
     color: white;
     padding: 5px;
@@ -1340,8 +1336,14 @@ body{
     width: 100%;
     max-width: 400px;
     margin-bottom: 20px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
   }
-
+ 
+  .prediction-container.fade-in .predition-content {
+    opacity: 1;
+  }
+  
 .predition-content h4{
     font-size: 0.70rem;
     font-family: 'Lato';
@@ -1388,15 +1390,9 @@ body{
     display: none; /* Hide scrollbar for swipe */
   }
 
-  .confidence-badge {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 6px;
-    color: #f66;
-  }
-  
+   
 
-
+/* Advert  */
 .advert {
     width: 100%;
     height: 200px;

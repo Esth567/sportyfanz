@@ -435,10 +435,6 @@ document.addEventListener("DOMContentLoaded", fetchTopScorers);
 
 
 
-
-
-
-
 //league table for 4 team beased on ranking
 const leagueId = 152;
 

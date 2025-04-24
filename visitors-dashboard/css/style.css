@@ -575,6 +575,7 @@ body{
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     color: white;
     width: 100%;
+    min-width: 280px;
     overflow: hidden;
     display: flex;
     padding: 10px 10px;
@@ -620,13 +621,17 @@ body{
 .table-header,
 .team-row {
     display: grid;
-    grid-template-columns: 5fr repeat(5, 1fr); /* Adjust column sizes */
+    grid-template-columns: 3fr repeat(6, 1fr); /* Adjust column sizes */
     margin: 0;
     gap: 0;
     padding: 5px 2px;
     
 }
-
+.stats-header, .team-stats {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 /* Team Info */
 .team-info {

@@ -1201,6 +1201,12 @@ body{
         margin-right: 10px;
     }
 
+    .preditScore-status {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        gap: 3px;    
+    }
 
 
 /*third layers*/

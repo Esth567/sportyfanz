@@ -1112,6 +1112,17 @@ const bigLeagues = [
     "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1", "Ligue 2"
   ];
   
+  // Function to get the current date as a string (format: YYYY-MM-DD)
+function getDateString(offsetDays = 0) {
+    const today = new Date();
+    today.setDate(today.getDate() + offsetDays);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Ensure 2 digits for month
+    const day = String(today.getDate()).padStart(2, '0'); // Ensure 2 digits for day
+    return `${year}-${month}-${day}`;
+  }
+
+  
   // Function to check if odds are realistic
   function isRealisticOdds(match) {
     const odd1 = parseFloat(match.odd_1);

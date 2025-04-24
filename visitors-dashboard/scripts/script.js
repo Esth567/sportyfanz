@@ -1210,7 +1210,7 @@ function getDateString(offset = 0) {
         return;
       }
   
-      showSlide(predictionContainer, competitiveMatches);
+      startPredictionSlider(predictionContainer, competitiveMatches);
     } catch (err) {
       console.error("Prediction fetch error:", err);
       predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
@@ -1219,8 +1219,8 @@ function getDateString(offset = 0) {
   
   let predictionIndex = 0;
   
-  
-    function showSlide(predictionContainer, matches) {
+  function startPredictionSlider(predictionContainer, matches) {
+    function showSlide() {
         predictionContainer.classList.remove('fade-in'); // Reset fade
         setTimeout(() => {
           const match = matches[predictionIndex];
@@ -1262,6 +1262,9 @@ function getDateString(offset = 0) {
         }, 100); // small delay to allow fade-out
       }
       
+  
+    showSlide(); // initial call
+  }
   
 
   

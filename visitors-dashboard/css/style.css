@@ -1154,7 +1154,7 @@ body{
         align-items: center;
         text-align: center;
         gap: 3px;
-        font-size: 0.10rem;
+        font-size: 0.8rem;
         font-weight: bold;
         font-family: 'Lato';
         min-width: 45px;
@@ -1175,7 +1175,7 @@ body{
 
     .match-meta {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: flex-start;
         justify-content: center;
         gap: 4px;

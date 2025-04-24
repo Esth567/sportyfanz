@@ -1086,16 +1086,19 @@ body{
     gap: 20px;
 }
 
-.match-column {
+.match-card {
     display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
-    justify-content: center;
-    flex: 1;
-    min-width: 80px; /* adjust as needed */
     text-align: center;
-    flex: unset;
-
+    background-color: #1a2f4bad;
+    color: white;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 
 .match-details {
     display: grid;

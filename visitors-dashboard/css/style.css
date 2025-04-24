@@ -1101,7 +1101,7 @@ body{
         grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1fr auto;
         align-items: center;
         width: 100%;
-        gap: 10px;
+        gap: 5px;
     }
     
 
@@ -1126,10 +1126,11 @@ body{
         justify-content: center;
         background: #fff;
         color: #1A2F4B;
-        padding: 4px 6px;
+        padding: 4px 10px;
         border-radius: 15px;
-        font-size: 0.65rem;
+        font-size: 0.60rem;
         font-family: 'Lato';
+        font-weight: 'bold';
         border: none;
         min-width: fit-content;
     }
@@ -1153,7 +1154,7 @@ body{
         align-items: center;
         text-align: center;
         gap: 3px;
-        font-size: 0.8rem;
+        font-size: 0.10rem;
         font-weight: bold;
         font-family: 'Lato';
         min-width: 45px;
@@ -1174,7 +1175,7 @@ body{
 
     .match-meta {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: flex-start;
         justify-content: center;
         gap: 4px;

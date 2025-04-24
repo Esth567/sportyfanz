@@ -671,13 +671,13 @@ function createMatchCard(container, match, category, matchIndex) {
     matchCard.innerHTML = `
     <div class="match-details">
         <!-- Column 1: Team 1 -->
-        <div class="match-column Matchteam">
+        <div class="Matchteam">
             <img src="${logo1}" alt="${team1}">
             <span>${team1}</span>
         </div>
 
         <!-- Column 2: Match Status & Score -->
-        <div class="match-column match-status-score">
+        <div class="match-status-score">
             ${category === "live" ? scoreDisplay : ""}
             ${category === "highlight" ? `
                 <div class="match-status">
@@ -689,13 +689,13 @@ function createMatchCard(container, match, category, matchIndex) {
         </div>
 
         <!-- Column 3: Team 2 -->
-        <div class="match-column Matchteam">
+        <div class="Matchteam">
             <img src="${logo2}" alt="${team2}">
             <span>${team2}</span>
         </div>
 
         <!-- Column 4 & 5 wrapped together -->
-      <div class="match-column match-meta">
+      <div class="match-meta">
         <div class="match-time">
           <img src="assets/icons/clock.png" alt="Clock">
           ${category === "live" ? `${matchMinute}'` : matchTime}
@@ -708,7 +708,7 @@ function createMatchCard(container, match, category, matchIndex) {
 
 
         <!-- Column 6: View Details Button -->
-        <button class="match-column view-details-btn" data-category="${category}" data-index="${matchIndex}">
+        <button class="view-details-btn" data-category="${category}" data-index="${matchIndex}">
             <img src="assets/icons/arrow-up.png" alt="Arrow-up">
             View Details
         </button>

@@ -1080,125 +1080,125 @@ body{
 .calendar ion-icon {
     font-size: 1rem;
 }
-.matches-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+    .matches-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
-.match-card {
-    display: flex;
-    background-color: #1a2f4bad;
-    color: white;
-    padding: 5px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-
-.match-details {
-    display: grid;
-    grid-template-columns: auto auto auto auto auto auto;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 5px;
-}
-
-/* Team Names */
-.Matchteam {
-    font-size: 0.70rem;
-    font-family: 'Lato';
-    font-weight: normal;
-    display: flex;
-    flex-direction: row;
-    text-align: left;
+    .match-card {
+        display: flex;
+        background-color: #1a2f4bad;
+        color: white;
+        padding: 5px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 
 
-}
+    .match-details {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1fr auto;
+        align-items: center;
+        width: 100%;
+        gap: 10px;
+    }
+    
 
-.match-info h5 {
-    font-weight: 300;
-}
+    /* Team Names */
+    .Matchteam {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        font-family: 'Lato';
+    }
+    
 
-
-.view-details-btn {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    color: #1A2F4B;
-    padding: 2px 4px;
-    border-radius: 15px;
-    font-size: 0.55rem;
-    font-family: 'Lato';
-    border: none;
-    min-width: fit-content;
-    white-space: nowrap;
-}
-
-.Matchteam img {
-    width: 18px; /* Reduce the size of logos */
-    height: 18px;
-    object-fit: cover;
-   
-}
-
-.hidden {
-    display: none !important;
-}
+    .match-info h5 {
+        font-weight: 300;
+    }
 
 
-.match-status-score {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 3px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    font-family: 'Lato';
-    min-width: 45px;
-}
+    .view-details-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        color: #1A2F4B;
+        padding: 4px 6px;
+        border-radius: 15px;
+        font-size: 0.65rem;
+        font-family: 'Lato';
+        border: none;
+        min-width: fit-content;
+    }
+    
+
+    .Matchteam img {
+        width: 18px; /* Reduce the size of logos */
+        height: 18px;
+        object-fit: cover;
+    
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+
+    .match-status-score {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 3px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        font-family: 'Lato';
+        min-width: 45px;
+    }
 
 
 
-.match-time,
-.match-country {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* Controls spacing between icon and text */
-    font-size: 0.7rem;
-    font-family: 'Lato';
-    font-weight: 300;
-    text-align: center;
-}
+    .match-time,
+    .match-country {
+        display: flex;
+        align-items: center;
+        gap: 5px; /* Controls spacing between icon and text */
+        font-size: 0.7rem;
+        font-family: 'Lato';
+        font-weight: 300;
+        text-align: center;
+    }
 
-.match-meta {
-    display: flex;
-    flex-direction: row;
-    gap: 10px; /* Reduce spacing between time and country */
-    align-items: center;
-    justify-content: center;
-}
+    .match-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 4px;
+    }
+    
 
 
-.match-time img,
-.match-country img{
-    width: 13px; /* Reduce the size of logos */
-    height: 13px;
-    object-fit: cover;
-}
+    .match-time img,
+    .match-country img{
+        width: 13px; /* Reduce the size of logos */
+        height: 13px;
+        object-fit: cover;
+    }
 
-.match-status,
-.match-score {
-    display: flex;
-    flex-direction: column; /* Stack score and match status vertically for highlight */
-    align-items: center;
-    gap: 5px;
-    font-size: 0.8rem;
-    font-family: 'Lato';
-    font-weight: bold;
-}
+    .match-status,
+    .match-score {
+        display: flex;
+        flex-direction: column; /* Stack score and match status vertically for highlight */
+        align-items: center;
+        gap: 10px;
+        font-size: 0.8rem;
+        font-family: 'Lato';
+        font-weight: bold;
+    }
 
 
 

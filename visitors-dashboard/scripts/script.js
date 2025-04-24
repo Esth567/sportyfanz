@@ -1106,14 +1106,7 @@ document.querySelectorAll('.category-btn').forEach(button => {
 
 
 //function for predition-container in middly layer
-function getDateString(offset = 0) {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    return date.toISOString().split('T')[0];
-  }
-  
- 
-  
+
   const bigLeagues = [
     "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1", "Ligue 2"
   ];
@@ -1150,7 +1143,7 @@ function getUserTimezone() {
     // Convert the match date to the user's timezone
     return matchDate.toLocaleString('en-US', { timeZone: userTimezone, hour12: false });
   }
-  
+
   // Update the live timers with timezone-aware match time
 function updateLiveTimers() {
     const now = new Date();

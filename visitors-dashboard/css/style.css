@@ -1086,6 +1086,16 @@ body{
     gap: 20px;
 }
 
+.match-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width: 80px; /* adjust as needed */
+    text-align: center;
+    flex: unset;
+
+}
 
 .match-details {
     display: grid;
@@ -1125,7 +1135,7 @@ body{
     color: #1A2F4B;
     padding: 2px 4px;
     border-radius: 15px;
-    font-size: 0.60rem;
+    font-size: 0.55rem;
     font-family: 'Lato';
     border: none;
     min-width: fit-content;

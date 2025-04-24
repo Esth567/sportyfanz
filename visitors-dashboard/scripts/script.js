@@ -464,6 +464,7 @@ async function fetchTopFourStandings() {
             <h3 class="league-title">${topFourTeams[0].league_name}</h3>
             <div class="table-header">
                 <span class="team-head">Team</span>
+                <span class="stats-header">W</span>
                 <span class="stats-header">D</span>
                 <span class="stats-header">L</span>
                 <span class="stats-header">GA</span>
@@ -481,6 +482,7 @@ async function fetchTopFourStandings() {
                         <img src="${team.team_badge || 'assets/images/default-logo.png'}" alt="${team.team_name} Logo" class="team-logo">
                         <span class="teamName-header">${team.team_name || 'N/A'}</span>
                     </div>
+                    <span class="team-stats">${team.overall_league_W || 0}</span>
                     <span class="team-stats">${team.overall_league_D || 0}</span>
                     <span class="team-stats">${team.overall_league_L || 0}</span>
                     <span class="team-stats">${team.overall_league_GA || 0}</span>

@@ -789,7 +789,7 @@ async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
                                     <td class="pos-cell ${posClass}">${team.overall_league_position}</td>
                                     <td>${team.team_name}</td>
                                     <td>${team.overall_league_payed}</td>
-                                    <td>${team.overall_league_W}</td>
+                                    <td>${team.overall_league_W}</td> 
                                     <td>${team.overall_league_D}</td>
                                     <td>${team.overall_league_L}</td>
                                     <td>${team.overall_league_GF}</td>

@@ -2553,13 +2553,17 @@ body{
 /* Main field styling */
 
 .field {
-    #football-field {
-        position: relative;
-        width: 100%;
-        height: 500px;
-        background: green;
-        border: 2px solid white;
-      }
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 300px;
+    background: #228B22;
+    border: 2px solid white;
+    margin: 20px auto;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
   
   /* Center Line & Circle */
   .center-line {

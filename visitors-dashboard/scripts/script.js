@@ -74,16 +74,14 @@ document.addEventListener("DOMContentLoaded", function () {
             ellipseImg = "assets/icons/Ellipse 1.png";
         } else if (hasStarted) {
             displayTime = `${getMinutesSince(match.match_date, startTime)}'`;
-            ellipseImg = "assets/icons/Ellipse 1.png";
+            ellipseImg = "assets/icons/Ellipse2.png";
         } else {
             displayTime = formatTo12Hour(startTime);
+            
         }
 
         return `
-        <div class="match-top-timer">
-            <img src="assets/icons/clock.png" alt="Clock">
-            <span class="display-time">${displayTime}</span>
-        </div>
+       
         <div class="teams-time">
             <div class="team">
                 <img src="${homeLogo}" alt="${homeTeam}">
@@ -502,7 +500,6 @@ function showMatches(category, event = null) {
 }
 
 
-// Function to Create a Match Card
 // Function to Create a Match Card
 function createMatchCard(container, match, category, matchIndex) {
     const team1 = match.match_hometeam_name || "Unknown Team";

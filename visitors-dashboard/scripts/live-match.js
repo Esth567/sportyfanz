@@ -548,19 +548,23 @@ async function displayLiveMatch(matchId, category) {
                     </div>
 
             
-                    <div class="football-field">
-  <div class="goal goal-left"></div>
-  <div class="penalty-box penalty-left"></div>
-  
-  <div class="lineup" id="lineup">
-    <div class="team home-team" id="home-lineup"></div>
-    <div class="midline"></div>
-    <div class="team away-team" id="away-lineup"></div>
-  </div>
-  
-  <div class="penalty-box penalty-right"></div>
-  <div class="goal goal-right"></div>
-</div>
+                   
+                    <div id="football-field" class="field">
+            <div class="goalpost home-goalpost"></div>
+            <div class="penalty-box home-box"></div>
+            <div class="penalty-arc home-arc"></div>
+        
+            <div id="home-formation" class="formation-area"></div>
+
+            <div class="center-circle"></div>
+           <div class="center-line"></div>
+
+           <div id="away-formation" class="formation-area"></div>
+
+           <div class="goalpost away-goalpost"></div>
+           <div class="penalty-box away-box"></div>
+           <div class="penalty-arc away-arc"></div>
+        </div>
 
 
                     <div class="lineup-players-names">
@@ -817,63 +821,71 @@ async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
   
   
   //This fetches the home and away players
-  function generateFormation(homeFormation = "4-2-3-1", awayFormation = "4-3-3") {
-  const homeContainer = document.getElementById("home-lineup");
-  const awayContainer = document.getElementById("away-lineup");
-  homeContainer.innerHTML = "";
-  awayContainer.innerHTML = "";
-
-  const homeArray = homeFormation.split("-").map(Number);
-  const awayArray = awayFormation.split("-").map(Number);
-
-  // Generate home team (left)
-  homeArray.forEach(players => {
-    const line = document.createElement("div");
-    line.classList.add("line");
-    for (let i = 0; i < players; i++) {
-      const player = document.createElement("div");
-      player.classList.add("player", "home-player");
-      player.textContent = i + 1;
-      line.appendChild(player);
+  function generateFormation(team, side) {
+    const containerId = side === "left" ? "home-formation" : "away-formation";
+    let container = document.getElementById(containerId);
+  
+    if (!container) {
+        console.error(❌ ERROR: Element with ID "${containerId}" not found.);
+        return;
     }
-    homeContainer.appendChild(line);
-  });
-
-  // Add home goalkeeper
-  const homeGKLine = document.createElement("div");
-  homeGKLine.classList.add("line");
-  const homeGK = document.createElement("div");
-  homeGK.classList.add("player", "home-player");
-  homeGK.textContent = "GK";
-  homeGKLine.appendChild(homeGK);
-  homeContainer.insertBefore(homeGKLine, homeContainer.firstChild);
-
-  // Generate away team (right) - reversed order
-  awayArray.forEach(players => {
-    const line = document.createElement("div");
-    line.classList.add("line");
-    for (let i = 0; i < players; i++) {
-      const player = document.createElement("div");
-      player.classList.add("player", "away-player");
-      player.textContent = i + 1;
-      line.appendChild(player);
+  
+    container.innerHTML = ""; // Clear previous content
+  
+    let formation = team.formation.split("-").map(Number);
+    let fieldWidth = container.clientWidth || 900;
+    let fieldHeight = container.clientHeight || 500;
+    let centerX = fieldWidth / 2;
+    let centerCircleRadius = 50; // Adjust if needed
+    let rowSpacing = fieldHeight / (formation.length + 1); // Reduce gap
+    let colSpacing = fieldWidth / (formation.length + 1);
+  
+    let jerseyNumber = 1;
+    let playerClass = side === "left" ? "home-player" : "away-player";
+    
+  
+    // ✅ Goalkeeper positioned correctly on goal line
+    let goalkeeper = document.createElement("div");
+    goalkeeper.classList.add("player", "goalkeeper", playerClass);
+    goalkeeper.textContent = jerseyNumber++;
+  
+    goalkeeper.style.top = "50%";
+    goalkeeper.style.left = side === "left" ? "35px" : "calc(100% - 35px)";
+    goalkeeper.style.transform = "translate(-50%, -50%)";
+    container.appendChild(goalkeeper);
+  
+    let topOffset = 80; // Less vertical gap
+  
+    // ✅ Positioning Defenders to Attackers
+    for (let rowIndex = 0; rowIndex < formation.length; rowIndex++) {
+        let numPlayers = formation[rowIndex];
+        let rowTop = topOffset + rowIndex * rowSpacing;
+        let colLeft = side === "left"
+            ? 90 + rowIndex * colSpacing
+            : fieldWidth - (90 + rowIndex * colSpacing);
+  
+        for (let i = 0; i < numPlayers; i++) {
+            let player = document.createElement("div");
+            player.classList.add("player", playerClass);
+            player.textContent = jerseyNumber++;
+  
+            if (rowIndex === formation.length - 1) {
+                // ✅ Forwards placed **on the center circle line, within their half**
+                let safeCenterX = side === "left"
+                    ? centerX - centerCircleRadius - 10
+                    : centerX + centerCircleRadius + 10;
+  
+                player.style.left = ${safeCenterX}px;
+                player.style.top = "50%"; // Exactly on the center circle line
+            } else {
+                player.style.left = ${colLeft}px;
+                player.style.top = ${(i + 1) * (100 / (numPlayers + 1))}%;
+            }
+  
+            container.appendChild(player);
+        }
     }
-    awayContainer.prepend(line); // reversed for mirror effect
-  });
-
-  // Add away goalkeeper
-  const awayGKLine = document.createElement("div");
-  awayGKLine.classList.add("line");
-  const awayGK = document.createElement("div");
-  awayGK.classList.add("player", "away-player");
-  awayGK.textContent = "GK";
-  awayGKLine.appendChild(awayGK);
-  awayContainer.appendChild(awayGKLine);
-}
-
-// Example usage:
-generateFormation("4-2-3-1", "4-3-3");
-
+  }
   
   
 

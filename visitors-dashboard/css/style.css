@@ -507,57 +507,7 @@ body{
    height: 7px;
 }
 
-.live-blink {
-    animation: blink 1s infinite;
-}
 
-.blink-green {
-    color: #00cc00;
-    font-weight: bold;
-    animation: blink 1s step-start infinite;
-  }
-  
-  .blink-orange {
-    color: #FFA500;
-    font-weight: bold;
-    animation: blink 1s step-start infinite;
-  }
-  
-  .blink-purple {
-    color: #9933FF;
-    font-weight: bold;
-    animation: blink 1s step-start infinite;
-  }
-
-
-  .match-top-timer {
-  padding-top: 5px;
-  margin-bottom: 5px;
-}
-
-
-  .countdown-container {
-    position: absolute;
-    top: 5px;
-    left: 10px;
-    font-size: 12px;
-    color: #fff;
-    padding: 4px 4px;
-    border-radius: 4px;
-    background-color: rgba(0,0,0,0.6);
-}
-
-.live-blink {
-    color: red;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-}
-
-  
   .fulltime-text,
   .halftime-text,
   .live-time {
@@ -1101,7 +1051,6 @@ body{
         grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr 1fr auto;
         align-items: center;
         width: 100%;
-        gap: 5px;
     }
     
 
@@ -1109,7 +1058,6 @@ body{
     .Matchteam {
         display: flex;
         align-items: center;
-        gap: 5px;
         font-size: 0.75rem;
         font-family: 'Lato';
     }
@@ -1126,7 +1074,7 @@ body{
         justify-content: center;
         background: #fff;
         color: #1A2F4B;
-        padding: 4px 5px;
+        padding: 4px 2px;
         border-radius: 15px;
         font-size: 0.60rem;
         font-family: 'Lato';
@@ -1153,7 +1101,6 @@ body{
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 3px;
         font-size: 0.8rem;
         font-weight: bold;
         font-family: 'Lato';

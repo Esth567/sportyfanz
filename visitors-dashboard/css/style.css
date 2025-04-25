@@ -1139,11 +1139,10 @@ body{
         display: flex;
         flex-direction: column; /* Stack score and match status vertically for highlight */
         align-items: center;
-        gap: 10px;
         font-size: 0.8rem;
         font-family: 'Lato';
         font-weight: bold;
-        margin-right: 10px;
+        
     }
 
     .preditScore-status {

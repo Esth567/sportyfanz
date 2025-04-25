@@ -12,6 +12,7 @@ function toggleSidebar() {
 document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 
 
+
 //display matches for live-match-demo
 document.addEventListener("DOMContentLoaded", function () {
     const liveMatchContainer = document.querySelector(".live-match-demo");
@@ -19,51 +20,36 @@ document.addEventListener("DOMContentLoaded", function () {
     const from = new Date().toISOString().split('T')[0]; // today's date
     const to = from;
     const leagueIDs = ["3", "152", "302", "207", "168", "175"]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
-    const bigTeams = ["Chelsea", "Barcelona", "Bayern Munich", "Manchecter United", "Manchester City", "Real Madrid", "Arsenal", "Liverpool", "Napoli", "PSG", "AC Milan", "Leicester City", "Newcastle United"];
 
-    let matchesList = []; // Store matches for the day
-    let currentMatchIndex = 0; // Track the current match being displayed
+    let matchesList = [];
+    let currentMatchIndex = 0;
 
     function getMinutesSince(matchDate, matchTime) {
         const [hours, minutes] = matchTime.split(':').map(Number);
-    
-        // Construct UTC datetime from matchDate + matchTime
         const matchUTC = new Date(matchDate);
         matchUTC.setUTCHours(hours);
         matchUTC.setUTCMinutes(minutes);
         matchUTC.setUTCSeconds(0);
-    
-        // Convert to local time by applying the inverse of the timezone offset
         const matchLocal = new Date(matchUTC.getTime() + (matchUTC.getTimezoneOffset() * -60000));
         const now = new Date();
-    
-        const diff = Math.floor((now - matchLocal) / 60000); // in minutes
+        const diff = Math.floor((now - matchLocal) / 60000);
         return diff > 0 ? diff : 0;
     }
-    
-    
+
     function formatTo12Hour(timeStr) {
         const [hours, minutes] = timeStr.split(':').map(Number);
-    
-        // Create a UTC date from today + time
         const utcDate = new Date();
         utcDate.setUTCHours(hours);
         utcDate.setUTCMinutes(minutes);
         utcDate.setUTCSeconds(0);
-    
-        // Convert to local time
         const localDate = new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * -60000));
-    
         let hour = localDate.getHours();
         const ampm = hour >= 12 ? "PM" : "AM";
         hour = hour % 12 || 12;
-    
         const paddedMinutes = String(localDate.getMinutes()).padStart(2, '0');
         return `${hour}:${paddedMinutes} ${ampm}`;
     }
-    
-    
-    
+
     function createMatchHTML(match) {
         const homeTeam = match.match_hometeam_name;
         const awayTeam = match.match_awayteam_name;
@@ -74,20 +60,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const matchStatus = match.match_status;
         const homeScore = match.match_hometeam_score;
         const awayScore = match.match_awayteam_score;
-    
+
         const isFinished = matchStatus === "Finished" || matchStatus === "FT";
         const hasStarted = matchStatus !== "" && matchStatus !== "Not Started";
         const isLive = !isNaN(parseInt(matchStatus));
-    
         const displayScore = hasStarted ? `${homeScore} - ${awayScore}` : "VS";
-    
-        // Format to local readable time
-        const formattedStart = formatTo12Hour(startTime);
-    
-        // Determine displayTime placeholder
+
         let displayTime = "";
         let ellipseImg = "";
-    
+
         if (isFinished) {
             displayTime = "FT";
             ellipseImg = "assets/icons/Ellipse 1.png";
@@ -95,22 +76,14 @@ document.addEventListener("DOMContentLoaded", function () {
             displayTime = `${getMinutesSince(match.match_date, startTime)}'`;
             ellipseImg = "assets/icons/Ellipse 1.png";
         } else {
-            // For upcoming match – setup countdown container
-            displayTime = `
-                <div class="countdown-container" data-date="${match.match_date}" data-time="${startTime}"></div>
-               <span class="display-time">${formattedStart}</span>
-              `;
-          
+            displayTime = formatTo12Hour(startTime);
         }
-    
+
         return `
         <div class="match-top-timer">
-         <img src="assets/icons/clock.png" alt="Clock">
-           ${category === "live" 
-             ? `<span class="display-time">${matchMinute}'</span><span class="countdown-container" data-date="${match.match_date}" data-time="${match.match_time}"></span>` 
-          : matchTime}
-         </div>
-
+            <img src="assets/icons/clock.png" alt="Clock">
+            <span class="display-time">${displayTime}</span>
+        </div>
         <div class="teams-time">
             <div class="team">
                 <img src="${homeLogo}" alt="${homeTeam}">
@@ -121,47 +94,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h2 class="vs-score">${displayScore}</h2>
                 <div class="highlight-time">
                     <img src="${ellipseImg}" alt="Ellipse" class="Ellipse-logo">
-                     ${displayTime}
+                    ${displayTime}
                 </div>
             </div>
             <div class="team">
                 <img src="${awayLogo}" alt="${awayTeam}">
                 ${awayTeam}
             </div>
-        </div> 
-        `;
+        </div>`;
     }
-    
-    
 
- 
     async function loadMatches() {
         try {
-            matchesList = []; // Reset matches list
-    
+            matchesList = [];
             for (let id of leagueIDs) {
                 const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&APIkey=${APIkey}`;
                 const res = await fetch(url);
                 const data = await res.json();
-    
-                console.log('API Response:', data); // Log the response to inspect the structure
-    
+
                 if (Array.isArray(data)) {
-                    const keyMatches = data.filter(match =>
-                        bigTeams.includes(match.match_hometeam_name) || bigTeams.includes(match.match_awayteam_name)
-                    );
-                    matchesList = [...matchesList, ...keyMatches];
+                    matchesList = [...matchesList, ...data];
                 } else {
                     console.error('Expected array but received:', data);
                 }
             }
-    
+
             matchesList.sort((a, b) => {
                 const aTime = new Date(a.match_date + " " + a.match_time);
                 const bTime = new Date(b.match_date + " " + b.match_time);
                 return aTime - bTime;
             });
-    
+
             if (matchesList.length > 0) {
                 displayNextMatch();
             } else {
@@ -172,124 +135,27 @@ document.addEventListener("DOMContentLoaded", function () {
             liveMatchContainer.innerHTML = `<div class="team">Error loading matches. Please try again later.</div>`;
         }
     }
-    
 
-    //function to display the matches
     function displayNextMatch() {
         if (matchesList.length === 0) {
             liveMatchContainer.innerHTML = "<div class='team'>No matches available.</div>";
             return;
         }
-    
+
         const match = matchesList[currentMatchIndex];
         const html = createMatchHTML(match);
         liveMatchContainer.innerHTML = html;
-    
-        // Always move to next match after timeout
+
         currentMatchIndex = (currentMatchIndex + 1) % matchesList.length;
-    
-        // Cycle every 10 seconds (or however long you want)
+
         setTimeout(() => {
-            // Stop countdown update for current match
-            document.querySelectorAll('.countdown-container').forEach(el => {
-                const date = el.getAttribute('data-date');
-                const time = el.getAttribute('data-time');
-            
-                const [hh, mm] = time.split(':').map(Number);
-                const utcStart = new Date(date);
-                utcStart.setUTCHours(hh);
-                utcStart.setUTCMinutes(mm);
-                utcStart.setUTCSeconds(0);
-            
-                const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
-                const now = new Date();
-                const diffMs = localStart - now;
-            
-                const parent = el.parentElement;
-                const displaySpan = parent.querySelector('.display-time');
-            
-                if (diffMs <= 0) {
-                    // match has started
-                    const minutesIn = Math.floor((now - localStart) / 60000);
-            
-                    if (minutesIn >= 45 && minutesIn < 60) {
-                        displaySpan.innerText = "HT";
-                    } else if (minutesIn >= 90) {
-                        displaySpan.innerText = "FT";
-                    } else {
-                        displaySpan.innerText = `${minutesIn}'`;
-                        displaySpan.classList.add("live-blink"); // blink effect
-                    }
-            
-                    el.innerText = ""; // hide countdown
-                } else {
-                    // match hasn't started yet
-                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-                    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-            
-                    el.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                    displaySpan.innerText = formatTo12Hour(time); // fallback in case not loaded
-                }
-            });
-            
-        
             displayNextMatch();
         }, 10000);
-        
     }
-    
 
-    function startCountdownUpdater() {
-        setInterval(() => {
-            document.querySelectorAll('.countdown-container').forEach(countdownEl => {
-                const date = countdownEl.getAttribute('data-date');
-                const time = countdownEl.getAttribute('data-time');
-    
-                const [hh, mm] = time.split(':').map(Number);
-                const utcStart = new Date(date);
-                utcStart.setUTCHours(hh);
-                utcStart.setUTCMinutes(mm);
-                utcStart.setUTCSeconds(0);
-    
-                const localStart = new Date(utcStart.getTime() + (utcStart.getTimezoneOffset() * -60000));
-                const now = new Date();
-                const diffMs = localStart - now;
-                const minutesIn = getMinutesSince(date, time);
-    
-                const parent = countdownEl.parentElement;
-                const displaySpan = parent.querySelector('.display-time');
-    
-                if (diffMs <= 0) {
-                    // Match has started
-                    if (minutesIn >= 90) {
-                        displaySpan.innerText = "FT";
-                    } else if (minutesIn >= 45 && minutesIn < 60) {
-                        displaySpan.innerText = "HT";
-                    } else {
-                        displaySpan.innerText = `${minutesIn}'`;
-                        displaySpan.classList.add("live-blink");
-                    }
-    
-                    countdownEl.innerText = "";
-                } else {
-                    // Match not started — update countdown every second
-                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-                    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-    
-                    countdownEl.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                }
-            });
-        }, 1000); // Real-time second updates
-    }
-    
-    // Initial load
+    // Start
     loadMatches();
-    startCountdownUpdater();
-
 });
-
 
 
 

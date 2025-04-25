@@ -566,6 +566,24 @@ async function displayLiveMatch(matchId, category) {
            <div class="penalty-arc away-arc"></div>
         </div>
 
+           setTimeout(() => {
+           generateFormation(
+           {
+            formation: match.match_hometeam_system,
+            players: match.lineup?.home?.starting_lineups
+          },
+          "left"
+          );
+        generateFormation(
+         {
+        formation: match.match_awayteam_system,
+        players: match.lineup?.away?.starting_lineups
+        },
+        "right"
+       );
+      }, 0);
+
+
 
                     <div class="lineup-players-names">
                         <h4>Players</h4>
@@ -826,64 +844,68 @@ async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
     let container = document.getElementById(containerId);
   
     if (!container) {
-        console.error(❌ ERROR: Element with ID "${containerId}" not found.);
-        return;
+      console.error(`❌ ERROR: Element with ID "${containerId}" not found.`);
+      return;
     }
   
     container.innerHTML = ""; // Clear previous content
   
-    let formation = team.formation.split("-").map(Number);
+    let formation = team.formation?.split("-").map(Number) || [];
+    let players = team.players || [];
+    let playerIndex = 0;
+  
     let fieldWidth = container.clientWidth || 900;
     let fieldHeight = container.clientHeight || 500;
     let centerX = fieldWidth / 2;
-    let centerCircleRadius = 50; // Adjust if needed
-    let rowSpacing = fieldHeight / (formation.length + 1); // Reduce gap
+    let centerCircleRadius = 50;
+    let rowSpacing = fieldHeight / (formation.length + 1);
     let colSpacing = fieldWidth / (formation.length + 1);
   
-    let jerseyNumber = 1;
     let playerClass = side === "left" ? "home-player" : "away-player";
-    
   
-    // ✅ Goalkeeper positioned correctly on goal line
-    let goalkeeper = document.createElement("div");
-    goalkeeper.classList.add("player", "goalkeeper", playerClass);
-    goalkeeper.textContent = jerseyNumber++;
+    // Goalkeeper
+    if (players.length > 0) {
+      const keeper = players.find(p => p.lineup_position === "1") || players[0];
+      let goalkeeper = document.createElement("div");
+      goalkeeper.classList.add("player", "goalkeeper", playerClass);
+      goalkeeper.textContent = keeper.lineup_number || "1";
+      goalkeeper.title = keeper.lineup_player || "GK";
   
-    goalkeeper.style.top = "50%";
-    goalkeeper.style.left = side === "left" ? "35px" : "calc(100% - 35px)";
-    goalkeeper.style.transform = "translate(-50%, -50%)";
-    container.appendChild(goalkeeper);
+      goalkeeper.style.top = "50%";
+      goalkeeper.style.left = side === "left" ? "35px" : "calc(100% - 35px)";
+      goalkeeper.style.transform = "translate(-50%, -50%)";
+      container.appendChild(goalkeeper);
+    }
   
-    let topOffset = 80; // Less vertical gap
+    let topOffset = 80;
   
-    // ✅ Positioning Defenders to Attackers
     for (let rowIndex = 0; rowIndex < formation.length; rowIndex++) {
-        let numPlayers = formation[rowIndex];
-        let rowTop = topOffset + rowIndex * rowSpacing;
-        let colLeft = side === "left"
-            ? 90 + rowIndex * colSpacing
-            : fieldWidth - (90 + rowIndex * colSpacing);
+      let numPlayers = formation[rowIndex];
+      let rowTop = topOffset + rowIndex * rowSpacing;
+      let colLeft = side === "left"
+        ? 90 + rowIndex * colSpacing
+        : fieldWidth - (90 + rowIndex * colSpacing);
   
-        for (let i = 0; i < numPlayers; i++) {
-            let player = document.createElement("div");
-            player.classList.add("player", playerClass);
-            player.textContent = jerseyNumber++;
+      for (let i = 0; i < numPlayers && playerIndex < players.length; i++) {
+        let player = document.createElement("div");
+        player.classList.add("player", playerClass);
+        player.textContent = players[playerIndex].lineup_number || "?";
+        player.title = players[playerIndex].lineup_player || "Unknown";
+        playerIndex++;
   
-            if (rowIndex === formation.length - 1) {
-                // ✅ Forwards placed **on the center circle line, within their half**
-                let safeCenterX = side === "left"
-                    ? centerX - centerCircleRadius - 10
-                    : centerX + centerCircleRadius + 10;
-  
-                player.style.left = ${safeCenterX}px;
-                player.style.top = "50%"; // Exactly on the center circle line
-            } else {
-                player.style.left = ${colLeft}px;
-                player.style.top = ${(i + 1) * (100 / (numPlayers + 1))}%;
-            }
-  
-            container.appendChild(player);
+        if (rowIndex === formation.length - 1) {
+          let safeCenterX = side === "left"
+            ? centerX - centerCircleRadius - 10
+            : centerX + centerCircleRadius + 10;
+          player.style.left = `${safeCenterX}px`;
+          player.style.top = "50%";
+        } else {
+          player.style.left = `${colLeft}px`;
+          player.style.top = `${(i + 1) * (100 / (numPlayers + 1))}%`;
         }
+  
+        container.appendChild(player);
+      }
     }
   }
   

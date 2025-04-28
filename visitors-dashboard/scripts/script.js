@@ -972,20 +972,17 @@ document.querySelectorAll('.category-btn').forEach(button => {
 //function for predition-container in middly layer
 
   // List of big leagues
+// List of big leagues
 const bigLeagues = [
     "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1", "Ligue 2"
   ];
   
   // Function to get the current date as a string (format: YYYY-MM-DD)
-function getDateString(offsetDays = 0) {
-    const today = new Date();
-    today.setDate(today.getDate() + offsetDays);
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Ensure 2 digits for month
-    const day = String(today.getDate()).padStart(2, '0'); // Ensure 2 digits for day
-    return `${year}-${month}-${day}`;
+  function getDateString(offset = 0) {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split('T')[0];
   }
-
   
   // Function to check if odds are realistic
   function isRealisticOdds(match) {
@@ -1036,7 +1033,7 @@ function getDateString(offsetDays = 0) {
     });
   }
   
-  // Fetch and display predictions as before
+  // Fetch and display predictions
   async function fetchTodayPredictions(predictionContainer) {
     const today = getDateString(0);
   
@@ -1065,7 +1062,7 @@ function getDateString(offsetDays = 0) {
           homeLogo: eventDetails.team_home_badge,
           awayLogo: eventDetails.team_away_badge,
           time: eventDetails.match_time,
-          league_name: eventDetails.league_name === "Premier League" ? "England" : eventDetails.league_name, // Update to show "England"
+          league_name: eventDetails.league_name,  // <-- Corrected here
           score: `${eventDetails.match_hometeam_score} - ${eventDetails.match_awayteam_score}`,
           odd_1: parseFloat(oddMatch.odd_1),
           odd_2: parseFloat(oddMatch.odd_2)
@@ -1110,11 +1107,11 @@ function getDateString(offsetDays = 0) {
                 <div class="team-logo">
                   <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
                 </div>
-                <div class="prediction-number">${match.odd_1}</div>
+                <div class="prediction-number">${odd1}</div>
               </div>
   
               <div class="preditScore-status">
-                <h4 class="match-leagueName">${match.league_name}</h4>
+                <h4 class="match-leagueName">${match.league_name}</h4> 
                 <h4 class="match-score">${match.score}</h4>
                 <span class="live-timer" data-start="${match.time}">${match.time}</span>
               </div>
@@ -1124,7 +1121,7 @@ function getDateString(offsetDays = 0) {
                 <div class="team-logo">
                   <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
                 </div>
-                <div class="prediction-number">${match.odd_2}</div>
+                <div class="prediction-number">${odd2}</div>
               </div>
             </div>
           </div>
@@ -1138,8 +1135,7 @@ function getDateString(offsetDays = 0) {
   
     showSlide(); // Show first slide immediately
     setInterval(showSlide, 10000); // Change every 10 seconds
-  }
-  
+  }  
   
 
   

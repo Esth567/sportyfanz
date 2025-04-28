@@ -1,8 +1,8 @@
 import re
 from flask import Flask, request, jsonify
 from transformers import pipeline
-from flask_cors import CORS  
-
+from flask_cors import CORS
+import hashlib
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -13,22 +13,37 @@ CORS(app)
 # Load Hugging Face summarization pipeline (You can change to other models like T5 or BERT)
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
+# A simple in-memory cache (for demo purposes, use Redis in production)
+cache = {}
+
 # Define a route for text summarization
 @app.route('/summarize', methods=['POST'])
 def summarize():
     data = request.get_json()
     text = data.get("text", "")
-    print(f"Received text: {text}")
     
     if not text or len(text.strip()) < 30:
         return jsonify({"error": "Text too short to summarize"}), 400
 
+    # Create a hash of the text to check cache
+    text_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
+
+    # Check if summary is cached
+    if text_hash in cache:
+        return jsonify({"summary": cache[text_hash]})
+
     try:
-        # The result is a list of one dict with a 'summary_text' key
-        summary = summarizer(text, max_length=150, min_length=30, do_sample=False)[0]['summary_text']
+        # Summarization with max_length and min_length constraints for words count
+        max_length = 200  # Aim for maximum 200 words in summary
+        min_length = 150  # Aim for at least 150 words in summary
+
+        summary = summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
+        
+        # Store in cache
+        cache[text_hash] = summary
         return jsonify({"summary": summary})  # Return the summary string directly
     except Exception as e:
-        print("Summarization error:", str(e))  # log to terminal
+        print("Summarization error:", str(e))
         return jsonify({"error": str(e)}), 500
 
 
@@ -40,11 +55,16 @@ def rewrite_title():
     if not title:
         return jsonify({"error": "No title provided"}), 400
 
+    # Simple SEO title rewrite: Replace 'Breaking' with 'Latest Update on'
     seo_title = title.replace("Breaking", "Latest Update on")
+
+    # Cache the result using the hash of the title
+    title_hash = hashlib.md5(title.encode('utf-8')).hexdigest()
+    cache[title_hash] = seo_title
+
     return jsonify({"seo_title": seo_title})
 
 
-# ✅ This should be **outside** the rewrite_title function
 @app.route('/generate-blog', methods=['POST'])
 def generate_blog():
     data = request.get_json()
@@ -98,7 +118,6 @@ def generate_blog():
         return jsonify({"error": str(e)}), 500
 
 
-    
 # Run app
 if __name__ == '__main__':
     app.run(debug=True)

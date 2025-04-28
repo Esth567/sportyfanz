@@ -1469,7 +1469,7 @@ body{
 
 .news-meta .news-description {
     flex: 4;
-    font-size: 0.63rem;
+    font-size: 0.75rem;
     line-height: 1.5;
     font-weight: 500;
     font-family: 'Lato';
@@ -1482,7 +1482,7 @@ body{
 .news-time {
     flex: 1;
     text-align: right;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-family: 'Lato';
     font-weight: 300;
     margin-left: 10px;
@@ -1556,31 +1556,42 @@ body{
     color: #70c172; /* Optional: Change text color on hover */
 }
 
+/* Realistic shimmer effect */
 .shimmer {
-    background: linear-gradient(to right, #eeeeee 0%, #dddddd 20%, #eeeeee 40%, #eeeeee 100%);
-    background-size: 1000px 100%;
-    animation: shimmer 1.2s infinite;
-    border-radius: 4px;
+    display: inline-block;
+    background-size: 200% 100%;
+    animation: shimmerMove 1.5s infinite;
+    color: transparent; /* Text hidden but space taken */
   }
+  
+  @keyframes shimmerMove {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
   
   @keyframes shimmer {
     0% { background-position: -1000px 0; }
     100% { background-position: 1000px 0; }
   }
-  
-  .shimmer-title {
-    height: 20px;
-    width: 70%;
-    margin-bottom: 8px;
-  }
-  
-  .shimmer-description {
-    height: 14px;
-    width: 100%;
-    margin-bottom: 6px;
-  }
-  
 
+
+  /* Fade out */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* Fade in */
+  .fade-in {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+  
 
 .live-games {
     background-color: #14273f;

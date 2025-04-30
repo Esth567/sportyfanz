@@ -445,17 +445,25 @@ body{
 
 }
 .game-leag {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 400;
-    font-family: 'lato';
+    font-family: 'Lato';
     color: #f4f6f698;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.1;
+    max-width: 100%;
+    text-align: center;
  
 }
 .live-match-event{
+    flex: 0 0 100px; /* Fixed width to prevent expansion */
     display: flex;
     flex-direction: column;
+    align-items: center;
     text-align: center;
     gap: 3px;
+    overflow-wrap: break-word;
 }
 .vs-score {
     font-size: 0.85rem;
@@ -466,19 +474,18 @@ body{
 }
 .teams-time {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between; /* Even spacing between teams and event */
+    align-items: center; /* Vertically center everything */
     gap: 10px;
     width: 100%;
-    padding-top: 5px;
-    margin-bottom: 5px;
-    margin-right: 10px;
     padding: 10px;
+    box-sizing: border-box;
 }
 
 .team {
     flex: 1;
     text-align: center;
-    font-size: 0.65rem;
+    font-size: 0.70rem;
     font-family: 'Lato';
     word-break: keep-all;
     overflow: hidden;
@@ -1042,15 +1049,24 @@ body{
         padding: 10px;
         border-radius: 10px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
     }
 
 
     .match-details {
         display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; 
         align-items: center;
         width: 100%;
     }
     
+    .league-header {
+        padding: 8px 0;
+        font-weight: bold;
+        border-bottom: 1px solid #ccc;
+        margin-top: 20px;
+      }
+      
 
     /* Team Names */
     .Matchteam {
@@ -1058,6 +1074,7 @@ body{
         align-items: center;
         font-size: 0.75rem;
         font-family: 'Lato';
+        gap: 5px;
     }
     
 
@@ -1072,13 +1089,14 @@ body{
         justify-content: center;
         background: #fff;
         color: #1A2F4B;
-        padding: 4px 2px;
+        padding: 2px 2px;
         border-radius: 15px;
         font-size: 0.60rem;
         font-family: 'Lato';
         font-weight: bold;
         border: none;
         min-width: fit-content;
+        width: 100px;
     }
     
 
@@ -1115,14 +1133,14 @@ body{
         font-size: 0.7rem;
         font-family: 'Lato';
         font-weight: 300;
-        text-align: center;
+        text-align: left;
     }
 
     .match-meta {
         display: flex;
-        flex-direction: row; /* Ensures the meta items are in a row */
+        flex-direction: column; /* Ensures the meta items are in a row */
         align-items: center;
-        gap: 12px; /* Adjusts space between time and country */
+        
     }
     
 
@@ -1142,8 +1160,18 @@ body{
         font-size: 0.8rem;
         font-family: 'Lato';
         font-weight: bold;
+        gap: 3px;
         
     }
+
+    .match-round {
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
 
     .preditScore-status {
         display: flex;
@@ -1151,6 +1179,22 @@ body{
         text-align: center;
         gap: 3px;    
     }
+
+    .date-filter {
+        display: none;
+        position: absolute;
+        background: #fff;
+        padding: 10px;
+        z-index: 999;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+      
+    .date-filter input[type="date"] {
+        padding: 0.3rem;
+        font-size: 1rem;
+    }
+    
 
 
 /*third layers*/

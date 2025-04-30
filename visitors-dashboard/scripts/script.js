@@ -412,33 +412,36 @@ const matchData = {
 };
 
 
+
 // Fetch Matches Data Dynamically
 async function fetchMatchesData() {
     try {
         const response = await fetch(
-            `https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-7)}&to=${getTodayDate()}&APIkey=${APIkey}`
+            `https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-1)}&to=${getTodayDate(+1)}&APIkey=${APIkey}`
         );
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
-        console.log("API Response:", data); // Debugging log
-        console.log("First match object:", data[0]); // Check available properties
-
-        if (!Array.isArray(data)) {
-            console.error("Unexpected API response:", data);
-            return;
-        }
 
         const now = new Date();
 
-        matchData.live = data.filter(match => String(match.match_live) === "1" && match.match_status !== "Finished");
-        matchData.highlight = data.filter(match => match.match_status === "Finished" || match.match_status === "FT");
+        // LIVE
+        matchData.live = data.filter(match => {
+            const status = match.match_status?.toLowerCase();
+            return status && !["ft", "fulltime", "finished", "ended"].includes(status) && /\d+'|ht|halftime/.test(status);
+        });
+
+        // HIGHLIGHT
+        matchData.highlight = data.filter(match => {
+            const status = match.match_status?.toLowerCase();
+            return ["ft", "fulltime", "finished", "ended"].includes(status);
+        });
+
+        // UPCOMING
         matchData.upcoming = data.filter(match => {
             const matchDateTime = new Date(`${match.match_date} ${match.match_time}`);
-            return (!match.match_status || match.match_status === "Not Started" || match.match_status === "Scheduled") && matchDateTime > now;
+            const status = match.match_status?.toLowerCase();
+            return (!status || ["not started", "scheduled", "ns", "tbd", "0", ""].includes(status)) && matchDateTime > now;
         });
 
         showMatches('live');
@@ -482,7 +485,6 @@ function showMatches(category, event = null) {
     const buttons = document.querySelectorAll('.category-btn');
     buttons.forEach(button => button.classList.remove('active'));
 
-    // Highlight the active button
     if (event) {
         event.target.classList.add('active');
     }
@@ -490,17 +492,92 @@ function showMatches(category, event = null) {
     const container = document.getElementById('matches-container');
     container.innerHTML = '';
 
-    const matches = matchData[category].slice(0, 5); // Limit to 5 matches
+    const leaguePriority = {
+        "Premier League": 0,
+        "UEFA Champions League": 1,
+        "La Liga": 2,
+        "Serie A": 3,
+        "Bundesliga": 4,
+        "Ligue 1": 5
+    };
 
-    if (matches.length > 0) {
-        matches.forEach((match, index) => createMatchCard(container, match, category, index));
-    } else {
+    const priorityMatches = [];
+    const nonPriorityMatches = [];
+
+    matchData[category].forEach(match => {
+        if (leaguePriority.hasOwnProperty(match.league_name)) {
+            priorityMatches.push(match);
+        } else {
+            nonPriorityMatches.push(match);
+        }
+    });
+
+    // Sort the priority matches
+    priorityMatches.sort((a, b) => {
+        return leaguePriority[a.league_name] - leaguePriority[b.league_name];
+    });
+
+    // Combine and limit to 7 matches
+    const matchesToShow = [...priorityMatches, ...nonPriorityMatches].slice(0, 7);
+
+    if (matchesToShow.length === 0) {
         container.innerHTML = `<p>No matches available</p>`;
+        return;
+    }
+
+    matchesToShow.forEach((match, index) => {
+        createMatchCard(container, match, category, index);
+    });
+}
+
+
+// Function to Filter Matches by Date
+function filterByDate() {
+    const selectedDate = document.getElementById('match-date').value;
+    const container = document.getElementById('matches-container');
+    container.innerHTML = '';
+
+    const allMatches = [...matchData.live, ...matchData.highlight, ...matchData.upcoming];
+    const filteredMatches = allMatches.filter(match => match.match_date === selectedDate);
+
+    const leaguePriority = {
+        "Premier League": 0,
+        "UEFA Champions League": 1,
+        "La Liga": 2,
+        "Serie A": 3,
+        "Bundesliga": 4,
+        "Ligue 1": 5
+    };
+
+    const priorityMatches = [];
+    const nonPriorityMatches = [];
+
+    filteredMatches.forEach(match => {
+        if (leaguePriority.hasOwnProperty(match.league_name)) {
+            priorityMatches.push(match);
+        } else {
+            nonPriorityMatches.push(match);
+        }
+    });
+
+    priorityMatches.sort((a, b) => {
+        return leaguePriority[a.league_name] - leaguePriority[b.league_name];
+    });
+
+    const matchesToShow = [...priorityMatches, ...nonPriorityMatches].slice(0, 7);
+
+    if (matchesToShow.length > 0) {
+        matchesToShow.forEach((match, index) => {
+            createMatchCard(container, match, "filtered", index);
+        });
+    } else {
+        container.innerHTML = `<p>No matches found for this date</p>`;
     }
 }
 
 
-// Function to Create a Match Card
+
+
 // Function to Create a Match Card
 function createMatchCard(container, match, category, matchIndex) {
     const team1 = match.match_hometeam_name || "Unknown Team";
@@ -512,6 +589,9 @@ function createMatchCard(container, match, category, matchIndex) {
     const score1 = match.match_hometeam_score || "0";
     const score2 = match.match_awayteam_score || "0";
     let matchMinute = match.match_status || matchTime;
+
+    const matchRound = match.league_round || "";
+
 
     let matchStatusDisplay = "";
     let scoreDisplay = "";
@@ -569,6 +649,11 @@ function createMatchCard(container, match, category, matchIndex) {
                 <img src="assets/icons/map-pin.png" alt="Map">
                 ${country}
             </div>
+            ${matchRound ? `
+                <div class="match-round">
+                    <img src="assets/icons/trophy.png" alt="Round">
+                    ${matchRound}
+                </div>` : ""}
         </div>
 
         <!-- Column 6: View Details Button -->
@@ -584,32 +669,30 @@ function createMatchCard(container, match, category, matchIndex) {
 
     // Select the button inside the newly created match card
     const viewDetailsBtn = matchCard.querySelector('.view-details-btn');
-
-    // Ensure the event listener is attached
     viewDetailsBtn.addEventListener('click', function () {
-        console.log(`Clicked: ${team1} vs ${team2}`);
         displayLiveMatch(match.match_id, category);
     });
 }
 
-
-
-
-// Function to Filter Matches by Date
-function filterByDate() {
-    const selectedDate = document.getElementById('match-date').value;
-    const container = document.getElementById('matches-container');
-    container.innerHTML = '';
-
-    const allMatches = Object.values(matchData).flat();
-    const filteredMatches = allMatches.filter(match => match.date === selectedDate);
-
-    if (filteredMatches.length > 0) {
-        filteredMatches.slice(0, 10).forEach((match, index) => createMatchCard(container, match, "filtered", index));
-    } else {
-        container.innerHTML = `<p>No matches found for this date</p>`;
+document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("match-date");
+    if (dateInput) {
+        dateInput.value = getTodayDate(); // Default to today
+        dateInput.addEventListener("change", filterByDate);
     }
-}
+});
+
+document.querySelector('.calendar').addEventListener('click', () => {
+    const dateFilter = document.querySelector('.date-filter');
+    if (dateFilter) {
+      dateFilter.style.display = dateFilter.style.display === 'block' ? 'none' : 'block';
+    }
+  });
+  
+
+
+
+
 
 
 // Function to display match details with video

@@ -281,8 +281,14 @@
                   <div class="category-btn" data-category="upcoming" onclick="showMatches('upcoming', event)">Upcoming</div>                
                   <!-- Calendar Button -->
                   <div class="category-btn calendar">
+                    <div class="match-calendar"></div>
+
                       <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
-                      <input type="date" id="match-date" onchange="filterByDate()" style="display: none;" />
+                      <div class="date-filter">
+                        <label for="match-date">Select Match Date:</label>
+                        <input type="date" id="match-date" name="match-date" />
+                      </div>
+                      
                   </div>
               </div>
           

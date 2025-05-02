@@ -862,6 +862,7 @@ async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
     try {
       const response = await fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${matchId}&APIkey=${APIkey}`);
       const data = await response.json();
+      console.log('Lineup API response:', data); // Log the response to inspect the data
   
       if (!data || !data[0] || !data[0].lineup) {
         console.error('Lineup data is missing or malformed:', data);

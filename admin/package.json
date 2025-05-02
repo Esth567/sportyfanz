@@ -29,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1",
     "natural": "^8.0.1",
+    "node-fetch": "^3.3.2",
     "xml2js": "^0.6.2"
   }
 }

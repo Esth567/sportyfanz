@@ -14,40 +14,49 @@ document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 
 
 //display matches for live-match-demo
+
 document.addEventListener("DOMContentLoaded", function () {
     const liveMatchContainer = document.querySelector(".live-match-demo");
 
     const from = new Date().toISOString().split('T')[0]; // today's date
     const to = from;
-    const leagueIDs = ["3", "152", "302", "207", "168", "175"]; // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
+    const leagueIDs = ["3", "152", "302", "207", "168", "175"]; // Major leagues
 
     let matchesList = [];
     let currentMatchIndex = 0;
 
+    // === LUXON Time Functions ===
     function getMinutesSince(matchDate, matchTime) {
-        const [hours, minutes] = matchTime.split(':').map(Number);
-        const matchUTC = new Date(matchDate);
-        matchUTC.setUTCHours(hours);
-        matchUTC.setUTCMinutes(minutes);
-        matchUTC.setUTCSeconds(0);
-        const matchLocal = new Date(matchUTC.getTime() + (matchUTC.getTimezoneOffset() * -60000));
-        const now = new Date();
-        const diff = Math.floor((now - matchLocal) / 60000);
-        return diff > 0 ? diff : 0;
+        const { DateTime } = luxon;
+
+        const matchDateTime = DateTime.fromFormat(
+            `${matchDate} ${matchTime}`,
+            "yyyy-MM-dd HH:mm",
+            { zone: "Europe/Berlin" }
+        );
+
+        const now = DateTime.now().setZone("Europe/Berlin");
+        const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
+        return diffInMinutes > 0 ? diffInMinutes : 0;
     }
 
-    function formatTo12Hour(timeStr) {
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        const utcDate = new Date();
-        utcDate.setUTCHours(hours);
-        utcDate.setUTCMinutes(minutes);
-        utcDate.setUTCSeconds(0);
-        const localDate = new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * -60000));
-        let hour = localDate.getHours();
-        const ampm = hour >= 12 ? "PM" : "AM";
-        hour = hour % 12 || 12;
-        const paddedMinutes = String(localDate.getMinutes()).padStart(2, '0');
-        return `${hour}:${paddedMinutes} ${ampm}`;
+    function formatToUserLocalTime(dateStr, timeStr) {
+        try {
+            const { DateTime } = luxon;
+
+            const berlinTime = DateTime.fromFormat(
+                `${dateStr} ${timeStr}`,
+                "yyyy-MM-dd HH:mm",
+                { zone: "Europe/Berlin" }
+            );
+
+            return berlinTime
+                .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+                .toFormat("hh:mm a");
+        } catch (e) {
+            console.error("Time conversion error:", e);
+            return "TBD";
+        }
     }
 
     function createMatchHTML(match) {
@@ -63,7 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const isFinished = matchStatus === "Finished" || matchStatus === "FT";
         const hasStarted = matchStatus !== "" && matchStatus !== "Not Started";
-        const isLive = !isNaN(parseInt(matchStatus));
         const displayScore = hasStarted ? `${homeScore} - ${awayScore}` : "VS";
 
         let displayTime = "";
@@ -76,12 +84,11 @@ document.addEventListener("DOMContentLoaded", function () {
             displayTime = `${getMinutesSince(match.match_date, startTime)}'`;
             ellipseImg = "assets/icons/Ellipse2.png";
         } else {
-            displayTime = formatTo12Hour(startTime);
-            
+            displayTime = formatToUserLocalTime(match.match_date, startTime);
+            ellipseImg = "assets/icons/Ellipse 1.png";
         }
 
         return `
-       
         <div class="teams-time">
             <div class="team">
                 <img src="${homeLogo}" alt="${homeTeam}">
@@ -106,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             matchesList = [];
             for (let id of leagueIDs) {
-                const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&APIkey=${APIkey}`;
+                const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&timezone=Europe/Berlin&APIkey=${APIkey}`;
                 const res = await fetch(url);
                 const data = await res.json();
 
@@ -118,8 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             matchesList.sort((a, b) => {
-                const aTime = new Date(a.match_date + " " + a.match_time);
-                const bTime = new Date(b.match_date + " " + b.match_time);
+                const aTime = new Date(`${a.match_date}T${a.match_time}`);
+                const bTime = new Date(`${b.match_date}T${b.match_time}`);
                 return aTime - bTime;
             });
 
@@ -158,28 +165,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
 // Top scorer slider
-const leagueIds = {
-    Bundesliga: 195,
-    NPFL: 302,
-    SerieA: 207,
-    Ligue1: 168,
-    PremierLeague: 152,
-    LaLiga: 302
-};
-
-
-// Example of player images mapping (make sure to use the correct player names and image filenames)
 const playerImageMap = {
-    "R. Lewandowski": "Lewandowski.png",
-    "O. Dembele": "Untitled.png",
-    "A. Alipour": "alipour.png",
+    "A. Alipour": "A.Alipour.png",
+    "R. Lewandowski": "R.Lewandowski.png",
     "M. Retegui": "M.Retegui.png",
-    "Mohammed Salah": "Mohammed.png",
+    "O. Dembélé": "O.Dembl.png",
+    "Mohamed Salah": "MohamedSalah.png",
+    "Serhou Guirassy": "S.Guirassy.png",
+    "D, Selke": "D.Selke.png"
     // Add more players here...
 };
 
-
+// List of top leagues (IDs can be replaced with actual IDs or names)
+const topLeagues = [
+    "Premier League", // England
+    "La Liga",
+    "Bundesliga",
+    "Serie A",
+    "Ligue 1"
+];
 
 async function fetchTopScorers() {
     try {
@@ -197,20 +203,42 @@ async function fetchTopScorers() {
         let playerIndex = 0;
         let playerElements = [];
 
-        for (const [leagueName, leagueId] of Object.entries(leagueIds)) {
-            const response = await fetch(`https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&APIkey=${APIkey}`);
-            const data = await response.json();
+        // Fetch all leagues and their top scorers dynamically
+        const response = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
+        const leaguesData = await response.json();
 
-            if (!Array.isArray(data) || data.length === 0) {
-                console.warn(`No data available for ${leagueName}`);
+        if (!Array.isArray(leaguesData) || leaguesData.length === 0) {
+            console.error("No leagues data found.");
+            return;
+        }
+
+        for (const league of leaguesData) {
+            const leagueName = league.league_name;
+            if (!topLeagues.includes(leagueName)) continue; // Only process top leagues
+
+            const leagueId = league.league_id;
+
+            const topScorersResponse = await fetch(`https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&APIkey=${APIkey}`);
+            const topScorersData = await topScorersResponse.json();
+
+            if (!Array.isArray(topScorersData) || topScorersData.length === 0) {
+                console.warn(`No top scorers data available for ${leagueName}`);
                 continue;
             }
 
-            const topScorer = data[0]; // Get the top scorer
+            // Sort top scorers by goals in descending order
+            topScorersData.sort((a, b) => b.goals - a.goals);
+
+            // Select only the highest goal scorer
+            const topScorer = topScorersData[0]; // Get the player with the highest goals
+
+            const goals = topScorer.goals || 0;
+            if (goals < 15) continue; // Only consider players with 15 or more goals
 
             const playerName = topScorer.player_name || "Unknown Player";
-            const playerImage = getLocalPlayerImage(playerName);  // Fetch image from local mapping
-            const goals = topScorer.goals || "0";
+            const apiImage = topScorer.player_image; // Image from API if available
+            const localImage = getLocalPlayerImage(playerName);
+            const playerImage = apiImage && apiImage !== '' ? apiImage : localImage || 'assets/images/default-player.png';
             const teamName = topScorer.team_name || "Unknown Team";
 
             // Create player item dynamically
@@ -244,6 +272,11 @@ async function fetchTopScorers() {
             playerIndex++;
         }
 
+        // Hide the slider dots if there are more than 10 players
+        if (playerElements.length > 10) {
+            dotsContainer.style.display = "none"; // Hide slider dots
+        }
+
         if (playerElements.length > 0) {
             startSlider(playerElements);
         } else {
@@ -258,8 +291,6 @@ async function fetchTopScorers() {
 function getLocalPlayerImage(playerName) {
     return playerImageMap[playerName] ? `assets/images/${playerImageMap[playerName]}` : null;
 }
-
-
 
 // Slider functionality
 let currentPlayer = 0;
@@ -295,6 +326,7 @@ function setActiveSlide(index) {
 
 // Fetch top scorers on page load
 document.addEventListener("DOMContentLoaded", fetchTopScorers);
+
 
 
 
@@ -1054,7 +1086,6 @@ document.querySelectorAll('.category-btn').forEach(button => {
 
 //function for predition-container in middly layer
 
-  // List of big leagues
 // List of big leagues
 const bigLeagues = [
     "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1", "Ligue 2"

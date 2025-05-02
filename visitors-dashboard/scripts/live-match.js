@@ -110,69 +110,111 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
 
 //function to fetch matches
 async function fetchMatches() {
+    const spinner = document.getElementById("loading-spinner");
+    if (spinner) spinner.style.display = "block";
+
     try {
         const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-7)}&to=${getTodayDate(7)}&APIkey=${APIkey}`);
         const data = await response.json();
-
         updateMatches(data);
     } catch (error) {
         console.error("Fetch error:", error);
+    } finally {
+        if (spinner) spinner.style.display = "none";
     }
 }
 
 
+const { DateTime } = luxon;
 
+function getMinutesSince(matchDate, matchTime) {
+    const { DateTime } = luxon;
+
+    // Parse the match time in Berlin timezone
+    const matchDateTime = DateTime.fromFormat(
+        `${matchDate} ${matchTime}`,
+        "yyyy-MM-dd HH:mm",
+        { zone: "Europe/Berlin" }
+    );
+
+    // Current time in Berlin
+    const now = DateTime.now().setZone("Europe/Berlin");
+
+    const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
+    return diffInMinutes > 0 ? diffInMinutes : 0;
+}
+
+function formatToUserLocalTime(date, time) {
+    const { DateTime } = luxon;
+
+    // Combine date and time into a full datetime string
+    const matchDateTime = DateTime.fromFormat(
+        `${date} ${time}`,
+        "yyyy-MM-dd HH:mm",
+        { zone: "UTC" }  // Assuming API gives time in UTC
+    );
+
+    // Convert to user's local timezone
+    return matchDateTime.setZone(DateTime.local().zoneName).toFormat("h:mm a"); // Adjust to 12-hour format
+}
+
+
+
+// Modify the updateMatches function to use getMinutesSince and formatToUserLocalTime for accurate time
 function updateMatches(matches) {
     matchesData.live = [];
     matchesData.highlight = [];
     matchesData.upcoming = [];
     matchesData.allHighlights = [];
 
-    const todayStr = new Date().toDateString();
-    const now = new Date();
+    const now = DateTime.utc();
+    const oneWeekAgo = now.minus({ days: 7 });
 
     matches.forEach(match => {
         const status = (match.match_status || "").trim().toLowerCase();
-        const matchDateTime = new Date(`${match.match_date} ${match.match_time}`);
+
+        // Convert match time from UTC to local timezone
+        const matchDateTimeLocal = DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`)
+            .setZone('utc')  // Assuming API gives UTC time
+            .setZone(DateTime.local().zoneName);  // Convert to local timezone
 
         const isFinished = status === "ft" || status === "finished" || status.includes("pen") || status.includes("after") || parseInt(status) >= 90;
-        const isUpcoming = matchDateTime > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
-
+        const isUpcoming = matchDateTimeLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
         const isLive = parseInt(status) > 0 && parseInt(status) < 90;
 
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(now.getDate() - 7);
-
         if (isLive) matchesData.live.push(match);
-
-        if (isFinished && matchDateTime >= oneWeekAgo) {
-            matchesData.highlight.push(match);
-        }
-        
-        // Sort highlights by date descending (recent first)
-        matchesData.highlight.sort((a, b) => {
-            const dateA = new Date(`${a.match_date}T${a.match_time}`);
-            const dateB = new Date(`${b.match_date}T${b.match_time}`);
-            return dateB - dateA;
-        });
-        
+        if (isFinished && matchDateTimeLocal >= oneWeekAgo) matchesData.highlight.push(match);
         if (isFinished) matchesData.allHighlights.push(match);
         if (isUpcoming) matchesData.upcoming.push(match);
-        
+
+        // Calculate minutes since the match started
+        const minutesSinceMatch = getMinutesSince(match.match_date, match.match_time);
+
+        // Format match time to user's local time for display
+        const formattedMatchTime = formatToUserLocalTime(match.match_date, match.match_time);
+
+        // Use formatted time and minutes to display or process match status
+        console.log(`Match: ${match.match_hometeam_name} vs ${match.match_awayteam_name} - Time: ${formattedMatchTime} - Minutes Since Start: ${minutesSinceMatch}`);
     });
 
     renderMatches(matchesData, "live");
 }
 
 
+
+//funtion to render matches
 function renderMatches(matchesData, category, leagues = []) {
     const matchesContainer = document.querySelector(".matches");
+    if (!matchesContainer) {
+        console.error("matches-container element not found.");
+        return;
+    }
+
     let selectedMatches = matchesData[category];
 
-    // Get league logos mapping
-    const leagueLogos = {}; 
+    const leagueLogos = {};
     leagues.forEach(league => {
-        leagueLogos[league.league_id] = league.league_logo || "assets/images/default-league.png"; // Default logo if not found
+        leagueLogos[league.league_id] = league.league_logo || "assets/images/default-league.png";
     });
 
     let grouped = (selectedMatches || []).reduce((acc, match) => {
@@ -191,7 +233,6 @@ function renderMatches(matchesData, category, leagues = []) {
 
     if (Object.keys(grouped).length === 0) {
         const defaultLogo = leagueLogos[selectedLeagueId] || "assets/images/default-league.png";
-    
         grouped[selectedLeagueId] = {
             league: selectedLeagueName,
             country: "",
@@ -203,7 +244,6 @@ function renderMatches(matchesData, category, leagues = []) {
     let html = "";
     let firstLeague = true;
 
-    // Custom league order
     const preferredLeagues = [
         { name: "Premier League", country: "England" },
         { name: "La Liga", country: "Spain" },
@@ -211,10 +251,8 @@ function renderMatches(matchesData, category, leagues = []) {
         { name: "UEFA Champions League", country: "eurocups" }
     ];
 
-    // Convert grouped object to array
     let leagueArray = Object.values(grouped);
 
-    // Sort leagues with preferredLeagues first
     leagueArray.sort((a, b) => {
         const indexA = preferredLeagues.findIndex(l => l.name === a.league && l.country === a.country);
         const indexB = preferredLeagues.findIndex(l => l.name === b.league && l.country === b.country);
@@ -243,13 +281,13 @@ function renderMatches(matchesData, category, leagues = []) {
         if (firstLeague) {
             selectedLeagueId = selectedLeagueId || league.matches[0]?.league_id || leagueId;
             selectedLeagueName = selectedLeagueName || league.league;
-        
+
             html += `
             <div class="matches-header">
                <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="displayMatchesByLeagueId('${selectedLeagueId}', '${selectedLeagueName}', 'live')">Live</div>
                <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="displayMatchesByLeagueId('${selectedLeagueId}', '${selectedLeagueName}', 'highlight')">Highlight</div>
                <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="displayMatchesByLeagueId('${selectedLeagueId}', '${selectedLeagueName}', 'upcoming')">Upcoming</div>
-        
+
                 <div class="calendar-wrapper" style="position: relative;">
                     <div class="match-category-btn calendar" onclick="toggleCalendar()">
                         <ion-icon name="calendar-outline"></ion-icon>
@@ -258,9 +296,10 @@ function renderMatches(matchesData, category, leagues = []) {
                 </div>
             </div>`;
             firstLeague = false;
-        }        
+        }
 
         html += `<div class="match-category-content">`;
+
         if (league.matches.length === 0) {
             html += `
                 <div class="match-row no-match-message">
@@ -273,25 +312,26 @@ function renderMatches(matchesData, category, leagues = []) {
             `;
         } else {
             league.matches.forEach(match => {
-                const matchDate = new Date(`${match.match_date}T${match.match_time}`);
-                const matchDay = matchDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                const matchUTC = DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`);
+                const matchLocal = matchUTC.setZone(DateTime.local().zoneName);  // Correct timezone conversion
 
-                let matchTimeDisplay;
+                const matchDay = matchLocal.toFormat("MMM d");
+
+                let matchTimeDisplay = "";
                 if (category === "highlight") {
-                  matchTimeDisplay = "FT";
-               } else if (parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90) {
-                 matchTimeDisplay = match.match_status + "'";
-               } else {
-                 matchTimeDisplay = matchDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
-               }
-
+                    matchTimeDisplay = "FT";
+                } else if (parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90) {
+                    matchTimeDisplay = match.match_status + "'";
+                } else {
+                    matchTimeDisplay = matchLocal.toFormat("h:mm a");
+                }
 
                 html += `
                 <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
                     <div class="matches-teams">
                         <div class="matches-time">
-                        ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
-                         <div>${matchTimeDisplay}</div>
+                            ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
+                            <div>${matchTimeDisplay}</div>
                         </div>
                         <div class="matches-datas">
                             <div class="matches-team">
@@ -311,37 +351,40 @@ function renderMatches(matchesData, category, leagues = []) {
                 </div>`;
             });
         }
+
         html += `</div></div>`;
     });
 
     matchesContainer.innerHTML = html;
 }
 
-// Function to filter matches by the selected date
-function filterByDate() {
-    const dateInput = document.getElementById("match-date");
-    const selectedDate = dateInput.value;
-    
-    if (!selectedDate) return; // If no date is selected, do nothing
-    
-    // Format selected date to match the date format of match dates (assuming 'yyyy-mm-dd')
-    const formattedSelectedDate = new Date(selectedDate).toISOString().split('T')[0];
-    
-    // Ensure matchesData[category] is available
-    if (!matchesData[category]) {
-        console.error(`No matches data available for category: ${category}`);
-        return;
-    }
 
-    // Filter the matches for the selected date
+// Function to filter matches by the selected date
+function filterByDate(category) {
+    const inputDate = document.getElementById("match-date").value;
+    if (!inputDate) return;
+
+    const selectedDate = DateTime.fromISO(inputDate).toISODate(); // Ensures YYYY-MM-DD format
+
     const filteredMatches = matchesData[category].filter(match => {
-        const matchDate = new Date(`${match.match_date}T${match.match_time}`).toISOString().split('T')[0];
-        return matchDate === formattedSelectedDate;
+        const matchDate = DateTime.fromISO(match.match_date).toISODate(); // Same format
+        return matchDate === selectedDate;
     });
 
-    // Re-render matches with filtered data
-    renderMatches({ [category]: filteredMatches }, category);
+    const selectedLeagueMatches = filteredMatches.filter(match => match.league_id === selectedLeagueId);
+
+    const grouped = {
+        [selectedLeagueId]: {
+            league: selectedLeagueName,
+            country: selectedLeagueCountry || "",
+            league_logo: selectedLeagueLogo || "assets/images/default-league.png",
+            matches: selectedLeagueMatches
+        }
+    };
+
+    renderMatches({ [category]: filteredMatches }, category, Object.values(grouped));
 }
+
 
 // Function to toggle calendar visibility
 function toggleCalendar() {
@@ -350,9 +393,7 @@ function toggleCalendar() {
     dateInput.style.display = (dateInput.style.display === "none" || !dateInput.style.display) ? "block" : "none";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    fetchMatches();
-});
+
 
 
 // Function to fetch match video (unchanged)
@@ -474,7 +515,7 @@ async function displayLiveMatch(matchId, category) {
     
             if (tab === "lineups") {
                 // Only render formation after the tab is active
-                generateFormation(match.match_id);
+                fetchAndRenderLineups(match.match_id);
               }
         });
     });
@@ -549,39 +590,18 @@ async function displayLiveMatch(matchId, category) {
 
             
                    
-                    <div id="football-field" class="field">
-            <div class="goalpost home-goalpost"></div>
-            <div class="penalty-box home-box"></div>
-            <div class="penalty-arc home-arc"></div>
-        
-            <div id="home-formation" class="formation-area"></div>
-
-            <div class="center-circle"></div>
-           <div class="center-line"></div>
-
-           <div id="away-formation" class="formation-area"></div>
-
-           <div class="goalpost away-goalpost"></div>
-           <div class="penalty-box away-box"></div>
-           <div class="penalty-arc away-arc"></div>
-        </div>
-
-           setTimeout(() => {
-           generateFormation(
-           {
-            formation: match.match_hometeam_system,
-            players: match.lineup?.home?.starting_lineups
-          },
-          "left"
-          );
-        generateFormation(
-         {
-        formation: match.match_awayteam_system,
-        players: match.lineup?.away?.starting_lineups
-        },
-        "right"
-       );
-      }, 0);
+                   <div id="football-field" class="field">
+                     <!-- Center line and circle -->
+    <div class="center-line"></div>
+    <div class="center-circle"></div>
+    <!-- Left Goal and Penalty Area -->
+    <div class="penalty-arc left-arc"></div>
+    <div class="penalty-arc right-arc"></div>
+    <div class="penalty-box left-box"></div>
+    <div class="penalty-box right-box"></div>
+    <div class="goal left-goal"></div>
+    <div class="goal right-goal"></div>  
+</div>
 
 
 
@@ -834,84 +854,128 @@ async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
             spinner.style.display = "none";
         }
     }
+     
+  
+  // Function to fetch player data
+ 
+  async function fetchAndRenderLineups(matchId) {
+    try {
+      const response = await fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${matchId}&APIkey=${APIkey}`);
+      const data = await response.json();
+  
+      if (!data || !data[0] || !data[0].lineup) {
+        console.error('Lineup data is missing or malformed:', data);
+        return;
+      }
+  
+      const lineups = data[0].lineup;
+
+      if (!lineups || !lineups.home_team || !lineups.away_team) {
+        console.error('Lineup data is missing.');
+        return;
+    }
     
   
+      const homeFormation = lineups.home_team.formation;
+      const awayFormation = lineups.away_team.formation;
   
+      const homePlayers = [
+        ...lineups.home_team.starting_lineups.map(p => ({
+          player_name: p.player_name || '',
+          number: p.player_number || ''
+        }))
+      ];
   
-  //This fetches the home and away players
-  function generateFormation(team, side) {
-    const containerId = side === "left" ? "home-formation" : "away-formation";
-    let container = document.getElementById(containerId);
+      const awayPlayers = [
+        ...lineups.away_team.starting_lineups.map(p => ({
+          player_name: p.player_name || '',
+          number: p.player_number || ''
+        }))
+      ];
   
-    if (!container) {
-      console.error(`❌ ERROR: Element with ID "${containerId}" not found.`);
-      return;
-    }
-  
-    container.innerHTML = ""; // Clear previous content
-  
-    let formation = team.formation?.split("-").map(Number) || [];
-    let players = team.players || [];
-    let playerIndex = 0;
-  
-    let fieldWidth = container.clientWidth || 900;
-    let fieldHeight = container.clientHeight || 500;
-    let centerX = fieldWidth / 2;
-    let centerCircleRadius = 50;
-    let rowSpacing = fieldHeight / (formation.length + 1);
-    let colSpacing = fieldWidth / (formation.length + 1);
-  
-    let playerClass = side === "left" ? "home-player" : "away-player";
-  
-    // Goalkeeper
-    if (players.length > 0) {
-      const keeper = players.find(p => p.lineup_position === "1") || players[0];
-      let goalkeeper = document.createElement("div");
-      goalkeeper.classList.add("player", "goalkeeper", playerClass);
-      goalkeeper.textContent = keeper.lineup_number || "1";
-      goalkeeper.title = keeper.lineup_player || "GK";
-  
-      goalkeeper.style.top = "50%";
-      goalkeeper.style.left = side === "left" ? "35px" : "calc(100% - 35px)";
-      goalkeeper.style.transform = "translate(-50%, -50%)";
-      container.appendChild(goalkeeper);
-    }
-  
-    let topOffset = 80;
-  
-    for (let rowIndex = 0; rowIndex < formation.length; rowIndex++) {
-      let numPlayers = formation[rowIndex];
-      let rowTop = topOffset + rowIndex * rowSpacing;
-      let colLeft = side === "left"
-        ? 90 + rowIndex * colSpacing
-        : fieldWidth - (90 + rowIndex * colSpacing);
-  
-      for (let i = 0; i < numPlayers && playerIndex < players.length; i++) {
-        let player = document.createElement("div");
-        player.classList.add("player", playerClass);
-        player.textContent = players[playerIndex].lineup_number || "?";
-        player.title = players[playerIndex].lineup_player || "Unknown";
-        playerIndex++;
-  
-        if (rowIndex === formation.length - 1) {
-          let safeCenterX = side === "left"
-            ? centerX - centerCircleRadius - 10
-            : centerX + centerCircleRadius + 10;
-          player.style.left = `${safeCenterX}px`;
-          player.style.top = "50%";
-        } else {
-          player.style.left = `${colLeft}px`;
-          player.style.top = `${(i + 1) * (100 / (numPlayers + 1))}%`;
-        }
-  
-        container.appendChild(player);
-      }
+      renderTeamsOnField('4-3-3', '4-2-3-1', [
+        {number: '1'}, {number: '2'}, {number: '3'}, {number: '4'}, {number: '5'},
+        {number: '6'}, {number: '7'}, {number: '8'}, {number: '9'}, {number: '10'}, {number: '11'}
+      ], [
+        {number: '1'}, {number: '12'}, {number: '13'}, {number: '14'}, {number: '15'},
+        {number: '16'}, {number: '17'}, {number: '18'}, {number: '19'}, {number: '20'}, {number: '21'}
+      ]);
+      
+      
+    } catch (error) {
+      console.error('Error fetching or rendering lineups:', error);
     }
   }
+
+
+  // Function to place players on the field
+  function renderTeamsOnField(homeFormation, awayFormation, homePlayers, awayPlayers) {
+    const field = document.getElementById('football-field');
+    field.innerHTML = ''; // Clear previous players
   
+    placeTeam(field, homeFormation, homePlayers, true);  // Home (left to right)
+    placeTeam(field, awayFormation, awayPlayers, false); // Away (right to left)
+
+    if (!homeFormation || !homePlayers.length) {
+        console.warn("Missing home formation or players", homeFormation, homePlayers);
+      }
+      if (!awayFormation || !awayPlayers.length) {
+        console.warn("Missing away formation or players", awayFormation, awayPlayers);
+      }
+      
+  }
   
+  function placeTeam(field, formation, players, isHomeTeam) {
+    const lines = formation.split('-').map(Number);
+    const totalLines = lines.length;
+    const fieldHeight = field.clientHeight;
+  
+    const goalkeeper = players[0];
+    const outfieldPlayers = players.slice(1);
+    let playerIndex = 0;
+  
+    // Goalkeeper
+    const gk = document.createElement('div');
+    gk.className = 'player';
+    gk.textContent = goalkeeper.number || '1';
+    gk.style.backgroundColor = isHomeTeam ? 'black' : 'white';
+    gk.style.color = isHomeTeam ? 'white' : 'black';
+    gk.style.top = '50%';
+    gk.style.left = isHomeTeam ? '5%' : '95%';
+    gk.style.transform = 'translate(-50%, -50%)';
+    field.appendChild(gk);
+  
+    // Outfield players
+   lines.forEach((numInLine, lineIdx) => {
+    const verticalSpacing = fieldHeight / (numInLine + 1);
+    const horizontalPercent = isHomeTeam
+        ? 15 + lineIdx * (70 / (totalLines - 1))
+        : 85 - lineIdx * (70 / (totalLines - 1));
 
+    for (let i = 0; i < numInLine; i++) {
+        const player = outfieldPlayers[playerIndex];
+        if (!player) continue; // Skip if no player is available
 
+        const playerDiv = document.createElement('div');
+        playerDiv.className = 'player';
+        playerDiv.innerHTML = `<strong>${player.number || (playerIndex + 2)}</strong>`;
+        playerDiv.style.backgroundColor = isHomeTeam ? 'black' : 'white';
+        playerDiv.style.color = isHomeTeam ? 'white' : 'black';
+        playerDiv.style.left = `${horizontalPercent}%`;
+        playerDiv.style.top = `${(i + 1) * verticalSpacing}px`;
+        playerDiv.style.transform = 'translate(-50%, -50%)';
 
+        field.appendChild(playerDiv);
+        playerIndex++;
+     }
+    });
 
+  }
+  
+ 
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchMatches();
+  });
+
+  
 

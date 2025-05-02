@@ -1,9 +1,10 @@
 const http = require("http");
 require("dotenv").config({ path: "./.env" });
-
 const app = require("./server/server.js"); 
 
 
+const fetchTopScorersAndDownloadImages = require('./server/downloadImages.js');
+fetchTopScorersAndDownloadImages();
 
 const port = process.env.PORT || 5000;
 

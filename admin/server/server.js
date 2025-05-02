@@ -6,10 +6,15 @@ const xml2js = require('xml2js');
 const { User, Data } = require("../database/db");  // ✅ Correct Import
 require("dotenv").config();
 const fetch = require('node-fetch');
+const fetchTopScorersAndDownloadImages = require('./downloadImages');
 
 const app = express();
+const path = require('path');
 app.use(bodyParser.json());
-app.use(cors({ origin: "*", methods: ["GET", "POST"], allowedHeaders: ["Content-Type", "Authorization"] }));
+app.use(cors());
+
+app.use('/assets/images', express.static(path.join(__dirname, 'assets/images')));
+
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -18,6 +23,17 @@ const users = [
     { username: "admin", password: "$2b$10$GjGWA1HRyM3nEd1blk/DD.sdCmes8IUQj1H9eIIAyD4lvesQ/4yTq", role: "super-admin" }, // Password: Admin@123
     { username: "editor", password: "$2b$10$iphbCHYYvUQ7fl239Hf6Ge2K6yO2NdBYRcGwN.LPjUbVtOsigNYLa", role: "editor" }  // Password: Editor@123
 ];
+
+
+app.get('/api/topscorers/images', async (req, res) => {
+    try {
+        const playerImageMap = await fetchTopScorersAndDownloadImages(true);
+        res.json(playerImageMap);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 // 🔐 Secure Login Endpoint
 app.post("/login", async (req, res) => {

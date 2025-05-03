@@ -445,6 +445,8 @@ body{
     border-radius: 15px;
     border: 1px solid #fbc12d8c;
     padding: 10px;
+    overflow: hidden; /* Prevents overflow */
+    max-width: 100%; /* Ensures the width is constrained */
 
 }
 .game-leag {
@@ -467,6 +469,7 @@ body{
     text-align: center;
     gap: 3px;
     overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 .vs-score {
     font-size: 0.85rem;
@@ -481,19 +484,24 @@ body{
     align-items: center; /* Vertically center everything */
     gap: 10px;
     width: 100%;
-    padding: 10px;
+    padding: 5px;
     box-sizing: border-box;
+    flex-wrap: wrap;
+    
+
 }
 
 .team {
-    flex: 1;
+    flex: 1 1 17%;
     text-align: center;
     font-size: 0.70rem;
     font-family: 'Lato';
     word-break: keep-all;
     overflow: hidden;
     white-space: nowrap;
-    padding: 5px;
+    text-overflow: ellipsis; /* Adds '...' if the text overflows */
+    display: flex;
+    flex-direction: column;
   
 }
 
@@ -1040,6 +1048,38 @@ body{
 .calendar ion-icon {
     font-size: 1rem;
 }
+
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: bold;
+    color: red;
+    font-size: 0.9em;
+}
+
+.red-dot {
+    width: 8px;
+    height: 8px;
+    background-color: red;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.fallback-message {
+    text-align: center;
+    color: #888; /* light gray text */
+    font-size: 1.1rem;
+    margin-top: 20px;
+    font-weight: 500;
+  }
+  
+
     .matches-container {
         display: flex;
         flex-direction: column;
@@ -1061,6 +1101,7 @@ body{
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; 
         align-items: center;
         width: 100%;
+        gap: -3px;
     }
     
     .league-header {
@@ -1077,6 +1118,10 @@ body{
         align-items: center;
         font-size: 0.75rem;
         font-family: 'Lato';
+        white-space: nowrap; /* Prevent the text from wrapping to the next line */
+        overflow: hidden;  /* Hide any overflow if the name is too long */
+        text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
+        justify-content: flex-start;
         gap: 5px;
     }
     
@@ -1089,17 +1134,17 @@ body{
     .view-details-btn {
         display: flex;
         align-items: center;
-        justify-content: center;
         background: #fff;
         color: #1A2F4B;
-        padding: 2px 2px;
         border-radius: 15px;
         font-size: 0.60rem;
         font-family: 'Lato';
         font-weight: bold;
+        padding: 2px 2px;
         border: none;
         min-width: fit-content;
         width: 100px;
+        margin-left: auto;
     }
     
 
@@ -1124,6 +1169,7 @@ body{
         font-weight: bold;
         font-family: 'Lato';
         min-width: 45px;
+        gap: 8px;
     }
 
 
@@ -1141,9 +1187,11 @@ body{
 
     .match-meta {
         display: flex;
-        flex-direction: column; /* Ensures the meta items are in a row */
+        flex-direction: row; /* Ensures the meta items are in a row */
         align-items: center;
-        gap: 5px;
+        gap: 10px;
+        margin-left: 0px; /* Remove the left margin to move it to the left */
+        justify-content: flex-start; /* Align items to the left */
     }
     
 
@@ -1165,6 +1213,10 @@ body{
         font-weight: bold;
         gap: 3px;
         
+    }
+
+    .match-status h5 {
+        font-size: 0.6rem;  /* Increase font size for "vs" */
     }
 
     .match-round {
@@ -1906,8 +1958,8 @@ body{
     
 }
 .team-infos img {
-    width: 20px; /* Adjust logo size */
-    height: 20px;
+    width: 18px; /* Adjust logo size */
+    height: 18px;
     object-fit: cover;
 }
 
@@ -1918,12 +1970,12 @@ body{
     justify-content: center;  /* Center the header text horizontally */
     align-items: center;  /* Center the header text vertically */
     text-align: center;  /* Ensure text is aligned to the center */
-  flex: 0 0 30px; 
+  flex: 0 0 25px; 
   width: 10%;
 }
   
   .stat-header {
-    font-size: 12px;
+    font-size: 0.75rem;
     font-family: 'Lato';
     color: #dce5e3af; /* Slight padding for header alignment */
     margin-right: 6px;
@@ -1949,7 +2001,7 @@ body{
 .stat-headerF {
    margin-right: 40px;
    font-family: 'Lato';
-   font-size: 0.85rem;
+   font-size: 0.75rem;
    font-weight: 500;
    
 
@@ -2014,8 +2066,8 @@ body{
 }
 
 .league-headers img {
-   width: 18px;
-   height: 18px;
+   width: 20px;
+   height: 20px;
    object-fit: contain;
    }
 
@@ -2060,8 +2112,71 @@ body{
     color: #007bff; /* Or your theme color */
 }
 
+.team-position.caf-champions-league {
+   color: #4CAF50; /* Green for CAF Champions League */
+   font-weight: bold;
+}
+
+.team-position.caf-confederation-cup {
+    color: #ff9500; /* Orange */
+    font-weight: bold;
+    
+}
 
 
+.team-position.champions-league {
+    color: #0070f3; /* Blue */
+    font-weight: bold;
+}
+
+.team-position.europa-league {
+    color: #ff9500; /* Orange */
+    font-weight: bold;
+}
+
+.team-position.relegation {
+    color: #ff3b30; /* Red */
+    font-weight: bold;
+}
+
+/* Tooltip Styles */
+.team-position {
+    position: relative;
+    cursor: pointer;
+}
+
+.team-position::after {
+    content: attr(title);
+    position: absolute;
+    top: 155%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+    padding: 4px 5px;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-size: 0.65rem;
+    font-family: 'Lato';
+    font-weight: 400;
+    white-space: nowrap;
+    border-radius: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+/* Show Tooltip on Hover */
+.team-position:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+}
+
+  .team-position:hover::after {
+    transform: translateX(-50%) scale(1);
+  }
+    
 
 
 

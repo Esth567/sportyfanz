@@ -14,7 +14,6 @@ document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 
 
 //display matches for live-match-demo
-
 document.addEventListener("DOMContentLoaded", function () {
     const liveMatchContainer = document.querySelector(".live-match-demo");
 
@@ -435,6 +434,41 @@ function getTodayDate(offset = 0) {
     return date.toISOString().split("T")[0];
 }
 
+// === LUXON Time Functions ===
+function getMinutesSince(matchDate, matchTime) {
+    const { DateTime } = luxon;
+
+    const matchDateTime = DateTime.fromFormat(
+        `${matchDate} ${matchTime}`,
+        "yyyy-MM-dd HH:mm",
+        { zone: "Europe/Berlin" }
+    );
+
+    const now = DateTime.now().setZone("Europe/Berlin");
+    const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
+    return diffInMinutes > 0 ? diffInMinutes : 0;
+}
+
+function formatToUserLocalTime(dateStr, timeStr) {
+    try {
+        const { DateTime } = luxon;
+
+        const berlinTime = DateTime.fromFormat(
+            `${dateStr} ${timeStr}`,
+            "yyyy-MM-dd HH:mm",
+            { zone: "Europe/Berlin" }
+        );
+
+        return berlinTime
+            .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+            .toFormat("hh:mm");
+    } catch (e) {
+        console.error("Time conversion error:", e);
+        return "TBD";
+    }
+}
+
+
 
 // Declare matchesData as a global object
 const matchData = {
@@ -514,11 +548,14 @@ function showMatches(category, event = null) {
         return;
     }
 
+    // Handle button active state
     const buttons = document.querySelectorAll('.category-btn');
     buttons.forEach(button => button.classList.remove('active'));
-
     if (event) {
         event.target.classList.add('active');
+    } else {
+        const activeButton = document.querySelector(`.category-btn[data-category="${category}"]`);
+        if (activeButton) activeButton.classList.add('active');
     }
 
     const container = document.getElementById('matches-container');
@@ -544,23 +581,26 @@ function showMatches(category, event = null) {
         }
     });
 
-    // Sort the priority matches
-    priorityMatches.sort((a, b) => {
-        return leaguePriority[a.league_name] - leaguePriority[b.league_name];
-    });
+    // Sort priority matches
+    priorityMatches.sort((a, b) => leaguePriority[a.league_name] - leaguePriority[b.league_name]);
 
-    // Combine and limit to 7 matches
+    // Combine and limit to 7 matches total
     const matchesToShow = [...priorityMatches, ...nonPriorityMatches].slice(0, 7);
 
+    // Show appropriate fallback message
     if (matchesToShow.length === 0) {
-        container.innerHTML = `<p>No matches available</p>`;
+        container.innerHTML = `<p class="fallback-message">No matches available today.</p>`;
         return;
+    } else if (priorityMatches.length === 0 && nonPriorityMatches.length > 0) {
+        container.innerHTML = `<p class="fallback-message">Showing matches from other leagues</p>`;
     }
 
+    // Render matches
     matchesToShow.forEach((match, index) => {
         createMatchCard(container, match, category, index);
     });
 }
+
 
 
 // Function to Filter Matches by Date
@@ -620,91 +660,88 @@ function createMatchCard(container, match, category, matchIndex) {
     const country = match.country_name || "Unknown Country";
     const score1 = match.match_hometeam_score || "0";
     const score2 = match.match_awayteam_score || "0";
-    let matchMinute = match.match_status || matchTime;
-
     const matchRound = match.league_round || "";
 
-
-    let matchStatusDisplay = "";
+    let matchMinute = match.match_status || matchTime;
     let scoreDisplay = "";
-
-    if (category === "highlight") {
-        matchStatusDisplay = `<h5>FT</h5>`;
-        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-    }
+    let matchStatusDisplay = "";
+    let formattedTime = "";
 
     if (category === "live") {
-        let matchMinuteText = match.match_status === "Halftime" ? "HT" : `${match.match_status}'`;
-        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`; // Score between the teams
-    }
-
-    if (category === "upcoming") {
-        matchStatusDisplay = `<h5>vs</h5>`; // Show "vs" for upcoming matches
+        const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
+        matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
+        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+        formattedTime = `
+            <div class="live-indicator">
+                <span class="red-dot"></span>
+                <span class="live-text">Live</span> - ${matchMinute}
+            </div>
+        `;
+    } else if (category === "highlight") {
+        matchStatusDisplay = `<h5>FT</h5>`;
+        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+        formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
+    } else if (category === "upcoming") {
+        matchStatusDisplay = `<h5>vs</h5>`;
+        formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
     }
 
     const matchCard = document.createElement('div');
     matchCard.classList.add('match-card');
-    
+
     matchCard.innerHTML = `
-    <div class="match-details">
-        <!-- Column 1: Team 1 -->
-        <div class="Matchteam">
-            <img src="${logo1}" alt="${team1}">
-            <span>${team1}</span>
-        </div>
+        <div class="match-details">
+            <!-- Column 1: Team 1 -->
+            <div class="Matchteam">
+                <img src="${logo1}" alt="${team1}">
+                <span>${team1}</span>
+            </div>
 
-        <!-- Column 2: Match Status & Score -->
-        <div class="match-status-score">
-            ${category === "live" ? scoreDisplay : ""}
-            ${category === "highlight" ? `
-                <div class="match-status">
-                    ${matchStatusDisplay}
-                    ${scoreDisplay}
+            <!-- Column 2: Match Status & Score -->
+            <div class="match-status-score">
+                ${scoreDisplay}
+                ${matchStatusDisplay}
+            </div>
+
+            <!-- Column 3: Team 2 -->
+            <div class="Matchteam">
+                <img src="${logo2}" alt="${team2}">
+                <span>${team2}</span>
+            </div>
+
+            <!-- Column 4 & 5 wrapped together -->
+            <div class="match-meta">
+                <div class="match-time">
+                    <img src="assets/icons/clock.png" alt="Clock">
+                    ${formattedTime}
                 </div>
-            ` : ""}
-            ${category === "upcoming" ? matchStatusDisplay : ""}
-        </div>
-
-        <!-- Column 3: Team 2 -->
-        <div class="Matchteam">
-            <img src="${logo2}" alt="${team2}">
-            <span>${team2}</span>
-        </div>
-
-        <!-- Column 4 & 5 wrapped together -->
-        <div class="match-meta">
-            <div class="match-time">
-                <img src="assets/icons/clock.png" alt="Clock">
-                ${category === "live" ? `${matchMinute}'` : matchTime}
+                <div class="match-country">
+                    <img src="assets/icons/map-pin.png" alt="Map">
+                    ${country}
+                </div>
+                ${matchRound ? `
+                    <div class="match-round">
+                        <img src="assets/icons/trophy.png" alt="Round">
+                        ${matchRound}
+                    </div>` : ""}
             </div>
-            <div class="match-country">
-                <img src="assets/icons/map-pin.png" alt="Map">
-                ${country}
-            </div>
-            ${matchRound ? `
-                <div class="match-round">
-                    <img src="assets/icons/trophy.png" alt="Round">
-                    ${matchRound}
-                </div>` : ""}
-        </div>
 
-        <!-- Column 6: View Details Button -->
-        <button class="view-details-btn" data-category="${category}" data-index="${matchIndex}">
-            <img src="assets/icons/arrow-up.png" alt="Arrow-up">
-            View Details
-        </button>
-    </div>
+            <!-- Column 6: View Details Button -->
+            <button class="view-details-btn" data-category="${category}" data-index="${matchIndex}">
+                <img src="assets/icons/arrow-up.png" alt="Arrow-up">
+                View Details
+            </button>
+        </div>
     `;
 
-    // Append card to container
     container.appendChild(matchCard);
 
-    // Select the button inside the newly created match card
     const viewDetailsBtn = matchCard.querySelector('.view-details-btn');
     viewDetailsBtn.addEventListener('click', function () {
         displayLiveMatch(match.match_id, category);
     });
 }
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const dateInput = document.getElementById("match-date");

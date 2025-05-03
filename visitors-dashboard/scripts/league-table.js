@@ -5,7 +5,7 @@ const selectedLeagues = {
     "Serie A": { league_id: null, country: "Italy" },
     "NPFL": { league_id: null, country: "Nigeria" },
     "Bundesliga": { league_id: null, country: "Germany" },
-    "Champions League": { league_id: null, country: "eurocups" }
+    "UEFA Champions League": { league_id: null, country: "eurocups" }
 };
 
 // Fetch the league names
@@ -24,15 +24,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const response = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
             const leagues = await response.json();
             leaguesContainer.innerHTML = ""; // Clear existing content
-
+    
             let firstLeagueId = null;
-
+    
             // Loop through API response and match selected leagues by BOTH name & country
             leagues.forEach(league => {
                 Object.entries(selectedLeagues).forEach(([leagueName, leagueInfo]) => {
                     if (league.league_name === leagueName && league.country_name === leagueInfo.country) {
                         selectedLeagues[leagueName].league_id = league.league_id; // Assign correct league ID
-
+    
                         const leagueElement = document.createElement("div");
                         leagueElement.classList.add("leagueNames");
                         leagueElement.innerHTML = `
@@ -47,14 +47,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <img src="assets/icons/Arrow - Right 2.png" alt="Arrow">
                             </div>
                         `;
-
+    
                         // Click event to fetch and display league table
                         leagueElement.addEventListener("click", () => {
                             updateLeagueTable(league.league_name, league.league_id);
                         });
-
+    
                         leaguesContainer.appendChild(leagueElement);
-
+    
                         // Set Premier League (England) as the default league to load
                         if (league.league_name === "Premier League" && league.country_name === "England") {
                             firstLeagueId = league.league_id;
@@ -62,25 +62,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 });
             });
-
+    
             // Load the Premier League table by default on page load
             if (firstLeagueId) {
                 updateLeagueTable("Premier League", firstLeagueId);
             }
-
+    
         } catch (error) {
             console.error("Error fetching leagues:", error);
         }
     }
-
     fetchLeagues(); // Fetch leagues only after confirming the element exists
 });
 
 
+const leagueLogos = {
+    "Premier League": "assets/images/premierleagueLogo.png",
+    "La Liga": "assets/images/laliga-logo.png",
+    "Serie A": "assets/images/series-aLogo.png",
+    "Bundesliga": "assets/images/bundesliga-logo.png",
+    "UEFA Champions League": "assets/images/UEFAchampionsleagueLogo.png",
+    "NPFL": "assets/images/npflLogo.png",
+    // Add other leagues here...
+};
 
- // Get the elements
-
-// Main function to fetch standings + form and update UI
 async function updateLeagueTable(leagueName, leagueId) {
     try {
         const [standingsResponse, formMap] = await Promise.all([
@@ -97,12 +102,16 @@ async function updateLeagueTable(leagueName, leagueId) {
         }
 
         const initialData = leagueData.slice(0, 10);
-        let tableHTML = generateTableHTML(initialData, formMap);
+        let tableHTML = generateTableHTML(initialData, formMap, leagueName, leagueData);
+
+        // Use the league logo mapping (local images)
+        const leagueLogo = leagueLogos[leagueName] || 'assets/images/default-logo.png'; // Fallback to default logo
+        console.log("League Logo:", leagueLogo); // Log the logo URL to check
 
         middleLayer.innerHTML = `
             <div class="league-table">
-                <div class="league-headers">           
-                    <img src="${leagueData[0].league_logo || 'assets/images/default-logo.png'}" alt="${leagueName} Logo" class="league-logo">
+                <div class="league-headers">
+                    <img src="${leagueLogo}" alt="${leagueName} Logo" class="league-logo">
                     <div class="league-details">
                         <h3 class="league-name">${leagueName}</h3>
                         <p class="league-country">${leagueData[0].country_name}</p>
@@ -127,11 +136,11 @@ async function updateLeagueTable(leagueName, leagueId) {
             const leagueTablesDetails = document.querySelector(".league-tables-details");
 
             if (expanded) {
-                leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap);
+                leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap, leagueName, leagueData);
                 seeMoreButton.querySelector(".see-more-text").textContent = "See Less";
                 seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-back-outline");
             } else {
-                leagueTablesDetails.innerHTML = generateTableHTML(initialData, formMap);
+                leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap, leagueName, leagueData);
                 seeMoreButton.querySelector(".see-more-text").textContent = "See More";
                 seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-forward-outline");
             }
@@ -141,6 +150,8 @@ async function updateLeagueTable(leagueName, leagueId) {
         console.error("Error fetching league table or form data:", err);
     }
 }
+
+
 
 
 // Prevent sidebar from collapsing when clicking .leag-count or .more-league-table
@@ -153,10 +164,35 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+function getLeagueRules(leagueName) {
+    const rulesByLeague = {
+        "Premier League": { championsLeagueSpots: 4, europaLeagueSpots: 2, relegationSpots: 3 },
+        "La Liga": { championsLeagueSpots: 4, europaLeagueSpots: 2, relegationSpots: 3 },
+        "Serie A": { championsLeagueSpots: 4, europaLeagueSpots: 2, relegationSpots: 3 },
+        "Bundesliga": { championsLeagueSpots: 4, europaLeagueSpots: 2, relegationSpots: 2 },
+        "Ligue 1": { championsLeagueSpots: 3, europaLeagueSpots: 2, relegationSpots: 2 },
+        "Eredivisie": { championsLeagueSpots: 2, europaLeagueSpots: 2, relegationSpots: 2 },
+        "Primeira Liga": { championsLeagueSpots: 2, europaLeagueSpots: 2, relegationSpots: 3 },
+        "Scottish Premiership": { championsLeagueSpots: 1, europaLeagueSpots: 2, relegationSpots: 1 },
+        "NPFL": { cafChampionsLeagueSpots: 2, cafConfederationCupSpots: 2, relegationSpots: 3 },
+        // Add more leagues as needed
+    };
+
+    return rulesByLeague[leagueName] || {
+        championsLeagueSpots: 2,
+        europaLeagueSpots: 2,
+        relegationSpots: 2
+    };
+}
+
+
 
 // Generate HTML for the league table
-function generateTableHTML(teams, formMap = {}) {
+function generateTableHTML(teams, formMap = {}, leagueName = "Default League", allTeams = teams) {
+    const { championsLeagueSpots, europaLeagueSpots, relegationSpots, cafChampionsLeagueSpots, cafConfederationCupSpots } = getLeagueRules(leagueName);
     teams.sort((a, b) => b.overall_league_PTS - a.overall_league_PTS);
+    const totalTeams = allTeams.length;
+
     let tableHTML = `
         <div class="table-headers">
             <span class="position-header">Pos</span>
@@ -174,9 +210,37 @@ function generateTableHTML(teams, formMap = {}) {
 
     teams.forEach((team, index) => {
         const form = formMap[team.team_name] || "";
+        const position = index + 1;
+        let rowClass = "";
+        let tooltipText = "";
+
+        if (leagueName === "NPFL") {
+            if (position <= cafChampionsLeagueSpots) {
+                rowClass = "caf-champions-league";
+                tooltipText = "CAF Champions League";
+            } else if (position <= cafChampionsLeagueSpots + cafConfederationCupSpots) {
+                rowClass = "caf-confederation-cup";
+                tooltipText = "CAF Confederation Cup";
+            } else if (position > totalTeams - relegationSpots) {
+                rowClass = "relegation";
+                tooltipText = "Relegation";
+            }
+        } else {
+            if (position <= championsLeagueSpots) {
+                rowClass = "champions-league";
+                tooltipText = "Champions League";
+            } else if (position <= championsLeagueSpots + europaLeagueSpots) {
+                rowClass = "europa-league";
+                tooltipText = "Europa League";
+            } else if (position > totalTeams - relegationSpots) {
+                rowClass = "relegation";
+                tooltipText = "Relegation";
+            }
+        }
+
         tableHTML += `
-            <div class="team-rows">
-                <span class="team-position">${index + 1}</span>
+            <div class="team-rows ${rowClass}">
+                <span class="team-position ${rowClass}" title="${tooltipText}">${position}</span>
                 <div class="team-infos" data-team-key="${team.team_key}">
                     <img src="${team.team_badge}" alt="${team.team_name} Logo" class="team-logo">
                     <span class="teamLeague-name">${team.team_name}</span>
@@ -197,12 +261,14 @@ function generateTableHTML(teams, formMap = {}) {
 }
 
 
+
  // Helper to get date in yyyy-mm-dd format
 function getTodayDate(offset = 0) {
     const date = new Date();
     date.setDate(date.getDate() + offset);
     return date.toISOString().split("T")[0];
 }
+
 
 // Fetch recent match results and build form per team
 async function getRecentForms(leagueId) {

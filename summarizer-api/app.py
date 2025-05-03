@@ -1,123 +1,100 @@
-import re
-from flask import Flask, request, jsonify
-from transformers import pipeline
-from flask_cors import CORS
+from fastapi import FastAPI, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import feedparser
 import hashlib
+import requests
+from datetime import datetime
+from transformers import pipeline
 
-# Initialize Flask app
-app = Flask(__name__)
+app = FastAPI()
 
-# Enable CORS for all domains
-CORS(app)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can specify allowed origins here if needed
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
-# Load Hugging Face summarization pipeline (You can change to other models like T5 or BERT)
+# Initialize Hugging Face summarizer
 summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
-# A simple in-memory cache (for demo purposes, use Redis in production)
+# List of sports news RSS feeds
+rss_feeds = [
+    "http://www.espn.com/espn/rss/news",
+    "http://feeds.bbci.co.uk/sport/rss.xml?edition=uk",
+    "https://www.skysports.com/rss/12040",
+    "https://www.goal.com/en/feeds/news?fmt=rss"
+]
+
+# Simple in-memory cache (for demo, replace with Redis for production)
 cache = {}
 
-# Define a route for text summarization
-@app.route('/summarize', methods=['POST'])
-def summarize():
-    data = request.get_json()
-    text = data.get("text", "")
-    
-    if not text or len(text.strip()) < 30:
-        return jsonify({"error": "Text too short to summarize"}), 400
+# Function to fetch RSS feeds
+def fetch_feed(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.text
+    return None
 
-    # Create a hash of the text to check cache
-    text_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
-
-    # Check if summary is cached
-    if text_hash in cache:
-        return jsonify({"summary": cache[text_hash]})
-
-    try:
-        # Summarization with max_length and min_length constraints for words count
-        max_length = 200  # Aim for maximum 200 words in summary
-        min_length = 150  # Aim for at least 150 words in summary
-
-        summary = summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)[0]['summary_text']
+# Function to process and summarize the feed
+def fetch_and_process_feeds():
+    news_data = []
+    for feed_url in rss_feeds:
+        print(f"Fetching feed: {feed_url}")
+        feed = feedparser.parse(feed_url)
         
-        # Store in cache
-        cache[text_hash] = summary
-        return jsonify({"summary": summary})  # Return the summary string directly
-    except Exception as e:
-        print("Summarization error:", str(e))
-        return jsonify({"error": str(e)}), 500
+        for entry in feed.entries:
+            title = entry.title
+            description = entry.summary
+            link = entry.link
 
+            print(f"Processing article: {title}")
 
-@app.route('/rewrite-title', methods=['POST'])
-def rewrite_title():
-    data = request.json
-    title = data.get("title", "")
-    
-    if not title:
-        return jsonify({"error": "No title provided"}), 400
+            # Check cache to avoid processing the same article again
+            article_hash = hashlib.md5(title.encode('utf-8')).hexdigest()
+            if article_hash in cache:
+                print(f"Article '{title}' already processed.")
+                continue
 
-    # Simple SEO title rewrite: Replace 'Breaking' with 'Latest Update on'
-    seo_title = title.replace("Breaking", "Latest Update on")
+            # Summarize and generate blog
+            try:
+                # Directly summarize using Hugging Face summarizer pipeline
+                summary = summarizer(description, max_length=min(200, len(description.split())), min_length=10, do_sample=False)
+                summary_text = summary[0].get('summary_text', description)  # Fallback to original description if no summary
 
-    # Cache the result using the hash of the title
-    title_hash = hashlib.md5(title.encode('utf-8')).hexdigest()
-    cache[title_hash] = seo_title
+                # Create an object for each news item
+                news_item = {
+                    "title": title,
+                    "description": summary_text,
+                    "link": link,
+                    "pubDate": entry.published,
+                    "image": entry.get("media_thumbnail", [{}])[0].get("url", "")
+                }
+                news_data.append(news_item)
+                cache[article_hash] = True  # Mark as processed
 
-    return jsonify({"seo_title": seo_title})
+            except Exception as e:
+                print(f"Error processing article '{title}': {str(e)}")
 
+    return news_data
 
-@app.route('/generate-blog', methods=['POST'])
-def generate_blog():
-    data = request.get_json()
-    title = data.get("title", "")
-    description = data.get("description", "")
-    
-    if not title or not description:
-        return jsonify({"error": "Title and description are required"}), 400
+@app.on_event("startup")
+async def startup_event():
+    # Run task on startup
+    fetch_and_process_feeds()
 
-    try:
-        # --- Step 1: Improve Title for SEO ---
-        seo_keywords = ["Match Preview", "Transfer News", "Live Updates", "Fixtures", "Team News"]
-        seo_title = title
-        for keyword in seo_keywords:
-            if keyword.lower() not in seo_title.lower():
-                seo_title += f" | {keyword}"
-                break
+# Endpoint to fetch the news
+@app.get("/api/news")
+async def get_news():
+    all_articles = fetch_and_process_feeds()  # Directly get the processed news
+    if not all_articles:
+        return JSONResponse(status_code=404, content={"message": "No news found"})
+    return JSONResponse(content={"news": all_articles})
 
-        # --- Step 2: Extract hashtags ---
-        tag_keywords = ["Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Transfer", "Injury", "Lineups"]
-        tags = [f"#{word.replace(' ', '')}" for word in tag_keywords if re.search(rf"\b{word}\b", description, re.IGNORECASE)]
-        tag_string = " ".join(tags)
-
-        # --- Step 3: Generate blog-style body ---
-        blog_prompt = f"""
-        Write a detailed, professional and engaging 500-word blog article for a sports website.
-        Use short paragraphs, subheadings (like <h2>), and include the key information in the following text:
-
-        "{description}"
-        """
-
-        summary_output = summarizer(blog_prompt, max_length=512, min_length=300, do_sample=False)[0]['summary_text']
-
-        # Wrap content like a WordPress blog post
-        blog_body = f"""
-        <h1>{seo_title}</h1>
-        <p><em>{tag_string}</em></p>
-        <div class="blog-content">
-            <p>{summary_output.replace('. ', '.</p><p>')}</p>
-        </div>
-        """
-
-        return jsonify({
-            "seo_title": seo_title,
-            "tags": tag_string,
-            "blog_body": blog_body.strip()
-        })
-
-    except Exception as e:
-        print("Error in generate-blog:", str(e))
-        return jsonify({"error": str(e)}), 500
-
-
-# Run app
-if __name__ == '__main__':
-    app.run(debug=True)
+# Endpoint to manually trigger feed processing
+@app.get("/trigger-fetch")
+async def trigger_fetch(background_tasks: BackgroundTasks):
+    background_tasks.add_task(fetch_and_process_feeds)
+    return {"message": "Feed processing started in background"}

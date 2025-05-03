@@ -12,25 +12,27 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Function to display the first 5 news items on page load
   async function showInitialNews(sectionId) {
     const newsSection = document.getElementById(sectionId);
-    if (!newsSection) return; // Prevent errors if section not found
- 
+    if (!newsSection || !Array.isArray(window.newsData)) return;
+
     const newsItems = newsSection.querySelectorAll(".news-infomat");
- 
+
     if (newsItems.length > 0) {
-        // Wait for news data to be enhanced before displaying
         for (let i = 0; i < newsItems.length; i++) {
-            await enhanceNews(i, window.newsData[i]);
+            const newsItem = window.newsData[i];
+            if (!newsItem) continue; // Skip undefined
+
+            await enhanceNews(i, newsItem);
         }
- 
+
         newsItems.forEach((item, index) => {
             item.style.display = index < 5 ? "flex" : "none";
         });
- 
-        newsSection.style.display = "flex"; 
+
+        newsSection.style.display = "flex";
         newsSection.style.flexDirection = "column";
     }
-  } 
-  
+}
+
   
   // Toggle news visibility when "See more" is clicked
 function toggleNews(section) {
@@ -211,6 +213,18 @@ async function enhanceNews(index, news) {
     let description = news.description || "No description available.";
     let pubDate = news.pubDate || new Date().toISOString();
 
+    if (!pubDate || pubDate === "undefined") {
+        console.warn("Missing pubDate, setting to current date");
+        return new Date().toISOString();
+    }
+
+    const parsedDate = new Date(pubDate);
+    if (isNaN(parsedDate)) {
+        console.warn("Invalid pubDate:", pubDate);
+        return new Date().toISOString();
+    }
+
+    return parsedDate.toISOString();
     // Generate blog content
     const { seo_title, blog_summary } = await generateBlogContent(title, description);
 
@@ -220,10 +234,11 @@ async function enhanceNews(index, news) {
 }
 
 
-//function to load news
+
+// Function to load news
 async function loadNews() {
     try {
-        const res = await fetch('http://localhost:8000/api/news');
+        const res = await fetch('http://localhost:8000/api/news');  // Change this URL to your FastAPI URL
         const data = await res.json();
 
         if (!Array.isArray(data)) {
@@ -247,8 +262,8 @@ async function loadNews() {
         window.summaries = [];
 
         data.forEach((news, i) => {
-            // Check if pubDate exists, otherwise set it to the current time
-            console.log("Raw pubDate:", news.pubDate); // Check format in console
+            // Ensure pubDate exists and parse it
+            console.log("Raw pubDate:", news.pubDate);
             if (!news.pubDate) {
                 console.warn("Missing pubDate, setting to current date");
                 news.pubDate = new Date().toISOString();  // Fallback to current date if missing
@@ -275,6 +290,7 @@ async function loadNews() {
         console.error('Error loading news:', err);
     }
 }
+
 
 
 

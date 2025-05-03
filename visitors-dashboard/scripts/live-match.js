@@ -124,59 +124,58 @@ async function fetchMatches() {
     }
 }
 
-
-const { DateTime } = luxon;
-
 function getMinutesSince(matchDate, matchTime) {
-    const { DateTime } = luxon;
+    const { DateTime } = luxon; // Access DateTime from the global luxon object
 
-    // Parse the match time in Berlin timezone
     const matchDateTime = DateTime.fromFormat(
         `${matchDate} ${matchTime}`,
         "yyyy-MM-dd HH:mm",
         { zone: "Europe/Berlin" }
     );
 
-    // Current time in Berlin
     const now = DateTime.now().setZone("Europe/Berlin");
-
     const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
     return diffInMinutes > 0 ? diffInMinutes : 0;
 }
 
-function formatToUserLocalTime(date, time) {
-    const { DateTime } = luxon;
+function formatToUserLocalTime(dateStr, timeStr) {
+    try {
+        const { DateTime } = luxon; // Access DateTime from the global luxon object
 
-    // Combine date and time into a full datetime string
-    const matchDateTime = DateTime.fromFormat(
-        `${date} ${time}`,
-        "yyyy-MM-dd HH:mm",
-        { zone: "UTC" }  // Assuming API gives time in UTC
-    );
+        const berlinTime = DateTime.fromFormat(
+            `${dateStr} ${timeStr}`,
+            "yyyy-MM-dd HH:mm",
+            { zone: "Europe/Berlin" }
+        );
 
-    // Convert to user's local timezone
-    return matchDateTime.setZone(DateTime.local().zoneName).toFormat("h:mm a"); // Adjust to 12-hour format
+        return berlinTime
+            .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone) // Convert to user local time
+            .toFormat("hh:mm");
+    } catch (e) {
+        console.error("Time conversion error:", e);
+        return "TBD";
+    }
 }
-
-
 
 // Modify the updateMatches function to use getMinutesSince and formatToUserLocalTime for accurate time
 function updateMatches(matches) {
-    matchesData.live = [];
-    matchesData.highlight = [];
-    matchesData.upcoming = [];
-    matchesData.allHighlights = [];
+    const matchesData = {
+        live: [],
+        highlight: [],
+        upcoming: [],
+        allHighlights: []
+    };
 
-    const now = DateTime.utc();
+    const now = luxon.DateTime.utc();
     const oneWeekAgo = now.minus({ days: 7 });
 
     matches.forEach(match => {
         const status = (match.match_status || "").trim().toLowerCase();
 
         // Convert match time from UTC to local timezone
-        const matchDateTimeLocal = DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`)
+        const matchDateTimeLocal = luxon.DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`)
             .setZone('utc')  // Assuming API gives UTC time
-            .setZone(DateTime.local().zoneName);  // Convert to local timezone
+            .setZone(luxon.DateTime.local().zoneName);  // Convert to local timezone
 
         const isFinished = status === "ft" || status === "finished" || status.includes("pen") || status.includes("after") || parseInt(status) >= 90;
         const isUpcoming = matchDateTimeLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
@@ -199,8 +198,6 @@ function updateMatches(matches) {
 
     renderMatches(matchesData, "live");
 }
-
-
 
 //funtion to render matches
 function renderMatches(matchesData, category, leagues = []) {
@@ -312,7 +309,7 @@ function renderMatches(matchesData, category, leagues = []) {
             `;
         } else {
             league.matches.forEach(match => {
-                const matchUTC = DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`);
+                const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
                 const matchLocal = matchUTC.setZone(DateTime.local().zoneName);  // Correct timezone conversion
 
                 const matchDay = matchLocal.toFormat("MMM d");
@@ -323,7 +320,7 @@ function renderMatches(matchesData, category, leagues = []) {
                 } else if (parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90) {
                     matchTimeDisplay = match.match_status + "'";
                 } else {
-                    matchTimeDisplay = matchLocal.toFormat("h:mm a");
+                    matchTimeDisplay = matchLocal.toFormat("h:mm");
                 }
 
                 html += `
@@ -592,16 +589,16 @@ async function displayLiveMatch(matchId, category) {
                    
                    <div id="football-field" class="field">
                      <!-- Center line and circle -->
-    <div class="center-line"></div>
-    <div class="center-circle"></div>
-    <!-- Left Goal and Penalty Area -->
-    <div class="penalty-arc left-arc"></div>
-    <div class="penalty-arc right-arc"></div>
-    <div class="penalty-box left-box"></div>
-    <div class="penalty-box right-box"></div>
-    <div class="goal left-goal"></div>
-    <div class="goal right-goal"></div>  
-</div>
+                     <div class="center-line"></div>
+                     <div class="center-circle"></div>
+                     <!-- Left Goal and Penalty Area -->
+                     <div class="penalty-arc left-arc"></div>
+                     <div class="penalty-arc right-arc"></div>
+                     <div class="penalty-box left-box"></div>
+                     <div class="penalty-box right-box"></div>
+                     <div class="goal left-goal"></div>
+                     <div class="goal right-goal"></div>  
+                    </div>
 
 
 

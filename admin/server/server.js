@@ -6,14 +6,12 @@ const xml2js = require('xml2js');
 const { User, Data } = require("../database/db");  // ✅ Correct Import
 require("dotenv").config();
 const fetch = require('node-fetch');
-const fetchTopScorersAndDownloadImages = require('./downloadImages');
 
 const app = express();
 const path = require('path');
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use('/assets/images', express.static(path.join(__dirname, 'assets/images')));
 
 
 const bcrypt = require("bcryptjs");
@@ -25,14 +23,6 @@ const users = [
 ];
 
 
-app.get('/api/topscorers/images', async (req, res) => {
-    try {
-        const playerImageMap = await fetchTopScorersAndDownloadImages(true);
-        res.json(playerImageMap);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 
 
 // 🔐 Secure Login Endpoint

@@ -113,60 +113,95 @@ function toggleNews(section) {
   
   
 // Function to summarize the text to 150-200 words using the Flask backend
-async function summarizeText(text) {
+async function summarizeText(title, description) {
     try {
-        const response = await fetch('http://localhost:5000/summarize', {
+        const response = await fetch('http://localhost:8000/summarize', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({
+                title: title,
+                description: description
+            })
         });
 
         const data = await response.json();
         if (!response.ok || data.error) {
             console.warn("Backend error:", data.error || response.statusText);
-            return text; // fallback to original if summarization failed
+            return {
+                title: title,         // fallback to original title
+                summary: description  // fallback to original description
+            };
         }
 
-        // Ensure the summary length is between 150-200 words
         const summary = data.summary;
+        const seoTitle = data.seo_title;
         const wordCount = summary.split(' ').length;
-        if (wordCount < 150) {
-            return summary + " (Extended Summary...)"  // Add filler text if the summary is too short
+
+
+        for (const newsItem of newsList) {
+            const originalTitle = newsItem.title;
+            const originalDescription = newsItem.description;
+        
+            const { title: seoTitle, summary } = await summarizeText(originalTitle, originalDescription);
+        
+            renderNewsCard({
+                title: seoTitle,
+                summary: summary,
+                date: newsItem.date,
+                image: newsItem.image,   // if available
+                link: newsItem.link      // if available
+            });
         }
-        return summary;
+        
+        return {
+            title: seoTitle || title,
+            summary: wordCount < 150 ? summary + " (Extended Summary...)" : summary
+        };
     } catch (error) {
         console.error('Error summarizing text:', error);
-        return text;
+        return {
+            title: title,
+            summary: description
+        };
     }
 }
 
+
 // Function to rewrite the title for SEO
-async function rewriteTitleForSEO(title) {
-    try {
-        const response = await fetch('http://localhost:5000/rewrite-title', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ title })
-        });
+function rewriteTitleForSEO(originalTitle, matchResult = '') {
+    const leagues = ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Champions League', 'Europa League', 'CAF Champions League', 'CAF Confederation Cup'];
+    const players = ['Erling Haaland', 'Kylian Mbappe', 'Cristiano Ronaldo', 'Lionel Messi', 'Victor Osimhen', 'Harry Kane'];
+    const clubs = ['Manchester City', 'Real Madrid', 'Barcelona', 'Bayern Munich', 'Arsenal', 'Napoli', 'PSG', 'Al Nassr'];
 
-        const data = await response.json();
-        console.log("Response from backend:", data); // Log the full response
+    const foundLeague = leagues.find(league => originalTitle.toLowerCase().includes(league.toLowerCase()));
+    const foundPlayer = players.find(player => originalTitle.toLowerCase().includes(player.toLowerCase()));
+    const foundClub = clubs.find(club => originalTitle.toLowerCase().includes(club.toLowerCase()));
 
-        if (data.error) {
-            console.error("Error rewriting title:", data.error);
-            return title; // fallback to original title
-        }
+    // Adding match result to SEO title if available
+    let baseTitle = originalTitle.trim();
 
-        console.log("Fetched SEO Title:", data.seo_title); // Log the fetched title
-        return data.seo_title;
-    } catch (error) {
-        console.error('Error rewriting title:', error);
-        return title;
+    if (matchResult) {
+        baseTitle += ` | Match Result: ${matchResult}`;
     }
+
+    if (foundPlayer && foundLeague) {
+        return `${foundPlayer} Makes Headlines in ${foundLeague} | Latest Update`;
+    } else if (foundPlayer && foundClub) {
+        return `${foundPlayer} Shines for ${foundClub} – Breaking Football News`;
+    } else if (foundClub && foundLeague) {
+        return `${foundClub} in ${foundLeague} Action: Match Highlights & Analysis`;
+    } else if (foundPlayer) {
+        return `${foundPlayer}'s Latest Performance – Must-Read Football Insight`;
+    } else if (foundClub) {
+        return `${foundClub} Update: Match News, Transfers & More`;
+    } else if (foundLeague) {
+        return `${foundLeague} Roundup – Key Matches, Players & Talking Points`;
+    }
+
+    // Fallback
+    return baseTitle.length > 80 ? baseTitle.slice(0, 77) + '...' : baseTitle;
 }
 
 
@@ -188,48 +223,24 @@ async function generateBlogContent(title, description) {
 
 async function enhanceNews(index, news) {
     const newsElement = document.getElementById(`news-${index}`);
-    if (!newsElement) {
-        console.warn(`News element #news-${index} not found`);
-        return;
-    }
-
-    if (!news) {
-        console.warn(`News data missing for index ${index}`);
-        newsElement.style.display = "none"; // Hide broken item
-        return;
-    }
+    if (!newsElement) return;
 
     const titleEl = newsElement.querySelector('.news-header');
     const descEl = newsElement.querySelector('.news-description');
     const timeEl = newsElement.querySelector('.news-time');
 
-    if (!titleEl || !descEl || !timeEl) {
-        console.warn(`Missing elements in news-${index}`);
-        newsElement.style.display = "none"; // Hide broken item
-        return;
-    }
-
     let title = news.title || "Untitled News";
     let description = news.description || "No description available.";
     let pubDate = news.pubDate || new Date().toISOString();
 
-    if (!pubDate || pubDate === "undefined") {
-        console.warn("Missing pubDate, setting to current date");
-        return new Date().toISOString();
-    }
-
-    const parsedDate = new Date(pubDate);
-    if (isNaN(parsedDate)) {
-        console.warn("Invalid pubDate:", pubDate);
-        return new Date().toISOString();
-    }
-
-    return parsedDate.toISOString();
-    // Generate blog content
+    // ✅ Inject SEO-enhanced content
     const { seo_title, blog_summary } = await generateBlogContent(title, description);
+    title = seo_title;
+    description = blog_summary;
 
-    titleEl.textContent = seo_title || title;
-    descEl.textContent = blog_summary || description;
+    // Display
+    titleEl.textContent = title;
+    descEl.textContent = description;
     timeEl.dataset.posted = pubDate;
 }
 
@@ -301,11 +312,9 @@ function createShimmerHTML(news, index) {
                 ${news.image ? `<img src="${news.image}" class="news-image" alt="News Image">` : ''}
             </div>
             <div class="news-messages">
-                <h3 class="news-header shimmer" data-original-title="${encodeURIComponent(news.title || '')}">
-                    ${news.title || "Loading title..."}
-                </h3>
+                <h3 class="news-header">${news.title}</h3>
                 <div class="news-meta">
-                    <p class="news-description shimmer">${news.description || "Loading description..."}</p>
+                    <p class="news-description">${news.description}</p>
                     <p class="news-time" data-posted="${news.pubDate || ''}"></p>
                 </div>
             </div>
@@ -314,15 +323,11 @@ function createShimmerHTML(news, index) {
 }
 
 
+// Automatically call loadNews when the page is reloaded
+document.addEventListener('DOMContentLoaded', function() {
+    loadNews(); // This will run once the page is fully loaded
+});
 
-
-// Start auto-refreshing
-function startAutoRefresh() {
-  if (refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(() => {
-    loadNews();
-  }, refreshIntervalMinutes * 60 * 1000);
-}
 
 
  // Show detailed news view

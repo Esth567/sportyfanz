@@ -204,6 +204,12 @@ body{
     min-height: 100vh; /* Ensure the container takes up the full viewport height */
 }
 
+.page-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+  
 
 .sidebar.collapsed ~ .body-container {
     margin-left: 60px; /* Adjusted margin for collapsed sidebar */
@@ -718,7 +724,8 @@ body{
     overflow: hidden;
     display: flex;
     padding: 10px;
-    margin-top: -10px;
+    overflow-y: auto;
+    padding-bottom: 60px;
 }
 
 .header-slider {
@@ -1251,6 +1258,19 @@ body{
     }
     
 
+    .advert-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 10;
+        background-color: #fff;
+        padding: 10px;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.15);
+        pointer-events: none; /* allows scroll behind */
+      }
+      
+      
 
 /*third layers*/
 .third-layer {
@@ -1459,22 +1479,38 @@ body{
 
 .about-details{
     color: #fff;
-    font-family: 'Lato';
-    font-weight: bold;
 }
 
-.advert-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #ff9900; /* Example background color */
-    color: white;
-    padding: 15px;
-    text-align: center;
-    font-size: 18px;
-    z-index: 999; /* Make sure it's on top of other content */
+.about-details h4{
+    color: #fff;
+    font-family: 'Lato';
+    font-weight: 500;
 }
+
+
+.main-footer {
+    background-color: #111; color: #fff; padding: 2rem 1rem; text-align: center;
+}
+
+.footer-links a {
+    color: #fff; margin: 0 0.5rem;
+
+}
+.footer-social {
+    margin-top: 1rem;
+}
+.footer-social a{
+    margin: 0 0.5rem;
+}
+
+.footer-social ion-icon {
+    font-size: 1.2rem; color: #fff;
+}
+
+
+
+
+
 
 
 /*------------------------------News css------------------------------------ */
@@ -2777,9 +2813,9 @@ body{
   .goal {
     position: absolute;
     width: 50px;
-    height: 95px;
+    height: 110px;
     border: 2px solid;
-    top: calc(50% - 50px);
+    top: calc(50% - 60px);
 }
 .left-goal {
     left: 0;
@@ -2790,9 +2826,9 @@ body{
 
 .penalty-box {
     position: absolute;
-    width: 100px;
-    height: 160px;
-    top: calc(50% - 80px);
+    width: 90px;
+    height: 180px;
+    top: calc(50% - 90px);
     border: 2px solid;
     background-color: #228B22;
 }
@@ -2809,7 +2845,7 @@ body{
     height: 120px;
     border: 2px solid;
     border-radius: 50%;
-    top: calc(50% - 40px);
+    top: calc(50% - 60px);
 }
 .left-arc {
     left: 0;
@@ -2825,18 +2861,27 @@ body{
     border: 4px solid white;
   }
   
-  .player {
+  .player-dot {
+    position: absolute;
+    transform: translate(-50%, -50%);
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    text-align: center;
-    line-height: 30px;
-    font-weight: bold;
     font-size: 12px;
-    position: absolute;
-    border: 1px solid #000;
-  }
-  
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2px;
+    z-index: 3;
+    cursor: pointer;
+}
+
+.player-number {
+    font-weight: bold;
+}
+
 
 
 /* 🟡 players names styling */
@@ -2943,7 +2988,7 @@ body{
     gap: 15px;
 }
 
-.h2h-league-container {
+.h2h-matches-container {
     background: #1f3750; /* Dark background for each league section */
     padding: 15px;
     border-radius: 10px;
@@ -2987,76 +3032,57 @@ body{
     gap: 8px;
 }
 
-.h2h-team-data {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-left: 8px;
-}
-
-/* 🔄 Match Content: Left (Time & FT) & Right (Teams & Scores) */
-.h2h-time {
+.h2h-left-column {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 5px;
-    font-size: 0.60rem;
-    font-family: 'Lato';
-    font-weight: 400;
-    color: white;
-    padding-left: 10px;
-}
-
-/* 🏟️ Right Column: Teams & Scores */
-.h2h-right {
+  }
+  
+  .h2h-match-meta {
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .h2h-teams-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .h2h-team {
     display: flex;
     align-items: center;
-    gap: 15px;
-    width: 100%;
-    justify-content: space-between;
-}
-
-/* 🎽 Team Info */
-.h2h-team {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* 🏅 Team Logos */
-.h2h-logo {
+    flex-direction: row;
+    gap: 3px;
+  }
+  
+  .h2h-badge {
     width: 17px;
     height: 17px;
-    object-fit: cover;
-}
-
-/* 🏷️ Team Names */
-.h2h-team-name {
+    object-fit: contain;
+  }
+  
+  .h2h-score-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-weight: bold;
     font-size: 0.75rem;
-    font-family: 'Lato';
-    color: white;
-    font-weight: 400;
-}
+    gap: 3px;
+  }
 
-/* ⚽ Scores */
-.h2h-matches-scores {
+  .h2h-stats {
+    background: #f8f8f8;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
     font-size: 0.75rem;
-    font-family: 'Lato';
-    font-weight: 400;
-    color: white;
-    text-align: center;
-}
-
-.h2h-match-row {
-    padding: 6px 12px;
-    border-bottom: 1px solid #eee;
-}
-
-.h2h-match-card {
-    padding: 8px;
-    border-bottom: 1px solid #ccc;
-}
-
+  }
+  .h2h-stats p {
+    margin: 4px 0;
+  }
+  
 
 .statistics-data {
     padding: 1rem;
@@ -3193,11 +3219,12 @@ body{
     border-collapse: collapse;
   }
   .standing-table th, .standing-table td {
-    border: 1px solid #ccc;
+    border: 1px solid #70c17194;
     padding: 6px;
     text-align: left;
     font-size: 0.75rem;
     font-family: 'Lato';
+    border-radius: 20px;
   }
 
   .highlight-team {
@@ -3215,19 +3242,19 @@ body{
 
 /* Champions League */
 .ucl {
-    background-color: #70c172;
+    color: #70c172;
     font-weight: bold;
 }
 
 /* Europa League */
 .uel {
-    background-color: #ffc107;
+    color: #ffc107;
     font-weight: bold;
 }
 
 /* Relegation Zone */
 .relegated {
-    background-color: #e03e00;
+    color: #e03e00;
     font-weight: bold;
 }
 

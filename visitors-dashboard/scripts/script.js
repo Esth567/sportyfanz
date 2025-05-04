@@ -395,7 +395,6 @@ fetchTopFourStandings();
 
 
 
-
 // middle hero banner header slider
 let currentIndex = 0;
 const slides = document.querySelectorAll(".slider-content");
@@ -761,9 +760,6 @@ document.querySelector('.calendar').addEventListener('click', () => {
 
 
 
-
-
-
 // Function to display match details with video
 async function displayLiveMatch(matchId, category) {
     
@@ -1123,173 +1119,175 @@ document.querySelectorAll('.category-btn').forEach(button => {
 
 //function for predition-container in middly layer
 
-// List of big leagues
 const bigLeagues = [
-    "Premier League", "La Liga", "Serie A", "Bundesliga", "UEFA Champions League", "Ligue 1", "Ligue 2"
-  ];
-  
-  // Function to get the current date as a string (format: YYYY-MM-DD)
-  function getDateString(offset = 0) {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    return date.toISOString().split('T')[0];
-  }
-  
-  // Function to check if odds are realistic
-  function isRealisticOdds(match) {
-    const odd1 = parseFloat(match.odd_1);
-    const odd2 = parseFloat(match.odd_2);
-    return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
-  }
-  
-  // Listen for DOMContentLoaded to fetch predictions
-  document.addEventListener("DOMContentLoaded", () => {
-    const predictionContainer = document.querySelector('.prediction-container');
-    if (predictionContainer) {
-      fetchTodayPredictions(predictionContainer);
-      setInterval(updateLiveTimers, 60000);
+  "Premier League", "LaLiga", "Serie A", "Bundesliga", 
+  "UEFA Champions League", "Ligue 1", "Ligue 2"
+];
+
+// Standardize league names (map)
+const normalizedLeague = league =>
+  league.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '');
+
+// Function to get today's date in YYYY-MM-DD
+function getDateString(offset = 0) {
+  const date = new Date();
+  date.setDate(date.getDate() + offset);
+  return date.toISOString().split("T")[0];
+}
+
+// Validate odds
+function isRealisticOdds(match) {
+  const odd1 = parseFloat(match.odd_1);
+  const odd2 = parseFloat(match.odd_2);
+  return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
+}
+
+// User timezone
+function getUserTimezone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+function convertMatchTimeToLocalTime(matchTime) {
+  const userTimezone = getUserTimezone();
+  const matchDate = new Date(`${getDateString(0)}T${matchTime}`);
+  return matchDate.toLocaleString("en-US", {
+    timeZone: userTimezone,
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+// Update match timers
+function updateLiveTimers() {
+  const now = new Date();
+  document.querySelectorAll(".live-timer").forEach(span => {
+    const startTime = span.dataset.start;
+    const localTime = convertMatchTimeToLocalTime(startTime);
+    const matchDate = new Date(`${getDateString(0)}T${localTime}`);
+    const diff = Math.floor((now - matchDate) / 60000);
+    if (diff >= 0 && diff <= 120) {
+      span.textContent = `${diff}'`;
+    } else if (diff > 120) {
+      span.textContent = "FT";
+    } else {
+      span.textContent = localTime;
     }
   });
-  
-  // Get the user's local timezone
-  function getUserTimezone() {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-  }
-  
-  // Convert match time to user's local time zone
-  function convertMatchTimeToLocalTime(matchTime) {
-    const userTimezone = getUserTimezone();
-    const matchDate = new Date(`${getDateString(0)} ${matchTime}`);
-  
-    // Convert the match date to the user's local timezone
-    return matchDate.toLocaleString('en-US', { timeZone: userTimezone, hour12: false });
-  }
-  
-  // Update live timers with timezone-aware match time
-  function updateLiveTimers() {
-    const now = new Date();
-    document.querySelectorAll('.live-timer').forEach(span => {
-      const startTime = span.dataset.start;
-      const matchTime = convertMatchTimeToLocalTime(startTime);
-      const matchDate = new Date(matchTime);
-      const diff = Math.floor((now - matchDate) / 60000); // Time difference in minutes
-  
-      if (diff >= 0 && diff <= 120) {
-        span.textContent = `${diff}'`;
-      } else if (diff > 120) {
-        span.textContent = "FT";
-      } else {
-        span.textContent = matchTime; // Show the local time for upcoming matches
-      }
-    });
-  }
-  
-  // Fetch and display predictions
-  async function fetchTodayPredictions(predictionContainer) {
-    const today = getDateString(0);
-  
-    try {
-      const [oddsRes, eventsRes] = await Promise.all([
-        fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${today}&to=${today}&APIkey=${APIkey}`),
-        fetch(`https://apiv3.apifootball.com/?action=get_events&from=${today}&to=${today}&APIkey=${APIkey}`)
-      ]);
-  
-      const oddsData = await oddsRes.json();
-      const eventsData = await eventsRes.json();
-  
-      if (!Array.isArray(oddsData) || !Array.isArray(eventsData)) {
-        predictionContainer.innerHTML = "<p>Unable to load prediction data.</p>";
-        return;
-      }
-  
-      const enrichedMatches = oddsData.map(oddMatch => {
-        const eventDetails = eventsData.find(ev => ev.match_id === oddMatch.match_id);
-        if (!eventDetails) return null;
-  
-        return {
-          ...oddMatch,
-          home: eventDetails.match_hometeam_name,
-          away: eventDetails.match_awayteam_name,
-          homeLogo: eventDetails.team_home_badge,
-          awayLogo: eventDetails.team_away_badge,
-          time: eventDetails.match_time,
-          league_name: eventDetails.league_name,  // <-- Corrected here
-          score: `${eventDetails.match_hometeam_score} - ${eventDetails.match_awayteam_score}`,
-          odd_1: parseFloat(oddMatch.odd_1),
-          odd_2: parseFloat(oddMatch.odd_2)
-        };
-      }).filter(Boolean);
-  
-      const competitiveMatches = enrichedMatches.filter(match =>
-        isRealisticOdds(match) &&
-        bigLeagues.map(l => l.toLowerCase()).includes(match.league_name.trim().toLowerCase())
-      );
-  
-      if (competitiveMatches.length === 0) {
-        predictionContainer.innerHTML = "<p>No big matches with reliable odds today.</p>";
-        return;
-      }
-  
-      startPredictionSlider(predictionContainer, competitiveMatches);
-    } catch (err) {
-      console.error("Prediction fetch error:", err);
-      predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
+}
+
+// Fetch and display predictions
+async function fetchTodayPredictions(predictionContainer) {
+  const today = getDateString(0);
+  try {
+    const [oddsRes, eventsRes] = await Promise.all([
+      fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${today}&to=${today}&APIkey=${APIkey}`),
+      fetch(`https://apiv3.apifootball.com/?action=get_events&from=${today}&to=${today}&APIkey=${APIkey}`)
+    ]);
+
+    const oddsData = await oddsRes.json();
+    const eventsData = await eventsRes.json();
+
+    if (!Array.isArray(oddsData) || !Array.isArray(eventsData)) {
+      predictionContainer.innerHTML = "<p>Unable to load prediction data.</p>";
+      return;
     }
+
+    const enriched = oddsData.map(oddMatch => {
+      const event = eventsData.find(ev => ev.match_id === oddMatch.match_id);
+      if (!event) return null;
+
+      return {
+        match_id: oddMatch.match_id,
+        home: event.match_hometeam_name,
+        away: event.match_awayteam_name,
+        homeLogo: event.team_home_badge,
+        awayLogo: event.team_away_badge,
+        time: event.match_time,
+        league_name: event.league_name,
+        score: `${event.match_hometeam_score} - ${event.match_awayteam_score}`,
+        odd_1: parseFloat(oddMatch.odd_1),
+        odd_2: parseFloat(oddMatch.odd_2)
+      };
+    }).filter(Boolean);
+
+    const filtered = enriched.filter(match => {
+      const leagueNorm = normalizedLeague(match.league_name);
+      return isRealisticOdds(match) &&
+        bigLeagues.some(big => normalizedLeague(big) === leagueNorm);
+    });
+
+    if (filtered.length === 0) {
+      predictionContainer.innerHTML = "<p>No big matches with reliable odds today.</p>";
+      return;
+    }
+
+    startPredictionSlider(predictionContainer, filtered);
+  } catch (error) {
+    console.error("Prediction fetch error:", error);
+    predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
   }
-  
-  let predictionIndex = 0;
-  
-  function startPredictionSlider(predictionContainer, matches) {
-    function showSlide() {
-      // Fade out
-      predictionContainer.classList.remove('fade-in');
-  
-      setTimeout(() => {
-        const match = matches[predictionIndex];
-        const odd1 = parseFloat(match.odd_1);
-        const odd2 = parseFloat(match.odd_2);
-  
-        predictionContainer.innerHTML = `
-          <div class="predition-content">
-            <h4>Who do you think will win</h4>
-            <div class="predit-selection">
-              <div class="team-nam">
-                <span>${match.home}</span>
-                <div class="team-logo">
-                  <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
-                </div>
-                <div class="prediction-number">${odd1}</div>
+}
+
+// Slide logic
+let predictionIndex = 0;
+function startPredictionSlider(container, matches) {
+  function showSlide() {
+    container.classList.remove("fade-in");
+
+    setTimeout(() => {
+      const match = matches[predictionIndex];
+      const odd1 = match.odd_1.toFixed(2);
+      const odd2 = match.odd_2.toFixed(2);
+
+      container.innerHTML = `
+        <div class="predition-content">
+          <h4>Who do you think will win</h4>
+          <div class="predit-selection">
+            <div class="team-nam">
+              <span>${match.home}</span>
+              <div class="team-logo">
+                <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
               </div>
-  
-              <div class="preditScore-status">
-                <h4 class="match-leagueName">${match.league_name}</h4> 
-                <h4 class="match-score">${match.score}</h4>
-                <span class="live-timer" data-start="${match.time}">${match.time}</span>
+              <div class="prediction-number">${odd1}</div>
+            </div>
+
+            <div class="preditScore-status">
+              <h4 class="match-leagueName">${match.league_name}</h4>
+              <h4 class="match-score">${match.score}</h4>
+              <span class="live-timer" data-start="${match.time}">${match.time}</span>
+            </div>
+
+            <div class="team-nam">
+              <span>${match.away}</span>
+              <div class="team-logo">
+                <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
               </div>
-  
-              <div class="team-nam">
-                <span>${match.away}</span>
-                <div class="team-logo">
-                  <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
-                </div>
-                <div class="prediction-number">${odd2}</div>
-              </div>
+              <div class="prediction-number">${odd2}</div>
             </div>
           </div>
-        `;
-  
-        updateLiveTimers();
-        predictionContainer.classList.add('fade-in'); // Fade in
-        predictionIndex = (predictionIndex + 1) % matches.length;
-      }, 200); // Give time for fade-out to finish
-    }
-  
-    showSlide(); // Show first slide immediately
-    setInterval(showSlide, 10000); // Change every 10 seconds
-  }  
-  
+        </div>
+      `;
 
-  
+      updateLiveTimers();
+      container.classList.add("fade-in");
+      predictionIndex = (predictionIndex + 1) % matches.length;
+    }, 200);
+  }
+
+  showSlide();
+  setInterval(showSlide, 10000);
+}
+
+// Initialize
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.querySelector(".prediction-container");
+  if (container) {
+    fetchTodayPredictions(container);
+    setInterval(updateLiveTimers, 60000);
+  }
+});
+
 
 
 // menu toggle button for sidebar for mobile view

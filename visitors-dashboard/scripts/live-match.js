@@ -26,41 +26,19 @@ function getTodayDate(offset = 0) {
     return date.toISOString().split("T")[0];
 }
 
-function displayMatchesByLeagueId(leagueId, leagueName, initialCategory = "live") {
-    const categoryOrder = ["live", "highlight", "upcoming"];
-    const startIndex = categoryOrder.indexOf(initialCategory);
+function displayMatchesByLeagueId(leagueId, leagueName, category) {
+    selectedLeagueId = leagueId;
+    selectedLeagueName = leagueName;
 
-    if (!leagueId) {
-        console.warn("No league ID selected. Falling back to all matches.");
-        renderMatches(matchesData, initialCategory); // make sure initialCategory is used
-        return;
-    }
-    
+    // Refetch if necessary, or filter from existing global matchesData
+    const leagueMatches = Object.fromEntries(
+        Object.entries(matchesData).map(([key, matches]) => [
+            key,
+            matches.filter(match => match.league_id === leagueId)
+        ])
+    );
 
-    function tryNextCategory(index) {
-        if (index >= categoryOrder.length) {
-            document.querySelector(".matches").innerHTML = `<p>No matches available for ${leagueName}.</p>`;
-            return;
-        }
-
-        const currentCategory = categoryOrder[index];
-        const matches = matchesData[currentCategory] || [];
-
-        let filtered = matches.filter(match => match.league_id === leagueId);
-
-        if (currentCategory === "highlight" && filtered.length === 0) {
-            filtered = matchesData.allHighlights.filter(m => m.league_id === leagueId);
-        }
-
-       if (filtered.length > 0 || currentCategory === initialCategory) {
-    renderMatches({ [currentCategory]: filtered }, currentCategory);
-} else {
-    tryNextCategory(index + 1);
-}
-
-    }
-
-    tryNextCategory(startIndex);    
+    renderMatches(leagueMatches, category);
 }
 
 
@@ -104,78 +82,105 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
             }
         });
 
-        fetchMatches();
+        fetchAndRenderMatches();
     });
 
 
+    // === LUXON Time Functions ===
+    function getMinutesSince(matchDate, matchTime) {
+        const { DateTime } = luxon;
+    
+        const matchDateTime = DateTime.fromFormat(
+            `${matchDate} ${matchTime}`,
+            "yyyy-MM-dd HH:mm",
+            { zone: "Europe/Berlin" }
+        );
+    
+        const now = DateTime.now().setZone("Europe/Berlin");
+        const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
+        return diffInMinutes > 0 ? diffInMinutes : 0;
+    }
+    
+    function formatToUserLocalTime(dateStr, timeStr) {
+        try {
+            const { DateTime } = luxon;
+    
+            const berlinTime = DateTime.fromFormat(
+                `${dateStr} ${timeStr}`,
+                "yyyy-MM-dd HH:mm",
+                { zone: "Europe/Berlin" }
+            );
+    
+            return berlinTime
+                .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+                .toFormat("hh:mm");
+        } catch (e) {
+            console.error("Time conversion error:", e);
+            return "TBD";
+        }
+    }
+
 //function to fetch matches
-async function fetchMatches() {
+async function fetchAndRenderMatches() {
     const spinner = document.getElementById("loading-spinner");
-    if (spinner) spinner.style.display = "block";
+    spinner.style.display = "flex";
 
     try {
         const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-7)}&to=${getTodayDate(7)}&APIkey=${APIkey}`);
         const data = await response.json();
-        updateMatches(data);
+
+        // Debugging: Check the raw data
+        console.log("Fetched Match Data: ", data);
+
+        matchesData = {
+            live: data.filter(match => {
+                // Ensure that match_status is an integer or has valid values for live matches
+                const status = match.match_status.trim().toLowerCase();
+                return status === "live" || (parseInt(status) > 0 && parseInt(status) < 90); // Or another appropriate condition
+            }),
+            highlight: data.filter(match => match.match_status === "Finished"),
+            upcoming: data.filter(match => match.match_status === "" || match.match_status === null),
+        };
+        
+
+        // Debugging: Check the categorized data
+        console.log("Live Matches: ", matchesData.live);
+        console.log("Highlight Matches: ", matchesData.highlight);
+        console.log("Upcoming Matches: ", matchesData.upcoming);
+
+        // Reset selected league
+        selectedLeagueId = null;
+        selectedLeagueName = null;
+
+        renderMatches(matchesData, "live");
     } catch (error) {
-        console.error("Fetch error:", error);
+        console.error("Error fetching match data:", error);
+        document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
     } finally {
-        if (spinner) spinner.style.display = "none";
+        spinner.style.display = "none";
     }
 }
 
-function getMinutesSince(matchDate, matchTime) {
-    const { DateTime } = luxon; // Access DateTime from the global luxon object
 
-    const matchDateTime = DateTime.fromFormat(
-        `${matchDate} ${matchTime}`,
-        "yyyy-MM-dd HH:mm",
-        { zone: "Europe/Berlin" }
-    );
 
-    const now = DateTime.now().setZone("Europe/Berlin");
-    const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
-    return diffInMinutes > 0 ? diffInMinutes : 0;
-}
-
-function formatToUserLocalTime(dateStr, timeStr) {
-    try {
-        const { DateTime } = luxon; // Access DateTime from the global luxon object
-
-        const berlinTime = DateTime.fromFormat(
-            `${dateStr} ${timeStr}`,
-            "yyyy-MM-dd HH:mm",
-            { zone: "Europe/Berlin" }
-        );
-
-        return berlinTime
-            .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone) // Convert to user local time
-            .toFormat("hh:mm");
-    } catch (e) {
-        console.error("Time conversion error:", e);
-        return "TBD";
-    }
-}
-
-// Modify the updateMatches function to use getMinutesSince and formatToUserLocalTime for accurate time
+// Modify the updateMatches function to use correct timezone conversion
 function updateMatches(matches) {
-    const matchesData = {
+    matchesData = {
         live: [],
         highlight: [],
         upcoming: [],
         allHighlights: []
     };
 
-    const now = luxon.DateTime.utc();
+    const now = luxon.DateTime.utc();  // Get the current time in UTC
     const oneWeekAgo = now.minus({ days: 7 });
 
     matches.forEach(match => {
         const status = (match.match_status || "").trim().toLowerCase();
 
-        // Convert match time from UTC to local timezone
-        const matchDateTimeLocal = luxon.DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`)
-            .setZone('utc')  // Assuming API gives UTC time
-            .setZone(luxon.DateTime.local().zoneName);  // Convert to local timezone
+        // Convert match time from UTC to local timezone (Ensure that match times are in UTC and are converted correctly)
+        const matchDateTimeUTC = luxon.DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`, { zone: "utc" }); // Treat as UTC explicitly
+        const matchDateTimeLocal = matchDateTimeUTC.setZone(luxon.DateTime.local().zoneName);  // Convert to local timezone explicitly
 
         const isFinished = status === "ft" || status === "finished" || status.includes("pen") || status.includes("after") || parseInt(status) >= 90;
         const isUpcoming = matchDateTimeLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
@@ -186,81 +191,70 @@ function updateMatches(matches) {
         if (isFinished) matchesData.allHighlights.push(match);
         if (isUpcoming) matchesData.upcoming.push(match);
 
-        // Calculate minutes since the match started
-        const minutesSinceMatch = getMinutesSince(match.match_date, match.match_time);
+        // Format the match time to the user's local time
+        const formattedMatchTime = matchDateTimeLocal.toFormat("h:mm a");  // Format the time in a readable local format
 
-        // Format match time to user's local time for display
-        const formattedMatchTime = formatToUserLocalTime(match.match_date, match.match_time);
-
-        // Use formatted time and minutes to display or process match status
-        console.log(`Match: ${match.match_hometeam_name} vs ${match.match_awayteam_name} - Time: ${formattedMatchTime} - Minutes Since Start: ${minutesSinceMatch}`);
+        console.log(`Match: ${match.match_hometeam_name} vs ${match.match_awayteam_name} - Time: ${formattedMatchTime}`);
     });
 
     renderMatches(matchesData, "live");
 }
 
+
 //funtion to render matches
-function renderMatches(matchesData, category, leagues = []) {
+function renderMatches(matchesData, category) {
     const matchesContainer = document.querySelector(".matches");
-    if (!matchesContainer) {
-        console.error("matches-container element not found.");
+    if (!matchesContainer) return;
+
+    const selectedMatches = matchesData[category] || [];
+
+    if (selectedMatches.length === 0) {
+        matchesContainer.innerHTML = `<p>No ${category} matches found.</p>`;
         return;
     }
 
-    let selectedMatches = matchesData[category];
-
-    const leagueLogos = {};
-    leagues.forEach(league => {
-        leagueLogos[league.league_id] = league.league_logo || "assets/images/default-league.png";
-    });
-
-    let grouped = (selectedMatches || []).reduce((acc, match) => {
-        const key = match.league_id;
-        if (!acc[key]) {
-            acc[key] = {
+    // Group matches by league_id
+    const grouped = selectedMatches.reduce((acc, match) => {
+        const leagueId = match.league_id;
+        if (!acc[leagueId]) {
+            acc[leagueId] = {
                 league: match.league_name,
                 country: match.country_name,
                 league_logo: match.league_logo,
                 matches: []
             };
         }
-        acc[key].matches.push(match);
+        acc[leagueId].matches.push(match);
         return acc;
     }, {});
 
-    if (Object.keys(grouped).length === 0) {
-        const defaultLogo = leagueLogos[selectedLeagueId] || "assets/images/default-league.png";
-        grouped[selectedLeagueId] = {
-            league: selectedLeagueName,
-            country: "",
-            league_logo: defaultLogo,
-            matches: []
-        };
-    }
-
-    let html = "";
-    let firstLeague = true;
-
+    // Sort leagues by priority
     const preferredLeagues = [
         { name: "Premier League", country: "England" },
         { name: "La Liga", country: "Spain" },
         { name: "Bundesliga", country: "Germany" },
-        { name: "UEFA Champions League", country: "eurocups" }
+        { name: "UEFA Champions League", country: "eurocups" },
+        { name: "Serie A", country: "Italy" },
+        { name: "NPFL", country: "Nigeria" }
     ];
 
-    let leagueArray = Object.values(grouped);
-
-    leagueArray.sort((a, b) => {
+    const leagueArray = Object.values(grouped).sort((a, b) => {
         const indexA = preferredLeagues.findIndex(l => l.name === a.league && l.country === a.country);
         const indexB = preferredLeagues.findIndex(l => l.name === b.league && l.country === b.country);
-
         if (indexA === -1 && indexB === -1) return 0;
         if (indexA === -1) return 1;
         if (indexB === -1) return -1;
         return indexA - indexB;
     });
 
-    leagueArray.forEach(league => {
+    let html = "";
+
+    leagueArray.forEach((league, index) => {
+        if (league.matches.length === 0) return;
+
+        const leagueId = league.matches[0].league_id;
+        const isCurrentLeagueSelected = selectedLeagueId && selectedLeagueId === leagueId;
+
         html += `
         <div class="league-header">
             <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
@@ -273,18 +267,15 @@ function renderMatches(matchesData, category, leagues = []) {
                 <a href="#" id="toggle-${league.league}">See All</a>
             </div>
         </div>
-        <div class="league-container ${firstLeague ? "first-league" : "other-league"}">`;
+        <div class="league-container">`;
 
-        if (firstLeague) {
-            selectedLeagueId = selectedLeagueId || league.matches[0]?.league_id || leagueId;
-            selectedLeagueName = selectedLeagueName || league.league;
-
+        // Add category buttons only for the first league
+        if (index === 0 && !selectedLeagueId) {
             html += `
             <div class="matches-header">
-               <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="displayMatchesByLeagueId('${selectedLeagueId}', '${selectedLeagueName}', 'live')">Live</div>
-               <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="displayMatchesByLeagueId('${selectedLeagueId}', '${selectedLeagueName}', 'highlight')">Highlight</div>
-               <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="displayMatchesByLeagueId('${selectedLeagueId}', '${selectedLeagueName}', 'upcoming')">Upcoming</div>
-
+                <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesByCategory('live')">Live</div>
+                <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesByCategory('highlight')">Highlight</div>
+                <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesByCategory('upcoming')">Upcoming</div>
                 <div class="calendar-wrapper" style="position: relative;">
                     <div class="match-category-btn calendar" onclick="toggleCalendar()">
                         <ion-icon name="calendar-outline"></ion-icon>
@@ -292,62 +283,49 @@ function renderMatches(matchesData, category, leagues = []) {
                     <input type="date" id="match-date" onchange="filterByDate('${category}')" style="display: none;">
                 </div>
             </div>`;
-            firstLeague = false;
         }
 
         html += `<div class="match-category-content">`;
 
-        if (league.matches.length === 0) {
+        league.matches.forEach(match => {
+            const matchUTC = luxon.DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`);
+            const matchLocal = matchUTC.setZone(luxon.DateTime.local().zoneName);
+            const matchDay = matchLocal.toFormat("MMM d");
+
+            let matchMinute;
+
+            if (category === "highlight") {
+                matchMinute = "FT";
+            } else if (category === "live") {
+                matchMinute = parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90 ? `${match.match_status}'` : matchLocal.toFormat("h:mm");
+            } else if (category === "upcoming") {
+                matchMinute = matchLocal.toFormat("h:mm a");  // Display time for upcoming matches
+            }
+
             html += `
-                <div class="match-row no-match-message">
-                    <p style="text-align: center; color: #888; font-style: italic;">
-                        ${category === "live" ? "No live matches available for this league at the moment." :
-                          category === "highlight" ? "No completed matches available for this league." :
-                          "No upcoming matches available for this league."}
-                    </p>
-                </div>
-            `;
-        } else {
-            league.matches.forEach(match => {
-                const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
-                const matchLocal = matchUTC.setZone(DateTime.local().zoneName);  // Correct timezone conversion
-
-                const matchDay = matchLocal.toFormat("MMM d");
-
-                let matchTimeDisplay = "";
-                if (category === "highlight") {
-                    matchTimeDisplay = "FT";
-                } else if (parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90) {
-                    matchTimeDisplay = match.match_status + "'";
-                } else {
-                    matchTimeDisplay = matchLocal.toFormat("h:mm");
-                }
-
-                html += `
-                <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-                    <div class="matches-teams">
-                        <div class="matches-time">
-                            ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
-                            <div>${matchTimeDisplay}</div>
+            <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
+                <div class="matches-teams">
+                    <div class="matches-time">
+                        ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
+                        <div>${matchMinute}</div>
+                    </div>
+                    <div class="matches-datas">
+                        <div class="matches-team">
+                            <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
+                            <span>${match.match_hometeam_name}</span>
                         </div>
-                        <div class="matches-datas">
-                            <div class="matches-team">
-                                <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
-                                <span>${match.match_hometeam_name}</span>
-                            </div>
-                            <div class="matches-team">
-                                <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
-                                <span>${match.match_awayteam_name}</span>
-                            </div>
-                        </div>
-                        <div class="matches-scores">
-                            <div class="score">${match.match_hometeam_score ?? "-"}</div>
-                            <div class="score">${match.match_awayteam_score ?? "-"}</div>
+                        <div class="matches-team">
+                            <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
+                            <span>${match.match_awayteam_name}</span>
                         </div>
                     </div>
-                </div>`;
-            });
-        }
+                    <div class="matches-scores">
+                        <div class="score">${match.match_hometeam_score ?? "-"}</div>
+                        <div class="score">${match.match_awayteam_score ?? "-"}</div>
+                    </div>
+                </div>
+            </div>`;
+        });
 
         html += `</div></div>`;
     });
@@ -355,31 +333,73 @@ function renderMatches(matchesData, category, leagues = []) {
     matchesContainer.innerHTML = html;
 }
 
+// Filter the matches based on category (live, highlight, upcoming)
+function filterMatchesByCategory(category) {
+    selectedLeagueId = null; // Reset selected league
+    selectedLeagueName = null; // Reset selected league name
+    renderMatches(matchesData, category);
+}
+
+// Event listener for category button click
+document.querySelectorAll(".match-category-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        const category = button.textContent.toLowerCase();
+        filterMatchesByCategory(category);
+    });
+});
+
+
+
+
 
 // Function to filter matches by the selected date
 function filterByDate(category) {
-    const inputDate = document.getElementById("match-date").value;
-    if (!inputDate) return;
+    const selectedDate = document.getElementById("match-date").value;
+    if (!selectedDate) return;
 
-    const selectedDate = DateTime.fromISO(inputDate).toISODate(); // Ensures YYYY-MM-DD format
+    const from = selectedDate;
+    const to = selectedDate;
 
-    const filteredMatches = matchesData[category].filter(match => {
-        const matchDate = DateTime.fromISO(match.match_date).toISODate(); // Same format
-        return matchDate === selectedDate;
-    });
+    fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`)
+        .then(res => res.json())
+        .then(data => {
+            const filtered = {
+                live: [],
+                highlight: [],
+                upcoming: []
+            };
 
-    const selectedLeagueMatches = filteredMatches.filter(match => match.league_id === selectedLeagueId);
+            data.forEach(match => {
+                const status = match.match_status.toLowerCase();
 
-    const grouped = {
-        [selectedLeagueId]: {
-            league: selectedLeagueName,
-            country: selectedLeagueCountry || "",
-            league_logo: selectedLeagueLogo || "assets/images/default-league.png",
-            matches: selectedLeagueMatches
-        }
-    };
+                if (status.includes("ht") || parseInt(status) > 0) {
+                    filtered.live.push(match);
+                } else if (status === "ft") {
+                    filtered.highlight.push(match);
+                } else {
+                    filtered.upcoming.push(match);
+                }
+            });
 
-    renderMatches({ [category]: filteredMatches }, category, Object.values(grouped));
+            // Save new filtered dataset
+            matchesData = filtered;
+
+            // Filter by current league if one is selected
+            let filteredData = filtered;
+            if (selectedLeagueId) {
+                filteredData = Object.fromEntries(
+                    Object.entries(filtered).map(([key, matches]) => [
+                        key,
+                        matches.filter(m => m.league_id === selectedLeagueId)
+                    ])
+                );
+            }
+
+            renderMatches(filteredData, category);
+        })
+        .catch(err => {
+            console.error("Date filter fetch error:", err);
+        });
 }
 
 
@@ -407,7 +427,7 @@ async function fetchMatchVideo(matchId) {
             return null;
         }
     } catch (error) {
-        console.error("❌ Error fetching match video:", error);
+        console.error("❌ Error fetching match video:", error);                 
         return null;
     }
 }
@@ -505,10 +525,6 @@ async function displayLiveMatch(matchId, category) {
             const tab = this.dataset.tab;
             tabContentDiv.innerHTML = getTabContent(tab, match, APIkey);
     
-            // ✅ Remove this, because H2H is now loaded inside getTabContent
-          if (tab === "h2h") {
-                loadH2HData(match.match_id, APIkey, 5);
-            }
     
             if (tab === "lineups") {
                 // Only render formation after the tab is active
@@ -585,7 +601,6 @@ async function displayLiveMatch(matchId, category) {
                         </div>
                     </div>
 
-            
                    
                    <div id="football-field" class="field">
                      <!-- Center line and circle -->
@@ -599,8 +614,6 @@ async function displayLiveMatch(matchId, category) {
                      <div class="goal left-goal"></div>
                      <div class="goal right-goal"></div>  
                     </div>
-
-
 
                     <div class="lineup-players-names">
                         <h4>Players</h4>
@@ -624,24 +637,31 @@ async function displayLiveMatch(matchId, category) {
                 `;
 
                 case "h2h":
-                    // 🔄 Dynamically fetch H2H data
-                    console.log("📦 Full match object for H2H:", match);
+            // Dynamically fetch H2H data
+            console.log("📦 Full match object for H2H:", match);
 
-                    // Fetch H2H using team names, not match ID
-                    if (match.match_hometeam_name && match.match_awayteam_name) {
-                        setTimeout(() => loadH2HData(APIkey, match.match_hometeam_name, match.match_awayteam_name, 10), 0);
-                    }
+            // Fetch H2H using team names, not match ID
+            if (match.match_hometeam_name && match.match_awayteam_name) {
+                setTimeout(() => loadH2HData(APIkey, match.match_hometeam_name, match.match_awayteam_name, 10), 0);
+            }
 
-                    return `
-                     <div class="h2h-header">
-                       <h3>H2H</h3>
-                       <h4>${match.match_hometeam_name}</h4>
-                       <h4>${match.match_awayteam_name}</h4>
-                      </div>
-                      <div class="h2h-header-line"></div>
-                       <div class="spinner" id="h2h-spinner"></div>
-                      <div class="h2h-matches-container" id="h2h-matches"></div>
-                   `;
+            case "h2h":
+    console.log("📦 Full match object for H2H:", match);
+
+    if (match.match_hometeam_name && match.match_awayteam_name) {
+        setTimeout(() => loadH2HData(APIkey, match.match_hometeam_name, match.match_awayteam_name, 10), 0);
+    }
+
+    return `
+        <div class="h2h-header">
+            <h3>H2H</h3>
+            <h4>${match.match_hometeam_name}</h4>
+            <h4>${match.match_awayteam_name}</h4>
+        </div>
+        <div class="h2h-header-line"></div>
+        <div class="spinner" id="h2h-spinner"></div>
+        <div class="h2h-matches-container" id="h2h-matches"></div>
+    `;
 
                 case "statistics":
                     // Trigger statistics loading before returning the UI container
@@ -715,75 +735,131 @@ async function loadMatchStatistics(match_id, APIkey, match) {
     }
 }
 
+function loadH2HData(APIkey, homeTeam, awayTeam) {
+    const spinner = document.querySelector("#h2h-spinner");
+    const h2hMatchesContainer = document.querySelector("#h2h-matches");
 
-
-//function to load h2h
-async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
-    const spinner = document.getElementById('h2h-spinner');
-    const container = document.getElementById('h2h-matches');
-
-    if (!spinner || !container) return;
-
-    spinner.style.display = 'block';
-    container.innerHTML = '';
-
-    if (!APIkey) {
-        console.error("❌ Missing API Key");
-        container.innerHTML = `<p style="color:red;">Missing API Key.</p>`;
-        spinner.style.display = 'none';
-        return;
-    }
-    
-    if (!homeTeam || !awayTeam) {
-        console.error("❌ Missing team names for H2H");
-        container.innerHTML = `<p style="color:red;">Missing team names.</p>`;
-        spinner.style.display = 'none';
+    if (!spinner || !h2hMatchesContainer) {
+        console.error('Missing DOM elements for H2H.');
         return;
     }
 
-    const fromYear = new Date().getFullYear() - 2; // 2 years back
-    const fromDate = `${fromYear}-01-01`;
-    const toDate = `${new Date().getFullYear()}-12-31`;
+    spinner.style.display = "block";
 
-    const url = `https://apiv3.apifootball.com/?action=get_H2H&firstTeam=${encodeURIComponent(homeTeam)}&secondTeam=${encodeURIComponent(awayTeam)}&from=${fromDate}&to=${toDate}&APIkey=${APIkey}`;
-   
+    const url = `https://apiv3.apifootball.com/?action=get_H2H&firstTeam=${encodeURIComponent(homeTeam)}&secondTeam=${encodeURIComponent(awayTeam)}&APIkey=${APIkey}`;
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log("📥 H2H API Response:", data);
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            spinner.style.display = "none";
 
-        if (data.error) {
-            container.innerHTML = `<p style="color:red;">API Error: ${data.error}</p>`;
-            return;
-        }
+            const h2hArray = data.firstTeam_VS_secondTeam;
 
+            if (!Array.isArray(h2hArray) || !h2hArray.length) {
+                h2hMatchesContainer.innerHTML = "<p>No H2H data available.</p>";
+                return;
+            }
 
-        const matches = data?.h2h || [];
+            const fiveYearsAgo = new Date();
+            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
 
+            const filtered = h2hArray.filter(match => {
+                const matchDate = new Date(match.match_date);
+                return !isNaN(matchDate) && matchDate >= fiveYearsAgo;
+            });
 
-        if (!matches.length) {
-            container.innerHTML = `<p>No H2H data available</p>`;
-            return;
-        }
+            if (!filtered.length) {
+                h2hMatchesContainer.innerHTML = "<p>No H2H matches in the last 5 years.</p>";
+                return;
+            }
 
-        const filtered = matches.slice(0, limit);
+            const grouped = {};
+            filtered.forEach(match => {
+                const league = match.match_league_name || "Unknown Competition";
+                if (!grouped[league]) grouped[league] = [];
+                grouped[league].push(match);
+            });
 
-        container.innerHTML = filtered.map(match => `
-            <div class="h2h-match-card">
-                <p><strong>${match.match_date}</strong> - ${match.match_hometeam_name} ${match.match_hometeam_score} : ${match.match_awayteam_score} ${match.match_awayteam_name}</p>
-            </div>
-        `).join("");
+            const h2hContent = Object.entries(grouped).map(([leagueName, matches]) => {
+                const sortedMatches = matches.sort((a, b) => new Date(b.match_date) - new Date(a.match_date));
 
-    } catch (err) {
-        console.error("❌ H2H fetch error:", err);
-        container.innerHTML = `<p style="color:red;">Error fetching H2H data.</p>`;
-    } finally {
-        spinner.style.display = 'none';
-        console.log("✅ H2H load complete");
-    }
+                // Aggregate stats
+                let homeWins = 0, awayWins = 0, draws = 0, homeGoals = 0, awayGoals = 0;
+
+                sortedMatches.forEach(match => {
+                    const homeScore = parseInt(match.match_hometeam_score);
+                    const awayScore = parseInt(match.match_awayteam_score);
+
+                    if (!isNaN(homeScore) && !isNaN(awayScore)) {
+                        homeGoals += homeScore;
+                        awayGoals += awayScore;
+
+                        if (homeScore > awayScore) homeWins++;
+                        else if (awayScore > homeScore) awayWins++;
+                        else draws++;
+                    }
+                });
+
+                const statsHTML = `
+                    <div class="h2h-stats">
+                        <p><strong>Total Matches:</strong> ${sortedMatches.length}</p>
+                        <p><strong>${homeTeam} Wins:</strong> ${homeWins}</p>
+                        <p><strong>${awayTeam} Wins:</strong> ${awayWins}</p>
+                        <p><strong>Draws:</strong> ${draws}</p>
+                        <p><strong>${homeTeam} Goals:</strong> ${homeGoals}</p>
+                        <p><strong>${awayTeam} Goals:</strong> ${awayGoals}</p>
+                    </div>
+                `;
+
+                const matchHTML = sortedMatches.map(match => `
+                    <div class="h2h-match">
+                        
+                        <div class="h2h-teams-info">
+                        <div class="h2h-match-meta">
+                            <p class="h2h-match-date">${match.match_date}</p>
+                            <p class="h2h-match-time">${
+                               (!isNaN(parseInt(match.match_hometeam_score)) && !isNaN(parseInt(match.match_awayteam_score)))
+                              ? "FT"
+                              : match.match_time
+                            }</p>
+
+                        </div>
+                            <div class="h2h-team">
+                                <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="h2h-badge">
+                                <p>${match.match_hometeam_name}</p>
+                            </div>
+                            <div class="h2h-score-column">
+                                <p class="score">${match.match_hometeam_score}</p>
+                                <p class="score">${match.match_awayteam_score}</p>
+                            </div>
+                            <div class="h2h-team">
+                                <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="h2h-badge">
+                                <p>${match.match_awayteam_name}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join("");
+
+                return `
+                    <div class="h2h-league-group">
+                        <h3 class="h2h-league-name">${leagueName}</h3>
+                        ${statsHTML}
+                        ${matchHTML}
+                    </div>
+                `;
+            }).join("");
+
+            h2hMatchesContainer.innerHTML = h2hContent;
+        })
+        .catch(err => {
+            console.error("Error fetching H2H data:", err);
+            spinner.style.display = "none";
+            h2hMatchesContainer.innerHTML = "<p>Error loading H2H data.</p>";
+        });
 }
-
 
 
 
@@ -854,126 +930,125 @@ async function loadH2HData(APIkey, homeTeam, awayTeam, limit = 10) {
      
   
   // Function to fetch player data
- 
-  async function fetchAndRenderLineups(matchId) {
-    try {
-      const response = await fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${matchId}&APIkey=${APIkey}`);
-      const data = await response.json();
-      console.log('Lineup API response:', data); // Log the response to inspect the data
-  
-      if (!data || !data[0] || !data[0].lineup) {
-        console.error('Lineup data is missing or malformed:', data);
-        return;
-      }
-  
-      const lineups = data[0].lineup;
+  function fetchAndRenderLineups(match_id, match) {
+    fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${match_id}&APIkey=${APIkey}`)
+        .then(res => res.json())
+        .then(data => {
+            const lineups = data[match_id]?.lineup;
+            if (!lineups) {
+                console.warn("No lineup data found for match_id:", match_id);
+                return;
+            }
 
-      if (!lineups || !lineups.home_team || !lineups.away_team) {
-        console.error('Lineup data is missing.');
-        return;
+            const homeFormation = match?.match_hometeam_system || "4-4-2";
+            const awayFormation = match?.match_awayteam_system || "4-4-2";
+            const homePlayers = lineups.home?.starting_lineups || [];
+            const awayPlayers = lineups.away?.starting_lineups || [];
+
+            renderPlayersOnField("home", homePlayers, homeFormation, "home");
+            renderPlayersOnField("away", awayPlayers, awayFormation, "away");
+        })
+        .catch(err => console.error("Error fetching lineups:", err));
+}
+
+
+      function parseFormation(formationString, players) {
+        const defaultFormation = "4-4-2";
+    
+        if (!formationString || typeof formationString !== "string") {
+            console.warn("Formation missing or invalid. Using default:", defaultFormation);
+            return defaultFormation.split("-").map(Number);
+        }
+    
+        const parts = formationString.split("-").map(p => parseInt(p.trim()));
+    
+        // Check all parts are numbers and total outfield = 10
+        const isValid = parts.every(n => Number.isInteger(n) && n > 0) &&
+                        parts.reduce((a, b) => a + b, 0) === 10;
+    
+        if (!isValid) {
+            console.warn("Malformed formation. Falling back to default:", defaultFormation);
+            return defaultFormation.split("-").map(Number);
+        }
+    
+        return parts;
     }
     
-  
-      const homeFormation = lineups.home_team.formation;
-      const awayFormation = lineups.away_team.formation;
-  
-      const homePlayers = [
-        ...lineups.home_team.starting_lineups.map(p => ({
-          player_name: p.player_name || '',
-          number: p.player_number || ''
-        }))
-      ];
-  
-      const awayPlayers = [
-        ...lineups.away_team.starting_lineups.map(p => ({
-          player_name: p.player_name || '',
-          number: p.player_number || ''
-        }))
-      ];
-  
-      renderTeamsOnField('4-3-3', '4-2-3-1', [
-        {number: '1'}, {number: '2'}, {number: '3'}, {number: '4'}, {number: '5'},
-        {number: '6'}, {number: '7'}, {number: '8'}, {number: '9'}, {number: '10'}, {number: '11'}
-      ], [
-        {number: '1'}, {number: '12'}, {number: '13'}, {number: '14'}, {number: '15'},
-        {number: '16'}, {number: '17'}, {number: '18'}, {number: '19'}, {number: '20'}, {number: '21'}
-      ]);
-      
-      
-    } catch (error) {
-      console.error('Error fetching or rendering lineups:', error);
+    
+    function renderPlayersOnField(team, players, formation, side = "home") {
+        const container = document.getElementById("football-field");
+        if (!container || !formation) return;
+    
+        const formationArray = parseFormation(formation, players);
+        const isHome = side === "home";
+    
+        // Goalkeeper position
+        const goalkeeper = players.find(p => p.lineup_position === "1");
+        if (goalkeeper) {
+            const gkX = isHome ? 10 : 90; // 10% for home, 90% for away
+            const gkY = 50;               // Center vertically
+            const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
+            container.appendChild(gkDiv);
+        }
+    
+        // Outfield players
+        const outfield = players.filter(p => p.lineup_position !== "1");
+        let currentIndex = 0;
+    
+        formationArray.forEach((playersInLine, lineIndex) => {
+            // Spread formation lines across X-axis (from backline to forward line)
+            const totalLines = formationArray.length;
+            const x = isHome
+                ? ((lineIndex + 1) / (totalLines + 1)) * 45 + 5   // 5–50% left half
+                : ((lineIndex + 1) / (totalLines + 1)) * 45 + 50; // 50–95% right half
+    
+            for (let j = 0; j < playersInLine; j++) {
+                const y = ((j + 1) / (playersInLine + 1)) * 100; // spread vertically
+    
+                const player = outfield[currentIndex];
+                if (player) {
+                    const div = createPlayerDiv({ ...player, team_type: side }, x, y);
+                    container.appendChild(div);
+                    currentIndex++;
+                }
+            }
+        });
+    }    
+    
+
+    function createPlayerDiv(player, xPercent, yPercent) {
+        const div = document.createElement("div");
+        div.classList.add("player-dot");
+        div.style.left = `${xPercent}%`;
+        div.style.top = `${yPercent}%`;
+    
+        const numberSpan = document.createElement("span");
+        numberSpan.classList.add("player-number");
+        numberSpan.textContent = player.lineup_number;
+    
+        div.appendChild(numberSpan);
+    
+        // Tooltip with player name on hover
+        div.title = player.lineup_player;
+    
+        // Color styles
+        if (player.team_type === "home") {
+            div.style.backgroundColor = "black";
+            div.style.color = "white";
+        } else {
+            div.style.backgroundColor = "white";
+            div.style.color = "black";
+        }
+    
+        return div;
     }
-  }
+    
 
-
-  // Function to place players on the field
-  function renderTeamsOnField(homeFormation, awayFormation, homePlayers, awayPlayers) {
-    const field = document.getElementById('football-field');
-    field.innerHTML = ''; // Clear previous players
-  
-    placeTeam(field, homeFormation, homePlayers, true);  // Home (left to right)
-    placeTeam(field, awayFormation, awayPlayers, false); // Away (right to left)
-
-    if (!homeFormation || !homePlayers.length) {
-        console.warn("Missing home formation or players", homeFormation, homePlayers);
-      }
-      if (!awayFormation || !awayPlayers.length) {
-        console.warn("Missing away formation or players", awayFormation, awayPlayers);
-      }
-      
-  }
-  
-  function placeTeam(field, formation, players, isHomeTeam) {
-    const lines = formation.split('-').map(Number);
-    const totalLines = lines.length;
-    const fieldHeight = field.clientHeight;
-  
-    const goalkeeper = players[0];
-    const outfieldPlayers = players.slice(1);
-    let playerIndex = 0;
-  
-    // Goalkeeper
-    const gk = document.createElement('div');
-    gk.className = 'player';
-    gk.textContent = goalkeeper.number || '1';
-    gk.style.backgroundColor = isHomeTeam ? 'black' : 'white';
-    gk.style.color = isHomeTeam ? 'white' : 'black';
-    gk.style.top = '50%';
-    gk.style.left = isHomeTeam ? '5%' : '95%';
-    gk.style.transform = 'translate(-50%, -50%)';
-    field.appendChild(gk);
-  
-    // Outfield players
-   lines.forEach((numInLine, lineIdx) => {
-    const verticalSpacing = fieldHeight / (numInLine + 1);
-    const horizontalPercent = isHomeTeam
-        ? 15 + lineIdx * (70 / (totalLines - 1))
-        : 85 - lineIdx * (70 / (totalLines - 1));
-
-    for (let i = 0; i < numInLine; i++) {
-        const player = outfieldPlayers[playerIndex];
-        if (!player) continue; // Skip if no player is available
-
-        const playerDiv = document.createElement('div');
-        playerDiv.className = 'player';
-        playerDiv.innerHTML = `<strong>${player.number || (playerIndex + 2)}</strong>`;
-        playerDiv.style.backgroundColor = isHomeTeam ? 'black' : 'white';
-        playerDiv.style.color = isHomeTeam ? 'white' : 'black';
-        playerDiv.style.left = `${horizontalPercent}%`;
-        playerDiv.style.top = `${(i + 1) * verticalSpacing}px`;
-        playerDiv.style.transform = 'translate(-50%, -50%)';
-
-        field.appendChild(playerDiv);
-        playerIndex++;
-     }
-    });
-
-  }
-  
  
-  document.addEventListener('DOMContentLoaded', () => {
-    fetchMatches();
-  });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    fetchAndRenderMatches(); // This ensures everything waits until the DOM is ready
+});
 
   
 

@@ -1487,6 +1487,17 @@ body{
     font-weight: 500;
 }
 
+.brandVission {
+   background-color: @fff;
+   color: #000;
+}
+.brandVission span{
+   font-weight: bold;
+    font-size: 0.80rem;
+}
+.brandPersonality span {
+    font-weight: bold;
+}
 
 .main-footer {
     background-color: #111; color: #fff; padding: 2rem 1rem; text-align: center;

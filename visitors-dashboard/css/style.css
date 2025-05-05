@@ -1519,7 +1519,13 @@ body{
 }
 
 
-
+/*privacy policy */
+  h1, h2 {
+      color: #007BFF;
+    }
+    ul {
+      margin-left: 20px;
+    }
 
 
 

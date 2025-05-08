@@ -1527,6 +1527,92 @@ body{
       margin-left: 20px;
     }
 
+/*partnership */
+.partner-with-us {
+    max-width: 800px;
+    margin: auto;
+    padding: 2rem;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+  
+  .partner-with-us h1,
+  .partner-with-us h2 {
+    color: #222;
+    margin-bottom: 0.5rem;
+  }
+  
+  .partner-with-us p,
+  .partner-with-us ul {
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+  
+  .partner-with-us ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .partner-with-us ul li::before {
+    content: '✔️';
+    margin-right: 0.6rem;
+    color: #2e7d32;
+  }
+  
+  .sponsor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #fff;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+  }
+  
+  .sponsor-form label {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .sponsor-form input,
+  .sponsor-form textarea {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .sponsor-form button {
+    background-color: #0077cc;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .sponsor-form button:hover {
+    background-color: #005fa3;
+  }
+  
+  @media (max-width: 600px) {
+    .partner-with-us {
+      padding: 1rem;
+    }
+  
+    .sponsor-form {
+      padding: 1rem;
+    }
+  }
+  
+
 
 
 

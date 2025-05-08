@@ -13,7 +13,8 @@ document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 
 
 
-//display matches for live-match-demo
+
+// Display matches for live-match-demo
 document.addEventListener("DOMContentLoaded", function () {
     const liveMatchContainer = document.querySelector(".live-match-demo");
 
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const matchDateTime = DateTime.fromFormat(
             `${matchDate} ${matchTime}`,
-            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd H:mm",
             { zone: "Europe/Berlin" }
         );
 
@@ -45,13 +46,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const berlinTime = DateTime.fromFormat(
                 `${dateStr} ${timeStr}`,
-                "yyyy-MM-dd HH:mm",
+                "yyyy-MM-dd H:mm",
                 { zone: "Europe/Berlin" }
             );
 
             return berlinTime
                 .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-                .toFormat("hh:mm a");
+                .toFormat("h:mm a");
         } catch (e) {
             console.error("Time conversion error:", e);
             return "TBD";
@@ -76,11 +77,19 @@ document.addEventListener("DOMContentLoaded", function () {
         let displayTime = "";
         let ellipseImg = "";
 
+        // Match phase determination
         if (isFinished) {
-            displayTime = "FT";
+            displayTime = "FT";  // Final Time
             ellipseImg = "assets/icons/Ellipse 1.png";
         } else if (hasStarted) {
-            displayTime = `${getMinutesSince(match.match_date, startTime)}'`;
+            const minutes = getMinutesSince(match.match_date, startTime);
+            if (minutes <= 90) {
+                displayTime = `${minutes}'`;  // Regular time in minutes
+            } else if (minutes <= 120) {
+                displayTime = `${minutes - 90}' (ET)`;  // Extra time phase
+            } else {
+                displayTime = `${minutes - 120}' (AET)`;  // After Extra Time
+            }
             ellipseImg = "assets/icons/Ellipse2.png";
         } else {
             displayTime = formatToUserLocalTime(match.match_date, startTime);
@@ -115,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&timezone=Europe/Berlin&APIkey=${APIkey}`;
                 const res = await fetch(url);
                 const data = await res.json();
+                console.log(data); 
 
                 if (Array.isArray(data)) {
                     matchesList = [...matchesList, ...data];
@@ -160,6 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Start
     loadMatches();
 });
+
 
 
 
@@ -424,7 +435,7 @@ setInterval(autoSlide, 4000); // Change slides every 3 seconds
 
 
 
-
+//function to display matches for the middle layers in home page
 
 // Function to get today's date or a date offset by days (formatted as YYYY-MM-DD)
 function getTodayDate(offset = 0) {
@@ -460,7 +471,7 @@ function formatToUserLocalTime(dateStr, timeStr) {
 
         return berlinTime
             .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-            .toFormat("hh:mm");
+            .toFormat("h:mm");
     } catch (e) {
         console.error("Time conversion error:", e);
         return "TBD";
@@ -487,6 +498,7 @@ async function fetchMatchesData() {
 
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
+        console.log(data); // Log the raw data for debugging
 
         const now = new Date();
 
@@ -496,19 +508,19 @@ async function fetchMatchesData() {
             return status && !["ft", "fulltime", "finished", "ended"].includes(status) && /\d+'|ht|halftime/.test(status);
         });
 
-        // HIGHLIGHT
+        // Other categories
         matchData.highlight = data.filter(match => {
             const status = match.match_status?.toLowerCase();
             return ["ft", "fulltime", "finished", "ended"].includes(status);
         });
 
-        // UPCOMING
         matchData.upcoming = data.filter(match => {
             const matchDateTime = new Date(`${match.match_date} ${match.match_time}`);
             const status = match.match_status?.toLowerCase();
             return (!status || ["not started", "scheduled", "ns", "tbd", "0", ""].includes(status)) && matchDateTime > now;
         });
 
+        // Show live matches on load
         showMatches('live');
     } catch (error) {
         console.error('Error fetching match data:', error);
@@ -527,16 +539,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fetch match data and display live matches first
     fetchMatchesData();
+});
 
-    // Select and highlight the "Live" button after the DOM has loaded
-    setTimeout(() => {
-        const liveButton = document.querySelector('.category-btn[data-category="live"]');
-        if (liveButton) {
-            liveButton.classList.add("active");
-        } else {
-            console.error("Live category button not found.");
-        }
-    }, 300); // Delay ensures HTML is fully loaded
+document.addEventListener("DOMContentLoaded", function () {
+    const liveButton = document.querySelector('.category-btn[data-category="live"]');
+    if (liveButton) {
+        liveButton.addEventListener('click', function() {
+            showMatches('live');
+        });
+    }
 });
 
 
@@ -580,21 +591,24 @@ function showMatches(category, event = null) {
         }
     });
 
-    // Sort priority matches
+    // Sort priority matches by league
     priorityMatches.sort((a, b) => leaguePriority[a.league_name] - leaguePriority[b.league_name]);
 
-    // Combine and limit to 7 matches total
-    const matchesToShow = [...priorityMatches, ...nonPriorityMatches].slice(0, 7);
+    let matchesToShow = [];
 
-    // Show appropriate fallback message
-    if (matchesToShow.length === 0) {
-        container.innerHTML = `<p class="fallback-message">No matches available today.</p>`;
-        return;
-    } else if (priorityMatches.length === 0 && nonPriorityMatches.length > 0) {
-        container.innerHTML = `<p class="fallback-message">Showing matches from other leagues</p>`;
+    if (priorityMatches.length >= 5) {
+        matchesToShow = priorityMatches.slice(0, 5);
+    } else {
+        matchesToShow = [...priorityMatches, ...nonPriorityMatches].slice(0, 5);
     }
 
-    // Render matches
+    // Fallback message logic for live matches
+    if (category === 'live' && matchesToShow.length === 0) {
+        container.innerHTML = `<p class="fallback-message">No live matches available at the moment.</p>`;
+        return;
+    }
+
+    // Render match cards
     matchesToShow.forEach((match, index) => {
         createMatchCard(container, match, category, index);
     });
@@ -602,14 +616,16 @@ function showMatches(category, event = null) {
 
 
 
+
 // Function to Filter Matches by Date
-function filterByDate() {
-    const selectedDate = document.getElementById('match-date').value;
+function filterByDate(category, selectedDate) {
+    if (!matchData[category]) {
+        console.error(`Category '${category}' does not exist.`);
+        return;
+    }
+
     const container = document.getElementById('matches-container');
     container.innerHTML = '';
-
-    const allMatches = [...matchData.live, ...matchData.highlight, ...matchData.upcoming];
-    const filteredMatches = allMatches.filter(match => match.match_date === selectedDate);
 
     const leaguePriority = {
         "Premier League": 0,
@@ -619,6 +635,11 @@ function filterByDate() {
         "Bundesliga": 4,
         "Ligue 1": 5
     };
+
+    // Filter matches by date
+    const filteredMatches = matchData[category].filter(match => {
+        return match.match_date === selectedDate;
+    });
 
     const priorityMatches = [];
     const nonPriorityMatches = [];
@@ -631,19 +652,30 @@ function filterByDate() {
         }
     });
 
-    priorityMatches.sort((a, b) => {
-        return leaguePriority[a.league_name] - leaguePriority[b.league_name];
-    });
+    // Sort priority matches
+    priorityMatches.sort((a, b) => leaguePriority[a.league_name] - leaguePriority[b.league_name]);
 
-    const matchesToShow = [...priorityMatches, ...nonPriorityMatches].slice(0, 7);
+    let matchesToShow = [];
 
-    if (matchesToShow.length > 0) {
-        matchesToShow.forEach((match, index) => {
-            createMatchCard(container, match, "filtered", index);
-        });
+    if (priorityMatches.length >= 5) {
+        matchesToShow = priorityMatches.slice(0, 5);
     } else {
-        container.innerHTML = `<p>No matches found for this date</p>`;
+        matchesToShow = [...priorityMatches, ...nonPriorityMatches].slice(0, 5);
     }
+
+    // Fallback message logic
+    if (matchesToShow.length === 0) {
+        if (category !== 'live') {
+            container.innerHTML = `<p class="fallback-message">No matches available for ${selectedDate}.</p>`;
+        }
+        return;
+    } else if (priorityMatches.length === 0 && nonPriorityMatches.length > 0) {
+        container.innerHTML = `<p class="fallback-message">Showing matches from other leagues on ${selectedDate}</p>`;
+    }
+
+    matchesToShow.forEach((match, index) => {
+        createMatchCard(container, match, category, index);
+    });
 }
 
 
@@ -757,6 +789,67 @@ document.querySelector('.calendar').addEventListener('click', () => {
     }
   });
   
+ // Highlight and filter matches when a calendar date is clicked
+document.querySelectorAll('.calendar-date').forEach(dateElem => {
+    dateElem.addEventListener('click', function () {
+        // Remove existing highlight
+        document.querySelectorAll('.calendar-date').forEach(el => el.classList.remove('active'));
+
+        // Highlight clicked date
+        this.classList.add('active');
+
+        // Update the date input value
+        const selectedDate = this.getAttribute('data-date');
+        document.getElementById('match-date').value = selectedDate;
+
+
+        const todayStr = getTodayDate(0);
+const todayElem = document.querySelector(`.calendar-date[data-date="${todayStr}"]`);
+if (todayElem) todayElem.classList.add('active');
+
+        // Trigger filtering
+        filterByDate();
+    });
+});
+
+function generateCalendarDates() {
+    const calendarScroll = document.querySelector('.calendar-scroll');
+    calendarScroll.innerHTML = ''; // Clear existing
+
+    for (let i = -3; i <= 3; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+
+        const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const dateNum = date.getDate().toString().padStart(2, '0');
+        const dateStr = date.toISOString().split('T')[0];
+
+        const div = document.createElement('div');
+        div.className = 'calendar-date';
+        div.dataset.date = dateStr;
+        div.innerHTML = `${day}<br><span>${dateNum}</span>`;
+
+        if (i === 0) div.classList.add('active'); // Highlight today
+
+        calendarScroll.appendChild(div);
+    }
+
+    // Rebind event listeners after generating
+    document.querySelectorAll('.calendar-date').forEach(dateElem => {
+        dateElem.addEventListener('click', function () {
+            document.querySelectorAll('.calendar-date').forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+
+            const selectedDate = this.getAttribute('data-date');
+            document.getElementById('match-date').value = selectedDate;
+            filterByDate();
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    generateCalendarDates(); // Run on load
+});
 
 
 

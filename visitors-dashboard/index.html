@@ -52,10 +52,6 @@
                 <a href="prediction.html">Prediction</a>
             </li>
             <li>
-                <img src="assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
-                <a href="#">My Prediction</a>
-            </li>
-            <li>
                 <img src="assets/icons/SoccerBall.png" alt="Soccer Ball" class="soccerBall">
                 <a href="league-table.html">League Table</a>
             </li>
@@ -194,75 +190,16 @@
         <div class="layer middle-layer">
             <div class="header-slider">
                 <!-- Banner 1 -->
-                <div class="slider-content">
-                  <div class="item-contnt">
-                    <h2 class="slider-title">PSG vs Bayern Munich</h2>
-                    <p class="slider-time">
-                      <ion-icon name="time-outline"></ion-icon> 9:00pm
-                    </p>
-                    <p class="slider-date">
-                      <ion-icon name="calendar-outline"></ion-icon> 25 December, 2024
-                    </p>
-                    <p class="slider-country">
-                        <ion-icon name="location-outline"></ion-icon> France
-                    </p>
-                    <a href="#" class="slider-button">
-                      <ion-icon name="arrow-forward-outline"></ion-icon><span>Watch now</span>
-                    </a>
-                  </div>
-                  <img src="assets/images/erling.png" alt="Erling Haaland">
+                <div class="slider-content banner1">
                 </div>
-              
+            
                 <!-- Banner 2 -->
-                <div class="slider-content">
-                  <div class="item-contnt">
-                    <h2 class="slider-title">Barcelona vs Real Madrid</h2>
-                    <p class="slider-time">
-                      <ion-icon name="time-outline"></ion-icon> 5:45pm
-                    </p>
-                    <p class="slider-date">
-                      <ion-icon name="calendar-outline"></ion-icon> 21 December, 2024
-                    </p>
-                    <p class="slider-country">
-                        <ion-icon name="location-outline"></ion-icon> Spain
-                    </p>
-                    <a href="#" class="slider-button">
-                      <ion-icon name="arrow-forward-outline"></ion-icon><span>Watch now</span>
-                    </a>
-                  </div>
-                  <img src="assets/images/asenalplayer.png" alt="Kylian Mbappe">
-                </div>
-              
-                <!-- Banner 3 -->
-                <div class="slider-content">
-                  <div class="item-contnt">
-                    <h2 class="slider-title">Manchester United vs Liverpool</h2>
-                    <p class="slider-time">
-                      <ion-icon name="time-outline"></ion-icon> 7:30pm
-                    </p>
-                    <p class="slider-date">
-                      <ion-icon name="calendar-outline"></ion-icon> 23 December, 2024
-                    </p>
-                    <p class="slider-country">
-                        <ion-icon name="location-outline"></ion-icon> England
-                    </p>
-                    <a href="#" class="slider-button">
-                      <ion-icon name="arrow-forward-outline"></ion-icon><span>Watch now</span>
-                    </a>
-                  </div>
-                  <img src="assets/images/lewandowski.png" alt="Robert Lewandowski">
-                </div>
-
-                 <!-- Banner 4 -->
-                 <div class="slider-content">
-                    <div class="item-contnt">
-                        <h2 class="slider-title">Exciting Offers Await!</h2>
-                        <p class="slider-description">Get 50% off on your first subscription.</p>
-                        <a href="#" class="slider-button"><ion-icon name="arrow-forward-outline"></ion-icon><span>Subscribe now</span></a>
+                <div class="slider-content banner2">
+                    <div class="banne2item-contnt">
+                        <h2 class="slider-title">Exciting podcast coming soon!</h2>
                     </div>
-                    <img src="assets/images/podcastimg.png" alt="Advert">
-                  </div>
-              </div>              
+                </div>
+            </div>                       
               
 
                 <!--latest matches section-->
@@ -280,10 +217,20 @@
                   <div class="category-btn active" data-category="live" onclick="showMatches('live', event)">Live</div>
                   <div class="category-btn" data-category="highlight" onclick="showMatches('highlight', event)">Highlight</div>
                   <div class="category-btn" data-category="upcoming" onclick="showMatches('upcoming', event)">Upcoming</div>                
-                  <!-- Calendar Button -->
+                  <!-- Calendar -->
                   <div class="category-btn calendar">
-                    <div class="match-calendar"></div>
-
+                    <div class="match-calendar">
+                        <div class="calendar-scroll">
+                          <div class="calendar-date" data-date="2025-05-06">Tue<br><span>06</span></div>
+                          <div class="calendar-date" data-date="2025-05-07">Wed<br><span>07</span></div>
+                          <div class="calendar-date" data-date="2025-05-08">Thu<br><span>08</span></div>
+                          <div class="calendar-date" data-date="2025-05-09">Fri<br><span>09</span></div>
+                          <div class="calendar-date" data-date="2025-05-10">Sat<br><span>10</span></div>
+                          <div class="calendar-date" data-date="2025-05-11">Sun<br><span>11</span></div>
+                          <div class="calendar-date" data-date="2025-05-12">Mon<br><span>12</span></div>
+                        </div>
+                      </div>
+                      
                       <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
                       <div class="date-filter">
                         <label for="match-date">Select Match Date:</label>

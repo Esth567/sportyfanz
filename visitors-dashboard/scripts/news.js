@@ -139,21 +139,6 @@ async function summarizeText(title, description) {
         const seoTitle = data.seo_title;
         const wordCount = summary.split(' ').length;
 
-
-        for (const newsItem of newsList) {
-            const originalTitle = newsItem.title;
-            const originalDescription = newsItem.description;
-        
-            const { title: seoTitle, summary } = await summarizeText(originalTitle, originalDescription);
-        
-            renderNewsCard({
-                title: seoTitle,
-                summary: summary,
-                date: newsItem.date,
-                image: newsItem.image,   // if available
-                link: newsItem.link      // if available
-            });
-        }
         
         return {
             title: seoTitle || title,

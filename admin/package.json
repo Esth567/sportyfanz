@@ -30,6 +30,7 @@
     "mongoose": "^8.10.1",
     "natural": "^8.0.1",
     "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.3",
     "xml2js": "^0.6.2"
   }
 }

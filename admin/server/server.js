@@ -6,9 +6,11 @@ const xml2js = require('xml2js');
 const { User, Data } = require("../database/db");  // ✅ Correct Import
 require("dotenv").config();
 const fetch = require('node-fetch');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const path = require('path');
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -114,5 +116,53 @@ app.get('/api/news', async (req, res) => {
   }
 });
   
+
+//auto-reply to the sender
+app.post('/send', async (req, res) => {
+    const { name, brand, email, message } = req.body;
+  
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+  
+    try {
+      // Send message to your inbox
+      await transporter.sendMail({
+        from: `"${name}" <${email}>`,
+        to: process.env.EMAIL_USER,
+        subject: `New Sponsorship Inquiry from ${brand}`,
+        html: `
+          <h3>New Sponsorship Inquiry</h3>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Brand:</strong> ${brand}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Message:</strong><br>${message}</p>
+        `
+      });
+  
+      // Send auto-reply to the sender
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: `Thanks for reaching out, ${name}!`,
+        html: `
+          <p>Hi ${name},</p>
+          <p>Thanks for contacting us about a potential partnership with <strong>Your Website</strong>. We’ve received your message and will be in touch shortly.</p>
+          <p>Best regards,<br>Your Team</p>
+        `
+      });
+  
+      res.status(200).send({ message: 'Emails sent successfully.' });
+    } catch (error) {
+      console.error('Error sending emails:', error);
+      res.status(500).send({ error: 'Email sending failed.' });
+    }
+  });
+
+
 // ✅ Export Express App
 module.exports = app;

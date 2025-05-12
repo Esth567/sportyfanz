@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A description of the web page">
+    <title>Webpage Design</title>
+    <!--Linking swipper css-->
+ <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+    <link rel="stylesheet" href="css/style.css">
+
+<!--linking link.tss-->
+<script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+
+</head>
+<body>
+    <div class="page-wrapper" style="display: flex;">
+    <div class="sidebar" id="sidebar">
+        <div class="toggle-icon">
+         <!-- X-icon for closing sidebar -->
+            <img src="assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
+            
+            <div class="icon">
+                <img src="assets/images/spfanzlogo.png" alt="Logos" class="logos">
+            </div>            
+        <div class="toggle-btn" onclick="toggleSidebar()">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div>    
+    </div>
+    <div class="stroke"></div>
+    <div class="menu">
+        <ul>  
+            <li>
+                <img src="assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
+                <a href="index.html">Dashboard</a>
+            </li>
+            <li>
+                <img src="assets/icons/Newspaper.png" alt="News paper" class="newspaper">
+                <a href="news.html">News</a>
+            </li>
+            <li>
+                <img src="assets/icons/VideoCamera.png" alt="Video Camera" class="videoCamera">
+                <a href="live-matches.html">Live Football</a>
+            </li>
+            <li>
+                <img src="assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
+                <a href="podcast.html">Podcast</a>
+            </li>
+            <li>
+                <img src="assets/icons/PokerChip.png" alt="Poker Chip" class="pokerChip">
+                <a href="prediction.html">Prediction</a>
+            </li>
+            <li>
+                <img src="assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
+                <a href="#">My Prediction</a>
+            </li>
+            <li>
+                <img src="assets/icons/SoccerBall.png" alt="Soccer Ball" class="soccerBall">
+                <a href="league-table.html">League Table</a>
+            </li>
+            <li>
+                <img src="assets/icons/Gear.png" alt="Gear" class="gear">
+                <a href="#">Settings</a>
+            </li>
+        </ul>
+        <div class="logout-section">
+        <div class="stroke"></div>
+        <ul>
+            <li>
+                <img src="assets/icons/SignOut.png" alt="Frame" class="frame">
+                <a href="#">Logout</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+    </div>
+
+    <div class="body-container">
+     <!-- Header -->
+    <div class="header">
+    <div class="header-top">
+        <h3>Dashboard / Home</h3>
+        <div class="header-topbar">
+
+            <!-- Movile view Header -->
+            <div class="mobileMenu-logo">
+                <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleMobileSidebar()"></ion-icon>  
+                 <img src="assets/images/Logo2.png" alt="Logo" class="logo">
+             </div>
+            <h1>
+                Welcome to your <span class="highlight">Ultimate Sports Hub</span>
+            </h1>
+          
+        <div class="header-actions">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <ion-icon name="arrow-forward-outline" class="search-icon"></ion-icon>
+                <input type="text" class="search-bar" placeholder="Search here...">
+            </div>
+            
+            <!-- Notification Icon -->
+            <div class="icons">
+                <img src="assets/icons/Vectorsearch.png" alt="search" class="iconSearch">
+                <img src="assets/icons/BellSimple.png" alt="Bells">
+                <!-- Settings Icon -->
+                <img src="assets/icons/UserCircle.png" alt="userCircle">
+            </div>
+            <!-- Signup Button -->
+            <button class="signup-btn">
+                <img src="assets/icons/arrow-up.png" alt="arrowIcon">
+                Sign In               
+            </button>
+        </div>
+    </div>
+    </div>
+    <!-- Horizontal Line -->
+    <div class="header-line"></div>
+   </div>
+   
+   
+    <!-- Main Content -->
+    <div class="content">
+        <div class="layer">
+            <section class="partner-with-us">
+                <h1>Partner With Us</h1>
+                <p>Reach a passionate audience of sports fans, bettors, and streamers. We offer premium placement for brands through sponsored content, banner ads, video promotions, and more.</p>
+              
+                <h2>Why Work With Us?</h2>
+                <ul>
+                  <li>✅ Niche and loyal sports audience</li>
+                  <li>✅ High engagement on articles and match updates</li>
+                  <li>✅ Custom packages for brands, tournaments, and streaming services</li>
+                  <li>✅ Transparent sponsorship disclosure and performance tracking</li>
+                </ul>
+              
+                <h2>Available Sponsorship Options</h2>
+                <ul>
+                  <li>📰 Sponsored Blog Articles</li>
+                  <li>📢 Social Media Promotion</li>
+                  <li>🎥 Video Product Features & Reviews</li>
+                  <li>🖼️ Homepage or Match Page Banners</li>
+                  <li>🏆 League or Event Partnerships</li>
+                </ul>
+              
+                <h2>Let's Talk</h2>
+                <p>Ready to collaborate? Fill out the form below or email us at <a href="mailto:partnerships@yourdomain.com">partnerships@yourdomain.com</a></p>
+              
+                <form class="sponsor-form" id="sponsorForm">
+                  <label for="name">Your Name</label>
+                  <input type="text" id="name" name="name" required />
+              
+                  <label for="brand">Brand / Company</label>
+                  <input type="text" id="brand" name="brand" required />
+              
+                  <label for="email">Email Address</label>
+                  <input type="email" id="email" name="email" required />
+              
+                  <label for="message">Your Proposal</label>
+                  <textarea id="message" name="message" rows="5" required></textarea>
+              
+                  <button type="submit">Send Inquiry</button>
+                </form>
+              </section>
+        </div>
+    </div>
+</div> 
+</div>
+         <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+         <!--linking custome script-->
+<script src="scripts/script.js"></script>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="partner-with-us.html">Partnership</a>
+      <a href="sportyfanz89@gmail.com">Contact Us</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://facebook.com" target="_blank">
+        <ion-icon name="logo-facebook" style="font-size: 1.5rem; color: #fff;"></ion-icon>
+      </a>
+      <a href="https://x.com" target="_blank">
+        <ion-icon name="logo-twitter"></ion-icon> <!-- X formerly Twitter -->
+      </a>
+      <a href="https://youtube.com" target="_blank">
+        <ion-icon name="logo-youtube"></ion-icon>
+      </a>
+      <a href="https://tiktok.com" target="_blank">
+        <ion-icon name="logo-tiktok"></ion-icon>
+      </a>
+    </div>
+    <p style="margin-top: 1rem; font-size: 0.9rem;">SportyFanz &copy; 2025 The Ultimate Sports Hub. All rights reserved.</p>
+  </footer>
+  
+</body>
+</html>

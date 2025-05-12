@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A description of the web page">
+    <title>Webpage Design</title>
+    <!--Linking swipper css-->
+ <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+ <link rel="stylesheet" href="css/style.css">
+    
+
+<!--linking link.tss-->
+<script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+
+</head>
+<body class="news-page">
+    <div class="page-wrapper" style="display: flex;">
+    <div class="sidebar" id="sidebar">
+        <div class="toggle-icon">
+
+            <!-- X-icon for closing sidebar -->
+            <img src="assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
+            
+            <div class="icon">
+                <img src="assets/images/spfanzlogo.png" alt="Logos" class="logos">
+            </div>            
+        <div class="toggle-btn" onclick="toggleSidebar()">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div>    
+    </div>
+    <div class="stroke"></div>
+    <div class="menu">
+        <ul>
+            <li>
+                <img src="assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
+                <a href="index.html">Dashboard</a>
+            </li>
+            <li>
+                <img src="assets/icons/Newspaper.png" alt="News paper" class="newspaper">
+                <a href="news.html">News</a>
+            </li>
+            <li>
+                <img src="assets/icons/VideoCamera.png" alt="Video Camera" class="videoCamera">
+                <a href="live-matches.html">Live Football</a>
+            </li>
+            <li>
+                <img src="assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
+                <a href="podcast.html">Podcast</a>
+            </li>
+            <li>
+                <img src="assets/icons/PokerChip.png" alt="Poker Chip" class="pokerChip">
+                <a href="prediction.html">Prediction</a>
+            </li>
+            <li>
+                <img src="assets/icons/SoccerBall.png" alt="Soccer Ball" class="soccerBall">
+                <a href="league-table.html">League Table</a>
+            </li>
+            <li>
+                <img src="assets/icons/Gear.png" alt="Gear" class="gear">
+                <a href="#">Settings</a>
+            </li>
+        </ul>
+        <div class="logout-section">
+        <div class="stroke"></div>
+        <ul>
+            <li>
+                <img src="assets/icons/SignOut.png" alt="Frame" class="frame">
+                <a href="#">Logout</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+    </div>
+
+    <div class="body-container">
+     <!-- Header -->
+    <div class="header">
+    <div class="header-top">
+        <h3>Dashboard / News</h3>
+        <div class="header-topbar">
+
+            <!-- mobile menu Header -->
+            <div class="mobileMenu-logo">
+                <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleMobileSidebar()"></ion-icon>  
+                 <img src="assets/images/Logo2.png" alt="Logo" class="logo">
+                 <h2>News</h2>
+             </div>
+            <h1>
+                Welcome to your <span class="highlight">Ultimate Sports Hub</span>
+            </h1>
+        <div class="header-actions">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <ion-icon name="arrow-forward-outline" class="search-icon"></ion-icon>
+                <input type="text" class="search-bar" placeholder="Search here...">
+            </div>
+            
+            <!-- Notification Icon -->
+            <div class="icons">
+                <img src="assets/icons/BellSimple.png" alt="Bells">
+                <!-- Settings Icon -->
+                <img src="assets/icons/UserCircle.png" alt="userCircle">
+            </div>
+            <!-- Signup Button -->
+            <button class="signup-btn">
+                <ion-icon name="arrow-forward-outline" class="arrow-icon"></ion-icon>
+                Sign In               
+            </button>
+        </div>
+    </div>
+    </div>
+    <!-- Horizontal Line -->
+    <div class="header-line"></div>
+   </div>
+
+   
+    <!-- Main Content -->
+    <div class="content">
+        <div class="layer">        
+            <div class="text-cont">
+                <h4 class="live-matches">Live Matches</h4>
+                <div class="more">
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                    <a href="live-matches.html">See more</a>
+                </div>
+            </div>
+            <div class="live-match-demo"></div>
+            <div class="leagueTable-text-cont">
+                <h4 class="live-matches">League Table</h4>
+                <div class="more">
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                    <a href="news.html">View all</a>
+                </div>
+            </div>
+
+            <div class="league-table-demo"></div> 
+                  
+        </div>
+        <div class="layer middle-layer">
+            <div class="news-text-cont">
+                <h4 class="news-headers">Trending News</h4>
+                <div class="see-more" onclick="toggleNews('trending')">
+                    <img src="assets/icons/ankle-vector.png" alt="ankle-vector" class="ankle-viewMore">
+                    <p id="trending-text">See more</p>
+                </div>
+            </div>
+            
+            <div class="top-story" id="trending-news" style="display: none;"></div>
+            
+            <!-- newsAd-middle content -->
+            <div class="newsAd-middle">
+                <div class="newsAd-container">
+                <div class="text-cont">
+                    <h4 class="live-matches">Upcoming Matches</h4>
+                    <div class="more">
+                        <ion-icon name="arrow-forward-outline"></ion-icon>
+                        <a href="live-matches.html">View all</a>
+                    </div>
+                </div>
+            
+
+            <div class="live-games">
+                <!-- live match 1 -->
+               <div class="live-matches-demo">
+                   <div class="team-times">
+                       <div class="teams-nameLogo">
+                           <img src="assets/images/chelsea-logo.png" alt="Chelsea" class="chelsea-logo">
+                           Chealse</div>
+                           <div class="live-match-event">
+                            <h4 class="game-leag">Premier League</h4>
+                            <h2 class="vs-scores">VS</h2>
+                           <div class="highlight-time">
+                               <img src="assets/icons/Ellipse2.png" alt="Ellipse" class="Ellipse-logo">
+                               9:00
+                            </div>
+                       </div>
+                       <div class="teams-nameLogo">
+                           <img src="assets/images/leichester-logo.png" alt="leichester" class="leichester-logo">
+                           Leichester C</div>
+                   </div>
+               </div>
+               
+                <!-- live match 2 -->
+               <div class="live-matches-demo">
+                   <div class="team-times">
+                       <div class="teams-nameLogo">
+                           <img src="assets/images/chelsea-logo.png" alt="Chelsea" class="chelsea-logo">
+                           Chealse</div>
+                           <div class="live-match-event">
+                            <h4 class="game-leag">Premier League</h4>
+                            <h2 class="vs-scores">VS</h2>
+                           <div class="highlight-time">
+                               <img src="assets/icons/Ellipse2.png" alt="Ellipse" class="Ellipse-logo">
+                               9:00</div>
+                       </div>
+                       <div class="teams-nameLogo">
+                           <img src="assets/images/leichester-logo.png" alt="leichester" class="leichester-logo">
+                           Leichester C</div>
+                   </div>
+               </div>
+               </div>
+            </div>
+               <div class="podcast-comingSoon">
+                <div class="podcastComingSoon-img">
+                    <img src="assets/images/podcastimg.png" alt="">
+                </div>
+                <div>
+                <h4>Voices of the Game | Football</h4>
+                <h4>Coming Soon</h4>
+            </div>
+            </div>
+            </div>
+ 
+
+            <!-- news update -->
+            <div class="news-text-cont">
+                <h4 class="news-headers">News Updates</h4>
+                <div class="see-more" onclick="toggleNews('updates')">
+                    <img src="assets/icons/ankle-vector.png" alt="ankle-vect">
+                    <p id="updates-text">See more</p>
+                </div>
+            </div>
+            
+            <div class="top-story" id="updates-news" style="display: none;"></div>
+               <!-- Detailed News View -->
+<div id="news-details-view" style="display: none;">
+    <div class="see-more" id="back-button" onclick="showNewsList()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <p>Back</p>
+    </div>
+    <div id="news-detail-content" class="newsDetails-content"></div>
+
+      <!-- middly container advert -->
+      <div class="advert-container">
+        <p>Advertisement</p>
+    </div>
+</div>
+
+        </div>
+        <div class="layer third-layer"> 
+            <div class="text-cont">
+                <h4 class="live-matches">Top Players</h4>
+            </div>
+           
+               <!-- Top Players slider -->
+               <div class="slider">
+                <div class="players-container"></div>
+                <!-- Slider Dots -->
+                <div class="slider-dots"></div>
+                </div>
+
+                <div class="advert">
+                    <h5>Advertisement</h5>
+                 </div>
+           <div class="text-cont">
+            <h4 class="live-matches">Predition for Today</h4>
+            <div class="more">
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+                <a href="prediction.html">View all</a>
+            </div>
+        </div>
+        
+        <div class="prediction-container"></div>
+
+        <div class="advert">
+            <h5>Advertisement</h5>
+         </div>
+         </div> 
+        </div>  
+
+         <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+
+
+         <!--linking custome script-->
+<script src="scripts/script.js"></script>
+<script src="scripts/news.js"></script>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="sportyfanz89@gmail.com">Contact Us</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://facebook.com" target="_blank">
+        <ion-icon name="logo-facebook" style="font-size: 1.5rem; color: #fff;"></ion-icon>
+      </a>
+      <a href="https://x.com" target="_blank">
+        <ion-icon name="logo-twitter"></ion-icon> <!-- X formerly Twitter -->
+      </a>
+      <a href="https://youtube.com" target="_blank">
+        <ion-icon name="logo-youtube"></ion-icon>
+      </a>
+      <a href="https://tiktok.com" target="_blank">
+        <ion-icon name="logo-tiktok"></ion-icon>
+      </a>
+    </div>
+    <p style="margin-top: 1rem; font-size: 0.9rem;">SportyFanz &copy; 2025 The Ultimate Sports Hub. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

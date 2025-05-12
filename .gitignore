@@ -1,6 +1,12 @@
 # Python bytecode
 __pycache__/
 *.py[cod]
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
 *$py.class
 
 # Virtual environments

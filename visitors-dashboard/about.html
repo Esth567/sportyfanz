@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A description of the web page">
+    <title>Webpage Design</title>
+    <!--Linking swipper css-->
+ <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+    <link rel="stylesheet" href="css/style.css">
+
+<!--linking link.tss-->
+<script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+
+</head>
+<body>
+    <div class="page-wrapper" style="display: flex;">
+    <div class="sidebar" id="sidebar">
+        <div class="toggle-icon">
+         <!-- X-icon for closing sidebar -->
+            <img src="assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
+            
+            <div class="icon">
+                <img src="assets/images/spfanzlogo.png" alt="Logos" class="logos">
+            </div>            
+        <div class="toggle-btn" onclick="toggleSidebar()">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div>    
+    </div>
+    <div class="stroke"></div>
+    <div class="menu">
+        <ul>  
+            <li>
+                <img src="assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
+                <a href="index.html">Dashboard</a>
+            </li>
+            <li>
+                <img src="assets/icons/Newspaper.png" alt="News paper" class="newspaper">
+                <a href="news.html">News</a>
+            </li>
+            <li>
+                <img src="assets/icons/VideoCamera.png" alt="Video Camera" class="videoCamera">
+                <a href="live-matches.html">Live Football</a>
+            </li>
+            <li>
+                <img src="assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
+                <a href="podcast.html">Podcast</a>
+            </li>
+            <li>
+                <img src="assets/icons/PokerChip.png" alt="Poker Chip" class="pokerChip">
+                <a href="prediction.html">Prediction</a>
+            </li>
+            <li>
+                <img src="assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
+                <a href="#">My Prediction</a>
+            </li>
+            <li>
+                <img src="assets/icons/SoccerBall.png" alt="Soccer Ball" class="soccerBall">
+                <a href="league-table.html">League Table</a>
+            </li>
+            <li>
+                <img src="assets/icons/Gear.png" alt="Gear" class="gear">
+                <a href="#">Settings</a>
+            </li>
+        </ul>
+        <div class="logout-section">
+        <div class="stroke"></div>
+        <ul>
+            <li>
+                <img src="assets/icons/SignOut.png" alt="Frame" class="frame">
+                <a href="#">Logout</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+    </div>
+
+    <div class="body-container">
+     <!-- Header -->
+    <div class="header">
+    <div class="header-top">
+        <h3>Dashboard / Home</h3>
+        <div class="header-topbar">
+
+            <!-- Movile view Header -->
+            <div class="mobileMenu-logo">
+                <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleMobileSidebar()"></ion-icon>  
+                 <img src="assets/images/Logo2.png" alt="Logo" class="logo">
+             </div>
+            <h1>
+                Welcome to your <span class="highlight">Ultimate Sports Hub</span>
+            </h1>
+          
+        <div class="header-actions">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <ion-icon name="arrow-forward-outline" class="search-icon"></ion-icon>
+                <input type="text" class="search-bar" placeholder="Search here...">
+            </div>
+            
+            <!-- Notification Icon -->
+            <div class="icons">
+                <img src="assets/icons/Vectorsearch.png" alt="search" class="iconSearch">
+                <img src="assets/icons/BellSimple.png" alt="Bells">
+                <!-- Settings Icon -->
+                <img src="assets/icons/UserCircle.png" alt="userCircle">
+            </div>
+            <!-- Signup Button -->
+            <button class="signup-btn">
+                <img src="assets/icons/arrow-up.png" alt="arrowIcon">
+                Sign In               
+            </button>
+        </div>
+    </div>
+    </div>
+    <!-- Horizontal Line -->
+    <div class="header-line"></div>
+   </div>
+   
+   
+    <!-- Main Content -->
+    <div class="content">
+        <div class="layer">
+            <div class="about-details">
+            <h3>About Us</h3>
+            <div class="brandVission">
+                
+                <p>
+                Sporty Fanz is a dynamic sports platform that brings fans closer to the games and teams they love. The
+                brand revolves around a fusion of high-performance technology, contemporary style, and a
+                relentless drive to empower sports enthusiasts with immersive experiences.
+                </p>
+                <p>Sporty Fanz is a dynamic sports platform that is revolutionizing the way fans engage with their favorite
+                sports, teams, and players. With its commitment to delivering real-time updates, breaking news, and
+                immersive content, Sporty Fanz has positioned itself as a leading destination for sports enthusiasts
+                worldwide.</p>
+                
+                <span>Brand Vision</span>
+                <p>Sporty Fanz envisions a world where every athlete, from the amateur to the professional, can achieve
+                their best performance while embracing their personal style. The brand seeks to combine cutting-edge
+                technology with design that is both functional and aesthetically pleasing.</p>
+                
+                <span>Brand Mission</span>
+                <p>Sporty Fanz's mission is to deliver real-time sports updates, breaking news, in-depth analysis, and
+                engaging content across a broad spectrum of sports, catering to a diverse global audience. By
+                harnessing the power of technology, the platform aims to foster a vibrant community where fans can
+                connect, share their passion, and enhance their overall sports experience.</p>
+            </div>
+            
+            
+            <div class="brandPersonality">  
+                 <h3 class="ourPersonal">Our Personality</h3>
+                <p><strong>Innovative:</strong>SportyFanz is always looking forward and striving to improve with the latest
+                 technology and trends, pushing the boundaries of what's possible in the digital sports
+                 landscape.</p>
+                
+                 <p><strong>Energetic:</strong> The brand is full of vitality and enthusiasm, reflecting the active nature of sports and
+                  the fervor of its fans.</p>
+                  
+                 <p><strong>Confident:</strong>Bold in design and performance, Sporty Fanz empowers athletes and fans alike,
+                 helping them feel empowered and inspired.</p>
+                 
+                 <p<strong>Authentic:</strong> > True to its mission of supporting real athletes with genuine solutions, the brand
+                  maintains a steadfast commitment to honesty and integrity.</p>
+                </div>
+             </div>
+        </div>
+    </div>
+</div> 
+</div>
+         <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+         <!--linking custome script-->
+<script src="scripts/script.js"></script>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="partner-with-us.html">Partnership</a>
+      <a href="sportyfanz89@gmail.com">Contact Us</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://facebook.com" target="_blank">
+        <ion-icon name="logo-facebook" style="font-size: 1.5rem; color: #fff;"></ion-icon>
+      </a>
+      <a href="https://x.com" target="_blank">
+        <ion-icon name="logo-twitter"></ion-icon> <!-- X formerly Twitter -->
+      </a>
+      <a href="https://youtube.com" target="_blank">
+        <ion-icon name="logo-youtube"></ion-icon>
+      </a>
+      <a href="https://tiktok.com" target="_blank">
+        <ion-icon name="logo-tiktok"></ion-icon>
+      </a>
+    </div>
+    <p style="margin-top: 1rem; font-size: 0.9rem;">SportyFanz &copy; 2025 The Ultimate Sports Hub. All rights reserved.</p>
+  </footer>
+  
+</body>
+</html>

@@ -1,5 +1,5 @@
 
-const APIkey = '23072c515f41a7c3bb05fb5703dfec31d906b0885c87203f7783587636cd914f';
+const APIkey = 'e71d42864ea0a2aaade48aa444ad82ebc9efa53000b7b91d5a279651a201bc71';
 
 //sidebar toggle for web view
 function toggleSidebar() {

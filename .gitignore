@@ -1,15 +1,65 @@
-# Ignore Python environments and cache
-env/
-.venv/
+# Python bytecode
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 
-# VSCode or Codespaces files
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+env1/
+
+# VSCode and IDE configs
 .vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# PyInstaller
+*.spec
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# Node modules (if any frontend uses Node.js)
+node_modules/
+
+# Built distributions
+dist/
+build/
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+
+# Test cache
+.cache/
+nosetests.xml
+pytest_cache/
+
+# Compiled static files (if Django or Flask is used)
+staticfiles/
+
+# Personal config files
 *.code-workspace
 
-# Ignore large models, etc.
+# Model files
 *.pt
 *.pth
+*.onnx
+*.h5
+*.tflite

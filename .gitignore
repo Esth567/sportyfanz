@@ -1,0 +1,15 @@
+# Ignore Python environments and cache
+env/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# VSCode or Codespaces files
+.vscode/
+*.code-workspace
+
+# Ignore large models, etc.
+*.pt
+*.pth

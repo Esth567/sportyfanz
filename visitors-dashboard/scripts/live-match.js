@@ -90,14 +90,15 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
     function getMinutesSince(matchDate, matchTime) {
         const { DateTime } = luxon;
     
-        const matchDateTime = DateTime.fromFormat(
-            `${matchDate} ${matchTime}`,
-            "yyyy-MM-dd HH:mm",
+        const matchBerlin = luxon.DateTime.fromFormat(
+           `${match.match_date} ${match.match_time}`,
+             "yyyy-MM-dd h:mm a",
             { zone: "Europe/Berlin" }
-        );
+         );
+     
     
-        const now = DateTime.now().setZone("Europe/Berlin");
-        const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
+        const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+        const diffInMinutes = Math.floor(now.diff(matchBerlin, "minutes").minutes);
         return diffInMinutes > 0 ? diffInMinutes : 0;
     }
     
@@ -179,8 +180,13 @@ function updateMatches(matches) {
         const status = (match.match_status || "").trim().toLowerCase();
 
         // Convert match time from UTC to local timezone (Ensure that match times are in UTC and are converted correctly)
-        const matchDateTimeUTC = luxon.DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`, { zone: "utc" }); // Treat as UTC explicitly
-        const matchDateTimeLocal = matchDateTimeUTC.setZone(luxon.DateTime.local().zoneName);  // Convert to local timezone explicitly
+        const matchBerlin = luxon.DateTime.fromFormat(
+        `${match.match_date} ${match.match_time}`,
+        "yyyy-MM-dd HH:mm",
+        { zone: "Europe/Berlin" }
+       );
+      const matchDateTimeLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+
 
         const isFinished = status === "ft" || status === "finished" || status.includes("pen") || status.includes("after") || parseInt(status) >= 90;
         const isUpcoming = matchDateTimeLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
@@ -288,8 +294,13 @@ function renderMatches(matchesData, category) {
         html += `<div class="match-category-content">`;
 
         league.matches.forEach(match => {
-            const matchUTC = luxon.DateTime.fromISO(`${match.match_date}T${match.match_time}:00Z`);
-            const matchLocal = matchUTC.setZone(luxon.DateTime.local().zoneName);
+            const matchBerlin = luxon.DateTime.fromFormat(
+           `${match.match_date} ${match.match_time}`,
+           "yyyy-MM-dd HH:mm",
+           { zone: "Europe/Berlin" }
+           );
+          const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+
             const matchDay = matchLocal.toFormat("MMM d");
 
             let matchMinute;

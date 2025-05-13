@@ -8,280 +8,208 @@ document.addEventListener("DOMContentLoaded", async function () {
     const middleLayer = document.querySelector(".middle-layer");
     if (middleLayer) middleLayer.style.display = "block";
 });
+
+
+// ========== CONFIG ========== //
+const API_BASE = 'http://localhost:8000';
+const MAX_VISIBLE_NEWS = 5;
+
+
+// ========== INITIAL LOAD ========== //
+document.addEventListener('DOMContentLoaded', loadNews);
+setInterval(updateRelativeTime, 30000);
+
+
   
-  // Function to display the first 5 news items on page load
-  async function showInitialNews(sectionId) {
-    const newsSection = document.getElementById(sectionId);
-    if (!newsSection || !Array.isArray(window.newsData)) return;
+  // ========== DISPLAY INITIAL 5 ========== //
+function showInitialNews(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
 
-    const newsItems = newsSection.querySelectorAll(".news-infomat");
+    const items = section.querySelectorAll('.news-infomat');
+    items.forEach((item, index) => {
+        item.style.display = index < MAX_VISIBLE_NEWS ? 'flex' : 'none';
+    });
 
-    if (newsItems.length > 0) {
-        for (let i = 0; i < newsItems.length; i++) {
-            const newsItem = window.newsData[i];
-            if (!newsItem) continue; // Skip undefined
-
-            await enhanceNews(i, newsItem);
-        }
-
-        newsItems.forEach((item, index) => {
-            item.style.display = index < 5 ? "flex" : "none";
-        });
-
-        newsSection.style.display = "flex";
-        newsSection.style.flexDirection = "column";
-    }
+    section.style.display = 'flex';
+    section.style.flexDirection = 'column';
 }
 
+
   
-  // Toggle news visibility when "See more" is clicked
+  // ========== TOGGLE SEE MORE ========== //
 function toggleNews(section) {
-    const newsSection = document.getElementById(section + "-news");
-    const seeMoreText = document.getElementById(section + "-text");
+    const newsSection = document.getElementById(`${section}-news`);
+    const seeMoreText = document.getElementById(`${section}-text`);
     const icon = document.querySelector(`#${section} .see-more ion-icon`);
 
-    if (!newsSection || !seeMoreText || !icon) {
-        console.warn(`toggleNews: Missing elements for section ${section}`);
-        return;
-    }
+    if (!newsSection || !seeMoreText || !icon) return;
 
-    const newsItems = newsSection.querySelectorAll(".news-infomat");
+    const items = newsSection.querySelectorAll('.news-infomat');
+    const expanded = seeMoreText.innerText === 'See less';
 
-    if (seeMoreText.innerText === "See more") {
-        newsItems.forEach(item => item.style.display = "block");
-        seeMoreText.innerText = "See less";
-        icon.name = "caret-up-outline"; 
-    } else {
-        newsItems.forEach((item, index) => {
-            item.style.display = index < 5 ? "block" : "none";
-        });
-        seeMoreText.innerText = "See more";
-        icon.name = "caret-down-outline"; 
-    }
+    items.forEach((item, index) => {
+        item.style.display = expanded ? (index < MAX_VISIBLE_NEWS ? 'flex' : 'none') : 'flex';
+    });
+
+    seeMoreText.innerText = expanded ? 'See more' : 'See less';
+    icon.name = expanded ? 'caret-down-outline' : 'caret-up-outline';
 }
   
   
-  
-  // Function to calculate and display the relative time
-  function updateRelativeTime() {
-    const timeElements = document.querySelectorAll(".news-time");
+  // ========== RELATIVE TIME ========== //
+function updateRelativeTime() {
+    const timeElements = document.querySelectorAll('.news-time');
     const now = new Date();
 
-    timeElements.forEach((timeElement) => {
-        const postedData = timeElement.dataset.posted;
-
-        if (!postedData) {
-            timeElement.textContent = "Unknown time";
+    timeElements.forEach(el => {
+        const posted = new Date(el.dataset.posted);
+        if (isNaN(posted)) {
+            el.textContent = 'Invalid time';
             return;
         }
 
-        let postedTime = new Date(postedData);
+        const diff = Math.floor((now - posted) / 1000);
+        let text;
 
-        if (isNaN(postedTime)) {
-            console.warn("Invalid date format:", postedData);
-            postedTime = Date.parse(postedData);  // Try parsing manually
-        }
+        if (diff < 60) text = `${diff} seconds ago`;
+        else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
+        else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
+        else text = `${Math.floor(diff / 86400)} day(s) ago`;
 
-        if (isNaN(postedTime)) {
-            timeElement.textContent = "Invalid time"; // Couldn’t parse it
-            return;
-        }
-
-        const timeDifference = Math.floor((now - postedTime) / 1000); // in seconds
-        let timeText;
-
-        if (timeDifference < 60) {
-            timeText = `${timeDifference} seconds ago`;
-        } else if (timeDifference < 3600) {
-            const minutes = Math.floor(timeDifference / 60);
-            timeText = `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-        } else if (timeDifference < 86400) {
-            const hours = Math.floor(timeDifference / 3600);
-            timeText = `${hours} hour${hours > 1 ? "s" : ""} ago`;
-        } else {
-            const days = Math.floor(timeDifference / 86400);
-            timeText = `${days} day${days > 1 ? "s" : ""} ago`;
-        }
-
-        timeElement.textContent = timeText;
+        el.textContent = text;
     });
 }
 
-
-  // Update relative time every 30 seconds
-  setInterval(updateRelativeTime, 30000);
+// ========== UTIL: PARSE DATE ========== //
+function parseDate(dateStr) {
+    const date = new Date(dateStr);
+    return isNaN(date) ? null : date;
+}
   
   
-// Function to summarize the text 
+// ========== SUMMARIZE TEXT ========== //
 async function summarizeText(title, description) {
     try {
-        const response = await fetch('http://localhost:8000/summarize', {
+        const response = await fetch(`${API_BASE}/summarize`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title: title,
-                description: description
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, description })
         });
 
         const data = await response.json();
-        if (!response.ok || data.error) {
-            console.warn("Backend error:", data.error || response.statusText);
-            return {
-                title: title,         
-                summary: description
-            };
-        }
+        if (!response.ok || data.error) throw new Error(data.error || response.statusText);
 
-        const summary = data.summary;
-        const seoTitle = data.seo_title;
+        const summary = data.summary || description;
         const wordCount = summary.split(' ').length;
 
-        
         return {
-            title: seoTitle || title,
-            summary: wordCount < 150 ? summary + " (Extended Summary...)" : summary
+            summary: wordCount < 150 ? `${summary} (Extended Summary...)` : summary
         };
-    } catch (error) {
-        console.error('Error summarizing text:', error);
-        return {
-            title: title,
-            summary: description
-        };
+    } catch (err) {
+        console.error('Summarization failed:', err);
+        return { summary: description };
     }
 }
 
 
-// Function to rewrite the title for SEO
+// ========== SEO TITLE REWRITE ========== //
 function rewriteTitleForSEO(originalTitle, matchResult = '') {
     const leagues = ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Champions League', 'Europa League', 'CAF Champions League', 'CAF Confederation Cup'];
     const players = ['Erling Haaland', 'Kylian Mbappe', 'Cristiano Ronaldo', 'Lionel Messi', 'Victor Osimhen', 'Harry Kane'];
     const clubs = ['Manchester City', 'Real Madrid', 'Barcelona', 'Bayern Munich', 'Arsenal', 'Napoli', 'PSG', 'Al Nassr'];
 
-    const foundLeague = leagues.find(league => originalTitle.toLowerCase().includes(league.toLowerCase()));
-    const foundPlayer = players.find(player => originalTitle.toLowerCase().includes(player.toLowerCase()));
-    const foundClub = clubs.find(club => originalTitle.toLowerCase().includes(club.toLowerCase()));
+    const lowerTitle = originalTitle.toLowerCase();
+    const foundLeague = leagues.find(l => lowerTitle.includes(l.toLowerCase()));
+    const foundPlayer = players.find(p => lowerTitle.includes(p.toLowerCase()));
+    const foundClub = clubs.find(c => lowerTitle.includes(c.toLowerCase()));
 
-    // Adding match result to SEO title if available
     let baseTitle = originalTitle.trim();
+    if (matchResult) baseTitle += ` | Match Result: ${matchResult}`;
 
-    if (matchResult) {
-        baseTitle += ` | Match Result: ${matchResult}`;
-    }
+    if (foundPlayer && foundLeague) return `${foundPlayer} Makes Headlines in ${foundLeague} | Latest Update`;
+    if (foundPlayer && foundClub) return `${foundPlayer} Shines for ${foundClub} – Breaking Football News`;
+    if (foundClub && foundLeague) return `${foundClub} in ${foundLeague} Action: Match Highlights & Analysis`;
+    if (foundPlayer) return `${foundPlayer}'s Latest Performance – Must-Read Football Insight`;
+    if (foundClub) return `${foundClub} Update: Match News, Transfers & More`;
+    if (foundLeague) return `${foundLeague} Roundup – Key Matches, Players & Talking Points`;
 
-    if (foundPlayer && foundLeague) {
-        return `${foundPlayer} Makes Headlines in ${foundLeague} | Latest Update`;
-    } else if (foundPlayer && foundClub) {
-        return `${foundPlayer} Shines for ${foundClub} – Breaking Football News`;
-    } else if (foundClub && foundLeague) {
-        return `${foundClub} in ${foundLeague} Action: Match Highlights & Analysis`;
-    } else if (foundPlayer) {
-        return `${foundPlayer}'s Latest Performance – Must-Read Football Insight`;
-    } else if (foundClub) {
-        return `${foundClub} Update: Match News, Transfers & More`;
-    } else if (foundLeague) {
-        return `${foundLeague} Roundup – Key Matches, Players & Talking Points`;
-    }
-
-    // Fallback
     return baseTitle.length > 80 ? baseTitle.slice(0, 77) + '...' : baseTitle;
 }
 
 
-// Function to generate blog content and fetch SEO title and summary in parallel
+// ========== GENERATE BLOG CONTENT ========== //
 async function generateBlogContent(title, description) {
     try {
-        // Run both title rewrite and summary generation in parallel
-        const [seoTitle, summary] = await Promise.all([
+        const [seoTitle, summaryObj] = await Promise.all([
             rewriteTitleForSEO(title),
-            summarizeText(description)
+            summarizeText(title, description)
         ]);
 
-        return { seo_title: seoTitle, blog_summary: summary };
-    } catch (error) {
-        console.error("Error generating blog content:", error);
+        return {
+            seo_title: seoTitle,
+            blog_summary: summaryObj.summary
+        };
+    } catch (err) {
+        console.error('Error generating blog content:', err);
         return { seo_title: title, blog_summary: description };
     }
 }
 
+
+// ========== ENHANCE EACH NEWS ITEM ========== //
 async function enhanceNews(index, news) {
-    const newsElement = document.getElementById(`news-${index}`);
-    if (!newsElement) return;
+    const newsEl = document.getElementById(`news-${index}`);
+    if (!newsEl) return;
 
-    const titleEl = newsElement.querySelector('.news-header');
-    const descEl = newsElement.querySelector('.news-description');
-    const timeEl = newsElement.querySelector('.news-time');
+    const titleEl = newsEl.querySelector('.news-header');
+    const descEl = newsEl.querySelector('.news-description');
+    const timeEl = newsEl.querySelector('.news-time');
 
-    let title = news.title || "Untitled News";
-    let description = news.description || "No description available.";
-    let pubDate = news.pubDate || new Date().toISOString();
-
-    // ✅ Inject SEO-enhanced content
-    const { seo_title, blog_summary } = await generateBlogContent(title, description);
-    title = seo_title;
-    description = blog_summary;
-
-    // Display
-    titleEl.textContent = title;
-    descEl.textContent = description;
-    timeEl.dataset.posted = pubDate;
+    const { seo_title, blog_summary } = await generateBlogContent(news.title, news.description);
+    titleEl.textContent = seo_title || news.title;
+    descEl.textContent = blog_summary || news.description;
+    timeEl.dataset.posted = news.pubDate;
 }
 
 
 
-// Function to load news
+
+// ========== LOAD NEWS ========== //
 async function loadNews() {
     try {
-        const res = await fetch('http://localhost:8000/api/news');  // Change this URL to your FastAPI URL
+        const res = await fetch(`${API_BASE}/api/news`);
         const data = await res.json();
 
-        if (!Array.isArray(data)) {
-            console.error('News data is not an array');
-            return;
-        }
-
-        const trendingContainer = document.getElementById('trending-news');
-        const updateContainer = document.getElementById('updates-news');
-
-        if (!trendingContainer || !updateContainer) {
-            console.error('News containers not found in DOM');
-            return;
-        }
-
-        trendingContainer.innerHTML = '';
-        updateContainer.innerHTML = '';
+        if (!Array.isArray(data)) throw new Error('News data is not an array');
 
         window.newsData = data;
-        window.seoTitles = [];
-        window.summaries = [];
+        const trendingContainer = document.getElementById('trending-news');
+        const updatesContainer = document.getElementById('updates-news');
+
+        if (!trendingContainer || !updatesContainer) throw new Error('News containers not found in DOM');
+
+        trendingContainer.innerHTML = '';
+        updatesContainer.innerHTML = '';
 
         data.forEach((news, i) => {
-            // Ensure pubDate exists and parse it
-            console.log("Raw pubDate:", news.pubDate);
-            if (!news.pubDate) {
-                console.warn("Missing pubDate, setting to current date");
-                news.pubDate = new Date().toISOString();  // Fallback to current date if missing
-            } else {
-                const parsedDate = new Date(news.pubDate);
-                if (!isNaN(parsedDate)) {
-                    news.pubDate = parsedDate.toISOString(); // Ensure ISO format
-                }
-            }
+            news.pubDate = parseDate(news.pubDate) || new Date().toISOString();
 
-            const newsHTML = createShimmerHTML(news, i);
+            const html = createNewsHTML(news, i);
+            const trendingItem = document.createElement('div');
+            const updatesItem = document.createElement('div');
 
-            const trendingDiv = document.createElement('div');
-            trendingDiv.innerHTML = newsHTML;
+            trendingItem.innerHTML = html;
+            updatesItem.innerHTML = html;
 
-            // Append the news element to the container
-            if (trendingContainer) trendingContainer.appendChild(trendingDiv);
-            if (updateContainer) updateContainer.appendChild(trendingDiv.cloneNode(true));
+            trendingContainer.appendChild(trendingItem);
+            updatesContainer.appendChild(updatesItem);
 
-            // Call enhanceNews after a short delay to ensure data is populated
-            setTimeout(() => enhanceNews(i, news), 100);
+            enhanceNews(i, news); // No delay needed; each runs independently
         });
+
+        showInitialNews('trending-news');
+        showInitialNews('updates-news');
     } catch (err) {
         console.error('Error loading news:', err);
     }
@@ -289,8 +217,8 @@ async function loadNews() {
 
 
 
-
-function createShimmerHTML(news, index) {
+// ========== CREATE NEWS ITEM HTML ========== //
+function createNewsHTML(news, index) {
     return `
         <div class="news-infomat" id="news-${index}" onclick="showNewsDetail(${index})">
             <div class="feature-img">
@@ -300,7 +228,7 @@ function createShimmerHTML(news, index) {
                 <h3 class="news-header">${news.title}</h3>
                 <div class="news-meta">
                     <p class="news-description">${news.description}</p>
-                    <p class="news-time" data-posted="${news.pubDate || ''}"></p>
+                    <span class="news-time" data-posted="${news.pubDate}">Loading...</span>
                 </div>
             </div>
         </div>
@@ -314,35 +242,46 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+// ========== Display full news details ========== //
+async function showNewsDetail(newsItem) {
+  const newsDetailContainer = document.getElementById("news-detail");
+  const summaryBox = newsDetailContainer.querySelector(".news-summary");
+  const headline = newsDetailContainer.querySelector(".news-headline");
+  const image = newsDetailContainer.querySelector(".news-image");
+  const meta = newsDetailContainer.querySelector(".news-meta");
 
- // Show detailed news view
-function showNewsDetail(index) {
-    const news = window.newsData?.[index];
-    const seoTitle = window.seoTitles?.[index] || news?.title;
-    const summary = window.summaries?.[index] || news?.description;
+  // Fill in basic info
+  headline.textContent = newsItem.title || "Untitled";
+  meta.textContent = new Date(newsItem.pubDate).toLocaleString();
+  image.src = newsItem.image || "fallback.jpg";
+  image.alt = newsItem.title;
 
-    if (!news) return;
+  // Show loading while fetching summary
+  summaryBox.innerHTML = `<div class="spinner">Summarizing...</div>`;
 
-    const detailView = document.getElementById('news-details-view');
-    const detailContent = document.getElementById('news-detail-content');
+  try {
+    const response = await fetch("http://localhost:8000/summarize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: newsItem.description })
+    });
 
-    if (!detailView || !detailContent) {
-        console.warn("News detail elements not found");
-        return;
-    }
-
-    detailView.style.display = 'block';
-    document.getElementById('trending-news').style.display = 'none';
-    document.getElementById('updates-news').style.display = 'none';
-
-    detailContent.innerHTML = `
-        <h2>${seoTitle}</h2>
-        <img src="${news.image || 'assets/images/default.jpg'}" alt="Detail image" class="feature-img-ankle">
-        <p class="news-description">${summary}</p>
-        <p class="news-time" data-posted="${news.pubDate || 'No date available'}"></p>
+    const data = await response.json();
+    summaryBox.innerHTML = `
+      <p class="seo-title">${data.seo_title || "News Summary"}</p>
+      <p>${data.summary || "No summary available."}</p>
     `;
+  } catch (err) {
+    console.error("Summary error:", err);
+    summaryBox.innerHTML = "<p>Failed to summarize content.</p>";
+  }
+
+  // Show the detail container
+  newsDetailContainer.style.display = "block";
 }
-  
+
+
+
 
 // Go back to news list view
 function showNewsList() {

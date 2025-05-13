@@ -112,7 +112,7 @@ function toggleNews(section) {
   setInterval(updateRelativeTime, 30000);
   
   
-// Function to summarize the text to 150-200 words using the Flask backend
+// Function to summarize the text 
 async function summarizeText(title, description) {
     try {
         const response = await fetch('http://localhost:8000/summarize', {
@@ -130,8 +130,8 @@ async function summarizeText(title, description) {
         if (!response.ok || data.error) {
             console.warn("Backend error:", data.error || response.statusText);
             return {
-                title: title,         // fallback to original title
-                summary: description  // fallback to original description
+                title: title,         
+                summary: description
             };
         }
 

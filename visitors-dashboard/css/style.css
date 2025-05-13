@@ -3761,7 +3761,8 @@ ul li {
 }
 
 
-@media screen and (max-width: 1024px) { /* Tablet */
+/* Media Query for Tablets Ipads portrait mode */
+ @media (min-width: 768px) and (max-width: 1024px) { /* Tablet */
 /* Sidebar Container */
     .sidebar {
         display: none;
@@ -4273,8 +4274,8 @@ ul li {
 }
 
 
-
-@media screen and (max-width: 768px) { /* Mobile */
+    /* Media Query for low resolution  Tablets, Ipads */
+ @media (min-width: 481px) and (max-width: 767px) { 
      
     .content {
         display: flex;
@@ -4314,11 +4315,14 @@ ul li {
     .advert1 img {
         max-height: 160px; 
         width: 100%;
-    }
-
-    
+    }  
    
 }
+
+/* Media Query for Mobile Devices */
+@media (max-width: 480px){
+
+    }
 
 
 

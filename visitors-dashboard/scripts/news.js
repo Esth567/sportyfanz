@@ -244,21 +244,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ========== Display full news details ========== //
 async function showNewsDetail(newsItem) {
-  const newsDetailContainer = document.getElementById("news-detail");
-  const summaryBox = newsDetailContainer.querySelector(".news-summary");
-  const headline = newsDetailContainer.querySelector(".news-headline");
-  const image = newsDetailContainer.querySelector(".news-image");
-  const meta = newsDetailContainer.querySelector(".news-meta");
+  const newsDetailContainer = document.getElementById("news-details-view");
+  const detailBox = document.getElementById("news-detail-content");
 
-  // Fill in basic info
-  headline.textContent = newsItem.title || "Untitled";
-  meta.textContent = new Date(newsItem.pubDate).toLocaleString();
-  image.src = newsItem.image || "fallback.jpg";
-  image.alt = newsItem.title;
+  // Set basic info immediately
+  detailBox.innerHTML = `
+    <h2 class="news-headline">${newsItem.title || "Untitled"}</h2>
+    <div class="news-meta">${new Date(newsItem.pubDate).toLocaleString()}</div>
+    <img class="news-image" src="${newsItem.image || 'fallback.jpg'}" alt="${newsItem.title}">
+    <div class="news-summary">
+      <div class="spinner">Summarizing...</div>
+    </div>
+  `;
 
-  // Show loading while fetching summary
-  summaryBox.innerHTML = `<div class="spinner">Summarizing...</div>`;
+  // Hide list views
+  document.getElementById("trending-news").style.display = "none";
+  document.getElementById("updates-news").style.display = "none";
 
+  // Show detail view
+  newsDetailContainer.style.display = "block";
+
+  // Fetch summary
   try {
     const response = await fetch("http://localhost:8000/summarize", {
       method: "POST",
@@ -267,18 +273,16 @@ async function showNewsDetail(newsItem) {
     });
 
     const data = await response.json();
-    summaryBox.innerHTML = `
+    const detailBox.querySelector('.news-summary').innerHTML = `
       <p class="seo-title">${data.seo_title || "News Summary"}</p>
       <p>${data.summary || "No summary available."}</p>
     `;
   } catch (err) {
     console.error("Summary error:", err);
-    summaryBox.innerHTML = "<p>Failed to summarize content.</p>";
+    detailBox.querySelector('.news-summary').innerHTML = "<p>Failed to summarize content.</p>";
   }
-
-  // Show the detail container
-  newsDetailContainer.style.display = "block";
 }
+
 
 
 

@@ -72,50 +72,7 @@ app.get("/data", async (req, res) => {
     }
 });
 
-app.post("/update", async (req, res) => {
-    try {
-        const { team1, team2, league, image, headline } = req.body;
-        let data = await Data.findOne();
-
-        if (!data) data = new Data({ liveMatch: {}, newsUpdate: {} });
-
-        if (team1) data.liveMatch.team1 = team1;
-        if (team2) data.liveMatch.team2 = team2;
-        if (league) data.liveMatch.league = league;
-        if (image) data.newsUpdate.image = image;
-        if (headline) data.newsUpdate.headline = headline;
-
-        await data.save();
-        res.json({ message: "Updated successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Server Error" });
-    }
-});
-
-// Example RSS feed (Sky Sports Football News)
-const RSS_URL = 'https://www.skysports.com/rss/12040';
-
-app.get('/api/news', async (req, res) => {
-  try {
-    const response = await axios.get(RSS_URL);
-    const xml = response.data;
-
-    xml2js.parseString(xml, (err, result) => {
-      if (err) return res.status(500).json({ error: 'Failed to parse XML' });
-
-      const items = result.rss.channel[0].item;
-      const news = items.map(item => ({
-        title: item.title[0],
-        description: item.description[0],
-      }));
-
-      res.json(news);
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch news' });
-  }
-});
-  
+ 
 
 //auto-reply to the sender
 app.post('/send', async (req, res) => {

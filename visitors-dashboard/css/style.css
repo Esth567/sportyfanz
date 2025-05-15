@@ -3763,7 +3763,7 @@ ul li {
 
 
  /* Tablet and small desktops */
-@media (min-width: 481px) and (max-width: 1024px) {
+@media (max-width: 1024px) {
 /* Sidebar Container */
     .sidebar {
         display: none;
@@ -4272,6 +4272,10 @@ ul li {
         flex-grow: 1;
     }
     
+}
+
+@media (min-width: 768px) {
+
 }
 
 

@@ -7,6 +7,9 @@ const { User, Data } = require("../database/db");  // ✅ Correct Import
 require("dotenv").config();
 const fetch = require('node-fetch');
 const nodemailer = require('nodemailer');
+const webpush = require("web-push");
+const Subscription = require("../models/Subscription");
+const cron = require("node-cron");
 
 const app = express();
 const path = require('path');
@@ -119,6 +122,68 @@ app.post('/send', async (req, res) => {
       res.status(500).send({ error: 'Email sending failed.' });
     }
   });
+
+
+  const VAPID_KEYS = {
+   publicKey: 'BAR21cur5ApKmazRv7EV8iQJEwaSreGzkPuCtBTtVeC0UkpdAAkE9gB1YlTGtpfSxo5FZRYZT6MB9tcJsccr6ZA',
+   privateKey: 'x_wswmsvakQqCXUN2OnExeSh92ebVWY1-pNcAPXepjE',
+};
+
+webpush.setVapidDetails(
+  "mailto:youremail@example.com",
+  VAPID_KEYS.publicKey,
+  VAPID_KEYS.privateKey
+);
+
+app.use(bodyParser.json());
+
+let subscriptions = [];
+
+// Save subscription to DB (avoids duplicates)
+app.post("/subscribe", async (req, res) => {
+  const sub = req.body;
+
+  const exists = await Subscription.findOne({ endpoint: sub.endpoint });
+  if (!exists) await Subscription.create(sub);
+
+  res.status(201).json({ message: "Subscribed" });
+});
+
+// Notify all
+app.post("/notify", async (req, res) => {
+  const { title, body } = req.body;
+  const payload = JSON.stringify({ title, body });
+
+  const subs = await Subscription.find();
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(sub, payload);
+    } catch (err) {
+      console.error("Notification error:", err);
+    }
+  }
+
+  res.status(200).json({ message: "Notifications sent" });
+});
+
+
+// Every day at 9am, send top scorer
+cron.schedule("0 9 * * *", async () => {
+  const title = "🏆 Top Scorer Today";
+  const body = "See who's leading the Golden Boot race!";
+  const payload = JSON.stringify({ title, body });
+
+  const subs = await Subscription.find();
+  for (const sub of subs) {
+    try {
+      await webpush.sendNotification(sub, payload);
+    } catch (err) {
+      console.error("Scheduled notification error:", err);
+    }
+  }
+
+  console.log("9AM Daily notification sent");
+});
 
 
 // ✅ Export Express App

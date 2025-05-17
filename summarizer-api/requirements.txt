@@ -16,6 +16,7 @@ feedfinder2==0.0.4
 feedparser==6.0.11
 filelock==3.18.0
 fsspec==2025.3.2
+gunicorn==23.0.0
 h11==0.16.0
 huggingface-hub==0.31.2
 idna==3.10

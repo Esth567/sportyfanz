@@ -29,12 +29,26 @@ def summarize_long_text(url):
         article.download()
         article.parse()
         text = article.text.strip()
+        
         if len(text) < 100:
             return None
-        max_len = 512 if len(text.split()) > 1000 else 300
-        summary = summarizer(text, max_length=max_len, min_length=80, do_sample=False)[0]["summary_text"]
+
+        # Estimate token count (approximate with word count for simplicity)
+        input_length = len(text.split())
+
+        # Dynamically calculate max_length (e.g., 40-50% of input length)
+        max_len = min(300, max(80, int(input_length * 0.45)))  # min 80 tokens
+
+        summary = summarizer(
+            text,
+            max_length=max_len,
+            min_length=80,
+            do_sample=False
+        )[0]["summary_text"]
+
         doc = nlp(text)
         first_sentence = next(doc.sents).text if doc.sents else ""
+
         return {
             "title": article.title or "",
             "summary": summary,
@@ -43,9 +57,11 @@ def summarize_long_text(url):
             "url": url,
             "first_sentence": first_sentence
         }
+
     except Exception as e:
         print(f"[ERROR] Failed to process {url}: {e}")
         return None
+
 
 def rewrite_title_for_seo(original_title: str) -> str:
     doc = nlp(original_title)

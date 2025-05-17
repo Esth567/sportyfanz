@@ -273,17 +273,17 @@ async function showNewsDetail(newsItem) {
     });
 
     const data = await response.json();
-    const detailBox.querySelector('.news-summary').innerHTML = `
-      <p class="seo-title">${data.seo_title || "News Summary"}</p>
+    const summaryBox = detailBox.querySelector('.news-summary');
+     summaryBox.innerHTML = `
+     <p class="seo-title">${data.seo_title || "News Summary"}</p>
       <p>${data.summary || "No summary available."}</p>
-    `;
-  } catch (err) {
-    console.error("Summary error:", err);
-    detailBox.querySelector('.news-summary').innerHTML = "<p>Failed to summarize content.</p>";
+     `;
+
+    } catch (err) {
+      console.error("Summary error:", err);
+      detailBox.querySelector('.news-summary').innerHTML = "<p>Failed to summarize content.</p>";
+    }
   }
-}
-
-
 
 
 

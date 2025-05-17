@@ -169,6 +169,7 @@ async function enhanceNews(index, news) {
     const { seo_title, blog_summary } = await generateBlogContent(news.title, news.description);
     titleEl.textContent = seo_title || news.title;
     descEl.textContent = blog_summary || news.description;
+    if (!news.title || !news.description) return;
     timeEl.dataset.posted = news.pubDate;
 }
 
@@ -187,10 +188,12 @@ async function loadNews() {
         const trendingContainer = document.getElementById('trending-news');
         const updatesContainer = document.getElementById('updates-news');
 
-        if (!trendingContainer || !updatesContainer) throw new Error('News containers not found in DOM');
+        if (!data.length) {
+          trendingContainer.innerHTML = '<p>No news available.</p>';
+          updatesContainer.innerHTML = '<p>No updates available.</p>';
+        return;
+       }
 
-        trendingContainer.innerHTML = '';
-        updatesContainer.innerHTML = '';
 
         data.forEach((news, i) => {
             news.pubDate = parseDate(news.pubDate) || new Date().toISOString();
@@ -225,9 +228,9 @@ function createNewsHTML(news, index) {
                 ${news.image ? `<img src="${news.image}" class="news-image" alt="News Image">` : ''}
             </div>
             <div class="news-messages">
-                <h3 class="news-header">${news.title}</h3>
+                <h3 class="news-header">${news.title || 'Untitled News'}</h3>
                 <div class="news-meta">
-                    <p class="news-description">${news.description}</p>
+                    <p class="news-description">${news.description || 'No summary available'}</p>
                     <span class="news-time" data-posted="${news.pubDate}">Loading...</span>
                 </div>
             </div>

@@ -8,19 +8,22 @@
     <!--Linking swipper css-->
  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 
- <link rel="stylesheet" href="style.css">
-    
+    <link rel="stylesheet" href="style.css">
+
+    <!--linking link.tss-->
+<script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <!--linking link.tss-->
-<script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>>
 
 </head>
-<body class="news-page">
-    <div class="page-wrapper" style="display: flex;">
+<body>
+    <div class="page-wrapper" style="display: flex;"></div>
     <div class="sidebar" id="sidebar">
         <div class="toggle-icon">
-
-            <!-- X-icon for closing sidebar -->
+         <!-- X-icon for closing sidebar -->
             <img src="assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
             
             <div class="icon">
@@ -32,7 +35,7 @@
     </div>
     <div class="stroke"></div>
     <div class="menu">
-        <ul>
+        <ul>  
             <li>
                 <img src="assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
                 <a href="index.html">Dashboard</a>
@@ -78,18 +81,18 @@
      <!-- Header -->
     <div class="header">
     <div class="header-top">
-        <h3>Dashboard / News</h3>
+        <h3>Dashboard / Home</h3>
         <div class="header-topbar">
 
-            <!-- mobile menu Header -->
+            <!-- Movile view Header -->
             <div class="mobileMenu-logo">
                 <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleMobileSidebar()"></ion-icon>  
                  <img src="assets/images/Logo2.png" alt="Logo" class="logo">
-                 <h2>News</h2>
              </div>
             <h1>
                 Welcome to your <span class="highlight">Ultimate Sports Hub</span>
             </h1>
+          
         <div class="header-actions">
             <!-- Search Bar -->
             <div class="search-container">
@@ -99,13 +102,14 @@
             
             <!-- Notification Icon -->
             <div class="icons">
+                <img src="assets/icons/Vectorsearch.png" alt="search" class="iconSearch">
                 <img src="assets/icons/BellSimple.png" alt="Bells">
                 <!-- Settings Icon -->
                 <img src="assets/icons/UserCircle.png" alt="userCircle">
             </div>
             <!-- Signup Button -->
             <button class="signup-btn">
-                <ion-icon name="arrow-forward-outline" class="arrow-icon"></ion-icon>
+                <img src="assets/icons/arrow-up.png" alt="arrowIcon">
                 Sign In               
             </button>
         </div>
@@ -114,11 +118,11 @@
     <!-- Horizontal Line -->
     <div class="header-line"></div>
    </div>
-
+   
    
     <!-- Main Content -->
     <div class="content">
-        <div class="layer">        
+        <div class="layer">
             <div class="text-cont">
                 <h4 class="live-matches">Live Matches</h4>
                 <div class="more">
@@ -127,19 +131,69 @@
                 </div>
             </div>
             <div class="live-match-demo"></div>
+            
             <div class="leagueTable-text-cont">
                 <h4 class="live-matches">League Table</h4>
+                <div class="more">
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                    <a href="league-table.html">View all</a>
+                </div>
+            </div>
+            <div class="league-table-demo">
+            </div>
+            <div class="text-cont">
+                <h4 class="live-matches">Trending News</h4>
                 <div class="more">
                     <ion-icon name="arrow-forward-outline"></ion-icon>
                     <a href="news.html">View all</a>
                 </div>
             </div>
-
-            <div class="league-table-demo"></div> 
-                  
+            <div class="news-update">
+                <div class="news-container" id="newsHeadline">
+                    <div class="news-image">
+                        <img src="assets/images/latest-transfer-news-LIVE-5909623.avif" alt="Featured News">
+                    </div>
+                    <div class="news-info">
+                      <h5 class="news-headline">Man Utd strike fee agreement as Arsenal learn Sesko verdict</h5>
+                    </div>
+                </div> 
+                <div class="news-container">
+                    <div class="news-image">
+                        <img src="assets/images/ArsenalSaliba24PredictedXIv1.avif" alt="Featured News">
+                    </div>
+                    <div class="news-info">
+                      <h5 class="news-headline">Arsenal XI vs Wolves: Confirmed team news, predicted lineup, injury latest for Premier League</h5>
+                    </div>
+                </div> 
+                <div class="news-container">
+                    <div class="news-image">
+                        <img src="assets/images/AA1wFgEd.jpg" alt="Featured News">
+                    </div>
+                    <div class="news-info">
+                      <h5 class="news-headline">Tottenham injury update: Dominic Solanke, Pape Sarr, Cristian Romero latest news and return dates</h5>
+                    </div>
+                </div> 
+                <div class="news-container">
+                    <div class="news-image">
+                        <img src="assets/images/0_Milos-Kerkez.jpg" alt="Featured News">
+                    </div>
+                    <div class="news-info">
+                      <h5 class="news-headline">Milos Kerkez latest, Mohamed Salah £65m claim, Darwin Nunez stance</h5>
+                    </div>
+                </div> 
+                <div class="news-container">
+                    <div class="news-image">
+                        <img src="assets/images/94369165-14310787-image-a-53_1737500202809.avif" alt="Featured News">
+                    </div>
+                    <div class="news-info">
+                      <h5 class="news-headline">NBA player becomes latest sports star targeted by burglars as his LA mansion is raided</h5>
+                    </div>
+                </div> 
+            </div>               
         </div>
+
         <div class="layer middle-layer">
-            <div class="news-text-cont">
+             <div class="news-text-cont">
                 <h4 class="news-headers">Trending News</h4>
                 <div class="see-more" onclick="toggleNews('trending')">
                     <img src="assets/icons/ankle-vector.png" alt="ankle-vector" class="ankle-viewMore">
@@ -211,7 +265,7 @@
                 <h4>Coming Soon</h4>
             </div>
             </div>
-            </div>
+            </div> 
  
 
             <!-- news update -->
@@ -241,54 +295,58 @@
       <!-- middly container advert -->
       <div class="advert-container">
         <p>Advertisement</p>
-    </div>
-</div>
-
+       </div>
         </div>
+
+     
         <div class="layer third-layer"> 
-            <div class="text-cont">
+            <div class="text-cont2">
                 <h4 class="live-matches">Top Players</h4>
             </div>
-           
-               <!-- Top Players slider -->
-               <div class="slider">
+
+            <!-- Top Players slider -->
+            <div class="slider">
                 <div class="players-container"></div>
                 <!-- Slider Dots -->
                 <div class="slider-dots"></div>
                 </div>
 
+                <!-- advert -->
                 <div class="advert">
                     <h5>Advertisement</h5>
                  </div>
-           <div class="text-cont">
+
+           <div class="text-cont3">
             <h4 class="live-matches">Predition for Today</h4>
             <div class="more">
                 <ion-icon name="arrow-forward-outline"></ion-icon>
                 <a href="prediction.html">View all</a>
             </div>
         </div>
-        
+
         <div class="prediction-container"></div>
 
         <div class="advert">
             <h5>Advertisement</h5>
          </div>
-         </div> 
-        </div>  
-
-        <!-- Swiper JS -->
+         </div>  
+         </div>
+        </div>
+         
+         <!-- Swiper JS -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+
 
          <!--linking custome script-->
 <script src="scripts/script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/luxon@3.0.0/build/global/luxon.min.js"></script>
-<script src="scripts/live-match.js"></script>
 
 <!-- Footer -->
 <footer class="main-footer">
     <div class="footer-links">
       <a href="about.html">About</a>
       <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="partner-with-us.html">Partnership</a>
       <a href="sportyfanz89@gmail.com">Contact Us</a>
     </div>
     <div class="footer-social">
@@ -307,6 +365,6 @@
     </div>
     <p style="margin-top: 1rem; font-size: 0.9rem;">SportyFanz &copy; 2025 The Ultimate Sports Hub. All rights reserved.</p>
   </footer>
-
+  
 </body>
 </html>

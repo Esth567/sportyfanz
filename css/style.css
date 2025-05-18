@@ -473,7 +473,7 @@ body{
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 3px;
+    gap: px;
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
@@ -1967,8 +1967,8 @@ body{
     gap: 5px;
 }
 .leag-count img {
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
    object-fit: contain;
 }
 
@@ -1976,13 +1976,16 @@ body{
     font-size: 0.75rem;
     font-weight: 400;
     font-family: 'Lato';
+    margin-top: 2px;
+    
   }
   
   .league-info p {
-    font-size: 0.60rem;
-    font-weight: 400;
+    font-size: 0.65rem;
+    font-weight: 500;
     font-family: 'Lato';
     color: #ffffffa9;
+    margin-top: 2px;
   }
   
   .table-headers {
@@ -2284,6 +2287,35 @@ body{
 
 /*..................................................line match page........................*/
 
+
+.leags-country {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+.leags-country img {
+    width: 18px;
+    height: 18px;
+   object-fit: contain;
+}
+
+ .leagues-info h3 {
+    font-size: 0.75rem;
+    font-weight: 400;
+    font-family: 'Lato';
+    margin-top: -3px;
+    
+  }
+  
+  .leagues-info p {
+    font-size: 0.65rem;
+    font-weight: 500;
+    font-family: 'Lato';
+    color: #ffffffa9;
+    margin-top: 2px;
+  }
+
+
 .matches-header {
     display: flex;
     align-items: center;
@@ -2449,18 +2481,6 @@ body{
       font-size: 0.75rem;
       color: #fff;
   }
-
-
-.leag-country {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-}
-.leag-country img {
-    width: 20px;
-    height: 20px;
-   object-fit: contain;
-}
 
 
 .matches-item {

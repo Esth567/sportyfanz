@@ -29,9 +29,11 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1",
     "natural": "^8.0.1",
-    "node-cron": "^4.0.5",
+    "node-cron": "^3.0.2",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.3",
+    "openai": "^4.100.0",
+    "rss-parser": "^3.13.0",
     "web-push": "^3.6.7",
     "xml2js": "^0.6.2"
   }

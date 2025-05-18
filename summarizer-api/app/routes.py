@@ -5,6 +5,18 @@ from app.cache import article_cache
 
 router = APIRouter()
 
+# POST endpoint for individual summarization
+@app.post("/summarize")
+def summarize_news(news: NewsItem):
+    summary = summarize_long_text(news.description)
+    seo_title = rewrite_title_for_seo(news.title)
+    return {
+        "original_title": news.title,
+        "seo_title": seo_title,
+        "summary": summary
+    }
+
+# GET endpoint to fetch full news list
 @router.get("/api/news")
 async def get_news():
     all_articles = fetch_and_process_feeds()
@@ -25,7 +37,7 @@ async def get_news():
 
     return JSONResponse(content={"posts": formatted_posts})
 
-
+# Optional: background trigger endpoint
 @router.get("/trigger-fetch")
 async def trigger_fetch(background_tasks: BackgroundTasks):
     background_tasks.add_task(fetch_and_process_feeds)

@@ -61,9 +61,9 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
                 leagueElement.setAttribute("data-league-name", league.league_name);
 
                 leagueElement.innerHTML = `
-                    <div class="leag-country">
+                    <div class="leags-country">
                         <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league_name} Logo">
-                        <div class="league-info">
+                        <div class="leagues-info">
                             <h3>${league.league_name}</h3>
                             <p>${league.country_name}</p>
                         </div>
@@ -634,14 +634,14 @@ async function displayLiveMatch(matchId, category) {
                                 <ul>${renderPlayers(match.lineup?.home?.starting_lineups)}</ul>
                                 <h4>Substitutes</h4>
                                 <ul>${renderPlayers(match.lineup?.home?.substitutes)}</ul>
-                                <ul>${renderPlayers(match.lineup?.home?.coaches)}</ul>
+                                <ul>${renderPlayers(match.lineup?.home?.coach_name)}</ul>
                             </div>
                             <div class="lineup-away-players">
                                 <h4>${match.match_awayteam_name}</h4>
                                 <ul>${renderPlayers(match.lineup?.away?.starting_lineups)}</ul>
                                 <h4>Substitutes</h4>
                                 <ul>${renderPlayers(match.lineup?.away?.substitutes)}</ul>
-                                <ul>${renderPlayers(match.lineup?.away?.coaches)}</ul>
+                                <ul>${renderPlayers(match.lineup?.away?.coach_name)}</ul>
                             </div>
                         </div>
                     </div>
@@ -940,8 +940,8 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
     }
      
   
-  // Function to fetch player data
-  function fetchAndRenderLineups(match_id, match) {
+  // ✅ Fetch lineup and dynamically infer formation
+function fetchAndRenderLineups(match_id, match) {
     fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${match_id}&APIkey=${APIkey}`)
         .then(res => res.json())
         .then(data => {
@@ -951,10 +951,11 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
                 return;
             }
 
-            const homeFormation = match?.match_hometeam_system || "4-4-2";
-            const awayFormation = match?.match_awayteam_system || "4-4-2";
             const homePlayers = lineups.home?.starting_lineups || [];
             const awayPlayers = lineups.away?.starting_lineups || [];
+
+            const homeFormation = inferFormation(homePlayers);
+            const awayFormation = inferFormation(awayPlayers);
 
             renderPlayersOnField("home", homePlayers, homeFormation, "home");
             renderPlayersOnField("away", awayPlayers, awayFormation, "away");
@@ -962,97 +963,125 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
         .catch(err => console.error("Error fetching lineups:", err));
 }
 
+// ✅ Parse inferred formation or fallback string-based one
+function parseFormation(formation, players) {
+    if (Array.isArray(formation)) return formation;
 
-      function parseFormation(formationString, players) {
-        const defaultFormation = "4-4-2";
-    
-        if (!formationString || typeof formationString !== "string") {
-            console.warn("Formation missing or invalid. Using default:", defaultFormation);
-            return defaultFormation.split("-").map(Number);
-        }
-    
-        const parts = formationString.split("-").map(p => parseInt(p.trim()));
-    
-        // Check all parts are numbers and total outfield = 10
-        const isValid = parts.every(n => Number.isInteger(n) && n > 0) &&
-                        parts.reduce((a, b) => a + b, 0) === 10;
-    
-        if (!isValid) {
-            console.warn("Malformed formation. Falling back to default:", defaultFormation);
-            return defaultFormation.split("-").map(Number);
-        }
-    
-        return parts;
+    const defaultFormation = "4-4-2";
+    console.log("🔍 Raw formation string:", formation);
+
+    if (!formation || typeof formation !== "string") {
+        console.warn("Formation missing or invalid. Using default:", defaultFormation);
+        return defaultFormation.split("-").map(Number);
     }
-    
-    
-    function renderPlayersOnField(team, players, formation, side = "home") {
-        const container = document.getElementById("football-field");
-        if (!container || !formation) return;
-    
-        const formationArray = parseFormation(formation, players);
-        const isHome = side === "home";
-    
-        // Goalkeeper position
-        const goalkeeper = players.find(p => p.lineup_position === "1");
-        if (goalkeeper) {
-            const gkX = isHome ? 10 : 90; // 10% for home, 90% for away
-            const gkY = 50;               // Center vertically
-            const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
-            container.appendChild(gkDiv);
-        }
-    
-        // Outfield players
-        const outfield = players.filter(p => p.lineup_position !== "1");
-        let currentIndex = 0;
-    
-        formationArray.forEach((playersInLine, lineIndex) => {
-            // Spread formation lines across X-axis (from backline to forward line)
-            const totalLines = formationArray.length;
-            const x = isHome
-                ? ((lineIndex + 1) / (totalLines + 1)) * 45 + 5   // 5–50% left half
-                : ((lineIndex + 1) / (totalLines + 1)) * 45 + 50; // 50–95% right half
-    
-            for (let j = 0; j < playersInLine; j++) {
-                const y = ((j + 1) / (playersInLine + 1)) * 100; // spread vertically
-    
-                const player = outfield[currentIndex];
-                if (player) {
-                    const div = createPlayerDiv({ ...player, team_type: side }, x, y);
-                    container.appendChild(div);
-                    currentIndex++;
-                }
+
+    const parts = formation.split("-").map(p => parseInt(p.trim())).filter(n => !isNaN(n));
+    const sum = parts.reduce((a, b) => a + b, 0);
+    const isValid = parts.every(n => Number.isInteger(n) && n > 0) && sum === 10;
+
+    if (!isValid) {
+        console.warn("❌ Malformed formation:", formation, "(sum =", sum, ")");
+        return defaultFormation.split("-").map(Number);
+    }
+
+    console.log("✅ Parsed formation:", parts);
+    return parts;
+}
+
+// ✅ Inference: derive formation from lineup_position
+function inferFormation(players) {
+    const outfield = players.filter(p => p.lineup_position !== "1");
+
+    const grouped = {
+        defense: [],
+        midfield: [],
+        attack: [],
+        extra: [],
+    };
+
+    outfield.forEach(p => {
+        const pos = parseInt(p.lineup_position);
+        if (pos <= 4) grouped.defense.push(p);
+        else if (pos <= 7) grouped.midfield.push(p);
+        else if (pos <= 10) grouped.attack.push(p);
+        else grouped.extra.push(p); // Position 11+
+    });
+
+    const result = [];
+    if (grouped.defense.length) result.push(grouped.defense.length);
+    if (grouped.midfield.length) result.push(grouped.midfield.length);
+    if (grouped.attack.length) result.push(grouped.attack.length);
+    if (grouped.extra.length) result.push(grouped.extra.length); // e.g. a 3-4-1-2 shape
+
+    console.log("🔧 Inferred formation:", result);
+    return result;
+}
+
+// ✅ Render player dots based on formation array
+function renderPlayersOnField(team, players, formation, side = "home") {
+    const container = document.getElementById("football-field");
+    if (!container || !formation) return;
+
+    const formationArray = parseFormation(formation, players);
+    const isHome = side === "home";
+
+    // Goalkeeper
+    const goalkeeper = players.find(p => p.lineup_position === "1");
+    if (goalkeeper) {
+        const gkX = isHome ? 10 : 90;
+        const gkY = 50;
+        const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
+        container.appendChild(gkDiv);
+    }
+
+    // Outfield players
+    const outfield = players.filter(p => p.lineup_position !== "1");
+    let currentIndex = 0;
+
+    formationArray.forEach((playersInLine, lineIndex) => {
+        const totalLines = formationArray.length;
+        const x = isHome
+            ? ((lineIndex + 1) / (totalLines + 1)) * 45 + 5
+            : ((lineIndex + 1) / (totalLines + 1)) * 45 + 50;
+
+        for (let j = 0; j < playersInLine; j++) {
+            const y = ((j + 1) / (playersInLine + 1)) * 100;
+            const player = outfield[currentIndex];
+            if (player) {
+                const div = createPlayerDiv({ ...player, team_type: side }, x, y);
+                container.appendChild(div);
+                currentIndex++;
             }
-        });
-    }    
-    
-
-    function createPlayerDiv(player, xPercent, yPercent) {
-        const div = document.createElement("div");
-        div.classList.add("player-dot");
-        div.style.left = `${xPercent}%`;
-        div.style.top = `${yPercent}%`;
-    
-        const numberSpan = document.createElement("span");
-        numberSpan.classList.add("player-number");
-        numberSpan.textContent = player.lineup_number;
-    
-        div.appendChild(numberSpan);
-    
-        // Tooltip with player name on hover
-        div.title = player.lineup_player;
-    
-        // Color styles
-        if (player.team_type === "home") {
-            div.style.backgroundColor = "black";
-            div.style.color = "white";
-        } else {
-            div.style.backgroundColor = "white";
-            div.style.color = "black";
         }
-    
-        return div;
+    });
+}
+
+// ✅ Create player dot element
+function createPlayerDiv(player, xPercent, yPercent) {
+    const div = document.createElement("div");
+    div.classList.add("player-dot");
+    div.style.left = `${xPercent}%`;
+    div.style.top = `${yPercent}%`;
+
+    const numberSpan = document.createElement("span");
+    numberSpan.classList.add("player-number");
+    numberSpan.textContent = player.lineup_number;
+    div.appendChild(numberSpan);
+
+    div.title = player.lineup_player;
+
+    // Colors
+    if (player.team_type === "home") {
+        div.style.backgroundColor = "black";
+        div.style.color = "white";
+    } else {
+        div.style.backgroundColor = "white";
+        div.style.color = "black";
     }
+
+    return div;
+}
+
     
 
  

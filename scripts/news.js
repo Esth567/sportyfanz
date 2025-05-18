@@ -91,7 +91,7 @@ function parseDate(dateStr) {
 // ========== SUMMARIZE TEXT ========== //
 async function summarizeText(title, description) {
     try {
-        const response = await fetch(`${API_BASE}/summarize`, {
+        const response = await fetch(`${API_BASE}/api/news`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ title, description })

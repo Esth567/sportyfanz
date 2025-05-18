@@ -1,21 +1,22 @@
+const dotenv = require("dotenv");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const axios = require('axios');
-const xml2js = require('xml2js');
-const { User, Data } = require("../database/db");  // ✅ Correct Import
-require("dotenv").config();
-const fetch = require('node-fetch');
 const nodemailer = require('nodemailer');
 const webpush = require("web-push");
-const Subscription = require("../models/Subscription");
 const cron = require("node-cron");
+const { OpenAI } = require('openai');
+const Parser = require('rss-parser');
+
 
 const app = express();
 const path = require('path');
+const parser = new Parser();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
+dotenv.config();
+
 
 
 
@@ -64,6 +65,109 @@ app.get("/admin-dashboard", verifyToken, (req, res) => {
     }
     res.json({ message: "Welcome to Admin Dashboard" });
 });
+
+
+
+// 📌 openai
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const rss_feeds = [
+  "http://www.espn.com/espn/rss/news",
+  "http://feeds.bbci.co.uk/sport/rss.xml?edition=uk",
+  "https://www.skysports.com/rss/12040",
+  "https://www.goal.com/en/feeds/news?fmt=rss"
+];
+
+// Rewriting the description (mock version)
+function rewriteDescription(desc) {
+  return `Latest: ${desc.replace(/<\/?[^>]+(>|$)/g, "")}`;
+}
+
+// Extract image from content
+function extractImage(entry) {
+  const mediaContent = entry.enclosure?.url || '';
+  const match = entry.content?.match(/<img.*?src="(.*?)"/);
+  return mediaContent || (match ? match[1] : '');
+}
+
+const summaryCache = new Map();
+
+async function rewriteDescriptionGPT(text, id = null) {
+  const key = id || text.slice(0, 100);
+
+  if (summaryCache.has(key)) return summaryCache.get(key);
+
+  try {
+    const prompt = `Rewrite this sports news in a short, engaging blog-style summary:\n\n"${text}"\n\nSummary:`;
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4', // or 'gpt-3.5-turbo' for lower cost
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 100,
+      temperature: 0.7,
+    });
+
+    const summary = response.choices[0].message.content.trim();
+    summaryCache.set(key, summary);
+    return summary;
+  } catch (err) {
+    console.error('OpenAI Error:', err.message);
+    return text; // fallback
+  }
+}
+
+
+async function fetchNews(useGPT = false) {
+  const allNews = [];
+
+  for (const feed of rss_feeds) {
+    try {
+      const result = await parser.parseURL(feed);
+
+      for (const item of result.items) {
+        const original = item.contentSnippet || item.summary || '';
+        const description = useGPT
+          ? await rewriteDescriptionGPT(original, item.guid || item.link)
+          : `Latest: ${original.replace(/<\/?[^>]+(>|$)/g, "")}`;
+
+        allNews.push({
+          title: item.title,
+          description,
+          originalDescription: original,
+          link: item.link,
+          image: extractImage(item),
+          pubDate: new Date(item.pubDate),
+          source: result.title,
+        });
+      }
+    } catch (err) {
+      console.error(`Error fetching ${feed}:`, err.message);
+    }
+  }
+
+  return allNews.sort((a, b) => b.pubDate - a.pubDate);
+}
+
+
+app.get('/api/news/updates', async (req, res) => {
+  const useGPT = req.query.rewrite === 'true';
+  const news = await fetchNews(useGPT);
+  res.json(news.slice(0, 15));
+});
+
+app.get('/api/news/trending', async (req, res) => {
+  console.log("🟢 /api/news/trending hit");
+  const useGPT = req.query.rewrite === 'true';
+  const news = await fetchNews(useGPT);
+  res.json(news);
+});
+
+
+
+
+
 
 // 📌 API Routes
 app.get("/data", async (req, res) => {
@@ -135,7 +239,6 @@ webpush.setVapidDetails(
   VAPID_KEYS.privateKey
 );
 
-app.use(bodyParser.json());
 
 let subscriptions = [];
 
@@ -184,6 +287,8 @@ cron.schedule("0 9 * * *", async () => {
 
   console.log("9AM Daily notification sent");
 });
+
+
 
 
 // ✅ Export Express App

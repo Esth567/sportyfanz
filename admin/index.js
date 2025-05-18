@@ -4,7 +4,8 @@ const app = require("./server/server.js");
 //const mongoose = require("mongoose");
 
 
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
+
 
 
   // Connect to DB
@@ -16,8 +17,12 @@ const port = process.env.PORT || 5000;
 
 const server = http.createServer(app);
 
-server.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-  });
+// Optional: serve a default message
+app.get("/", (req, res) => {
+  res.send("Server is running and responding");
+});
 
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
 

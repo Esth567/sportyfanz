@@ -1438,19 +1438,20 @@ document.addEventListener("DOMContentLoaded", function () {
           const newsPodcast = document.querySelector(".news-podcast");
 
          
+ 
           // Append in the correct order
-          parent.appendChild(headerSlider);
-          parent.appendChild(textCont);
-          parent.appendChild(liveMatchDemo);
-          parent.appendChild(textCont2);
-          parent.appendChild(slider);
-          parent.appendChild(advertPodcast);
-          parent.appendChild(textCont3);
-          parent.appendChild(predictionContainer);
-          parent.appendChild(leagueTabletextCont);
-          parent.appendChild(leagueTableDemo);
-          parent.appendChild(advert1Podcast);
-          parent.appendChild(newsPodcast);
+          if (headerSlider) parent.appendChild(headerSlider);
+          if (textCont) parent.appendChild(textCont);
+          if (liveMatchDemo) parent.appendChild(liveMatchDemo);
+          if (textCont2) parent.appendChild(textCont2);
+          if (slider) parent.appendChild(slider);
+          if (advertPodcast) parent.appendChild(advertPodcast);
+          if (textCont3) parent.appendChild(textCont3);
+          if (predictionContainer) parent.appendChild(predictionContainer);
+          if (leagueTabletextCont) parent.appendChild(leagueTabletextCont);
+          if (leagueTableDemo) parent.appendChild(leagueTableDemo);
+          if (advert1Podcast) parent.appendChild(advert1Podcast);
+          if (newsPodcast) parent.appendChild(newsPodcast);
       }
   }
 

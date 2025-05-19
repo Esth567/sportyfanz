@@ -4107,10 +4107,11 @@ body{
       body.news-page .header-top h1,
       body.news-page .header-actions,
       body.news-page .header-top h1,
-      body.news-page .header-top .mobileMenu-logo img ,
+      body.news-page .header-top .mobileMenu-logo img,
       body.news-page .header-line {
           display: none; /* Hide everything except menu icon, logo, and h2 */
       }
+      
 
        /* Ensure mobileMenu-logo and h2 are visible */
     body.news-page .header-top .mobileMenu-logo {
@@ -4219,13 +4220,14 @@ body{
     body.matches-page .header-top .mobileMenu-logo img,
     body.matches-page .header-actions,
     body.matches-page .header-top h1,
-    body.matches-page .layer,
+    body.matches-page .layer:not(.middle-layer),
     body.matches-page .third-layer,
     body.matches-page .text-cont
     {
         display: none;
     }
 
+    
     body.matches-page .header-top .mobileMenu-logo {
         display: flex;
         align-items: center;
@@ -4265,7 +4267,7 @@ body{
     body.league-table-page .header-top .mobileMenu-logo img,
     body.league-table-page .header-actions,
     body.league-table-page .header-top h1,
-    body.league-table-page .layer,
+    body.league-table-page .layer:not(.middle-layer),
     body.league-table-page .third-layer,
     body.league-table-page .text-cont
     {
@@ -4285,7 +4287,69 @@ body{
         text-align: center;
         flex-grow: 1;
     }
-    
+
+
+    /*......prediction page .....*/
+
+     body.matches-page .middle-layer {
+        padding: 0; /* Removes padding */
+        margin: 0 auto; /* Centers content */
+    }
+
+
+    body.prediction-page .header-top .mobileMenu-logo img,
+    body.prediction-page .header-actions,
+    body.prediction-page .header-top h1,
+    body.prediction-page .layer:not(.middle-layer),
+    body.prediction-page .third-layer,
+    body.prediction-page .text-cont
+    {
+        display: none;
+    }
+
+    body.prediction-page .header-top .mobileMenu-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* Centers the items */
+        width: 100%;
+    }
+
+    body.prediction-page  .header-top .mobileMenu-logo h2 {
+        display: block;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    .lineup-players-names h4,
+    .info-teamNames,
+    .info-match-container h3 {
+        font-size: 1rem;
+        margin-top: 10px;
+        font-family: 'Lato';
+    }
+
+    .matches-team span{
+        font-family: 'Lato';
+        font-size: 1rem;
+      }
+ 
+} 
+
+/* === Adjustments for 768px Devices === */
+@media (max-width: 768px) {
+  .header {
+    padding: 20px 15px;
+  }
+
+  /*......league table page .....*/
+  
+}
+
+/* === Adjustments for 480px Devices === */
+@media (max-width: 480px) {
+  .mobileMenu-logo img {
+    width: 80px;
+  }
 }
 
 

@@ -54,15 +54,16 @@ function updateRelativeTime() {
 
     timeElements.forEach(el => {
         const posted = new Date(el.dataset.posted);
-        if (isNaN(posted)) {
+        if (isNaN(posted.getTime())) {
             el.textContent = 'Invalid time';
             return;
         }
 
-        const diff = Math.floor((now - posted) / 1000);
+        const diff = Math.floor((now.getTime() - posted.getTime()) / 1000);
         let text;
 
-        if (diff < 60) text = `${diff} seconds ago`;
+        if (diff < 0) text = 'Just now'; // Future-published feeds
+        else if (diff < 60) text = `${diff} seconds ago`;
         else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
         else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
         else text = `${Math.floor(diff / 86400)} day(s) ago`;
@@ -72,82 +73,111 @@ function updateRelativeTime() {
 }
 
 
-async function fetchNews() {
-  const [trendingRes, updatesRes] = await Promise.all([
-    fetch('/api/news/trending?rewrite=true'),
-    fetch('/api/news/updates?rewrite=true')
-  ]);
 
-  const trending = await trendingRes.json();
-  const updates = await updatesRes.json();
+const MAX_VISIBLE_NEWS = 5;
 
-  console.log("Trending:", trending);
-  console.log("Updates:", updates);
+ // ========== LoAD NEWS ========== //
+async function loadNews() {
+    try {
+        const response = await fetch('https://curly-space-computing-machine-v7qj957x6593xr4r-3000.app.github.dev/api/news', {
+         credentials: 'include'
+         });
+        const { trending, updates } = await response.json();
 
-  renderNews(trending, 'trending-news');
-  renderNews(updates, 'updates-news');
-  document.getElementById('trending-news').style.display = 'block';
-  document.getElementById('updates-news').style.display = 'block';
+        populateNewsSection('trending-news', trending);
+        populateNewsSection('updates-news', updates);
+    } catch (error) {
+        console.error('Failed to load news:', error);
+    }
+}
+
+// ========== POPULATE NEWS ========== //
+function populateNewsSection(sectionId, newsList) {
+    const container = document.getElementById(sectionId);
+    if (!container) return;
+
+    container.innerHTML = newsList.map((item, index) => `
+        <div class="news-infomat" data-index="${index}" data-section="${sectionId}"
+             data-title="${encodeURIComponent(item.title)}"
+             data-description="${encodeURIComponent(item.description)}"
+             data-pubDate="${item.pubDate}"
+             data-image="${encodeURIComponent(item.image || '')}">
+             
+            ${item.image ? `<img src="${item.image}" class="news-thumb" alt="News Image" />` : ''}
+            <h4 class="news-title">${item.title}</h4>
+            <div class="news-meta">
+                <p class="news-desc">${item.description}</p>
+                <span class="news-time" data-posted="${item.pubDate}">Just now</span>
+            </div>
+        </div>
+    `).join('');
+
+    container.querySelectorAll('.news-infomat').forEach(item => {
+        item.addEventListener('click', () => {
+            showFullNews(item);
+        });
+    });
 }
 
 
-function renderNews(newsList, containerId) {
-  const container = document.getElementById(containerId);
-  if (!container || !Array.isArray(newsList)) return;
+// ========== SHOW FULL NEWS ========== //
+function showFullNews(clickedItem) {
+    const middleLayer = document.querySelector('.middle-layer');
+    const children = Array.from(middleLayer.children);
+    children.forEach(child => child.style.display = 'none');
 
-  container.innerHTML = '';
+    const title = decodeURIComponent(clickedItem.dataset.title);
+    const description = decodeURIComponent(clickedItem.dataset.description);
+    const pubDate = clickedItem.dataset.pubDate;
+    const image = decodeURIComponent(clickedItem.dataset.image || '');
 
-  newsList.forEach(news => {
-    const card = document.createElement('div');
-    card.className = 'news-card news-infomat';
-    card.onclick = () => showNewsDetail(news);
+    const fullView = document.createElement('div');
+    fullView.className = 'news-full-view';
 
-    card.innerHTML = `
-      <img src="${news.image || 'fallback.jpg'}" alt="${news.title}" />
-      <h3>${news.title}</h3>
-      <p>${news.description}</p>
-      <span class="news-time" data-posted="${news.pubDate}"></span>
+    fullView.innerHTML = `
+        ${image ? `<img src="${image}" class="news-thumb" alt="Featured Image" />` : ''}
+        <h2 class="news-title">${title}</h2>
+        <p class="news-time">${new Date(pubDate).toLocaleString()}</p>
+        <div class="news-desc">${description}</div>
     `;
 
-    container.appendChild(card);
-  });
+    const backButton = document.createElement('button');
+    backButton.textContent = '← Back to news';
+    backButton.className = 'back-button';
+    backButton.onclick = () => {
+        fullView.remove();
+        children.forEach(child => child.style.display = '');
+        showInitialNews("trending-news");
+        showInitialNews("updates-news");
+        updateRelativeTime();
+    };
+
+    fullView.prepend(backButton);
+    middleLayer.appendChild(fullView);
+}
+
+
+function enhanceSportsDescription(text) {
+  const ytMatch = text.match(/https:\/\/(?:www\.)?youtube\.com\/watch\?v=([\w-]+)/);
+  if (ytMatch) {
+    const videoId = ytMatch[1];
+    return `
+      <div class="video-embed">
+        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
+                frameborder="0" allowfullscreen></iframe>
+      </div>
+      <p>This match or update is turning heads online. Watch the analysis and reactions from fans and pundits in this exclusive clip.</p>
+    `;
+  }
+
+  // Fallback to enhanced plain description
+  const plain = text.replace(/<\/?[^>]+(>|$)/g, '').replace(/[^a-zA-Z0-9 .,?!]/g, '');
+  return `${plain} Expect intense matchups, bold predictions, and tactical breakdowns — your go-to hub for all football insights.`;
 }
 
 
 
-function showNewsDetail(news) {
-  const detailView = document.getElementById('news-details-view');
-  const content = document.getElementById('news-detail-content');
-  content.innerHTML = `
-    <img src="${news.image}" alt="${news.title}" />
-    <h2>${news.title}</h2>
-    <p>${news.description}</p>
-    <article>
-      ${generateBlogPost(news)}
-    </article>
-  `;
-  detailView.style.display = 'block';
-  document.getElementById('trending-news').style.display = 'none';
-  document.getElementById('updates-news').style.display = 'none';
-}
 
-function showNewsList() {
-  document.getElementById('news-details-view').style.display = 'none';
-  document.getElementById('trending-news').style.display = 'block';
-  document.getElementById('updates-news').style.display = 'block';
-}
-
-function generateBlogPost(news) {
-  return `
-    <h4>In-depth Coverage</h4>
-    <p>${news.description} This performance has created waves in the sports world, marking a defining moment of the season.</p>
-    <p>Stay tuned for more details and analysis on this breaking story.</p>
-  `;
-}
-
-document.addEventListener('DOMContentLoaded', fetchNews);
-
-      
   
 
 

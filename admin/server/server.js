@@ -7,6 +7,8 @@ const webpush = require("web-push");
 const cron = require("node-cron");
 const { OpenAI } = require('openai');
 const Parser = require('rss-parser');
+const axios = require('axios');
+
 
 
 const app = express();
@@ -68,11 +70,6 @@ app.get("/admin-dashboard", verifyToken, (req, res) => {
 
 
 
-// 📌 openai
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const rss_feeds = [
   "http://www.espn.com/espn/rss/news",
   "http://feeds.bbci.co.uk/sport/rss.xml?edition=uk",
@@ -80,93 +77,49 @@ const rss_feeds = [
   "https://www.goal.com/en/feeds/news?fmt=rss"
 ];
 
-// Rewriting the description (mock version)
-function rewriteDescription(desc) {
-  return `Latest: ${desc.replace(/<\/?[^>]+(>|$)/g, "")}`;
+function rewriteToSportsStyle(description) {
+  return description
+    .replace(/<\/?[^>]+(>|$)/g, '') // remove HTML
+    .replace(/[^a-zA-Z0-9 .,?!]/g, '') // remove unusual characters
+    .replace(/\b(match|game)\b/gi, 'fixture')
+    .replace(/\bteam\b/gi, 'side')
+    .replace(/\bplayer\b/gi, 'athlete')
+    + ' Stay tuned for more updates on this story.';
 }
 
-// Extract image from content
-function extractImage(entry) {
-  const mediaContent = entry.enclosure?.url || '';
-  const match = entry.content?.match(/<img.*?src="(.*?)"/);
-  return mediaContent || (match ? match[1] : '');
-}
+async function fetchNews() {
+  const allItems = [];
 
-const summaryCache = new Map();
-
-async function rewriteDescriptionGPT(text, id = null) {
-  const key = id || text.slice(0, 100);
-
-  if (summaryCache.has(key)) return summaryCache.get(key);
-
-  try {
-    const prompt = `Rewrite this sports news in a short, engaging blog-style summary:\n\n"${text}"\n\nSummary:`;
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4', // or 'gpt-3.5-turbo' for lower cost
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 100,
-      temperature: 0.7,
-    });
-
-    const summary = response.choices[0].message.content.trim();
-    summaryCache.set(key, summary);
-    return summary;
-  } catch (err) {
-    console.error('OpenAI Error:', err.message);
-    return text; // fallback
-  }
-}
-
-
-async function fetchNews(useGPT = false) {
-  const allNews = [];
-
-  for (const feed of rss_feeds) {
+  for (let feed of rssFeeds) {
     try {
-      const result = await parser.parseURL(feed);
-
-      for (const item of result.items) {
-        const original = item.contentSnippet || item.summary || '';
-        const description = useGPT
-          ? await rewriteDescriptionGPT(original, item.guid || item.link)
-          : `Latest: ${original.replace(/<\/?[^>]+(>|$)/g, "")}`;
-
-        allNews.push({
-          title: item.title,
-          description,
-          originalDescription: original,
-          link: item.link,
-          image: extractImage(item),
-          pubDate: new Date(item.pubDate),
-          source: result.title,
-        });
-      }
-    } catch (err) {
-      console.error(`Error fetching ${feed}:`, err.message);
+      const res = await parser.parseURL(feed);
+      allItems.push(...res.items.map(item => ({
+        title: item.title,
+        description: item.contentSnippet || item.content || '',
+        pubDate: item.pubDate,
+        link: item.link,
+        source: res.title
+      })));
+    } catch (e) {
+      console.error(`Failed to fetch ${feed}`, e.message);
     }
   }
 
-  return allNews.sort((a, b) => b.pubDate - a.pubDate);
+  // Simple trending heuristic: pick top 5 latest
+  const sortedItems = allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  const trending = sortedItems.slice(0, 5);
+  const updates = sortedItems.slice(5, 20).map(item => ({
+    ...item,
+    description: rewriteToSportsStyle(item.description)
+  }));
+
+  return { trending, updates };
 }
 
-
-app.get('/api/news/updates', async (req, res) => {
-  const useGPT = req.query.rewrite === 'true';
-  const news = await fetchNews(useGPT);
-  res.json(news.slice(0, 15));
+app.get('/api/news', async (req, res) => {
+  const data = await fetchNews();
+  res.json(data);
 });
-
-app.get('/api/news/trending', async (req, res) => {
-  console.log("🟢 /api/news/trending hit");
-  const useGPT = req.query.rewrite === 'true';
-  const news = await fetchNews(useGPT);
-  res.json(news);
-});
-
-
-
-
 
 
 // 📌 API Routes
@@ -293,3 +246,4 @@ cron.schedule("0 9 * * *", async () => {
 
 // ✅ Export Express App
 module.exports = app;
+

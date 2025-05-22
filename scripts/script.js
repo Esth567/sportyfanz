@@ -1416,56 +1416,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-
-
- // restructure page layout for mobile and tablet view
- function reorderForMobile() {
-  const content = document.querySelector(".content");
-  if (!content) return;
-
-  const isMobile = window.innerWidth <= 1024;
-  if (!isMobile) return;
-
-  setTimeout(() => {
-    const firstLayer = document.querySelector(".first-layer");
-    const middleLayer = document.querySelector(".middle-layer");
-    const thirdLayer = document.querySelector(".third-layer");
-
-    if (!firstLayer || !middleLayer || !thirdLayer) return;
-
-    const headerSlider = middleLayer.querySelector(".header-slider");
-    const firstSections = Array.from(firstLayer.querySelectorAll(".section-wrapper"));
-    const middleSections = Array.from(middleLayer.querySelectorAll(".section-wrapper"));
-    const thirdSections = Array.from(thirdLayer.querySelectorAll(".section-wrapper"));
-
-    content.innerHTML = "";
-
-    // Your custom order here
-    if (headerSlider) content.appendChild(headerSlider);
-    if (firstSections[0]) content.appendChild(firstSections[0]);
-    if (thirdSections[0]) content.appendChild(thirdSections[0]);
-    if (thirdSections[1]) content.appendChild(thirdSections[1]);
-    if (thirdSections[2]) content.appendChild(thirdSections[2]);
-    if (thirdSections[3]) content.appendChild(thirdSections[3]);
-    if (middleSections.length > 0) content.appendChild(middleSections[middleSections.length - 1]);
-
-  }, 100); // slight delay ensures layout is ready
-}
-
-document.addEventListener("DOMContentLoaded", reorderForMobile);
-
-window.addEventListener("resize", function () {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    location.reload(); // this re-triggers DOMContentLoaded
-  }, 300);
-});
-
-
-
-
-
-
+ 
 //mobile menu icon functionality
 document.addEventListener("DOMContentLoaded", function () {
   if (window.innerWidth <= 1024) { // Apply only for mobile/tablet

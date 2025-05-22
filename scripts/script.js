@@ -1418,48 +1418,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
- // css code to restructure page layout for mobile and tablet view
- document.addEventListener("DOMContentLoaded", function () {
-  function reorderElements() {
-      if (window.innerWidth <= 1024) {
-          const parent = document.querySelector(".content");
+ // restructure page layout for mobile and tablet view
+ function reorderForMobile() {
+  const content = document.querySelector(".content");
+  if (!content) return;
 
-          const headerSlider = document.querySelector(".header-slider");
-          const textCont = document.querySelector(".text-cont");
-          const liveMatchDemo = document.querySelector(".live-match-demo");
-          const textCont2 = document.querySelector(".text-cont2");
-          const slider = document.querySelector(".slider");
-          const advertPodcast = document.querySelector(".advert");
-          const textCont3 = document.querySelector(".text-cont3");
-          const predictionContainer = document.querySelector(".predition-container");
-          const leagueTabletextCont = document.querySelector(".leagueTable-text-cont");
-          const leagueTableDemo = document.querySelector(".league-table-demo");
-          const advert1Podcast = document.querySelector(".advert1");
-          const newsPodcast = document.querySelector(".news-podcast");
+  const isMobile = window.innerWidth <= 1024;
+  if (!isMobile) return;
 
-         
- 
-          // Append in the correct order
-          if (headerSlider) parent.appendChild(headerSlider);
-          if (textCont) parent.appendChild(textCont);
-          if (liveMatchDemo) parent.appendChild(liveMatchDemo);
-          if (textCont2) parent.appendChild(textCont2);
-          if (slider) parent.appendChild(slider);
-          if (advertPodcast) parent.appendChild(advertPodcast);
-          if (textCont3) parent.appendChild(textCont3);
-          if (predictionContainer) parent.appendChild(predictionContainer);
-          if (leagueTabletextCont) parent.appendChild(leagueTabletextCont);
-          if (leagueTableDemo) parent.appendChild(leagueTableDemo);
-          if (advert1Podcast) parent.appendChild(advert1Podcast);
-          if (newsPodcast) parent.appendChild(newsPodcast);
-      }
-  }
+  setTimeout(() => {
+    const firstLayer = document.querySelector(".first-layer");
+    const middleLayer = document.querySelector(".middle-layer");
+    const thirdLayer = document.querySelector(".third-layer");
 
-  reorderElements();
-  window.addEventListener("resize", reorderElements);
+    if (!firstLayer || !middleLayer || !thirdLayer) return;
+
+    const headerSlider = middleLayer.querySelector(".header-slider");
+    const firstSections = Array.from(firstLayer.querySelectorAll(".section-wrapper"));
+    const middleSections = Array.from(middleLayer.querySelectorAll(".section-wrapper"));
+    const thirdSections = Array.from(thirdLayer.querySelectorAll(".section-wrapper"));
+
+    content.innerHTML = "";
+
+    // Your custom order here
+    if (headerSlider) content.appendChild(headerSlider);
+    if (firstSections[0]) content.appendChild(firstSections[0]);
+    if (thirdSections[0]) content.appendChild(thirdSections[0]);
+    if (thirdSections[1]) content.appendChild(thirdSections[1]);
+    if (thirdSections[2]) content.appendChild(thirdSections[2]);
+    if (thirdSections[3]) content.appendChild(thirdSections[3]);
+    if (middleSections.length > 0) content.appendChild(middleSections[middleSections.length - 1]);
+
+  }, 100); // slight delay ensures layout is ready
+}
+
+document.addEventListener("DOMContentLoaded", reorderForMobile);
+
+window.addEventListener("resize", function () {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    location.reload(); // this re-triggers DOMContentLoaded
+  }, 300);
 });
 
 
+
+
+
+
+//mobile menu icon functionality
 document.addEventListener("DOMContentLoaded", function () {
   if (window.innerWidth <= 1024) { // Apply only for mobile/tablet
       let headerTopbar = document.querySelector(".header-topbar");
@@ -1498,6 +1505,7 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebar.style.display = "none";
     });
 });
+
 
 //news-podcast animation slider
 document.addEventListener("DOMContentLoaded", function () {

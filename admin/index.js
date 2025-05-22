@@ -1,42 +1,31 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const Parser = require("rss-parser");
+require('dotenv').config();
 const cors = require("cors");
 const path = require('path');
 const sanitizeHtml = require ('sanitize-html');
+const axios = require('axios');
+const compression = require('compression');
 
-
-const app = express();
-const port = 3000;
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    console.log("CORS request from:", origin);
-
-    // Allow undefined (for curl, etc.), and your frontend GitHub Codespace
-    const allowedOriginPattern = /^https:\/\/curly-space-computing-machine.*\.app\.github\.dev$/;
-
-    if (!origin || allowedOriginPattern.test(origin)) {
-      callback(null, origin); // Return the exact origin
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true
+  origin: '*', // or restrict to frontend domain
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
-
-
+app.use(cors(corsOptions));
+app.use(compression());
+const app = express();
+const port = 3000; 
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public'))); // put your HTML here
 app.use((req, res, next) => {
   console.log('Origin:', req.headers.origin);
   next();
 });
 
 
-app.use(cors(corsOptions)); 
-
-app.use(bodyParser.json());
-
-app.use(express.static(path.join(__dirname, 'public'))); // put your HTML here
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
@@ -63,59 +52,127 @@ function rewriteToSportsStyle(description) {
     + ' Stay tuned for more updates on this story.';
 }
 
+async function expandWithGroq(title, shortDesc) {
+  const prompt = `You're a seasoned British football pundit with a flair for dramatic, Premier League-style commentary. Rewrite and expand this breaking sports news into a vivid, engaging 1500-word article. Include tactical analysis, dramatic language, and reactions from players, coaches, and fans.\n\nTitle: ${title}\nDescription: ${shortDesc}`;
+
+  try {
+    const response = await axios.post(
+      'https://api.groq.com/openai/v1/chat/completions',
+      {
+        model: 'mixtral-8x7b-32768',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a professional football journalist writing Premier League-style commentary with energy, insight, and flair.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 3000
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error('Groq API error:', error.message);
+    return shortDesc + ' (Original content, expansion failed.)';
+  }
+}
+
+// ========= Main News Fetcher ========= //
+const fs = require('fs');
+const CACHE_FILE = path.join(__dirname, 'cache/news.json');
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 async function fetchNews() {
-  const allItems = [];
+  try {
+    // Check cache
+    if (fs.existsSync(CACHE_FILE)) {
+      const { data, timestamp } = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+      if (Date.now() - timestamp < CACHE_TTL) {
+        console.log('Serving news from cache...');
+        return data;
+      }
+    }
 
-  for (let feed of rssFeeds) {
-    try {
+    const allItems = [];
+
+    for (let feed of rssFeeds) {
       const res = await parser.parseURL(feed);
-      allItems.push(...res.items.map(item => {
-        // Try to extract image from media:content or enclosure
-        const image = item.enclosure?.url || item['media:content']?.url || '';
-        
+      for (const item of res.items) {
         const rawContent = item['content:encoded'] || item.content || item.contentSnippet || '';
-        const cleanDescription = sanitizeHtml(rawContent, {
-        allowedTags: ['p', 'b', 'i', 'strong', 'em', 'ul', 'li', 'a', 'br', 'img'],
-        allowedAttributes: {
-        'a': ['href', 'target'],
-        'img': ['src', 'alt']
-         }
-         });
+        const sanitized = sanitizeHtml(rawContent, {
+          allowedTags: ['p', 'b', 'i', 'strong', 'em', 'ul', 'li', 'a', 'br', 'img'],
+          allowedAttributes: {
+            'a': ['href', 'target'],
+            'img': ['src', 'alt']
+          }
+        });
 
-        return {
+        const imageMatch = sanitized.match(/<img[^>]+src="([^">]+)"/);
+        const imageUrl = imageMatch ? imageMatch[1] : null;
+
+        let longFormDescription;
+        try {
+          longFormDescription = await expandWithGroq(item.title, sanitized);
+        } catch (err) {
+          console.warn('Groq expansion failed. Using original content.');
+          longFormDescription = sanitized + ' (Original content used due to expansion failure.)';
+        }
+
+        allItems.push({
           title: item.title,
-          description: cleanDescription,
+          description: longFormDescription,
           pubDate: item.pubDate,
           link: item.link,
           source: res.title,
-          image
-        };
-      }));
-    } catch (e) {
-      console.error(`Failed to fetch ${feed}`, e.message);
+          image: imageUrl
+        });
+      }
     }
+
+    const sortedItems = allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    const trending = sortedItems.slice(0, 5);
+    const updates = sortedItems.slice(5, 20);
+
+    const result = { trending, updates };
+
+    // Save cache
+    fs.mkdirSync(path.join(__dirname, 'cache'), { recursive: true });
+    fs.writeFileSync(CACHE_FILE, JSON.stringify({ data: result, timestamp: Date.now() }));
+
+    return result;
+  } catch (err) {
+    console.error('Error fetching news, falling back to cache:', err);
+
+    // Try cached fallback
+    if (fs.existsSync(CACHE_FILE)) {
+      const { data } = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+      return data;
+    }
+
+    throw new Error('News fetch and fallback both failed.');
   }
-
-  const sortedItems = allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-  const trending = sortedItems.slice(0, 5);
-  const updates = sortedItems.slice(5, 20);
-
-  return { trending, updates };
-}
-
-// Custom enhancement function
-function enhanceSportsDescription(text) {
-  const plain = text
-    .replace(/<\/?[^>]+(>|$)/g, '') // Strip HTML
-    .replace(/[^a-zA-Z0-9 .,?!]/g, ''); // Clean characters
-
-  return `${plain} This development could have a major impact on the standings. Stay with us for more insightful commentary and match-day analysis.`;
 }
 
 
 app.get('/api/news', async (req, res) => {
-  const data = await fetchNews();
-  res.json(data);
+  try {
+    const news = await fetchNews();
+    res.json(news);
+  } catch (err) {
+    console.error('Error fetching news:', err);
+    res.status(500).json({ error: 'Failed to fetch news' });
+  }
 });
 
 app.get("/", (req, res) => {

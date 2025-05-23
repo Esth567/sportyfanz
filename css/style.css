@@ -383,7 +383,7 @@ body{
 }
 
 /* Layers */
-.layer {
+.first-layer {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -3970,12 +3970,12 @@ body{
 
     .content {
      display: flex;
-      flex-direction: column;
+      
     }
 
  .layer {
      display: flex;
-      flex-direction: column;
+     
     }
 
     .live-match-demo,
@@ -3995,20 +3995,25 @@ body{
 
 
     .header-slider {
-      order: 1;
+      order: 0;
      }
 
   .section-wrapper {
-   order: 2;
+   order: 1;
    }
 
-  .section-wrapper1 {
+  .section-wrapper4 {
+   order: 2;
+   } 
+
+   .section-wrapper5 {
    order: 3;
    }
 
-.slider {
-  order: 4;
-}
+   .section-wrapper3 {
+   order: 4;
+   }
+   
 
 .advert {
   order: 5;

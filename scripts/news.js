@@ -78,18 +78,22 @@ const MAX_VISIBLE_NEWS = 5;
 
  // ========== LoAD NEWS ========== //
 async function loadNews() {
-    try {
-        const response = await fetch('https://curly-space-computing-machine-v7qj957x6593xr4r-3000.app.github.dev/api/news', {
-         credentials: 'include'
-         });
-        const { trending, updates } = await response.json();
+  const loader = document.querySelector('.loading-indicator');
+  if (loader) loader.style.display = 'block';
 
-        populateNewsSection('trending-news', trending);
-        populateNewsSection('updates-news', updates);
-    } catch (error) {
-        console.error('Failed to load news:', error);
-    }
+  try {
+    const response = await fetch('/api/news');
+    const { trending, updates } = await response.json();
+    populateNewsSection('trending-news', trending);
+    populateNewsSection('updates-news', updates);
+  } catch (error) {
+    console.error('Failed to load news:', error);
+    alert("Failed to load the latest news.");
+  } finally {
+    if (loader) loader.style.display = 'none';
+  }
 }
+
 
 // ========== POPULATE NEWS ========== //
 function populateNewsSection(sectionId, newsList) {
@@ -97,21 +101,16 @@ function populateNewsSection(sectionId, newsList) {
     if (!container) return;
 
     container.innerHTML = newsList.map((item, index) => `
-        <div class="news-infomat" data-index="${index}" data-section="${sectionId}"
-             data-title="${encodeURIComponent(item.title)}"
-             data-description="${encodeURIComponent(item.description)}"
-             data-pubDate="${item.pubDate}"
-             data-image="${encodeURIComponent(item.image || '')}">
-             
-            ${item.image ? `<img src="${item.image}" class="news-thumb" alt="News Image" />` : ''}
-            <h4 class="news-title">${item.title}</h4>
+        <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
+            <h1 class="news-title">${item.title}</h1>
             <div class="news-meta">
-                <p class="news-desc">${item.description}</p>
+                <p class="news-desc">${enhanceSportsDescription(item.description)}</p>
                 <span class="news-time" data-posted="${item.pubDate}">Just now</span>
             </div>
         </div>
     `).join('');
 
+    // Add event listeners to each item
     container.querySelectorAll('.news-infomat').forEach(item => {
         item.addEventListener('click', () => {
             showFullNews(item);
@@ -120,41 +119,45 @@ function populateNewsSection(sectionId, newsList) {
 }
 
 
+
 // ========== SHOW FULL NEWS ========== //
 function showFullNews(clickedItem) {
     const middleLayer = document.querySelector('.middle-layer');
+
+    // Hide all children inside middle-layer
     const children = Array.from(middleLayer.children);
-    children.forEach(child => child.style.display = 'none');
+    children.forEach(child => {
+        child.style.display = 'none';
+    });
 
-    const title = decodeURIComponent(clickedItem.dataset.title);
-    const description = decodeURIComponent(clickedItem.dataset.description);
-    const pubDate = clickedItem.dataset.pubDate;
-    const image = decodeURIComponent(clickedItem.dataset.image || '');
-
+    // Create and display the full view container
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
+    fullView.innerHTML = clickedItem.innerHTML;
 
-    fullView.innerHTML = `
-        ${image ? `<img src="${image}" class="news-thumb" alt="Featured Image" />` : ''}
-        <h2 class="news-title">${title}</h2>
-        <p class="news-time">${new Date(pubDate).toLocaleString()}</p>
-        <div class="news-desc">${description}</div>
-    `;
-
+    // Add back button
     const backButton = document.createElement('button');
     backButton.textContent = '← Back to news';
     backButton.className = 'back-button';
     backButton.onclick = () => {
         fullView.remove();
-        children.forEach(child => child.style.display = '');
+
+        // Restore all children inside middle-layer
+        children.forEach(child => {
+            child.style.display = '';
+        });
+
         showInitialNews("trending-news");
         showInitialNews("updates-news");
         updateRelativeTime();
     };
 
     fullView.prepend(backButton);
+
+    // Append fullView inside the middle-layer
     middleLayer.appendChild(fullView);
 }
+
 
 
 function enhanceSportsDescription(text) {

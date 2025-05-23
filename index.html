@@ -122,79 +122,49 @@
    
    
     <!-- Main Content -->
-    <div class="content">
-        <div class="layer">
-            <div class="text-cont">
-                <h4 class="live-matches">Live Matches</h4>
-                <div class="more">
-                    <ion-icon name="arrow-forward-outline"></ion-icon>
-                    <a href="live-matches.html">See more</a>
-                </div>
-            </div>
-            <div class="live-match-demo"></div>
-            
-            <div class="leagueTable-text-cont">
-                <h4 class="live-matches">League Table</h4>
-                <div class="more">
-                    <ion-icon name="arrow-forward-outline"></ion-icon>
-                    <a href="league-table.html">View all</a>
-                </div>
-            </div>
-            <div class="league-table-demo">
-            </div>
-            <div class="text-cont">
-                <h4 class="live-matches">Trending News</h4>
-                <div class="more">
-                    <ion-icon name="arrow-forward-outline"></ion-icon>
-                    <a href="news.html">View all</a>
-                </div>
-            </div>
-            <div class="news-update">
-                <div class="news-container" id="newsHeadline">
-                    <div class="news-image">
-                        <img src="assets/images/latest-transfer-news-LIVE-5909623.avif" alt="Featured News">
-                    </div>
-                    <div class="news-info">
-                      <h5 class="news-headline">Man Utd strike fee agreement as Arsenal learn Sesko verdict</h5>
-                    </div>
-                </div> 
-                <div class="news-container">
-                    <div class="news-image">
-                        <img src="assets/images/ArsenalSaliba24PredictedXIv1.avif" alt="Featured News">
-                    </div>
-                    <div class="news-info">
-                      <h5 class="news-headline">Arsenal XI vs Wolves: Confirmed team news, predicted lineup, injury latest for Premier League</h5>
-                    </div>
-                </div> 
-                <div class="news-container">
-                    <div class="news-image">
-                        <img src="assets/images/AA1wFgEd.jpg" alt="Featured News">
-                    </div>
-                    <div class="news-info">
-                      <h5 class="news-headline">Tottenham injury update: Dominic Solanke, Pape Sarr, Cristian Romero latest news and return dates</h5>
-                    </div>
-                </div> 
-                <div class="news-container">
-                    <div class="news-image">
-                        <img src="assets/images/0_Milos-Kerkez.jpg" alt="Featured News">
-                    </div>
-                    <div class="news-info">
-                      <h5 class="news-headline">Milos Kerkez latest, Mohamed Salah £65m claim, Darwin Nunez stance</h5>
-                    </div>
-                </div> 
-                <div class="news-container">
-                    <div class="news-image">
-                        <img src="assets/images/94369165-14310787-image-a-53_1737500202809.avif" alt="Featured News">
-                    </div>
-                    <div class="news-info">
-                      <h5 class="news-headline">NBA player becomes latest sports star targeted by burglars as his LA mansion is raided</h5>
-                    </div>
-                </div> 
-            </div>               
-        </div>
+<div class="content">
 
-        <div class="layer middle-layer">
-            <div class="header-slider">
+  <!-- First Layer -->
+  <div class="layer first-layer">
+    <div class="section-wrapper">
+      <div class="text-cont">
+        <h4 class="live-matches">Live Matches</h4>
+        <div class="more">
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+          <a href="live-matches.html">See more</a>
+        </div>
+      </div>
+      <div class="live-match-demo"></div>
+    </div>
+
+    <div class="section-wrapper1">
+      <div class="leagueTable-text-cont">
+        <h4 class="live-matches">League Table</h4>
+        <div class="more">
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+          <a href="league-table.html">View all</a>
+        </div>
+      </div>
+      <div class="league-table-demo"></div>
+    </div>
+
+    <div class="section-wrapper">
+      <div class="text-cont">
+        <h4 class="live-matches">Trending News</h4>
+        <div class="more">
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+          <a href="news.html">View all</a>
+        </div>
+      </div>
+      <div class="news-update">
+        <!-- News Items... -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle Layer -->
+  <div class="layer middle-layer">
+    <div class="header-slider">
                 <!-- Banner 1 -->
                 <div class="slider-content banner1">
                 </div>
@@ -205,129 +175,70 @@
                         <h2 class="slider-title">Exciting podcast coming soon!</h2>
                     </div>
                 </div>
-            </div>                       
-              
+            </div>            
 
-                <!--latest matches section-->
-          <div class="latest-match">
-            <div class="text-cont">
-              <h4 class="shortTop-story">Latest Matches</h4>
-              <div class="more">
-                  <ion-icon name="arrow-forward-outline"></ion-icon>
-                  <a href="live-matches.html">View all</a>
-              </div>
-          </div>
-          <div class="match-latest">
-              <!-- Match Header with Buttons -->
-              <div class="match-header">
-                  <div class="category-btn active" data-category="live" onclick="showMatches('live', event)">Live</div>
-                  <div class="category-btn" data-category="highlight" onclick="showMatches('highlight', event)">Highlight</div>
-                  <div class="category-btn" data-category="upcoming" onclick="showMatches('upcoming', event)">Upcoming</div>                
-                  <!-- Calendar -->
-                  <div class="category-btn calendar">
-                    <div class="match-calendar">
-                        <div class="calendar-scroll">
-                          <div class="calendar-date" data-date="2025-05-06">Tue<br><span>06</span></div>
-                          <div class="calendar-date" data-date="2025-05-07">Wed<br><span>07</span></div>
-                          <div class="calendar-date" data-date="2025-05-08">Thu<br><span>08</span></div>
-                          <div class="calendar-date" data-date="2025-05-09">Fri<br><span>09</span></div>
-                          <div class="calendar-date" data-date="2025-05-10">Sat<br><span>10</span></div>
-                          <div class="calendar-date" data-date="2025-05-11">Sun<br><span>11</span></div>
-                          <div class="calendar-date" data-date="2025-05-12">Mon<br><span>12</span></div>
-                        </div>
-                      </div>
-                      
-                      <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
-                      <div class="date-filter">
-                        <label for="match-date">Select Match Date:</label>
-                        <input type="date" id="match-date" name="match-date" />
-                      </div>
-                      
-                  </div>
-              </div>
-          
-              <!-- Matches Container -->
-              <div class="matches-container" id="matches-container">
-                  <!-- Dynamic Match Category Content will be injected here -->
-              </div>
-          </div>        
-          </div>  
-
-      <!-- News and podcast section -->
-     <div class="news-podcast-wrapper">
-    <div class="news-podcast">
-        <div class="top-stories">
-            <div class="text-cont">
-                <h4 class="shortTop-story">Top Stories Today</h4>
-                <div class="more">
-                    <ion-icon name="arrow-forward-outline"></ion-icon>
-                    <a href="news.html">View all</a>
-                </div>
-            </div>  
-            <div class="news-short-highlight">
-                <a href="news-page1.html" class="news-short-message">
-                    <div class="news-shortfeature-image">
-                        <img src="assets/images/AA1xMLFA.jpg" alt="Logos">
-                    </div>
-                    <h2 class="shortNews-header">Chesterfield transfers latest as Paul Cook talks incomings and outgoings</h2>
-                    <p class="shortNews-description">The Spireites have brought in four new signings...</p>
-                </a>
-                <a href="news-page2.html" class="news-short-message">
-                    <div class="news-shortfeature-image">
-                        <img src="assets/images/AA1xCf3d.jpg" alt="Logos" class="logos">
-                    </div>
-                    <h2 class="shortNews-header">Liverpool XI vs Ipswich...</h2>
-                    <p class="shortNews-description">The Reds are hosting the Tractor Boys...</p>
-                </a>
-            </div>
+    <div class="section-wrapper">
+      <div class="text-cont">
+        <h4 class="shortTop-story">Latest Matches</h4>
+        <div class="more">
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+          <a href="live-matches.html">View all</a>
         </div>
-        <div class="podcast-updates">
-            <div class="podcast-update-img">
-                <img src="assets/images/podcastimg.png" alt="">
-            </div>
-            <h5>Voices of the Game | Football</h5>
-            <h4>Podcast Coming Soon in May</h4>
-        </div>
+      </div>
+      <div class="latest-match">
+        <!-- Match filters, calendar, and match list here -->
+      </div>
     </div>
-     </div>
-     <div class="advert-container">
-        <p>Advertisement</p>
+
+    <div class="news-podcast-wrapper section-wrapper">
+      <div class="news-podcast">
+        <!-- Top stories and podcast content -->
+      </div>
     </div>
+
+    <div class="advert-container section-wrapper">
+      <p>Advertisement</p>
+    </div>
+  </div>
+
+  <!-- Third Layer -->
+  <div class="layer third-layer">
+    <div class="section-wrapper">
+      <div class="text-cont2">
+        <h4 class="live-matches">Top Players</h4>
+      </div>
+      <div class="slider">
+        <div class="players-container"></div>
+        <div class="slider-dots"></div>
+      </div>
+    </div>
+
+    <div class="section-wrapper">
+      <div class="advert">
+        <h5>Advertisement</h5>
+      </div>
+    </div>
+
+    <div class="section-wrapper">
+      <div class="text-cont3">
+        <h4 class="live-matches">Prediction for Today</h4>
+        <div class="more">
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+          <a href="prediction.html">View all</a>
         </div>
-     
-        <div class="layer third-layer"> 
-            <div class="text-cont2">
-                <h4 class="live-matches">Top Players</h4>
-            </div>
+      </div>
+      <div class="prediction-container"></div>
+    </div>
 
-            <!-- Top Players slider -->
-            <div class="slider">
-                <div class="players-container"></div>
-                <!-- Slider Dots -->
-                <div class="slider-dots"></div>
-                </div>
+    <div class="section-wrapper">
+      <div class="advert1">
+        <h5>Advertisement</h5>
+      </div>
+    </div>
+  </div>
 
-                <!-- advert -->
-                <div class="advert">
-                    <h5>Advertisement</h5>
-                 </div>
+</div>
 
-           <div class="text-cont3">
-            <h4 class="live-matches">Predition for Today</h4>
-            <div class="more">
-                <ion-icon name="arrow-forward-outline"></ion-icon>
-                <a href="prediction.html">View all</a>
-            </div>
-        </div>
-
-        <div class="prediction-container"></div>
-
-        <div class="advert">
-            <h5>Advertisement</h5>
-         </div>
-         </div>  
-         </div>
-        </div>
          
          <!-- Swiper JS -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>

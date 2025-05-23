@@ -1695,25 +1695,37 @@ body{
     white-space: nowrap;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 .news-full-view {
-    padding: 20px;
+    padding: 1rem;
+    background: white;
     font-size: 1.1rem;
     width: 100%;
     box-sizing: border-box;
-    color: #fff;
     animation: fadeIn 0.3s ease-in-out;
 }
 
 
 .back-button {
-    margin-bottom: 20px;
-    color: #003366;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 0.75rem; 
+  margin-bottom: 1rem;
+  background-color: #ddd;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
 }
+
 
 .news-thumb {
     width: 100%;
@@ -3839,6 +3851,11 @@ body{
         font-size: 16px;
     }
 
+    body.loading .content {
+     visibility: hidden;
+    }
+
+
     .body-container {
         width: 100%;
         margin-left: 0;
@@ -3952,11 +3969,14 @@ body{
     }
 
     .content {
-        display: flex;
-        flex-direction: column;
-        
+     display: flex;
+      flex-direction: column;
     }
 
+ .layer {
+     display: flex;
+      flex-direction: column;
+    }
 
     .live-match-demo,
     .league-table-demo,
@@ -3966,10 +3986,6 @@ body{
         width: 100%;
     }
     
-    .middle-layer {
-        display: flex;
-        flex-direction: column;
-    }
    
     .header-slider {
         width: 100%;
@@ -3978,19 +3994,37 @@ body{
 
 
 
-    .header-slider { order: 1; }  /* First in mobile */
-    .text-cont { order: 2; }
-    .live-match-demo { order: 3; } /* Second */
-    .text-cont2 { order: 4; }
-    .slider { order: 5; }
-    .advert { order: 6; }
-    .text-cont3 { order: 7; } 
-    .predition-container { order: 8; } /* Fourth */
-    .leagueTable-text-cont { order: 9; }
-    .league-table-demo { order: 10; } /* Third */
-    .advert1 { order: 11; }
-    .news-podcast { order: 12; } /* Fifth (should be positioned after prediction container) */
+    .header-slider {
+      order: 1;
+     }
 
+  .section-wrapper {
+   order: 2;
+   }
+
+  .section-wrapper1 {
+   order: 3;
+   }
+
+.slider {
+  order: 4;
+}
+
+.advert {
+  order: 5;
+}
+
+.prediction-container {
+  order: 6;
+}
+
+.advert1 {
+  order: 7;
+}
+
+.league-table-demo {
+  order: 8;
+}
   
     .highlight-time,
      .game-leag,
@@ -4296,6 +4330,11 @@ body{
   }
 
   /*......league table page .....*/
+
+  .content {
+  display: flex;
+  flex-direction: column;
+}
   
 }
 
@@ -4304,6 +4343,11 @@ body{
   .mobileMenu-logo img {
     width: 80px;
   }
+
+  .content {
+  display: flex;
+  flex-direction: column;
+}
 }
 
 

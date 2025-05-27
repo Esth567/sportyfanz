@@ -1386,40 +1386,36 @@ document.addEventListener("DOMContentLoaded", () => {
 // menu toggle button for sidebar for mobile view
 document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.querySelector(".toggle-btn"); // visible on mobile/tablet
-    const menuIcon = document.querySelector(".mobileMenu-logo ion-icon");
+    const toggleBtn = document.querySelector(".toggle-btn");
+    const menuLogo = document.querySelector(".mobileMenu-logo"); // safer than ion-icon
     const closeIcon = document.querySelector(".iconX");
 
-    // Ensure toggle button visibility
+    function isMobileOrTablet() {
+        return window.innerWidth <= 1024;
+    }
+
     function updateSidebarVisibility() {
-        if (window.innerWidth <= 1024) {
+        if (isMobileOrTablet()) {
             if (toggleBtn) toggleBtn.style.display = "block";
-            if (!sidebar.classList.contains("collapsed")) {
-                sidebar.classList.add("collapsed");
-            }
+            sidebar.classList.remove("active");
+            sidebar.style.display = "none";
         } else {
             if (toggleBtn) toggleBtn.style.display = "none";
             sidebar.classList.remove("collapsed");
-            sidebar.style.display = "block"; // Always show on desktop
+            sidebar.classList.remove("active");
+            sidebar.style.display = "block";
         }
     }
 
-    // Toggle sidebar visibility for mobile/tablet
     function toggleSidebar() {
-        if (window.innerWidth <= 1024) {
+        if (isMobileOrTablet()) {
             sidebar.classList.toggle("active");
-
-            if (sidebar.classList.contains("active")) {
-                sidebar.style.display = "block";
-            } else {
-                sidebar.style.display = "none";
-            }
+            sidebar.style.display = sidebar.classList.contains("active") ? "block" : "none";
         }
     }
 
-    // Event listeners
-    if (menuIcon) {
-        menuIcon.addEventListener("click", toggleSidebar);
+    if (menuLogo) {
+        menuLogo.addEventListener("click", toggleSidebar);
     }
 
     if (toggleBtn) {
@@ -1433,7 +1429,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Run on load and resize
+    // Move h1 under logo
+    if (isMobileOrTablet()) {
+        const headerTopbar = document.querySelector(".header-topbar");
+        const h1 = headerTopbar?.querySelector("h1");
+        if (menuLogo && h1) {
+            headerTopbar.insertBefore(h1, menuLogo.nextSibling);
+        }
+    }
+
     updateSidebarVisibility();
     window.addEventListener("resize", updateSidebarVisibility);
 });
@@ -1449,22 +1453,6 @@ document.addEventListener("DOMContentLoaded", function () {
           searchBar.style.display = searchBar.style.display === "none" ? "block" : "none";
       }
   });
-});
-
-
- 
-//mobile menu icon functionality
-document.addEventListener("DOMContentLoaded", function () {
-  if (window.innerWidth <= 1024) { // Apply only for mobile/tablet
-      let headerTopbar = document.querySelector(".header-topbar");
-      let mobileMenuLogo = document.querySelector(".mobileMenu-logo");
-      let h1 = document.querySelector(".header-topbar h1");
-
-      // Move h1 below mobileMenu-logo
-      if (mobileMenuLogo && h1) {
-          headerTopbar.insertBefore(h1, mobileMenuLogo.nextSibling);
-      }
-  }
 });
 
 

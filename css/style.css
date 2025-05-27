@@ -3791,6 +3791,17 @@ body{
         
     }
 
+    /* Sidebar Icon */
+   .icon img {
+     width: 140px; /* Consistent size */
+     height: 50px;
+     object-fit: contain;   
+     cursor: pointer;
+     margin-left: -10px;
+     margin-right: 10px;
+    }
+
+
      .toggle-icon .icon {
         display: none;
      }

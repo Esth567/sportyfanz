@@ -1385,21 +1385,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // menu toggle button for sidebar for mobile view
 document.addEventListener("DOMContentLoaded", function () {
-  function updateSidebarVisibility() {
-      const sidebar = document.getElementById("sidebar");
-      const toggleBtn = document.querySelector(".toggle-btn");
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.querySelector(".toggle-btn"); // visible on mobile/tablet
+    const menuIcon = document.querySelector(".mobileMenu-logo ion-icon");
+    const closeIcon = document.querySelector(".iconX");
 
-      if (window.innerWidth <= 1024) {
-          toggleBtn.style.display = "block"; // Show toggle button for mobile & tablet
-      } else {
-          toggleBtn.style.display = "none"; // Hide toggle button for web view
-          sidebar.classList.remove("collapsed"); // Ensure sidebar is fully visible on web
-      }
-  }
+    // Ensure toggle button visibility
+    function updateSidebarVisibility() {
+        if (window.innerWidth <= 1024) {
+            if (toggleBtn) toggleBtn.style.display = "block";
+            if (!sidebar.classList.contains("collapsed")) {
+                sidebar.classList.add("collapsed");
+            }
+        } else {
+            if (toggleBtn) toggleBtn.style.display = "none";
+            sidebar.classList.remove("collapsed");
+            sidebar.style.display = "block"; // Always show on desktop
+        }
+    }
 
-  // Run on page load and on window resize
-  updateSidebarVisibility();
-  window.addEventListener("resize", updateSidebarVisibility);
+    // Toggle sidebar visibility for mobile/tablet
+    function toggleSidebar() {
+        if (window.innerWidth <= 1024) {
+            sidebar.classList.toggle("active");
+
+            if (sidebar.classList.contains("active")) {
+                sidebar.style.display = "block";
+            } else {
+                sidebar.style.display = "none";
+            }
+        }
+    }
+
+    // Event listeners
+    if (menuIcon) {
+        menuIcon.addEventListener("click", toggleSidebar);
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener("click", toggleSidebar);
+    }
+
+    if (closeIcon) {
+        closeIcon.addEventListener("click", () => {
+            sidebar.classList.remove("active");
+            sidebar.style.display = "none";
+        });
+    }
+
+    // Run on load and resize
+    updateSidebarVisibility();
+    window.addEventListener("resize", updateSidebarVisibility);
 });
 
 
@@ -1429,32 +1465,6 @@ document.addEventListener("DOMContentLoaded", function () {
           headerTopbar.insertBefore(h1, mobileMenuLogo.nextSibling);
       }
   }
-});
-
-
-// toggle sidebar for mobile view
-document.addEventListener("DOMContentLoaded", function () {
-    let sidebar = document.getElementById("sidebar");
-    let menuIcon = document.querySelector(".mobileMenu-logo ion-icon");
-    let closeIcon = document.querySelector(".iconX");
-
-    function toggleMobileSidebar() {
-        if (window.innerWidth <= 1024) { // Mobile & Tablet Only
-            sidebar.classList.toggle("active");
-            sidebar.style.display = sidebar.classList.contains("active") ? "block" : "none";
-        }
-    }
-
-    // Open sidebar on menu icon click
-    if (menuIcon) { 
-        menuIcon.addEventListener("click", toggleMobileSidebar);
-    }
-
-    // Close sidebar on close icon click
-    closeIcon.addEventListener("click", () => {
-        sidebar.classList.remove("active");
-        sidebar.style.display = "none";
-    });
 });
 
 

@@ -4043,36 +4043,17 @@ body{
     }
 
 
-   .middle-layer.header-slider {
-    order: 1;
-   }
-
-    
+      
   .text-cont, .live-match-demo {
-    order: 2;
-  }
-
-  .leagueTable-text-cont,.league-table-demo {
-    order: 3;
-  }
-   
-
-  .slider {
-    order: 4;
-  }
-
-  .advert {
-    order: 5;
-  }
-
-  .prediction-container {
-    order: 6;
-  }
-
-  .advert1 {
     order: 7;
   }
 
+  .leagueTable-text-cont,.league-table-demo {
+    order: 8;
+  }
+   
+
+ 
  
     .highlight-time,
      .game-leag,

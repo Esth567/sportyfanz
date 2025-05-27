@@ -383,10 +383,14 @@ body{
 }
 
 /* Layers */
-.first-layer {
+.layer {
     flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%; /* Adjust as needed */
+    overflow: hidden;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Ensure content stacks vertically */
     padding: 0;
     margin: 0;
 }
@@ -4005,44 +4009,6 @@ body{
         height: 250px;
     }
 
-
-
-    .header-slider {
-      order: 0;
-     }
-
-  .section-wrapper {
-   order: 1;
-   }
-
-  .section-wrapper4 {
-   order: 2;
-   } 
-
-   .section-wrapper5 {
-   order: 3;
-   }
-
-   .section-wrapper3 {
-   order: 4;
-   }
-   
-
-.advert {
-  order: 5;
-}
-
-.prediction-container {
-  order: 6;
-}
-
-.advert1 {
-  order: 7;
-}
-
-.league-table-demo {
-  order: 8;
-}
   
     .highlight-time,
      .game-leag,

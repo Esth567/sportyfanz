@@ -4043,15 +4043,19 @@ body{
     }
 
 
-   
+   .header-slider {
+    order: 0;
+   }
 
+    
   .text-cont, .live-match-demo {
     order: 2;
   }
 
-  .latest-match {
+  .leagueTable-text-cont,.league-table-demo {
     order: 3;
   }
+   
 
   .slider {
     order: 4;
@@ -4069,10 +4073,7 @@ body{
     order: 7;
   }
 
-  .league-table-demo {
-    order: 8;
-  }
-  
+ 
     .highlight-time,
      .game-leag,
     .team {

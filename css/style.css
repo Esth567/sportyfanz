@@ -4043,8 +4043,8 @@ body{
     }
 
 
-   .header-slider {
-    order: 0;
+   .middle-layer.header-slider {
+    order: 1;
    }
 
     

@@ -4016,8 +4016,10 @@ body{
     }
     
     /* Layers 1*/
+.text-cont4,
 .text-cont3,
 .text-cont2,
+.text-cont1,
 .text-cont{
     display: flex;
     padding-bottom: 15px;
@@ -4026,8 +4028,10 @@ body{
     width: 100%;
 }
 
+.text-cont4 h4,
 .text-cont3 h4,
 .text-cont2 h4,
+.text-cont1 h4,
 .text-cont h4 {
     font-size: 0.80rem;
     font-family: 'Lato';

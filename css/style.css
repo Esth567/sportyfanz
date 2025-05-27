@@ -406,9 +406,9 @@ body{
 .text-cont3 h4,
 .text-cont2 h4,
 .text-cont h4 {
-    font-size: 0.75rem;
+    font-size: 0.80rem;
     font-family: 'Lato';
-    font-weight: 500;
+    font-weight: bold;
 }
 
 .live-matches {

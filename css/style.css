@@ -2284,7 +2284,7 @@ body{
 
 
 
-/*..................................................line match page........................*/
+/*..................................................live match page........................*/
 
 
 .leags-country {
@@ -2868,6 +2868,8 @@ body{
     margin: 20px auto;
     border-radius: 10px;
     overflow: hidden;
+    transform: rotate(0deg);
+    transform-origin: center;
   }
   
   
@@ -4051,9 +4053,7 @@ body{
     }
 
 
-    .header-slider {
-        order: 6;
-     } 
+    
   .text-cont, .live-match-demo {
     order: 7;
   }
@@ -4066,6 +4066,9 @@ body{
     order: 9;
   }
 
+  .header-slider {
+        order: 6;
+     } 
   .slider.text-cont3 {
     order: 10;
   }
@@ -4100,6 +4103,27 @@ body{
         font-size: 0.80rem;
      }
 
+
+     .field {
+    height: 600px; /* Increase for more vertical space */
+    width: 300px;
+    transform: rotate(90deg);
+    transform-origin: center;
+    margin: 40px auto;
+  }
+
+  .player-dot {
+    /* Unrotate players so they're upright */
+    transform: translate(-50%, -50%) rotate(-90deg);
+  }
+
+  .center-circle,
+  .penalty-box,
+  .penalty-arc,
+  .center-line,
+  .goal {
+    transform: rotate(-90deg);
+  }
 
      .advert img {
         max-height: 200px; 

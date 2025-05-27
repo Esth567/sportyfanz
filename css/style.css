@@ -4051,7 +4051,9 @@ body{
     }
 
 
-      
+    .header-slider {
+        order: 6;
+     } 
   .text-cont, .live-match-demo {
     order: 7;
   }
@@ -4060,7 +4062,13 @@ body{
     order: 8;
   }
    
+  .text-cont1, .news-update {
+    order: 9;
+  }
 
+  .slider.text-cont3 {
+    order: 10;
+  }
  
  
     .highlight-time,

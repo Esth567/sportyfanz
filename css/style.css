@@ -86,7 +86,7 @@ body{
 /* Sidebar Icon */
 .icon img {
     width: 140px; /* Consistent size */
-    height: 50px;
+    height: 55px;
     object-fit: contain;   
     cursor: pointer;
     margin-left: -10px;
@@ -4043,11 +4043,9 @@ body{
     }
 
 
-    .header-slider {
-    order: 1;
-  }
+   
 
-  .live-match-demo {
+  .text-cont, .live-match-demo {
     order: 2;
   }
 

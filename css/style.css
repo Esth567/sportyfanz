@@ -3988,7 +3988,6 @@ body{
 
  .layer {
      display: flex;
-     
     }
 
     .live-match-demo,
@@ -3999,6 +3998,31 @@ body{
         width: 100%;
     }
     
+    /* Layers 1*/
+.text-cont3,
+.text-cont2,
+.text-cont{
+    display: flex;
+    padding-bottom: 15px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.text-cont3 h4,
+.text-cont2 h4,
+.text-cont h4 {
+    font-size: 0.80rem;
+    font-family: 'Lato';
+    font-weight: bold;
+}
+
+.live-matches {
+    font-size: 0.90rem;
+    font-family: 'Lato';
+    font-weight: bold;
+    color: #ffffff;
+}
    
     .header-slider {
         width: 100%;

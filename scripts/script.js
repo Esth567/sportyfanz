@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const from = new Date().toISOString().split('T')[0]; // today's date
     const to = from;
-    const leagueIDs = ["3", "152", "302", "207", "168", "175"]; // Major leagues
+    const leagueIDs = ["3", "152", "302", "207", "168", "175", "135", "162", "275", "61"]; //major leagues
 
     let matchesList = [];
     let currentMatchIndex = 0;

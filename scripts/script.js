@@ -756,12 +756,6 @@ function createMatchCard(container, match, category, matchIndex) {
                         ${matchRound}
                     </div>` : ""}
             </div>
-
-            <!-- Column 6: View Details Button -->
-            <button class="view-details-btn" data-category="${category}" data-index="${matchIndex}">
-                <img src="assets/icons/arrow-up.png" alt="Arrow-up">
-                View Details
-            </button>
         </div>
     `;
 

@@ -54,14 +54,21 @@ const rssFeeds = [
   "https://www.goal.com/en/feeds/news?fmt=rss"
 ];
 
-async function expandWithGroq(title, shortDesc) {
-  const prompt = `You're a seasoned British football pundit with a flair for dramatic, Premier League-style commentary. Rewrite and expand this breaking sports news into a vivid, engaging 1500-word article. Include tactical analysis, dramatic language, and reactions from players, coaches, and fans.\n\nTitle: ${title}\nDescription: ${shortDesc}`;
+
+
+async function expandWithGroq(title, shortDescRaw) {
+  const shortDesc = (shortDescRaw || '').slice(0, 2000); // Prevent too-long payloads
+
+  const prompt = `You're a seasoned British football pundit with a flair for dramatic, Premier League-style commentary. Rewrite and expand this breaking sports news into a vivid, engaging 1500-word article. Include tactical analysis, dramatic language, and reactions from players, coaches, and fans.
+
+Title: ${title}
+Description: ${shortDesc}`;
 
   try {
     const response = await axios.post(
       'https://api.groq.com/openai/v1/chat/completions',
       {
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-guard-4-12b',
         messages: [
           {
             role: 'system',
@@ -73,7 +80,7 @@ async function expandWithGroq(title, shortDesc) {
           }
         ],
         temperature: 0.7,
-        max_tokens: 3000
+        max_tokens: 2000 // Safe limit
       },
       {
         headers: {
@@ -83,12 +90,20 @@ async function expandWithGroq(title, shortDesc) {
       }
     );
 
-    return response.data.choices[0].message.content;
+    return response.data?.choices?.[0]?.message?.content || '(No content returned)';
   } catch (error) {
-    console.error('Groq API error:', error.message);
-    return shortDesc + ' (Original content, expansion failed.)';
+    console.error('❌ Groq API error:', error.message);
+
+    // Log detailed response if available
+    if (error.response) {
+      console.error('Groq response status:', error.response.status);
+      console.error('Groq response data:', error.response.data);
+    }
+
+    return `${shortDescRaw || 'No original content'} (Original content, expansion failed.)`;
   }
 }
+
 
 // Cache keys & TTL
 const CACHE_KEY = 'news:cache';
@@ -142,8 +157,9 @@ async function fetchNews(forceRefresh = false) {
         let longFormDescription;
         try {
           const fullContent = await extractFullArticle(item.link);
-          const descriptionToExpand = fullContent || sanitized;
-          longFormDescription = await expandWithGroq(item.title, descriptionToExpand);
+          const descriptionToUse = sanitized || item.contentSnippet || item.title;
+          const longFormDescription = await expandWithGroq(item.title, descriptionToUse);
+
         } catch (err) {
           console.warn('⚠️ Groq or extraction failed. Using fallback.');
           longFormDescription = sanitized + ' (Original content used due to expansion failure.)';

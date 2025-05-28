@@ -184,9 +184,28 @@
           <a href="live-matches.html">View all</a>
         </div>
       </div>
-      <div class="latest-match">
-        <!-- Match filters, calendar, and match list here -->
-      </div>
+      <div class="match-latest">
+              <!-- Match Header with Buttons -->
+              <div class="match-header">
+                  <div class="category-btn active" data-category="live" onclick="showMatches('live', event)">Live</div>
+                  <div class="category-btn" data-category="highlight" onclick="showMatches('highlight', event)">Highlight</div>
+                  <div class="category-btn" data-category="upcoming" onclick="showMatches('upcoming', event)">Upcoming</div>                
+                  <!-- Calendar -->
+                  <div class="category-btn calendar">  
+                      <ion-icon name="calendar-outline" id="calendar-icon"></ion-icon>
+                      <div class="date-filter">
+                        <label for="match-date">Select Match Date:</label>
+                        <input type="date" id="match-date" name="match-date" />
+                      </div>
+                      
+                  </div>
+              </div>
+          
+              <!-- Matches Container -->
+              <div class="matches-container" id="matches-container">
+                  <!-- Dynamic Match Category Content will be injected here -->
+              </div>
+          </div>        
     
 
     <div class="news-podcast-wrapper section-wrapper">
@@ -195,7 +214,7 @@
       </div>
     </div>
 
-    <div class="advert-container section-wrapper">
+    <div class="advert-container">
       <p>Advertisement</p>
     </div>
   </div>
@@ -203,33 +222,36 @@
   <!-- Third Layer -->
   <div class="layer third-layer">
       <div class="text-cont3">
-        <h4 class="live-matches">Top Players</h4>
-      </div>
-      <div class="slider">
-        <div class="players-container"></div>
-        <div class="slider-dots"></div>
-      </div>
+                <h4 class="live-matches">Top Players</h4>
+            </div>
 
-      <div class="advert">
-        <h5>Advertisement</h5>
-      </div>
-    
-      <div class="text-cont4">
-        <h4 class="live-matches">Prediction for Today</h4>
-        <div class="more">
-          <ion-icon name="arrow-forward-outline"></ion-icon>
-          <a href="prediction.html">View all</a>
+            <!-- Top Players slider -->
+            <div class="slider">
+                <div class="players-container"></div>
+                <!-- Slider Dots -->
+                <div class="slider-dots"></div>
+                </div>
+
+                <!-- advert -->
+                <div class="advert">
+                    <h5>Advertisement</h5>
+                 </div>
+
+           <div class="text-cont4">
+            <h4 class="live-matches">Predition for Today</h4>
+            <div class="more">
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+                <a href="prediction.html">View all</a>
+            </div>
         </div>
-      </div>
-      <div class="prediction-container"></div>
-    </div>
-  
-      <div class="advert1">
-        <h5>Advertisement</h5>
-      </div>
-    </div>
 
+        <div class="prediction-container"></div>
 
+        <div class="advert">
+            <h5>Advertisement</h5>
+         </div>
+    </div>
+    </div>
 </div>
 
          

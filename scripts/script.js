@@ -1377,6 +1377,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+// css code to restructure page layout for mobile and tablet view
+ document.addEventListener("DOMContentLoaded", function () {
+  function reorderElements() {
+      if (window.innerWidth <= 1024) {
+          const parent = document.querySelector(".content");
+
+          const headerSlider = document.querySelector(".header-slider");
+          const textCont = document.querySelector(".text-cont");
+          const liveMatchDemo = document.querySelector(".live-match-demo");
+          const textCont2 = document.querySelector(".text-cont2");
+          const slider = document.querySelector(".slider");
+          const advertPodcast = document.querySelector(".advert");
+          const textCont3 = document.querySelector(".text-cont3");
+          const predictionContainer = document.querySelector(".predition-container");
+          const leagueTabletextCont = document.querySelector(".leagueTable-text-cont");
+          const leagueTableDemo = document.querySelector(".league-table-demo");
+          const advert1Podcast = document.querySelector(".advert1");
+          const newsPodcast = document.querySelector(".news-podcast");
+
+         
+ 
+          // Append in the correct order
+          if (headerSlider) parent.appendChild(headerSlider);
+          if (textCont) parent.appendChild(textCont);
+          if (liveMatchDemo) parent.appendChild(liveMatchDemo);
+          if (textCont2) parent.appendChild(textCont2);
+          if (slider) parent.appendChild(slider);
+          if (advertPodcast) parent.appendChild(advertPodcast);
+          if (textCont3) parent.appendChild(textCont3);
+          if (predictionContainer) parent.appendChild(predictionContainer);
+          if (leagueTabletextCont) parent.appendChild(leagueTabletextCont);
+          if (leagueTableDemo) parent.appendChild(leagueTableDemo);
+          if (advert1Podcast) parent.appendChild(advert1Podcast);
+          if (newsPodcast) parent.appendChild(newsPodcast);
+      }
+  }
+
+  reorderElements();
+  window.addEventListener("resize", reorderElements);
+});
+
 // menu toggle button for sidebar for mobile view
 document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.getElementById("sidebar");

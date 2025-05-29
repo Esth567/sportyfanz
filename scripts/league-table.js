@@ -429,3 +429,35 @@ document.addEventListener("DOMContentLoaded", function () {
 });
  
   
+
+
+//..............mobile and tablet view.....//
+function moveLeaguesCountryForMobile() {
+    const leaguesCountry = document.querySelector('.leagues-country');
+    const leagueTable = document.querySelector('.league-table');
+
+    if (!leaguesCountry || !leagueTable) return;
+
+    const isMobileOrTablet = window.innerWidth <= 1024;
+
+    if (isMobileOrTablet) {
+        // Avoid duplication or re-adding
+        if (!leagueTable.contains(leaguesCountry)) {
+            leaguesCountry.classList.add("moved");
+            leagueTable.insertAdjacentElement("afterbegin", leaguesCountry);
+        }
+    } else {
+        // Move it back to original layer if on desktop
+        const originalLayer = document.querySelector('.layer');
+        const textCont = originalLayer.querySelector('.text-cont');
+        if (!originalLayer.contains(leaguesCountry)) {
+            leaguesCountry.classList.remove("moved");
+            originalLayer.insertBefore(leaguesCountry, textCont.nextSibling); // or wherever originally located
+        }
+    }
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', moveLeaguesCountryForMobile);
+// Run on resize
+window.addEventListener('resize', moveLeaguesCountryForMobile);

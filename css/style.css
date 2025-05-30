@@ -781,7 +781,7 @@ body{
 
 /* Banner 2 background image */
 .banner2 {
-    background-image: url('../assets/images/podcastImg.png');
+    background-image: url('../assets/images/podImage.png');
 }
 
 /* Overlay text box */
@@ -794,7 +794,7 @@ body{
 /* Heading styling */
 .slider-title {
     color: #fff;
-    font-size: 2rem;
+ 
     font-weight: bold;
     text-align: center;
 }
@@ -1423,6 +1423,7 @@ body{
    
 
 /* Advert  */
+.advert1,
 .advert {
     width: 100%;
     height: 200px;
@@ -2282,6 +2283,11 @@ body{
 
 /*..................................................live match page........................*/
 
+.league-header {
+    margin: 0;
+    padding: 0;
+    margin-top: -5px;
+}
 
 .leags-country {
     display: flex;
@@ -2307,7 +2313,7 @@ body{
     font-weight: 500;
     font-family: 'Lato';
     color: #ffffffa9;
-    margin-top: 2px;
+    margin-top: 2px; ,
   }
 
 
@@ -2316,6 +2322,7 @@ body{
     align-items: center;
     gap: 8px;
     position: relative;
+    margin-bottom: 10px;
     border: none;
   }
 
@@ -3937,7 +3944,7 @@ body{
     }
 
     .mobileMenu-logo ion-icon {
-        font-size: 27px;
+        font-size: 25px;
         cursor: pointer;
         display: inline-block;
     
@@ -4009,6 +4016,8 @@ body{
  .layer {
      display: flex;
      flex-direction: column;
+     padding: 0;
+     margin: 0;
     }
 
     .live-match-demo,
@@ -4026,7 +4035,8 @@ body{
 .text-cont1,
 .text-cont{
     display: flex;
-    padding-bottom: 15px;
+    margin-bottom: -15px;
+    padding-top: 5px;
     justify-content: space-between;
     align-items: center;
     width: 100%;
@@ -4037,7 +4047,7 @@ body{
 .text-cont2 h4,
 .text-cont1 h4,
 .text-cont h4 {
-    font-size: 0.80rem;
+    font-size: 0.77rem;
     font-family: 'Lato';
     font-weight: bold;
 }
@@ -4051,25 +4061,28 @@ body{
    
     .header-slider {
         width: 100%;
-        height: 170px;
+        height: 150px;
     }
 
      
-    .header-slider { order: 1; }  /* First in mobile */
-    .text-cont { order: 2; }
-    .live-match-demo { order: 3; } /* Second */
-    .text-cont2 { order: 4; }
-    .slider { order: 5; }
-    .advert { order: 6; }
-    .text-cont3 { order: 7; } 
-    .predition-container { order: 8; } /* Fourth */
-    .leagueTable-text-cont { order: 9; }
-    .league-table-demo { order: 10; } /* Third */
-    .advert1 { order: 11; }
-    .news-podcast { order: 12; } /* Fifth (should be positioned after prediction container) */
+    .header-slider { order: 0; }  /* First in mobile */
+    .text-cont { order: 1; }
+    .live-match-demo { order: 2; } /* Second */
+    .text-cont3 { order: 3; }
+    .slider { order: 4; }
+    .advert { order: 5; }
+    .text-cont2 { order: 6; }
+    .match-latest { order: 7; }
+    .text-cont4 { order: 8; } 
+    .prediction-container { order: 8; } 
+    .leagueTable-text-cont { order: 10; }
+    .league-table-demo { order: 11; } /* Third */
+    .advert1 { order: 12; }
+    .news-podcast { order: 13; } /* Fifth (should be positioned after prediction container) */
+    .text-cont1 { order: 14; }
+    .news-update { order: 15; }
 
-  
-    
+
   
  
     .highlight-time,
@@ -4411,9 +4424,7 @@ body{
 
 /* === Adjustments for 480px Devices === */
 @media screen and (max-width: 480px) {
-  .mobileMenu-logo img {
-    width: 80px;
-  }
+ 
 
   .content {
   display: flex;

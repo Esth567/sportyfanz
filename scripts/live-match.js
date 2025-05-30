@@ -69,7 +69,7 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
                         </div>
                     </div>
                     <div class="arrow-direct">
-                        <img src="assets/icons/Arrow - Right 2.png" alt="Arrow">
+                        <img src="/assets/icons/Arrow - Right 2.png" alt="Arrow">
                     </div>`;
 
                 leagueElement.addEventListener("click", function () {

@@ -1386,15 +1386,19 @@ document.addEventListener("DOMContentLoaded", () => {
           const headerSlider = document.querySelector(".header-slider");
           const textCont = document.querySelector(".text-cont");
           const liveMatchDemo = document.querySelector(".live-match-demo");
-          const textCont2 = document.querySelector(".text-cont2");
+          const textCont3 = document.querySelector(".text-cont3");
           const slider = document.querySelector(".slider");
           const advertPodcast = document.querySelector(".advert");
-          const textCont3 = document.querySelector(".text-cont3");
-          const predictionContainer = document.querySelector(".predition-container");
+          const textCont2 = document.querySelector(".text-cont2");
+          const matchLatest = document.querySelector(".match-latest");
+          const textCont4 = document.querySelector(".text-cont4");
+          const prediction = document.querySelector(".prediction-container");
           const leagueTabletextCont = document.querySelector(".leagueTable-text-cont");
           const leagueTableDemo = document.querySelector(".league-table-demo");
           const advert1Podcast = document.querySelector(".advert1");
           const newsPodcast = document.querySelector(".news-podcast");
+          const textCont1 = document.querySelector(".text-cont1");
+          const newsUpdate = document.querySelector(".news-update");
 
          
  
@@ -1402,15 +1406,19 @@ document.addEventListener("DOMContentLoaded", () => {
           if (headerSlider) parent.appendChild(headerSlider);
           if (textCont) parent.appendChild(textCont);
           if (liveMatchDemo) parent.appendChild(liveMatchDemo);
-          if (textCont2) parent.appendChild(textCont2);
+          if (textCont3) parent.appendChild(textCont3);
           if (slider) parent.appendChild(slider);
           if (advertPodcast) parent.appendChild(advertPodcast);
-          if (textCont3) parent.appendChild(textCont3);
-          if (predictionContainer) parent.appendChild(predictionContainer);
+          if (textCont2) parent.appendChild(textCont2);
+          if (matchLatest) parent.appendChild(matchLatest);
+          if (textCont4) parent.appendChild(textCont4);
+          if (prediction) parent.appendChild(prediction);
           if (leagueTabletextCont) parent.appendChild(leagueTabletextCont);
           if (leagueTableDemo) parent.appendChild(leagueTableDemo);
           if (advert1Podcast) parent.appendChild(advert1Podcast);
           if (newsPodcast) parent.appendChild(newsPodcast);
+          if (textCont1) parent.appendChild(textCont1);
+          if (newsUpdate) parent.appendChild(newsUpdate);
       }
   }
 

@@ -4083,7 +4083,14 @@ body{
     .news-update { order: 15; }
 
 
-  
+        .match-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; 
+        align-items: center;
+        width: 100%;
+        gap: -3px;
+    }
+
  
     .highlight-time,
      .game-leag,
@@ -4095,6 +4102,7 @@ body{
      .vs-score {
         font-size: 1rem;
      }
+
 
      .slider {
        width: 100%;

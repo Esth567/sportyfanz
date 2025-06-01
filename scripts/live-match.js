@@ -173,6 +173,7 @@ function updateMatches(matches) {
         allHighlights: []
     };
 
+    
     const now = luxon.DateTime.utc();  // Get the current time in UTC
     const oneWeekAgo = now.minus({ days: 7 });
 

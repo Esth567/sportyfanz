@@ -82,7 +82,7 @@ async function loadNews() {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/news');
+    const response = await fetch('http://localhost:3000/api/news');
     const { trending, updates } = await response.json();
     populateNewsSection('trending-news', trending);
     populateNewsSection('updates-news', updates);
@@ -103,7 +103,10 @@ function populateNewsSection(sectionId, newsList) {
     container.innerHTML = newsList.map((item, index) => `
         <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
             <h1 class="news-title">${item.title}</h1>
-            ${item.image ? `<div class="news-image"><img src="${item.image}" alt="Image for ${item.title}" loading="lazy" /></div>` : ''}
+            ${item.image ? `<div class="news-image">
+          <img src="/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+          alt="Image for ${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
+          </div>` : ''}
             <div class="news-meta">
                 <p class="news-desc">${enhanceSportsDescription(item.description)}</p>
                 <span class="news-time" data-posted="${item.pubDate}">Just now</span>

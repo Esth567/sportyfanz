@@ -1648,14 +1648,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (window.innerWidth <= 1024) {
           const parent = document.querySelector(".content");
 
-          const headerSlider = document.querySelector(".header-slider");
+          
           const textCont = document.querySelector(".text-cont");
           const liveMatchDemo = document.querySelector(".live-match-demo");
+          const textCont2 = document.querySelector(".text-cont2");
+          const matchLatest = document.querySelector(".match-latest");
           const textCont3 = document.querySelector(".text-cont3");
           const slider = document.querySelector(".slider");
           const advertPodcast = document.querySelector(".advert");
-          const textCont2 = document.querySelector(".text-cont2");
-          const matchLatest = document.querySelector(".match-latest");
+          const headerSlider = document.querySelector(".header-slider");
           const textCont4 = document.querySelector(".text-cont4");
           const prediction = document.querySelector(".prediction-container");
           const leagueTabletextCont = document.querySelector(".leagueTable-text-cont");
@@ -1668,14 +1669,14 @@ document.addEventListener("DOMContentLoaded", () => {
          
  
           // Append in the correct order
-          if (headerSlider) parent.appendChild(headerSlider);
           if (textCont) parent.appendChild(textCont);
           if (liveMatchDemo) parent.appendChild(liveMatchDemo);
+          if (textCont2) parent.appendChild(textCont2);
+          if (matchLatest) parent.appendChild(matchLatest);
           if (textCont3) parent.appendChild(textCont3);
           if (slider) parent.appendChild(slider);
           if (advertPodcast) parent.appendChild(advertPodcast);
-          if (textCont2) parent.appendChild(textCont2);
-          if (matchLatest) parent.appendChild(matchLatest);
+          if (headerSlider) parent.appendChild(headerSlider);
           if (textCont4) parent.appendChild(textCont4);
           if (prediction) parent.appendChild(prediction);
           if (leagueTabletextCont) parent.appendChild(leagueTabletextCont);

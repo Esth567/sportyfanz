@@ -4058,14 +4058,15 @@ body{
     }
 
      
-    .header-slider { order: 0; }  /* First in mobile */
-    .text-cont { order: 1; }
-    .live-match-demo { order: 2; } /* Second */
-    .text-cont3 { order: 3; }
-    .slider { order: 4; }
-    .advert { order: 5; }
-    .text-cont2 { order: 6; }
-    .match-latest { order: 7; }
+     
+    .text-cont { order: 0; } /* First in mobile */
+    .live-match-demo { order: 1; } 
+    .text-cont2 { order: 2; }
+    .match-latest { order: 3; }
+    .text-cont3 { order: 4; }
+    .slider { order: 5; }
+    .advert { order: 6; }
+    .header-slider { order: 7; }
     .text-cont4 { order: 8; } 
     .prediction-container { order: 8; } 
     .leagueTable-text-cont { order: 10; }
@@ -4137,7 +4138,7 @@ body{
         border: none;
         min-width: fit-content;
         width: 50px;
-        height: 25px;
+        height: 20px;
         margin-left: auto;
     }
 

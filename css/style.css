@@ -410,7 +410,7 @@ body{
 .text-cont2 h4,
 .text-cont1 h4,
 .text-cont h4 {
-    font-size: 0.80rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     font-weight: bold;
 }
@@ -737,6 +737,7 @@ body{
     width: 100%;
     height: 250px; /* Adjust height as needed */
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 /* Individual Slide Styling */
@@ -1019,24 +1020,26 @@ body{
 .calendar ion-icon {
     font-size: 1rem;
 }
-
 .live-indicator {
-    display: flex;
+    display: inline-flex;       /* keep content inline and flexible */
     align-items: center;
-    gap: 4px;
+    gap: 7px;
     font-weight: bold;
-    color: red;
-    font-size: 0.9em;
+    color: #228B22;
+    font-size: 0.7rem;
+    white-space: nowrap;        /* prevent text wrapping */
+    overflow: hidden;           /* hide overflow if too long */
+    text-overflow: ellipsis;    /* show "..." if overflow */
 }
 
 .red-dot {
     width: 8px;
     height: 8px;
-    background-color: red;
+    background-color: #228B22;
     border-radius: 50%;
     animation: blink 1s infinite;
+    flex-shrink: 0;             /* prevent shrinking */
 }
-
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
@@ -1057,50 +1060,47 @@ body{
     }
 
     .match-card {
-        display: flex;
-        background-color: #1a2f4bad;
-        flex-direction: row;
-        color: white;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        margin-top: 10px;
-        width: 100%;
+    display: flex;
+    flex-direction: row; /* change from row to column */
+    align-items: center;
+    width: 100%;
+   
     }
 
-
-    .match-details {
-    width: 100%;
-    display: flex; /* change from grid to flex */
-    justify-content: center; /* center if needed */
-    margin: 0 auto;
-    padding: 0;
-   }
+.match-col {
+    flex: 1; /* Equal width for each column */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     
-    .league-header {
-        padding: 8px 0;
-        font-weight: bold;
-        border-bottom: 1px solid #ccc;
-        margin-top: 20px;
-      }
-      
+}
+
+
+.match-details {
+   display: flex;
+    flex-direction: row; /* change from row to column */
+    align-items: center;
+    background-color: #1a2f4bad;
+    color: white;
+    border-radius: 10px;
+    padding: 8px;
+    margin-top: 10px;
+    width: 100%;
+    gap: 10px; /* space between sections */
+   }
 
     /* Team Names */
     .Matchteam {
         display: flex;
         align-items: center;
-        font-size: 0.75rem;
+        flex-direction: row;
+        font-size: 0.70rem;
         font-family: 'Lato';
         white-space: nowrap; /* Prevent the text from wrapping to the next line */
         overflow: hidden;  /* Hide any overflow if the name is too long */
         text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
         justify-content: flex-start;
         gap: 5px;
-    }
-    
-
-    .match-info h5 {
-        font-weight: 300;
     }
 
 
@@ -1113,17 +1113,20 @@ body{
         font-size: 0.60rem;
         font-family: 'Lato';
         font-weight: bold;
-        padding: 2px 2px;
         border: none;
         min-width: fit-content;
-        width: 100px;
+        width: 85px;
+        height: 25px;
         margin-left: auto;
     }
     
+    .view-details-btn img{
+        font-size: 10px;
+    }
 
     .Matchteam img {
-        width: 18px; /* Reduce the size of logos */
-        height: 18px;
+        width: 17px; /* Reduce the size of logos */
+        height: 17px;
         object-fit: cover;
     
     }
@@ -1133,42 +1136,48 @@ body{
     }
 
 
-    .match-status-score {
+    .match-status,
+    .match-score {
         display: flex;
-        flex-direction: column;
+        flex-direction: row; /* Stack score and match status vertically for highlight */
         align-items: center;
-        text-align: center;
-        font-size: 0.8rem;
-        font-weight: bold;
+        font-size: 0.75rem;
         font-family: 'Lato';
-        min-width: 45px;
-        gap: 8px;
+        font-weight: bold;
+        gap: 5px;
+         text-align: center;
+        
     }
 
+    .match-status-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      font-family: 'Lato';
+      min-width: 40px;
+      margin-right: 3px; /* Small gap only */
+    }
 
 
     .match-time,
     .match-country {
         display: flex;
         align-items: center;
-        gap: 3px; 
         font-size: 0.7rem;
         font-family: 'Lato';
-        font-weight: 300;
+        font-weight: 400;
         text-align: center;
     }
 
-    .match-meta {
-        display: flex;
-        flex-direction: row; /* Ensures the meta items are in a row */
-        align-items: center;
-        gap: 10px;
-        margin-left: 10px; /* Remove the left margin to move it to the left */
-        justify-content: flex-start; /* Align items to the left */
-        padding: 15px;
-    }
-    
-
+ .match-time-country {
+    font-size: 0.75rem;
+    gap: 10px;
+    flex-direction: row;
+    display: flex;
+}
 
     .match-time img,
     .match-country img{
@@ -1176,32 +1185,6 @@ body{
         height: 12px;
         object-fit: cover;
     }
-
-    .match-status,
-    .match-score {
-        display: flex;
-        flex-direction: row; /* Stack score and match status vertically for highlight */
-        align-items: center;
-        font-size: 0.8rem;
-        font-family: 'Lato';
-        font-weight: bold;
-        gap: 10px;
-        padding: 15px;
-        
-    }
-
-    .match-status h5 {
-        font-size: 0.6rem;  /* Increase font size for "vs" */
-    }
-
-    .match-round {
-        font-size: 0.85rem;
-        margin-top: 5px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-      
 
     .preditScore-status {
         display: flex;
@@ -3810,8 +3793,8 @@ body{
 
     /* Sidebar Icon */
    .icon img {
-     width: 140px; /* Consistent size */
-     height: 50px;
+     width: 100px; /* Consistent size */
+     height: 45px;
      object-fit: contain;   
      cursor: pointer;
      margin-left: -10px;
@@ -3942,8 +3925,11 @@ body{
         gap: 10px;
     }
 
+    .mobileMenu-logo h1 {
+        font-size: 0.75rem;
+    }
     .mobileMenu-logo img {
-        width: 107px; /* Adjust logo size */
+        width: 105px; /* Adjust logo size */
         height: auto;
         object-fit: contain; 
         margin-left: 7px;
@@ -3951,7 +3937,7 @@ body{
     }
 
     .mobileMenu-logo ion-icon {
-        font-size: 25px;
+        font-size: 23px;
         cursor: pointer;
         display: inline-block;
     
@@ -4090,14 +4076,73 @@ body{
     .news-update { order: 15; }
 
 
-        .match-details {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; 
+   .match-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0px;
+  }
+
+  .match-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    white-space: nowrap; /* Prevent the text from wrapping to the next line */
+        overflow: hidden;  /* Hide any overflow if the name is too long */
+        text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
+        justify-content: flex-start;
+  }
+
+  .match-time-country {
+    align-items: flex-start;
+  }
+  
+  
+    .match-status,
+    .match-score {
+        display: flex;
+        flex-direction: row; /* Stack score and match status vertically for highlight */
         align-items: center;
-        width: 100%;
-        gap: -3px;
+        font-size: 0.75rem;
+        font-family: 'Lato';
+        font-weight: bold;
+        gap: 1px;
+         text-align: center;
+        
     }
 
+      .match-status-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      font-family: 'Lato';      
+      margin-right: 1px; /* Small gap only */
+    }
+  
+
+
+     .view-details-btn {
+        display: flex;
+        align-items: center;
+        text-align: right;
+        background: #fff;
+        color: #1A2F4B;
+        border-radius: 15px;
+        font-size: 0.60rem;
+        font-family: 'Lato';
+        font-weight: bold;
+        border: none;
+        min-width: fit-content;
+        width: 50px;
+        height: 25px;
+        margin-left: auto;
+    }
+
+
+  
  
     .highlight-time,
      .game-leag,
@@ -4338,6 +4383,24 @@ body{
       }
 
 
+
+        .tab-btn {
+    color: #fff;
+    border-radius: 20px;
+    padding: 4px 10px;
+    background-color: #1f3750;
+    cursor: pointer;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.60rem;
+    font-family: 'Lato';
+    font-weight: 500;
+    gap: 5px;
+    border: none;
+
+  }
 
 
       /*......league table page .....*/

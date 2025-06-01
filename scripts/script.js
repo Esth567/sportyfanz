@@ -445,19 +445,19 @@ function getTodayDate(offset = 0) {
 
 // === LUXON Time Functions ===
     function getMinutesSince(matchDate, matchTime) {
-        const { DateTime } = luxon;
-    
-        const matchBerlin = luxon.DateTime.fromFormat(
-           `${match.match_date} ${match.match_time}`,
-             "yyyy-MM-dd h:mm a",
-            { zone: "Europe/Berlin" }
-         );
-     
-    
-        const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-        const diffInMinutes = Math.floor(now.diff(matchBerlin, "minutes").minutes);
-        return diffInMinutes > 0 ? diffInMinutes : 0;
-    }
+    const { DateTime } = luxon;
+
+    const matchDateTime = DateTime.fromFormat(
+        `${matchDate} ${matchTime}`,
+        "yyyy-MM-dd HH:mm",
+        { zone: "Europe/Berlin" }
+    );
+
+    const now = DateTime.now().setZone("Europe/Berlin");
+    const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
+    return diffInMinutes > 0 ? diffInMinutes : 0;
+}
+
     
     function formatToUserLocalTime(dateStr, timeStr) {
         try {
@@ -663,36 +663,55 @@ function showMatches(matchesData, category) {
 
         html += `
         <div class="match-details" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-            <div class="match-card">                
-                    <div class="Matchteam">
+            <div class="match-card">
+                    <div class="match-col Matchteam">
                         <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
                         <span>${match.match_hometeam_name}</span>
                     </div>
-                    <div class="match-status-score">
+                    <div class="match-col match-status-score">
                       ${scoreDisplay}
                       ${matchStatusDisplay}
                     </div>
-                    <div class="Matchteam">
+                    <div class="match-col Matchteam">
                         <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
                         <span>${match.match_awayteam_name}</span>
                     </div>
-                     <div class="match-meta">
+                    </div>
+                    <div class="match-col match-time-country">
                       <div class="match-time"><img src="assets/icons/clock.png" alt="Clock">${formattedTime}</div>
                      <div class="match-country"><img src="assets/icons/map-pin.png" alt="Map">${country}</div>
+                   
                       ${matchRound ? `
-                    <div class="match-round">
+                    <div class="match-col match-round">
                         <img src="assets/icons/trophy.png" alt="Round">
                         ${matchRound}
                     </div>` : ""}
-                </div>                  
+                    <div class="match-col match-btn">  
+                <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
+                    <img src="assets/icons/arrow-up.png" alt="Round">
+                  View
+                  </button>
                 </div>
+                  </div>
+                
              </div>`;
 
         displayedMatchCount++;
+
     }
 
     html += `</div>`;
     matchesContainer.innerHTML = html;
+    // Add event listeners to all "View Details" buttons
+document.querySelectorAll('.view-details-btn').forEach(btn => {
+    btn.addEventListener('click', function (event) {
+        event.stopPropagation(); // Prevent parent .match-details click
+        const matchId = this.getAttribute('data-match-id');
+        const category = this.getAttribute('data-category');
+        displayLiveMatch(matchId, category);
+    });
+});
+
 }
 
 
@@ -871,6 +890,12 @@ async function displayLiveMatch(matchId, category) {
             <div class="live-match-teams">${teamHTML}</div>
             ${contentHTML}
         </div>`;
+
+        // Hide the header slider when showing match details
+        const headerSlider = document.querySelector('.header-slider');
+          if (headerSlider) {
+            headerSlider.style.display = 'none';
+           }
 
     // Attach tab click events
     document.querySelectorAll(".tab-btn").forEach(button => {

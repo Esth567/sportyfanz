@@ -4383,9 +4383,16 @@ body{
         font-size: 1rem;
       }
 
+     .match-tabs {
+    display: flex;
+    padding: 0;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 8px;
 
+  }
 
-        .tab-btn {
+    .tab-btn {
     color: #fff;
     border-radius: 20px;
     padding: 4px 10px;

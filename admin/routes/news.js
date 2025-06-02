@@ -7,9 +7,10 @@ router.get("/", async (req, res) => {
     const news = await fetchNews();
     res.json(news);
   } catch (err) {
-    console.error("❌ Failed to fetch news", err.message);
+    console.error("Failed to fetch news:", err.message);
     res.status(500).json({ error: "Failed to fetch news" });
   }
 });
+
 
 module.exports = router;

@@ -437,14 +437,17 @@ setInterval(autoSlide, 4000); // Change slides every 3 seconds
 
 //function to display matches for the middle layers in home page
 
+// Function to get today's date or a date offset by days (formatted as YYYY-MM-DD)
 function getTodayDate(offset = 0) {
-    const { DateTime } = luxon;
-    return DateTime.local().plus({ days: offset }).toFormat("yyyy-MM-dd");
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split("T")[0];
 }
 
 
+
 // === LUXON Time Functions ===
-    function getMinutesSince(matchDate, matchTime) {
+ function getMinutesSince(matchDate, matchTime) {
     const { DateTime } = luxon;
 
     const matchDateTime = DateTime.fromFormat(
@@ -458,25 +461,26 @@ function getTodayDate(offset = 0) {
     return diffInMinutes > 0 ? diffInMinutes : 0;
 }
 
-    
-    function formatToUserLocalTime(dateStr, timeStr) {
-        try {
-            const { DateTime } = luxon;
-    
-            const berlinTime = DateTime.fromFormat(
-                `${dateStr} ${timeStr}`,
-                "yyyy-MM-dd HH:mm",
-                { zone: "Europe/Berlin" }
-            );
-    
-            return berlinTime
-                .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-                .toFormat("hh:mm");
-        } catch (e) {
-            console.error("Time conversion error:", e);
-            return "TBD";
-        }
+function formatToUserLocalTime(dateStr, timeStr) {
+    try {
+        const { DateTime } = luxon;
+
+        const berlinTime = DateTime.fromFormat(
+            `${dateStr} ${timeStr}`,
+            "yyyy-MM-dd HH:mm",
+            { zone: "Europe/Berlin" }
+        );
+
+        return berlinTime
+            .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+            .toFormat("h:mm");
+    } catch (e) {
+        console.error("Time conversion error:", e);
+        return "TBD";
     }
+}
+
+
 
 //function to fetch matches
 async function fetchMatchesData() {
@@ -613,13 +617,13 @@ function showMatches(matchesData, category) {
             </div>
         </div>`;
 
-       for (const match of selectedMatches.sort((a, b) => {
-          const getPriority = (m) => {
-          const index = preferredLeagues.findIndex(l => l.name === m.league_name && l.country === m.country_name);
-          return index === -1 ? Infinity : index;
-      };
-       return getPriority(a) - getPriority(b);
-     })) {
+        const getPriority = (m) => {
+        const index = preferredLeagues.findIndex(
+             l => l.name === m.league_name && l.country === m.country_name
+           );
+             return index === -1 ? Infinity : index;
+          };
+     for (const match of selectedMatches.sort((a, b) => getPriority(a) - getPriority(b))) { 
         if (displayedMatchCount >= MAX_MATCHES) break;
 
         const matchBerlin = luxon.DateTime.fromFormat(
@@ -640,25 +644,25 @@ function showMatches(matchesData, category) {
         let scoreDisplay = "";
         let matchStatusDisplay = "";
         let formattedTime = "";
-
-        if (category === "live") {
-          const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
-          matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
-          scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-          formattedTime = `
+  if (category === "live") {
+        const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
+        matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
+        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+        formattedTime = `
             <div class="live-indicator">
                 <span class="red-dot"></span>
                 <span class="live-text">Live</span> - ${matchMinute}
             </div>
-          `;
-         } else if (category === "highlight") {
-          matchStatusDisplay = `<h5>FT</h5>`;
-          scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-          formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
-         } else if (category === "upcoming") {
-          matchStatusDisplay = `<h5>vs</h5>`;
-          formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
-        }
+        `;
+    } else if (category === "highlight") {
+        matchStatusDisplay = `<h5>FT</h5>`;
+        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+        formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
+    } else if (category === "upcoming") {
+        matchStatusDisplay = `<h5>vs</h5>`;
+        formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
+    }
+
 
 
         html += `
@@ -689,7 +693,7 @@ function showMatches(matchesData, category) {
                     <div class="match-col match-btn">  
                 <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
                     <img src="assets/icons/arrow-up.png" alt="Round">
-                  View
+                  View Details
                   </button>
                 </div>
                   </div>
@@ -713,6 +717,7 @@ document.querySelectorAll('.view-details-btn').forEach(btn => {
 });
 
 }
+    
 
 
 // Filter the matches based on category (live, highlight, upcoming)

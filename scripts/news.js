@@ -80,10 +80,20 @@ const MAX_VISIBLE_NEWS = 5;
 async function loadNews() {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
+  //const baseURL =
+  //window.location.hostname === 'localhost'
+   // ? 'http://localhost:10000'
+   // : 'https://sports-news-api-a7gh.onrender.com'; // replace with actual Render backend URL
 
   try {
-    const response = await fetch('http://localhost:3000/api/news');
-    const { trending, updates } = await response.json();
+    
+   const response = await fetch(`http://localhost:3000/api/news`);
+    if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+const { trending, updates } = await response.json();
+
     populateNewsSection('trending-news', trending);
     populateNewsSection('updates-news', updates);
   } catch (error) {

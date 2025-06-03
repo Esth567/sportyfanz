@@ -1066,6 +1066,7 @@ body{
     width: 100%;
    
     }
+    
 
 .match-col {
     flex: 1; /* Equal width for each column */
@@ -3925,8 +3926,13 @@ body{
         gap: 10px;
     }
 
+    
     .mobileMenu-logo h1 {
         font-size: 0.75rem;
+    }
+
+    .mobileMenu-logo h2 {
+         font-size: 0.85rem;
     }
     .mobileMenu-logo img {
         width: 105px; /* Adjust logo size */
@@ -4177,26 +4183,18 @@ body{
      }
 
 
-     .field {
-    height: 600px; /* Increase for more vertical space */
-    width: 300px;
-    transform: rotate(90deg);
-    transform-origin: center;
-    margin: 40px auto;
-  }
+       .field {
+        height: 120vw;
+        width: 100vh; /* fixed width like height on desktop */
+        transform: rotate(90deg);
+        transform-origin: center center;
+        }
 
-  .player-dot {
-    /* Unrotate players so they're upright */
-    transform: translate(-50%, -50%) rotate(-90deg);
-  }
-
-  .center-circle,
-  .penalty-box,
-  .penalty-arc,
-  .center-line,
-  .goal {
-    transform: rotate(-90deg);
-  }
+     .player-dot {
+        /* Reverse rotation so player labels are upright */
+       transform: translate(-50%, -50%) rotate(-90deg);
+       position: absolute;
+     }
 
      .advert img {
         max-height: 200px; 
@@ -4341,6 +4339,7 @@ body{
 
      /*......matches page .....*/
 
+
      body.matches-page .middle-layer {
         padding: 0; /* Removes padding */
         margin: 0 auto; /* Centers content */
@@ -4352,9 +4351,17 @@ body{
     body.matches-page .header-top h1,
     body.matches-page .layer:not(.middle-layer),
     body.matches-page .third-layer,
+    body.matches-page .live-match-demo,
+    body.matches-page .leagueTable-text-cont,
+    body.matches-page .league-table-demo,
+    body.matches-page .news-update,
+    body.matches-page .advert-container,
+    body.matches-page .slider,
+    body.matches-page .advert,
+    body.matches-page .prediction-container,
     body.matches-page .text-cont
     {
-        display: none;
+        display: none !important;
     }
 
     
@@ -4374,24 +4381,22 @@ body{
     .lineup-players-names h4,
     .info-teamNames,
     .info-match-container h3 {
-        font-size: 1rem;
+        font-size: 0.75rem;
         margin-top: 10px;
         font-family: 'Lato';
     }
 
-    .matches-team span{
-        font-family: 'Lato';
-        font-size: 1rem;
-      }
+     .matches-team span {
+       font-size: 0.75rem;
+   
+     }
 
-     .match-tabs {
-    display: flex;
-    padding: 0;
-    align-items: center;
-    margin-bottom: 20px;
-    gap: 8px;
 
-  }
+       .match-category-btn {
+         font-size: 0.67rem;
+         font-family: 'Lato';
+         font-weight: 300;
+       }
 
     .tab-btn {
     color: #fff;

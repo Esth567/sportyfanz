@@ -37,14 +37,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         leagueElement.classList.add("leagueNames");
                         leagueElement.innerHTML = `
                             <div class="leag-count">
-                                <img src="${league.league_logo || 'assets/images/default-logo.png'}" alt="${league.league_name} Logo">
+                                <img src="${league.league_logo || '/assets/images/default-logo.png'}" alt="${league.league_name} Logo">
                                 <div class="league-info">
                                     <h3>${league.league_name}</h3>
                                     <p>${league.country_name}</p>                    
                                 </div>
                             </div>
                             <div class="arrow-direct">
-                                <img src="assets/icons/Arrow - Right 2.png" alt="Arrow">
+                                <img src="/assets/icons/Arrow - Right 2.png" alt="Arrow">
                             </div>
                         `;
     
@@ -77,12 +77,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 const leagueLogos = {
-    "Premier League": "assets/images/premierleagueLogo.png",
-    "La Liga": "assets/images/laliga-logo.png",
-    "Serie A": "assets/images/series-aLogo.png",
-    "Bundesliga": "assets/images/bundesliga-logo.png",
-    "UEFA Champions League": "assets/images/UEFAchampionsleagueLogo.png",
-    "NPFL": "assets/images/npflLogo.png",
+    "Premier League": "/assets/images/premierleagueLogo.png",
+    "La Liga": "/assets/images/laliga-logo.png",
+    "Serie A": "/assets/images/series-aLogo.png",
+    "Bundesliga": "/assets/images/bundesliga-logo.png",
+    "UEFA Champions League": "/assets/images/UEFAchampionsleagueLogo.png",
+    "NPFL": "/assets/images/npflLogo.png",
     // Add other leagues here...
 };
 
@@ -105,7 +105,7 @@ async function updateLeagueTable(leagueName, leagueId) {
         let tableHTML = generateTableHTML(initialData, formMap, leagueName, leagueData);
 
         // Use the league logo mapping (local images)
-        const leagueLogo = leagueLogos[leagueName] || 'assets/images/default-logo.png'; // Fallback to default logo
+        const leagueLogo = leagueLogos[leagueName] || '/assets/images/default-logo.png'; // Fallback to default logo
         console.log("League Logo:", leagueLogo); // Log the logo URL to check
 
         middleLayer.innerHTML = `
@@ -193,11 +193,12 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
     teams.sort((a, b) => b.overall_league_PTS - a.overall_league_PTS);
     const totalTeams = allTeams.length;
 
+
     let tableHTML = `
         <div class="table-headers">
             <span class="position-header">Pos</span>
             <span class="team-name-header">Team</span>
-            <span class="stat-headerF">Form</span>
+            <span class="stat-headerF hide-on-mobile">Form</span>
             <span class="stat-header">P</span>
             <span class="stat-header">W</span>
             <span class="stat-header">D</span>
@@ -245,7 +246,7 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
                     <img src="${team.team_badge}" alt="${team.team_name} Logo" class="team-logo">
                     <span class="teamLeague-name">${team.team_name}</span>
                 </div>
-                <div class="form-stat">${generateFormHTML(form, 5)}</div>
+                <div class="form-stat hide-on-mobile">${generateFormHTML(form, 5)}</div>
                 <span class="team-stat">${team.overall_league_payed}</span>
                 <span class="team-stat">${team.overall_league_W}</span>
                 <span class="team-stat">${team.overall_league_D}</span>
@@ -257,7 +258,10 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
         `;
     });
 
-    return tableHTML;
+     const toggleButton = `
+     <button class="toggle-form-button show-on-mobile" onclick="toggleFormColumn()">Show Form</button>
+     `;
+     return toggleButton + tableHTML;
 }
 
 
@@ -461,3 +465,18 @@ function moveLeaguesCountryForMobile() {
 document.addEventListener('DOMContentLoaded', moveLeaguesCountryForMobile);
 // Run on resize
 window.addEventListener('resize', moveLeaguesCountryForMobile);
+
+
+//dispay form button on mobile
+function toggleFormColumn() {
+    const formStats = document.querySelectorAll('.form-stat');
+    const formHeader = document.querySelector('.stat-headerF');
+    const button = document.querySelector('.toggle-form-button');
+
+    formStats.forEach(div => div.classList.toggle('mobile-visible'));
+    if (formHeader) formHeader.classList.toggle('mobile-visible');
+
+    if (button) {
+        button.textContent = button.textContent.includes("Show") ? "Hide Form" : "Show Form";
+    }
+}

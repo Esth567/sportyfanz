@@ -1,5 +1,6 @@
-require("dotenv").config();
+// index.js
 
+require("dotenv").config();
 const { spawn } = require("child_process");
 const axios = require("axios");
 const express = require("express");
@@ -8,51 +9,62 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
 
-const newsRoutes = require("./routes/news");
-const imageProxyRoutes = require("./routes/imageProxy");
+const newsRoutes = require("../routes/news");
+const imageProxyRoutes = require("../routes/imageProxy");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
-// Start vLLM server
-const vllmProcess = spawn("vllm", ["serve", "--model", "deepseek-ai/DeepSeek-R1-0528"]);
+const fastapi = spawn(
+  "uvicorn",
+  ["app.main:app", "--host", "0.0.0.0", "--port", "8000"],
+  {
+    cwd: path.join(__dirname, "../../summarizer-api"), // 👈 run from summarizer-api folder
+    env: {
+      ...process.env,
+      PYTHONPATH: ".", // 👈 this tells Python to resolve from cwd, which now has `app/`
+    },
+  }
+);
 
-vllmProcess.stdout.on("data", (data) => {
-  console.log(`🧠 vLLM: ${data}`);
+
+
+fastapi.stdout.on("data", (data) => {
+  console.log(`🔥 FastAPI: ${data}`);
 });
-vllmProcess.stderr.on("data", (data) => {
-  console.error(`❗ vLLM error: ${data}`);
+fastapi.stderr.on("data", (data) => {
+  console.error(`❗ FastAPI error: ${data}`);
 });
-vllmProcess.on("close", (code) => {
-  console.log(`⚠️ vLLM process exited with code ${code}`);
+fastapi.on("close", (code) => {
+  console.log(`⚠️ FastAPI process exited with code ${code}`);
 });
 
-// Wait for vLLM to be ready
-async function waitForVLLM(timeout = 15000, interval = 1000) {
+// 🕐 Wait for FastAPI to be ready
+async function waitForFastAPI(timeout = 15000, interval = 1000) {
   const url = "http://localhost:8000/v1/chat/completions";
   const start = Date.now();
 
   while (Date.now() - start < timeout) {
     try {
       await axios.post(url, {
-        model: "deepseek-ai/DeepSeek-R1-0528",
+        model: "google/flan-t5-small",
         messages: [{ role: "user", content: "ping" }]
       });
-      console.log("✅ vLLM is ready.");
+      console.log("✅ FastAPI is ready.");
       return true;
     } catch (err) {
-      console.log("⌛ Waiting for vLLM to be ready...");
+      console.log("⌛ Waiting for FastAPI...");
       await new Promise((res) => setTimeout(res, interval));
     }
   }
 
-  console.warn("❌ Timed out waiting for vLLM. Continuing anyway.");
+  console.warn("❌ Timed out waiting for FastAPI.");
   return false;
 }
 
-// Start server after vLLM is ready
+// 🚀 Start Express app after FastAPI is up
 (async () => {
-  await waitForVLLM();
+  await waitForFastAPI();
 
   app.use(cors({ origin: ["https://sports-news.onrender.com"] }));
   app.use(compression());
@@ -68,9 +80,7 @@ async function waitForVLLM(timeout = 15000, interval = 1000) {
   app.use("/api/news", newsRoutes);
   app.use("/api", imageProxyRoutes);
 
-  app.get("/", (req, res) => {
-    res.send("Server running.");
-  });
+  app.get("/", (req, res) => res.send("Server running."));
 
   app.listen(port, () => {
     console.log(`🚀 Server running on http://localhost:${port}`);

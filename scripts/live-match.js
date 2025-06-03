@@ -943,17 +943,25 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
   
   // ✅ Fetch lineup and dynamically infer formation
      function fetchAndRenderLineups(match_id, match) {
-       fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${match_id}&APIkey=${APIkey}`)
+    fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${match_id}&APIkey=${APIkey}`)
         .then(res => res.json())
         .then(data => {
+            const container = document.getElementById("football-field");
+            container.innerHTML = ""; // Clear previous content
+
             const lineups = data[match_id]?.lineup;
             if (!lineups) {
-                console.warn("No lineup data found for match_id:", match_id);
+                displayNoLineupMessage(container, "No lineup data found.");
                 return;
             }
 
             const homePlayers = lineups.home?.starting_lineups || [];
             const awayPlayers = lineups.away?.starting_lineups || [];
+
+            if (homePlayers.length === 0 && awayPlayers.length === 0) {
+                displayNoLineupMessage(container, "No lineup formation available.");
+                return;
+            }
 
             const homeFormation = inferFormation(homePlayers);
             const awayFormation = inferFormation(awayPlayers);
@@ -961,8 +969,25 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
             renderPlayersOnField("home", homePlayers, homeFormation, "home");
             renderPlayersOnField("away", awayPlayers, awayFormation, "away");
         })
-        .catch(err => console.error("Error fetching lineups:", err));
+        .catch(err => {
+            console.error("Error fetching lineups:", err);
+            const container = document.getElementById("football-field");
+            displayNoLineupMessage(container, "Error loading lineups.");
+        });
 }
+
+
+function displayNoLineupMessage(container, message) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("no-lineup-message");
+    msgDiv.textContent = message;
+    msgDiv.style.textAlign = "center";
+    msgDiv.style.marginTop = "20px";
+    msgDiv.style.color = "#888";
+    msgDiv.style.fontSize = "1.2em";
+    container.appendChild(msgDiv);
+}
+
 
 // ✅ Parse inferred formation or fallback string-based one
 function parseFormation(formation, players) {

@@ -4,7 +4,7 @@ async function expandWithGroq(title, content, retries = 2) {
   const prompt = `You're a British football pundit. Rewrite and expand this sports news article in dramatic, engaging style.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 1500)}`;
 
   const payload = {
-    model: "tiiuae/falcon-7b-instruct",
+    model: "google/flan-t5-small",
     messages: [
       { role: "system", content: "You are a football journalist." },
       { role: "user", content: prompt }

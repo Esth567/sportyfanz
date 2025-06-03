@@ -1025,12 +1025,13 @@ function renderPlayersOnField(team, players, formation, side = "home") {
 
     const formationArray = parseFormation(formation, players);
     const isHome = side === "home";
+    const vertical = isVerticalMode();
 
-    // Goalkeeper
+    // Goalkeeper position
     const goalkeeper = players.find(p => p.lineup_position === "1");
     if (goalkeeper) {
-        const gkX = isHome ? 10 : 90;
-        const gkY = 50;
+        const gkX = vertical ? 50 : (isHome ? 10 : 90);
+        const gkY = vertical ? (isHome ? 10 : 90) : 50;
         const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
         container.appendChild(gkDiv);
     }
@@ -1038,17 +1039,19 @@ function renderPlayersOnField(team, players, formation, side = "home") {
     // Outfield players
     const outfield = players.filter(p => p.lineup_position !== "1");
     let currentIndex = 0;
-
     formationArray.forEach((playersInLine, lineIndex) => {
         const totalLines = formationArray.length;
-        const x = isHome
-            ? ((lineIndex + 1) / (totalLines + 1)) * 45 + 5
-            : ((lineIndex + 1) / (totalLines + 1)) * 45 + 50;
+
+        // Calculate line position (X in horizontal, Y in vertical)
+        const linePos = ((lineIndex + 1) / (totalLines + 1)) * 45 + 5;
+        const lineCoord = isHome ? linePos : linePos + 50;
 
         for (let j = 0; j < playersInLine; j++) {
-            const y = ((j + 1) / (playersInLine + 1)) * 100;
+            const spread = ((j + 1) / (playersInLine + 1)) * 100;
             const player = outfield[currentIndex];
             if (player) {
+                const x = vertical ? spread : lineCoord;
+                const y = vertical ? lineCoord : spread;
                 const div = createPlayerDiv({ ...player, team_type: side }, x, y);
                 container.appendChild(div);
                 currentIndex++;
@@ -1056,6 +1059,7 @@ function renderPlayersOnField(team, players, formation, side = "home") {
         }
     });
 }
+
 
 // ✅ Create player dot element
 function createPlayerDiv(player, xPercent, yPercent) {
@@ -1118,7 +1122,18 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebar.style.display = "none";
     });
 });
- 
+
+window.addEventListener('resize', () => {
+    // Optionally clear and re-render field
+    const container = document.getElementById("football-field");
+    if (container) container.innerHTML = '';
+    fetchAndRenderLineups(match_id, match); // re-render
+});
+
+function isVerticalMode() {
+    return window.innerWidth <= 768; // match CSS media query
+}
+
 
   
 

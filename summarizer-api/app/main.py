@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 import os
 from dotenv import load_dotenv
@@ -26,9 +26,9 @@ if not hf_token:
     raise EnvironmentError("Missing HUGGINGFACE_HUB_TOKEN in .env")
 
 # ✅ Load model with authentication
-model_name = "tiiuae/falcon-7b-instruct"
-tokenizer = AutoTokenizer.from_pretrained(model_name, token=hf_token)
-model = AutoModelForCausalLM.from_pretrained(model_name, token=hf_token)
+model_name = "google/flan-t5-small"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
 
 # Pydantic models for request schema

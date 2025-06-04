@@ -1,40 +1,36 @@
 const axios = require("axios");
 
 async function expandWithGroq(title, content, retries = 2) {
-  const prompt = `You're a British football pundit. Rewrite and expand this sports news article in dramatic, engaging style.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 1500)}`;
+  const prompt = `Rewrite and dramatically expand the following football news article using expressive and emotional language.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`;
 
   const payload = {
-    model: "google/flan-t5-small",
+    model: "mistral-7b-instruct", // or whichever model you're calling
     messages: [
-      { role: "system", content: "You are a football journalist." },
+      { role: "system", content: "You are a football journalist for a British sports magazine." },
       { role: "user", content: prompt }
     ],
-    temperature: 0.7,
-    max_tokens: 2000
+    temperature: 0.85,
+    max_tokens: 2048
   };
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await axios.post(
-        "http://localhost:8000/v1/chat/completions",
+        "http://localhost:8000/v1/chat/completions", // adjust to your backend
         payload,
-        { timeout: 8000 }
+        { timeout: 10000 }
       );
 
       const responseText = res.data.choices?.[0]?.message?.content;
-      if (responseText) return responseText;
-
+      if (responseText && responseText.length > content.length) return responseText;
     } catch (err) {
       console.error(`🛑 AI call failed (Attempt ${attempt}):`, err.message);
-      if (attempt === retries) {
-        console.warn("❗ Falling back to original content.");
-        return content;
-      }
-      await new Promise(res => setTimeout(res, 1000 * attempt)); // backoff
+      if (attempt === retries) return content;
+      await new Promise(res => setTimeout(res, 1000 * attempt));
     }
   }
-
   return content;
 }
+
 
 module.exports = { expandWithGroq };

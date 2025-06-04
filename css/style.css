@@ -1652,6 +1652,9 @@ body{
     font-weight: 'Lato';
 }
 
+.news-infomat .news-title {
+    font-size: 1.2rem;
+}
 
 .feature-img img {
     width: 120px;
@@ -3942,6 +3945,7 @@ body{
 
     .mobileMenu-logo h2 {
          font-size: 0.85rem;
+         
     }
     .mobileMenu-logo img {
         width: 105px; /* Adjust logo size */
@@ -4261,6 +4265,19 @@ body{
       body.news-page .header-actions,
       body.news-page .header-top h1,
       body.news-page .header-top .mobileMenu-logo img,
+      body.news-page .layer:not(.middle-layer),
+      body.news-page .third-layer,
+      body.news-page .live-match-demo,
+      body.news-page .leagueTable-text-cont,
+      body.news-page .league-table-demo,
+      body.news-page .news-update,
+      body.news-page.advert-container,
+      body.news-page .slider,
+      body.news-page .advert,
+      body.news-page .prediction-container,
+      body.news-page .text-cont3,
+      body.news-page .text-cont2,
+      body.news-page .text-cont,
       body.news-page .header-line {
           display: none; /* Hide everything except menu icon, logo, and h2 */
       }

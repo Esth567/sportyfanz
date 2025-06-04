@@ -64,8 +64,13 @@ async function waitForFastAPI(timeout = 15000, interval = 1000) {
 (async () => {
   await waitForFastAPI();
 
-  app.use(cors({
-  origin: ['https://friendly-parakeet-jwqpvgwxjqvf5464-5500.app.github.dev']
+ const allowedOrigin = "https://friendly-parakeet-jwqpvgwxjqvf5464-5500.app.github.dev";
+
+app.use(cors({
+  origin: allowedOrigin,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+  credentials: true
 }));
 
   //app.use(cors({ origin: ["https://sports-news.onrender.com"] }));

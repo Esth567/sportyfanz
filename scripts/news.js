@@ -87,7 +87,7 @@ async function loadNews() {
 
   try {
     
-   const response = await fetch(`http://localhost:3000/api/news`);
+   const response = await fetch(`https://friendly-parakeet-jwqpvgwxjqvf5464-3000.app.github.dev/api/news`);
     if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Error ${response.status}: ${errorText}`);

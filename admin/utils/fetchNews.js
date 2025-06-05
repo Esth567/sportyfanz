@@ -6,7 +6,7 @@ const redis = require('./redisClient'); // your Redis client
 const fs = require('fs');
 const path = require('path');
 const { extractFullArticle } = require('./extractArticle');
-const { expandWithGroq } = require('./expandWithGroq');
+const { expandWithGroq } = require('./rewriteWithMistral');
 const { extractImageFromContent } = require('./extractImageFromContent');
 
 const rssFeeds = [

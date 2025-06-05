@@ -15,8 +15,9 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "dev": "node server/index.js"
-  },
+     "start": "node server/index.js",
+     "dev": "nodemon server/index.js"
+    },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
     "axios": "^1.9.0",

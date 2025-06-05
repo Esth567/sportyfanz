@@ -1,15 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const { fetchNews } = require("../utils/fetchNews.js");
+const { rewriteWithMistral } = require("../utils/rewriteWithMistral");
 
-router.get("/", async (req, res) => {
+router.post("/rewrite", async (req, res) => {
+  const { title, content } = req.body;
+
+  if (!title || !content) {
+    return res.status(400).json({ error: "Missing title or content." });
+  }
+
   try {
-    const news = await fetchNews();
-    res.json(news);  // This sends { trending: [...], updates: [...] }
+    const rewritten = await rewriteWithMistral(title, content);
+    res.json({ rewritten });
   } catch (err) {
-    console.error("❌ Failed to fetch news:", err.message);
-    res.status(500).json({ error: "Failed to fetch news." });
+    console.error("🛑 Rewrite error:", err.message);
+    res.status(500).json({ error: "Failed to rewrite article." });
   }
 });
 
 module.exports = router;
+

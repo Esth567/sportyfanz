@@ -26,9 +26,9 @@ if not hf_token:
     raise EnvironmentError("Missing HUGGINGFACE_HUB_TOKEN in .env")
 
 # ✅ Load model with authentication
-model_name = "google/flan-t5-small"
+model_name = "mistralai/Mistral-7B-Instruct-v0.1"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
 
 
 # Pydantic models for request schema

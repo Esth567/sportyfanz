@@ -6,7 +6,7 @@ const redis = require('./redisClient'); // your Redis client
 const fs = require('fs');
 const path = require('path');
 const { extractFullArticle } = require('./extractArticle');
-const { expandWithGroq } = require('./rewriteWithMistral');
+const { rewriteWithMistral } = require('./rewriteWithMistral');
 const { extractImageFromContent } = require('./extractImageFromContent');
 
 const rssFeeds = [
@@ -75,7 +75,7 @@ async function fetchNews(forceRefresh = false) {
         let fullDescription;
         try {
           const article = await extractFullArticle(item.link);
-          fullDescription = await expandWithGroq(item.title, article || sanitized);
+          fullDescription = await rewriteWithMistral(item.title, article || sanitized);
           if (!fullDescription || fullDescription.trim() === "") {
             fullDescription = sanitized + " (Original content)";
           }

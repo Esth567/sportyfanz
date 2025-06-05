@@ -1,22 +1,24 @@
+// routes/news.js
 const express = require("express");
 const router = express.Router();
-const { rewriteWithMistral } = require("../utils/rewriteWithMistral");
+const { fetchNews } = require("../utils/fetchNews");
 
-router.post("/rewrite", async (req, res) => {
-  const { title, content } = req.body;
-
-  if (!title || !content) {
-    return res.status(400).json({ error: "Missing title or content." });
-  }
-
+router.get("/", async (req, res) => {
   try {
-    const rewritten = await rewriteWithMistral(title, content);
-    res.json({ rewritten });
+    const force = req.query.force === "true"; // /api/news?force=true
+    const news = await fetchNews(force);
+    res.json(news);
   } catch (err) {
-    console.error("🛑 Rewrite error:", err.message);
-    res.status(500).json({ error: "Failed to rewrite article." });
+    console.error("❌ Failed to fetch news:", err.message);
+
+    // Optional fallback: load from disk cache
+    try {
+      const fallback = require("fs").readFileSync(require("path").join(__dirname, "../utils/cache/news.json"));
+      res.json(JSON.parse(fallback).data);
+    } catch (fsErr) {
+      res.status(500).json({ error: "Failed to load news" });
+    }
   }
 });
 
 module.exports = router;
-

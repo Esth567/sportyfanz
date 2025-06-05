@@ -1938,12 +1938,6 @@ body{
 
 /*---------------------league names page css ---------------------------*/
 
-.leagues-country {
-    width: 100%;
-    margin-top: 5px;
-    padding-bottom: 15px;
-
-}
 .leagueNames {
     display: flex;
     justify-content: space-between;
@@ -1982,12 +1976,90 @@ body{
     margin-top: 2px;
   }
   
+  .arrow-direct img{
+    height: 13px;
+    width: 13px;
+}
+ 
+.league-table {
+    width: 100%;
+    border-radius: 20px;
+    padding-top: 10px;
+}
+
+.league-tables-details {
+    background: linear-gradient( #1a2f4b6c 50%, #1b364e8e 25%);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px; 
+}
+
+.league-headers {
+    color: #fff;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px; 
+    align-items: center;
+    gap: 5px;
+}
+
+
+
+.league-headers img {
+   width: 18px;
+   height: 18px;
+   object-fit: contain;
+   }
+
+   .leagues-country {
+    width: 100%;
+    margin-top: 5px;
+    padding-bottom: 15px;
+
+}
+
+
+.league-details h3 {
+    font-size: 0.80rem;
+    font-weight: bold;
+    font-family: 'Lato';
+   
+  }
+
+ .league-details p {
+   font-size: 0.65rem;
+   font-weight: 400;
+   margin-top: 2px;
+   font-family: 'lato';
+   color: #ffffffa2;
+  
+ }
+.league-details {
+    flex: 1;
+}
+
+.more-league-table {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 0.75rem;
+     font-family: 'Lato';
+    font-weight: 500;
+    color: #ffffff;
+    right: 15px;
+}
+
+.more-league-table ion-icon {
+    font-size: 0.80rem;
+}
+
   .table-headers {
     display: flex;
     align-items: center;
     font-weight: bold;
     color: #fff;
-    font-family: 'Lato';
+   
   }
   
 
@@ -2050,8 +2122,7 @@ body{
     font-size: 12px;
     font-weight: 400;
     font-family: 'Lato';
-    text-align: left;
-    
+    text-align: left;  
 }
 .team-infos img {
     width: 18px; /* Adjust logo size */
@@ -2135,74 +2206,6 @@ body{
 }
 
 
-  .arrow-direct img{
-    height: 13px;
-    width: 13px;
-}
- 
-.league-table {
-    width: 100%;
-    border-radius: 20px;
-    padding-top: 10px;
-}
-
-.league-tables-details {
-    background: linear-gradient( #1a2f4b6c 50%, #1b364e8e 25%);
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 20px; 
-}
-
-.league-headers {
-    color: #fff;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 20px;
- 
-}
-
-.league-headers img {
-   width: 20px;
-   height: 20px;
-   object-fit: contain;
-   }
-
-
-.league-headers .league-details h3 {
-    font-size: 0.80rem;
-    font-weight: bold;
-    font-family: 'Lato';
-   
-  }
-
-  .league-headers .league-details p {
-   font-size: 0.65rem;
-   font-weight: 400;
-   margin-top: 2px;
-   font-family: 'lato';
-   color: #ffffffa2;
-  
- }
-.league-details {
-    margin-left: 5px;
-    flex: 1;
-}
-
-.more-league-table {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #ffffff;
-    right: 15px;
-}
-
-.more-league-table ion-icon {
-    font-size: 0.80rem;
-}
-
 .team-infos:hover .teamLeague-name {
     text-decoration: underline;
     color: #007bff; /* Or your theme color */
@@ -2234,6 +2237,28 @@ body{
     color: #ff3b30; /* Red */
     font-weight: bold;
 }
+
+  /* Hide form column and button by default on desktop */
+.hide-on-mobile {
+    display: flex;
+}
+
+.show-on-mobile {
+    display: none;
+}
+
+/* Hide default stat columns on toggle */
+.hide-on-mobile-toggle {
+    display: none !important;
+}
+
+/* Only show form column in block layout on toggle */
+.form-stat.mobile-visible {
+    display: block;
+    text-align: left;
+    padding: 5px 0;
+}
+
 
 /* Tooltip Styles */
 .team-position {
@@ -2273,14 +2298,6 @@ body{
     transform: translateX(-50%) scale(1);
   }
 
-  /* Hide form column and button by default on desktop */
-.hide-on-mobile {
-    display: flex;
-}
-
-.show-on-mobile {
-    display: none;
-}
 
 
 /*..................................................live match page........................*/
@@ -4483,36 +4500,99 @@ body{
         flex-grow: 1;
     }
 
+  
+    .team-stat {
+      color: #fff;
+      font-size: 0.6rem; 
+      font-family: 'Lato';
+     }
+
+
+     .teamLeague-name{
+       font-size: 0.75rem;
+       font-weight: 400;
+       font-family: 'Lato';
+       text-align: left;  
+     }
+     
+    .team-infos img {
+       width: 12px; /* Adjust logo size */
+       height: 12px;
+       object-fit: cover;
+     }
+
       .hide-on-mobile {
         display: none !important;
-    }
+       }
 
-    .show-on-mobile {
+      .show-on-mobile {
         display: block;
         margin: 10px auto;
-        padding: 8px 12px;
+        padding: 5px 5px;
         font-size: 0.75rem;
-        background-color: #003366;
-        color: white;
+        background: #003366;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-    }
+      }
 
        
-    .position-header,
-    .stat-header,
-    .team-name-header {
-        font-size: 0.50rem;
-    }
+     .position-header,
+     .stat-header,
+     .team-name-header {
+        font-size: 0.70rem;
+      }
 
+    
     .form-stat.mobile-visible {
-        display: flex !important;
+        display: block !important;
     }
 
-    .stat-headerF.mobile-visible {
-        display: flex !important;
+    .stat-headerF {
+        display: none !important;
     }
+
+   
+   .form-button-container {
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+   .form-stat.mobile-visible {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 4px;
+}
+
+.form-box {
+    width: 17px;
+    height: 17px;
+    font-size: 12px;
+    
+}
+
+     .stat-headerF.mobile-visible {
+        display: inline-block !important;
+    }
+
+    .hidden-on-mobile {
+        display: none !important;
+    }
+
+
+    .toggle-form-button {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    
 
     /*......prediction page .....*/
 

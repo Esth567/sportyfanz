@@ -26,7 +26,7 @@ if not hf_token:
     raise EnvironmentError("Missing HUGGINGFACE_HUB_TOKEN in .env")
 
 # ✅ Load model with authentication
-model_name = "mistralai/Mistral-7B-Instruct-v0.1"
+model_name = "mistral-7b-instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 

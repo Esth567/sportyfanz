@@ -259,10 +259,13 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
     });
 
      const toggleButton = `
-     <button class="toggle-form-button show-on-mobile" onclick="toggleFormColumn()">Show Form</button>
-     `;
+       <div class="form-button-container show-on-mobile">
+       <button class="toggle-form-button" onclick="toggleFormColumn()">Form</button>
+       </div>
+      `;
+
      return toggleButton + tableHTML;
-}
+  }
 
 
 
@@ -471,12 +474,20 @@ window.addEventListener('resize', moveLeaguesCountryForMobile);
 function toggleFormColumn() {
     const formStats = document.querySelectorAll('.form-stat');
     const formHeader = document.querySelector('.stat-headerF');
+    const statHeaders = document.querySelectorAll('.stat-header:not(.stat-headerF)');
+    const teamStats = document.querySelectorAll('.team-stat');
     const button = document.querySelector('.toggle-form-button');
 
-    formStats.forEach(div => div.classList.toggle('mobile-visible'));
+    // Toggle visibility classes
+    formStats.forEach(stat => stat.classList.toggle('mobile-visible'));
     if (formHeader) formHeader.classList.toggle('mobile-visible');
 
+    statHeaders.forEach(header => header.classList.toggle('hidden-on-mobile'));
+    teamStats.forEach(stat => stat.classList.toggle('hidden-on-mobile'));
+
+    // Toggle button text (optional — you can change to "Show Stats" etc.)
     if (button) {
-        button.textContent = button.textContent.includes("Show") ? "Hide Form" : "Show Form";
+        const showingForm = formHeader?.classList.contains('mobile-visible');
+        button.textContent = showingForm ? "Form" : "Form";
     }
 }

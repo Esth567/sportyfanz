@@ -1,16 +1,23 @@
 const axios = require("axios");
 
 async function expandWithGroq(title, content, retries = 2) {
-  const prompt = `Rewrite and dramatically expand the following football news article using expressive and emotional language.\n\nTitle: ${title}\n\nContent: ${content.slice(0, 2000)}`;
+  const prompt = `
+     Rewrite and dramatically expand this football news article with detailed insights, dramatic flair, and vivid narrative. Use a British football commentator's tone and add emotional weight, historical context, or player reactions.
+
+     Title: ${title}
+
+     Content: ${content.slice(0, 2000)}
+    `;
+
 
   const payload = {
-    model: "mistral-7b-instruct", // or whichever model you're calling
+    model: "mistralai/Mistral-7B-Instruct-v0.1", // or whichever model you're calling
     messages: [
       { role: "system", content: "You are a football journalist for a British sports magazine." },
       { role: "user", content: prompt }
     ],
     temperature: 0.85,
-    max_tokens: 2048
+    max_tokens: 1024
   };
 
   for (let attempt = 1; attempt <= retries; attempt++) {

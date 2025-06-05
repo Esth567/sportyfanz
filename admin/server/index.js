@@ -47,7 +47,7 @@ async function waitForFastAPI(timeout = 15000, interval = 1000) {
   while (Date.now() - start < timeout) {
     try {
       await axios.post(url, {
-        model: "google/flan-t5-small",
+        model: "mistral-7b-instruct",
         messages: [{ role: "user", content: "ping" }]
       });
       console.log("✅ FastAPI is ready.");

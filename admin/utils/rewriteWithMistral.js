@@ -5,7 +5,20 @@ async function rewriteWithMistral(title, content) {
   const maxLength = parseInt(process.env.MAX_NEWS_LENGTH || "2000", 10);
   const truncated = content.length > maxLength ? content.slice(0, maxLength) : content;
 
-  const prompt = `You're a dramatic British football pundit. Rewrite and expand this sports news article in an engaging, entertaining tone. Don't just summarize — enrich it with flair.\n\nTitle: ${title}\n\nContent: ${truncated}`;
+  const prompt = `
+You're a dramatic British football pundit. Rewrite and **expand** the following news into a 3-5 paragraph article filled with narrative flair, insight, and footballing passion.
+
+Use both the main news and any related context provided to enrich the story. Mention rivalries, significance, performance history, and expert speculation.
+
+--- START ---
+
+Title: ${title}
+
+Content:
+${truncated}
+
+--- END ---
+`;
 
   try {
     const res = await axios.post(
@@ -28,11 +41,27 @@ async function rewriteWithMistral(title, content) {
       }
     );
 
-    const rewritten = res.data.choices?.[0]?.message?.content;
-    return rewritten || content;
+    let rewritten = res.data.choices?.[0]?.message?.content?.trim();
+
+    // Check for bad output
+    const suspiciousPatterns = [
+      "Expand this into a 3-5 paragraph", 
+      "--- START ---", 
+      "--- END ---"
+    ];
+
+    if (!rewritten || rewritten.length < 150 || suspiciousPatterns.some(p => rewritten.includes(p))) {
+      console.warn("⚠️ AI returned suspicious or low-quality output. Falling back to original content.");
+      return content + " (Original content)";
+    }
+
+    // Optional debug preview
+    console.log("🧠 Rewritten preview:", rewritten.slice(0, 300));
+
+    return rewritten;
   } catch (err) {
     console.error("🛑 Mistral rewrite failed:", err.message);
-    return content;
+    return content + " (Original content)";
   }
 }
 

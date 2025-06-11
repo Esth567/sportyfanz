@@ -11,14 +11,13 @@ const imageProxyRoutes = require("../routes/imageProxy");
 const app = express();
 const port = process.env.PORT || 3000;
 
-const allowedOrigin = process.env.ALLOWED_ORIGIN || "*"; // Customize per deploy
-
 app.use(cors({
-  origin: allowedOrigin,
+  origin: 'https://friendly-parakeet-jwqpvgwxjqvf5464-5500.app.github.dev',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
-  credentials: true
+  credentials: false  // only true if you're using cookies/auth
 }));
+
 
 app.use(compression());
 app.use(express.json());

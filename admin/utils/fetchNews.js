@@ -1,4 +1,3 @@
-
 const Parser = require('rss-parser');
 const parser = new Parser(); 
 const sanitizeHtml = require('sanitize-html');
@@ -33,6 +32,21 @@ async function safeParseURL(url, retries = 2) {
     }
   }
 }
+
+//function to build richer input
+function buildRichInput(article, sanitized, resItems, currentTitle) {
+  if (article && article.length > 300) return article;
+
+  const mainKeyword = currentTitle.split(" ")[0]; // crude keyword
+  const related = resItems
+    .filter(i => i.title !== currentTitle && i.title.includes(mainKeyword))
+    .map(i => i["content:encoded"] || i.content || i.contentSnippet || "")
+    .slice(0, 2)
+    .join("\n\n");
+
+  return `${sanitized}\n\nRelated Context:\n${related}\n\nExpand this into a 3-5 paragraph article.`;
+}
+
 
 async function fetchNews(forceRefresh = false) {
   console.log("🔍 Fetching news...");
@@ -72,17 +86,30 @@ async function fetchNews(forceRefresh = false) {
         const imageUrl = extractImageFromContent(sanitized) || PLACEHOLDER_IMAGE;
         console.log(`Image URL: ${imageUrl}`);
 
-        let fullDescription;
-        try {
-          const article = await extractFullArticle(item.link);
-          fullDescription = await rewriteWithMistral(item.title, article || sanitized);
-          if (!fullDescription || fullDescription.trim() === "") {
-            fullDescription = sanitized + " (Original content)";
-          }
-        } catch (err) {
-          console.warn(`⚠️ Expansion failed for ${item.link}:`, err.message);
-          fullDescription = sanitized + " (Original content)";
-        }
+       let fullDescription;
+       try {
+        const article = await extractFullArticle(item.link);
+        const inputContent = buildRichInput(article, sanitized, res.items, item.title);
+
+        fullDescription = await rewriteWithMistral(item.title, inputContent);
+
+  // Clean accidental prompt echo from Mistral
+   const promptCheck = "Expand this into a 3-5 paragraph article";
+   if (fullDescription && fullDescription.includes(promptCheck)) {
+   fullDescription = fullDescription.split(promptCheck)[0].trim();
+   }
+
+   // Fallback if the output is suspicious or empty
+   if (!fullDescription || fullDescription.trim().length < 150) {
+     console.warn(`⚠️ Fallback triggered for: ${item.title}`);
+     fullDescription = sanitized + " (Original content)";
+    }
+
+     } catch (err) {
+     console.warn(`⚠️ Expansion failed for ${item.link}:`, err.message);
+     fullDescription = sanitized + " (Original content)";
+    }
+
 
         console.log(`Description length: ${fullDescription.length}`);
         // Check pubDate validity

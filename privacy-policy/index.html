@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- SEO Title & Description -->
+  <title>SportyFanz | Live Football Scores, Live Football Matches, Highlights, Match Predictions, and so much more</title>
+  <meta name="description" content="Follow SportyFanz for real-time football scores, live match streams, highlights, fixtures, and expert predictions from leagues around the world.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/assets/images/brandlogo.png" type="image/png">
+
+  <!-- Open Graph (Facebook & others) -->
+  <meta property="og:title" content="SportyFanz | Live Football Scores & Highlights">
+  <meta property="og:description" content="Stream live football, track scores, and catch all the highlights with SportyFanz.">
+  <meta property="og:image" content="https://sportyfanz.com/images/brandlogo.png">
+  <meta property="og:url" content="https://sportyfanz.com">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SportyFanz | Live Football & Predictions">
+  <meta name="twitter:description" content="Live scores, predictions, highlights and streams for all major football matches.">
+  <meta name="twitter:image" content="https://sportyfanz.com/images/brandlogo.png">
+
+    <!--Linking swipper css-->
+ <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+    <link rel="stylesheet" href="/css/style.css">
+
+<!--linking link.tss-->
+<script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+
+</head>
+<body>
+    <div class="page-wrapper" style="display: flex;">
+    <div class="sidebar" id="sidebar">
+        <div class="toggle-icon">
+         <!-- X-icon for closing sidebar -->
+            <img src="/assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
+            
+            <div class="icon">
+                <img src="/assets/images/spfanzlogo.png" alt="Logos" class="logos">
+            </div>            
+        <div class="toggle-btn" onclick="toggleSidebar()">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div>    
+    </div>
+    <div class="stroke"></div>
+    <div class="menu">
+        <ul>  
+            <li>
+                <img src="/assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
+                <a href="/">Dashboard</a>
+            </li>
+            <li>
+                <img src="/assets/icons/Newspaper.png" alt="News paper" class="newspaper">
+                <a href="/news/">News</a>
+            </li>
+            <li>
+                <img src="/assets/icons/VideoCamera.png" alt="Video Camera" class="videoCamera">
+                <a href="/matches/">Live Football</a>
+            </li>
+            <li>
+                <img src="/assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
+                <a href="/podcast/">Podcast</a>
+            </li>
+            <li>
+                <img src="/assets/icons/PokerChip.png" alt="Poker Chip" class="pokerChip">
+                <a href="/prediction/">Prediction</a>
+            </li>
+            <li>
+                <img src="/assets/icons/SoccerBall.png" alt="Soccer Ball" class="soccerBall">
+                <a href="/standings/">League Table</a>
+            </li>
+            <li>
+                <img src="/assets/icons/Gear.png" alt="Gear" class="gear">
+                <a href="#">Settings</a>
+            </li>
+        </ul>
+        <div class="logout-section">
+        <div class="stroke"></div>
+        <ul>
+            <li>
+                <img src="/assets/icons/SignOut.png" alt="Frame" class="frame">
+                <a href="#">Logout</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+    </div>
+
+    <div class="body-container">
+     <!-- Header -->
+    <div class="header">
+    <div class="header-top">
+        <h3>Dashboard / Privacy Policy</h3>
+        <div class="header-topbar">
+
+            <!-- Movile view Header -->
+            <div class="mobileMenu-logo">
+                <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleMobileSidebar()"></ion-icon>  
+                 <img src="/assets/images/Logo2.png" alt="Logo" class="logo">
+             </div>
+            <h1>
+                Welcome to your <span class="highlight">Ultimate Sports Hub</span>
+            </h1>
+          
+        <div class="header-actions">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <ion-icon name="arrow-forward-outline" class="search-icon"></ion-icon>
+                <input type="text" class="search-bar" placeholder="Search here...">
+            </div>
+            
+            <!-- Notification Icon -->
+            <div class="icons">
+                <img src="/assets/icons/Vectorsearch.png" alt="search" class="iconSearch">
+                <img src="/assets/icons/BellSimple.png" alt="Bells">
+                <!-- Settings Icon -->
+                <img src="/assets/icons/UserCircle.png" alt="userCircle">
+            </div>
+            <!-- Signup Button -->
+            <button class="signup-btn">
+                <img src="/assets/icons/arrow-up.png" alt="arrowIcon">
+                Sign In               
+            </button>
+        </div>
+    </div>
+    </div>
+    <!-- Horizontal Line -->
+    <div class="header-line"></div>
+   </div>
+   
+   
+    <!-- Main Content -->
+    <div class="content">
+        <div class="layer">
+           <h3>Privacy Policy</h3>
+           <p><strong>Effective Date:</strong> [01 May 2024]</p>
+            
+           <p>At <strong>SportyFanz ("we", "us", or "our"),</strong>, we value your privacy. This Privacy Policy explains how we collect, use, disclose, and protect your information when you visit our website <strong>https://www.sportyfanz.com</strong> (the “Website”).</p>
+
+           <h2>1. Information We Collect</h2>
+
+  <h4>Personal Information</h4>
+  <p>We may collect personal information that you voluntarily provide, such as when you:</p>
+  <ul>
+    <li>Subscribe to our newsletter</li>
+    <li>Create an account or user profile</li>
+    <li>Participate in polls, contests, or sweepstakes</li>
+    <li>Leave comments or engage in community forums</li>
+    <li>Contact customer support</li>
+  </ul>
+  <p>This may include:</p>
+  <ul>
+    <li>Name, email address, phone number</li>
+    <li>Date of birth or age group</li>
+    <liBilling and shipping address (if purchasing)</li>
+    <li>Username, avatar, or social profile (if social login is used)</li>
+  </ul>
+
+  <h4>Usage Data</h4>
+  <p>We automatically collect data about how you use the website to analyze traffic and improve services. This includes:</p>
+  <ul>
+    <li>Pages viewed, links clicked, time spent on site</li>
+    <li>Navigation patterns and on-site search queries</li>
+    <li>Interaction with videos, articles, or sponsored content</li>
+  </ul>
+
+  <h4>Device Information</h4>
+  <p>We may collect technical data from your device to improve performance and compatibility:</p>
+  <ul>
+    <li>Device type (e.g., mobile, tablet, desktop)</li>
+    <li>Operating system and version</li>
+    <li>Browser type, version, and language settings</li>
+    <li>Screen resolution</li>
+    <li>Approximate geolocation (based on IP address)</li>
+  </ul>
+
+  <h4>2. Cookies and Tracking Technologies</h4>
+  <p>We use cookies and similar technologies to:</p>
+  <ul>
+    <li>Maintain session data and preferences</li>
+    <li>Analyze traffic and user engagement</li>
+    <li>Serve personalized ads and sponsored content</li>
+  </ul>
+  <p>You can control cookie preferences in your browser settings. Some features may be limited if cookies are disabled.</p>
+
+  <h4>3. Advertising and Affiliate Marketing</h4>
+
+  <h4>Brand Partnerships</h4>
+  <p>We partner with brands and sponsors to bring you exclusive content, giveaways, or features. These may involve:</p>
+  <ul>
+    <li>Co-branded pages or articles</li>
+    <li>Sponsored social posts or video content</li>
+    <li>Contests run jointly with partners</li>
+  </ul>
+  <p>We will disclose when content is paid for or presented in collaboration with a partner.</p>
+
+  <h4>Advertising</h4>
+  <p>We use third-party advertising networks (e.g., Google AdSense) to display ads relevant to your interests. These services may use:</p>
+  <ul>
+    <li>Cookies and web beacons</li>
+    <li>Device identifiers and location data</li>
+    <li>Browsing history across websites (interest-based advertising)</li>
+  </ul>
+  <p>You can manage ad preferences via your browser or by visiting <a href="https://www.youradchoices.com" target="_blank">www.youradchoices.com</a>.</p>
+
+  <h4>Affiliate Marketing</h4>
+  <p>We may participate in affiliate marketing programs, meaning we may earn a commission when you click on a link or make a purchase through partner links (e.g., sports gear, tickets, or services). These links do not affect your pricing and are always disclosed.</p>
+
+  <h3>4. How We Use Your Information</h3>
+  <ul>
+    <li>Deliver personalized sports content and recommendations</li>
+    <li>Send newsletters, alerts, and promotions</li>
+    <li>Provide access to forums, contests, and surveys</li>
+    <li>Analyze performance, trends, and audience engagement</li>
+    <li>Comply with legal obligations and protect our platform</li>
+  </ul>
+
+  <h3>5. Sharing Your Information</h3>
+  <p>We do <strong>not</strong> sell your personal information. We may share your data with:</p>
+  <ul>
+    <li>Trusted service providers (e.g., hosting, analytics, email services)</li>
+    <li>Advertising and marketing partners, under strict agreements</li>
+    <li>Authorities when legally required or to protect our legal rights</li>
+  </ul>
+
+  <h3>6. Your Rights and Choices</h3>
+  <p>You may have the following rights depending on your jurisdiction:</p>
+  <ul>
+    <li>Access and review the personal data we hold about you</li>
+    <li>Correct inaccurate or outdated information</li>
+    <li>Request data deletion ("right to be forgotten")</li>
+    <li>Withdraw consent to marketing communications</li>
+    <li>Object to automated decision-making or profiling</li>
+  </ul>
+  <p>To exercise your rights, contact us at <strong>[your email]</strong>.</p>
+
+  <h3>7. Data Security</h3>
+  <p>We use commercially reasonable measures to safeguard your information. However, no online system is completely secure. Please use the website responsibly.</p>
+
+  <h3>8. International Users</h3>
+  <p>If you are accessing the site from outside [Your Country], please note that your data may be processed and stored in [Your Country], where data protection laws may differ from those in your jurisdiction.</p>
+
+  <h2>9. Children’s Privacy</h2>
+  <p>We do not knowingly collect personal data from children under 13. If we become aware that such data has been collected, we will promptly delete it.</p>
+
+  <h3>10. Changes to This Policy</h3>
+  <p>We may revise this Privacy Policy occasionally. The most recent version will always be posted on this page, with the updated “Effective Date.”</p>
+
+  <h3>11. Contact Us</h3>
+  <p>If you have any questions or concerns, please contact us at:</p>
+  <ul>
+    <li><strong>Email:</strong> [your email]</li>
+    <li><strong>Website:</strong> [your website URL]</li>
+  </ul>
+</div>
+</div>
+
+
+
+         <!-- Swiper JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+         <!--linking custome script-->
+<script src="/scripts/script.js"></script>
+
+<!-- Footer -->
+<footer class="main-footer">
+    <div class="footer-links">
+      <a href="/about/">About</a>
+      <a href="/privacy-policy/">Privacy Policy</a>
+      <a href="/partner-with-us/">Partnership</a>
+      <a href="sportyfanz89@gmail.com">Contact Us</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://facebook.com" target="_blank">
+        <ion-icon name="logo-facebook" style="font-size: 1.5rem; color: #fff;"></ion-icon>
+      </a>
+      <a href="https://x.com" target="_blank">
+        <ion-icon name="logo-twitter"></ion-icon> <!-- X formerly Twitter -->
+      </a>
+      <a href="https://youtube.com" target="_blank">
+        <ion-icon name="logo-youtube"></ion-icon>
+      </a>
+      <a href="https://tiktok.com" target="_blank">
+        <ion-icon name="logo-tiktok"></ion-icon>
+      </a>
+    </div>
+    <p style="margin-top: 1rem; font-size: 0.9rem;">SportyFanz &copy; 2025 The Ultimate Sports Hub. All rights reserved.</p>
+  </footer>
+  
+</body>
+</html>

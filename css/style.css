@@ -26,7 +26,7 @@ body{
     position: fixed;
     top: 0; /* Start at the top of the page */
     left: 0;
-    display: flex;
+    display: block;
     flex-direction: column;
     transition: width 0.3s ease-in-out;
     border-top-left-radius: 20px;
@@ -86,7 +86,7 @@ body{
 /* Sidebar Icon */
 .icon img {
     width: 140px; /* Consistent size */
-    height: 50px;
+    height: 55px;
     object-fit: contain;   
     cursor: pointer;
     margin-left: -10px;
@@ -393,8 +393,10 @@ body{
 
 
 /* Layers 1*/
+.text-cont4,
 .text-cont3,
 .text-cont2,
+.text-cont1,
 .text-cont{
     display: flex;
     padding-bottom: 15px;
@@ -403,12 +405,14 @@ body{
     width: 100%;
 }
 
+.text-cont4 h4,
 .text-cont3 h4,
 .text-cont2 h4,
+.text-cont1 h4,
 .text-cont h4 {
     font-size: 0.75rem;
     font-family: 'Lato';
-    font-weight: 500;
+    font-weight: bold;
 }
 
 .live-matches {
@@ -568,9 +572,9 @@ body{
 }
 
 .leagueTable-text-cont h4 {
-    font-size: 0.75rem;
+    font-size: 0.80rem;
     font-family: 'Lato';
-    font-weight: 300;
+    font-weight: bold;
 }
 
 
@@ -733,6 +737,7 @@ body{
     width: 100%;
     height: 250px; /* Adjust height as needed */
     overflow: hidden;
+    margin-bottom: 20px;
 }
 
 /* Individual Slide Styling */
@@ -777,7 +782,7 @@ body{
 
 /* Banner 2 background image */
 .banner2 {
-    background-image: url('../assets/images/podcastimg.png');
+    background-image: url('../assets/images/podImage.png');
 }
 
 /* Overlay text box */
@@ -790,7 +795,7 @@ body{
 /* Heading styling */
 .slider-title {
     color: #fff;
-    font-size: 2rem;
+ 
     font-weight: bold;
     text-align: center;
 }
@@ -938,10 +943,12 @@ body{
 
 .match-header {
     display: flex;
-    justify-content: space-between; /* Positions the left and right groups apart */
+    background-color: #007bff;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     gap: 10px; 
+    border-radius: 8px;
+    align-items: center;
 }
 
 .match-header .category-btn {
@@ -960,6 +967,7 @@ body{
     font-weight: 400;
     gap: 3px;
     margin-bottom: -15px;
+    transition: background-color 0.3s ease;
 }
 
 .match-header .category-btn.calendar {
@@ -1012,24 +1020,26 @@ body{
 .calendar ion-icon {
     font-size: 1rem;
 }
-
 .live-indicator {
-    display: flex;
+    display: inline-flex;       /* keep content inline and flexible */
     align-items: center;
-    gap: 4px;
+    gap: 7px;
     font-weight: bold;
-    color: red;
-    font-size: 0.9em;
+    color: #228B22;
+    font-size: 0.7rem;
+    white-space: nowrap;        /* prevent text wrapping */
+    overflow: hidden;           /* hide overflow if too long */
+    text-overflow: ellipsis;    /* show "..." if overflow */
 }
 
 .red-dot {
     width: 8px;
     height: 8px;
-    background-color: red;
+    background-color: #228B22;
     border-radius: 50%;
     animation: blink 1s infinite;
+    flex-shrink: 0;             /* prevent shrinking */
 }
-
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
@@ -1045,53 +1055,53 @@ body{
   
 
     .matches-container {
-        display: flex;
-        flex-direction: column;
+        background-color: #141e30;
+        padding: 10px;
     }
 
     .match-card {
-        display: flex;
-        background-color: #1a2f4bad;
-        color: white;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        margin-top: 10px;
-    }
-
-
-    .match-details {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; 
-        align-items: center;
-        width: 100%;
-        gap: -3px;
+    display: flex;
+    flex-direction: row; /* change from row to column */
+    align-items: center;
+    width: 100%;
+   
     }
     
-    .league-header {
-        padding: 8px 0;
-        font-weight: bold;
-        border-bottom: 1px solid #ccc;
-        margin-top: 20px;
-      }
-      
+
+.match-col {
+    flex: 1; /* Equal width for each column */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+}
+
+
+.match-details {
+   display: flex;
+    flex-direction: row; /* change from row to column */
+    align-items: center;
+    background-color: #1a2f4bad;
+    color: white;
+    border-radius: 10px;
+    padding: 8px;
+    margin-top: 10px;
+    width: 100%;
+    gap: 10px; /* space between sections */
+   }
 
     /* Team Names */
     .Matchteam {
         display: flex;
         align-items: center;
-        font-size: 0.75rem;
+        flex-direction: row;
+        font-size: 0.70rem;
         font-family: 'Lato';
         white-space: nowrap; /* Prevent the text from wrapping to the next line */
         overflow: hidden;  /* Hide any overflow if the name is too long */
         text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
         justify-content: flex-start;
         gap: 5px;
-    }
-    
-
-    .match-info h5 {
-        font-weight: 300;
     }
 
 
@@ -1104,17 +1114,20 @@ body{
         font-size: 0.60rem;
         font-family: 'Lato';
         font-weight: bold;
-        padding: 2px 2px;
         border: none;
         min-width: fit-content;
-        width: 100px;
+        width: 85px;
+        height: 25px;
         margin-left: auto;
     }
     
+    .view-details-btn img{
+        font-size: 10px;
+    }
 
     .Matchteam img {
-        width: 18px; /* Reduce the size of logos */
-        height: 18px;
+        width: 17px; /* Reduce the size of logos */
+        height: 17px;
         object-fit: cover;
     
     }
@@ -1124,41 +1137,48 @@ body{
     }
 
 
-    .match-status-score {
+    .match-status,
+    .match-score {
         display: flex;
-        flex-direction: column;
+        flex-direction: row; /* Stack score and match status vertically for highlight */
         align-items: center;
-        text-align: center;
-        font-size: 0.8rem;
-        font-weight: bold;
+        font-size: 0.75rem;
         font-family: 'Lato';
-        min-width: 45px;
-        gap: 8px;
+        font-weight: bold;
+        gap: 5px;
+         text-align: center;
+        
     }
 
+    .match-status-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      font-family: 'Lato';
+      min-width: 40px;
+      margin-right: 3px; /* Small gap only */
+    }
 
 
     .match-time,
     .match-country {
         display: flex;
         align-items: center;
-        gap: 3px; 
         font-size: 0.7rem;
         font-family: 'Lato';
-        font-weight: 300;
+        font-weight: 400;
         text-align: center;
     }
 
-    .match-meta {
-        display: flex;
-        flex-direction: row; /* Ensures the meta items are in a row */
-        align-items: center;
-        gap: 10px;
-        margin-left: 0px; /* Remove the left margin to move it to the left */
-        justify-content: flex-start; /* Align items to the left */
-    }
-    
-
+ .match-time-country {
+    font-size: 0.75rem;
+    gap: 10px;
+    flex-direction: row;
+    display: flex;
+}
 
     .match-time img,
     .match-country img{
@@ -1166,31 +1186,6 @@ body{
         height: 12px;
         object-fit: cover;
     }
-
-    .match-status,
-    .match-score {
-        display: flex;
-        flex-direction: column; /* Stack score and match status vertically for highlight */
-        align-items: center;
-        font-size: 0.8rem;
-        font-family: 'Lato';
-        font-weight: bold;
-        gap: 3px;
-        
-    }
-
-    .match-status h5 {
-        font-size: 0.6rem;  /* Increase font size for "vs" */
-    }
-
-    .match-round {
-        font-size: 0.85rem;
-        margin-top: 5px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-      
 
     .preditScore-status {
         display: flex;
@@ -1419,6 +1414,7 @@ body{
    
 
 /* Advert  */
+.advert1,
 .advert {
     width: 100%;
     height: 200px;
@@ -1457,7 +1453,7 @@ body{
 }
 
 .main-footer {
-    background-color: #111; color: #fff; padding: 2rem 1rem; text-align: center;
+    background-color: #9fbad98f; color: #fff; padding: 2rem 1rem; text-align: center;
 }
 
 .footer-links a {
@@ -1656,6 +1652,9 @@ body{
     font-weight: 'Lato';
 }
 
+.news-infomat .news-title {
+    font-size: 1.2rem;
+}
 
 .feature-img img {
     width: 120px;
@@ -1726,6 +1725,69 @@ body{
   font-size: 1rem;
 }
 
+.blog-post {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  font-family: 'Georgia', serif;
+  line-height: 1.8;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.blog-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #222;
+}
+
+.blog-image-wrapper {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.blog-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+
+.blog-image:hover {
+  transform: scale(1.02);
+  cursor: zoom-in;
+}
+
+.blog-meta {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 1.5rem;
+}
+
+.blog-content {
+  font-size: 1.125rem;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.back-button {
+  display: inline-block;
+  margin: 1rem 0;
+  padding: 0.6rem 1.2rem;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.back-button:hover {
+  background: #444;
+}
 
 .news-thumb {
     width: 100%;
@@ -1745,6 +1807,19 @@ body{
     transform: translateY(0);
   }
 }
+
+.news-image {
+  margin: 10px 0;
+  text-align: center;
+}
+
+.news-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
 
 
 .newsDetails-content img {
@@ -1926,12 +2001,6 @@ body{
 
 /*---------------------league names page css ---------------------------*/
 
-.leagues-country {
-    width: 100%;
-    margin-top: 5px;
-    padding-bottom: 15px;
-
-}
 .leagueNames {
     display: flex;
     justify-content: space-between;
@@ -1970,12 +2039,90 @@ body{
     margin-top: 2px;
   }
   
+  .arrow-direct img{
+    height: 13px;
+    width: 13px;
+}
+ 
+.league-table {
+    width: 100%;
+    border-radius: 20px;
+    padding-top: 10px;
+}
+
+.league-tables-details {
+    background: linear-gradient( #1a2f4b6c 50%, #1b364e8e 25%);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px; 
+}
+
+.league-headers {
+    color: #fff;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px; 
+    align-items: center;
+    gap: 5px;
+}
+
+
+
+.league-headers img {
+   width: 18px;
+   height: 18px;
+   object-fit: contain;
+   }
+
+   .leagues-country {
+    width: 100%;
+    margin-top: 5px;
+    padding-bottom: 15px;
+
+}
+
+
+.league-details h3 {
+    font-size: 0.80rem;
+    font-weight: bold;
+    font-family: 'Lato';
+   
+  }
+
+ .league-details p {
+   font-size: 0.65rem;
+   font-weight: 400;
+   margin-top: 2px;
+   font-family: 'lato';
+   color: #ffffffa2;
+  
+ }
+.league-details {
+    flex: 1;
+}
+
+.more-league-table {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 0.75rem;
+     font-family: 'Lato';
+    font-weight: 500;
+    color: #ffffff;
+    right: 15px;
+}
+
+.more-league-table ion-icon {
+    font-size: 0.80rem;
+}
+
   .table-headers {
     display: flex;
     align-items: center;
     font-weight: bold;
     color: #fff;
-    font-family: 'Lato';
+   
   }
   
 
@@ -2038,8 +2185,7 @@ body{
     font-size: 12px;
     font-weight: 400;
     font-family: 'Lato';
-    text-align: left;
-    
+    text-align: left;  
 }
 .team-infos img {
     width: 18px; /* Adjust logo size */
@@ -2123,74 +2269,6 @@ body{
 }
 
 
-  .arrow-direct img{
-    height: 13px;
-    width: 13px;
-}
- 
-.league-table {
-    width: 100%;
-    border-radius: 20px;
-    padding-top: 10px;
-}
-
-.league-tables-details {
-    background: linear-gradient( #1a2f4b6c 50%, #1b364e8e 25%);
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 20px; 
-}
-
-.league-headers {
-    color: #fff;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 20px;
- 
-}
-
-.league-headers img {
-   width: 20px;
-   height: 20px;
-   object-fit: contain;
-   }
-
-
-.league-headers .league-details h3 {
-    font-size: 0.80rem;
-    font-weight: bold;
-    font-family: 'Lato';
-   
-  }
-
-  .league-headers .league-details p {
-   font-size: 0.65rem;
-   font-weight: 400;
-   margin-top: 2px;
-   font-family: 'lato';
-   color: #ffffffa2;
-  
- }
-.league-details {
-    margin-left: 5px;
-    flex: 1;
-}
-
-.more-league-table {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #ffffff;
-    right: 15px;
-}
-
-.more-league-table ion-icon {
-    font-size: 0.80rem;
-}
-
 .team-infos:hover .teamLeague-name {
     text-decoration: underline;
     color: #007bff; /* Or your theme color */
@@ -2222,6 +2300,28 @@ body{
     color: #ff3b30; /* Red */
     font-weight: bold;
 }
+
+  /* Hide form column and button by default on desktop */
+.hide-on-mobile {
+    display: flex;
+}
+
+.show-on-mobile {
+    display: none;
+}
+
+/* Hide default stat columns on toggle */
+.hide-on-mobile-toggle {
+    display: none !important;
+}
+
+/* Only show form column in block layout on toggle */
+.form-stat.mobile-visible {
+    display: block;
+    text-align: left;
+    padding: 5px 0;
+}
+
 
 /* Tooltip Styles */
 .team-position {
@@ -2260,15 +2360,16 @@ body{
   .team-position:hover::after {
     transform: translateX(-50%) scale(1);
   }
-    
 
 
 
+/*..................................................live match page........................*/
 
-
-
-/*..................................................line match page........................*/
-
+.league-header {
+    margin: 0;
+    padding: 0;
+    margin-top: -5px;
+}
 
 .leags-country {
     display: flex;
@@ -2301,10 +2402,12 @@ body{
 .matches-header {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
     gap: 8px;
     position: relative;
+    margin-bottom: 10px;
+    border: none;
   }
+
   .match-category-btn {
     color: #fff;
     border-radius: 20px;
@@ -2383,7 +2486,6 @@ body{
     margin-bottom: 15px;
     border-radius: 8px;
 }
-
 
 .leagues-matches {
     display: flex;
@@ -2851,6 +2953,8 @@ body{
     margin: 20px auto;
     border-radius: 10px;
     overflow: hidden;
+    transform: rotate(0deg);
+    transform-origin: center;
   }
   
   
@@ -2947,7 +3051,9 @@ body{
     font-weight: bold;
 }
 
-
+.no-lineup-message {
+    font-family: sans-serif;
+}
 
 /* 🟡 players names styling */
 
@@ -3759,7 +3865,7 @@ body{
 
 
  /* Tablet and small desktops */
-@media (max-width: 1024px) {
+@media screen and (max-width: 1024px) {
 /* Sidebar Container */
     .sidebar {
         display: none;
@@ -3778,6 +3884,17 @@ body{
         
     }
 
+    /* Sidebar Icon */
+   .icon img {
+     width: 100px; /* Consistent size */
+     height: 45px;
+     object-fit: contain;   
+     cursor: pointer;
+     margin-left: -10px;
+     margin-right: 10px;
+    }
+
+
      .toggle-icon .icon {
         display: none;
      }
@@ -3793,6 +3910,11 @@ body{
      /* Hide other icons except X when sidebar is open */
      .sidebar.active .toggle-btn {
         display: none;
+    }
+
+     .toggle-btn {
+        display: block; /* Ensure button is visible */
+        cursor: pointer;
     }
 
     
@@ -3896,8 +4018,17 @@ body{
         gap: 10px;
     }
 
+    
+    .mobileMenu-logo h1 {
+        font-size: 0.75rem;
+    }
+
+    .mobileMenu-logo h2 {
+         font-size: 0.85rem;
+         
+    }
     .mobileMenu-logo img {
-        width: 107px; /* Adjust logo size */
+        width: 105px; /* Adjust logo size */
         height: auto;
         object-fit: contain; 
         margin-left: 7px;
@@ -3905,7 +4036,7 @@ body{
     }
 
     .mobileMenu-logo ion-icon {
-        font-size: 27px;
+        font-size: 23px;
         cursor: pointer;
         display: inline-block;
     
@@ -3970,12 +4101,15 @@ body{
 
     .content {
      display: flex;
-      flex-direction: column;
+     flex-direction: column;
+      
     }
 
  .layer {
      display: flex;
-      flex-direction: column;
+     flex-direction: column;
+     padding: 0;
+     margin: 0;
     }
 
     .live-match-demo,
@@ -3986,46 +4120,131 @@ body{
         width: 100%;
     }
     
+    /* Layers 1*/
+.text-cont4,
+.text-cont3,
+.text-cont2,
+.text-cont1,
+.text-cont{
+    display: flex;
+    margin-bottom: -15px;
+    padding-top: 5px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.text-cont4 h4,
+.text-cont3 h4,
+.text-cont2 h4,
+.text-cont1 h4,
+.text-cont h4 {
+    font-size: 0.77rem;
+    font-family: 'Lato';
+    font-weight: bold;
+}
+
+.leagueTable-text-cont h4 {
+    font-size: 0.80rem;
+    font-family: 'Lato';
+    font-weight: bold;
+}
+
    
     .header-slider {
         width: 100%;
-        height: 250px;
+        height: 150px;
+    }
+
+     
+     
+    .text-cont { order: 0; } /* First in mobile */
+    .live-match-demo { order: 1; } 
+    .text-cont2 { order: 2; }
+    .match-latest { order: 3; }
+    .text-cont3 { order: 4; }
+    .slider { order: 5; }
+    .advert { order: 6; }
+    .header-slider { order: 7; }
+    .text-cont4 { order: 8; } 
+    .prediction-container { order: 8; } 
+    .leagueTable-text-cont { order: 10; }
+    .league-table-demo { order: 11; } /* Third */
+    .advert1 { order: 12; }
+    .news-podcast { order: 13; } /* Fifth (should be positioned after prediction container) */
+    .text-cont1 { order: 14; }
+    .news-update { order: 15; }
+
+
+   .match-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0px;
+  }
+
+  .match-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    white-space: nowrap; /* Prevent the text from wrapping to the next line */
+        overflow: hidden;  /* Hide any overflow if the name is too long */
+        text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
+        justify-content: flex-start;
+  }
+
+  .match-time-country {
+    align-items: flex-start;
+  }
+  
+  
+    .match-status,
+    .match-score {
+        display: flex;
+        flex-direction: row; /* Stack score and match status vertically for highlight */
+        align-items: center;
+        font-size: 0.75rem;
+        font-family: 'Lato';
+        font-weight: bold;
+        gap: 1px;
+         text-align: center;
+        
+    }
+
+    .match-status-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      font-family: 'Lato';      
+      margin-right: 1px; /* Small gap only */
+    }
+  
+
+
+     .view-details-btn {
+        display: flex;
+        align-items: center;
+        text-align: right;
+        background: #fff;
+        color: #1A2F4B;
+        border-radius: 15px;
+        font-size: 0.50rem;
+        font-family: 'Lato';
+        font-weight: bold;
+        border: none;
+        min-width: fit-content;
+        width: 50px;
+        height: 20px;
+        padding: 10px;
+        margin-left: auto;
     }
 
 
-
-    .header-slider {
-      order: 1;
-     }
-
-  .section-wrapper {
-   order: 2;
-   }
-
-  .section-wrapper1 {
-   order: 3;
-   }
-
-.slider {
-  order: 4;
-}
-
-.advert {
-  order: 5;
-}
-
-.prediction-container {
-  order: 6;
-}
-
-.advert1 {
-  order: 7;
-}
-
-.league-table-demo {
-  order: 8;
-}
   
+ 
     .highlight-time,
      .game-leag,
     .team {
@@ -4036,6 +4255,7 @@ body{
      .vs-score {
         font-size: 1rem;
      }
+
 
      .slider {
        width: 100%;
@@ -4055,6 +4275,19 @@ body{
         font-size: 0.80rem;
      }
 
+
+       .field {
+        height: 120vw;
+        width: 100vh; /* fixed width like height on desktop */
+        transform: rotate(90deg);
+        transform-origin: center center;
+        }
+
+     .player-dot {
+        /* Reverse rotation so player labels are upright */
+       transform: translate(-50%, -50%) rotate(-90deg);
+       position: absolute;
+     }
 
      .advert img {
         max-height: 200px; 
@@ -4112,6 +4345,19 @@ body{
       body.news-page .header-actions,
       body.news-page .header-top h1,
       body.news-page .header-top .mobileMenu-logo img,
+      body.news-page .layer:not(.middle-layer),
+      body.news-page .third-layer,
+      body.news-page .live-match-demo,
+      body.news-page .leagueTable-text-cont,
+      body.news-page .league-table-demo,
+      body.news-page .news-update,
+      body.news-page.advert-container,
+      body.news-page .slider,
+      body.news-page .advert,
+      body.news-page .prediction-container,
+      body.news-page .text-cont3,
+      body.news-page .text-cont2,
+      body.news-page .text-cont,
       body.news-page .header-line {
           display: none; /* Hide everything except menu icon, logo, and h2 */
       }
@@ -4199,6 +4445,7 @@ body{
 
      /*......matches page .....*/
 
+
      body.matches-page .middle-layer {
         padding: 0; /* Removes padding */
         margin: 0 auto; /* Centers content */
@@ -4210,9 +4457,17 @@ body{
     body.matches-page .header-top h1,
     body.matches-page .layer:not(.middle-layer),
     body.matches-page .third-layer,
+    body.matches-page .live-match-demo,
+    body.matches-page .leagueTable-text-cont,
+    body.matches-page .league-table-demo,
+    body.matches-page .news-update,
+    body.matches-page .advert-container,
+    body.matches-page .slider,
+    body.matches-page .advert,
+    body.matches-page .prediction-container,
     body.matches-page .text-cont
     {
-        display: none;
+        display: none !important;
     }
 
     
@@ -4232,21 +4487,48 @@ body{
     .lineup-players-names h4,
     .info-teamNames,
     .info-match-container h3 {
-        font-size: 1rem;
+        font-size: 0.75rem;
         margin-top: 10px;
         font-family: 'Lato';
     }
 
-    .matches-team span{
-        font-family: 'Lato';
-        font-size: 1rem;
-      }
+     .matches-team span {
+       font-size: 0.75rem;
+   
+     }
 
 
+       .match-category-btn {
+         font-size: 0.67rem;
+         font-family: 'Lato';
+         font-weight: 300;
+       }
+
+    .tab-btn {
+    color: #fff;
+    border-radius: 20px;
+    padding: 4px 10px;
+    background-color: #1f3750;
+    cursor: pointer;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.60rem;
+    font-family: 'Lato';
+    font-weight: 500;
+    gap: 5px;
+    border: none;
+
+  }
 
 
       /*......league table page .....*/
     
+      body.league-table-page .leagues-country.moved {
+        margin-top: 1rem;
+      }
+      
       body.league-table-page .middle-layer {
         padding: 0; /* Removes padding */
         margin: 0 auto; /* Centers content */
@@ -4257,6 +4539,11 @@ body{
     body.league-table-page .header-top h1,
     body.league-table-page .layer:not(.middle-layer),
     body.league-table-page .third-layer,
+    body.league-table-page .leagues-country,
+    body.league-table-page .slider,
+    body.league-table-page .news-update,
+    body.league-table-page .advert,
+    body.league-table-page .live-match-demo,
     body.league-table-page .text-cont
     {
         display: none;
@@ -4276,6 +4563,99 @@ body{
         flex-grow: 1;
     }
 
+  
+    .team-stat {
+      color: #fff;
+      font-size: 0.6rem; 
+      font-family: 'Lato';
+     }
+
+
+     .teamLeague-name{
+       font-size: 0.75rem;
+       font-weight: 400;
+       font-family: 'Lato';
+       text-align: left;  
+     }
+     
+    .team-infos img {
+       width: 12px; /* Adjust logo size */
+       height: 12px;
+       object-fit: cover;
+     }
+
+      .hide-on-mobile {
+        display: none !important;
+       }
+
+      .show-on-mobile {
+        display: block;
+        margin: 10px auto;
+        padding: 5px 5px;
+        font-size: 0.75rem;
+        background: #003366;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+       
+     .position-header,
+     .stat-header,
+     .team-name-header {
+        font-size: 0.70rem;
+      }
+
+    
+    .form-stat.mobile-visible {
+        display: block !important;
+    }
+
+    .stat-headerF {
+        display: none !important;
+    }
+
+   
+   .form-button-container {
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+   .form-stat.mobile-visible {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 4px;
+}
+
+.form-box {
+    width: 17px;
+    height: 17px;
+    font-size: 12px;
+    
+}
+
+     .stat-headerF.mobile-visible {
+        display: inline-block !important;
+    }
+
+    .hidden-on-mobile {
+        display: none !important;
+    }
+
+
+    .toggle-form-button {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    background-color: #003366;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    
 
     /*......prediction page .....*/
 
@@ -4324,7 +4704,7 @@ body{
 } 
 
 /* === Adjustments for 768px Devices === */
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
   .header {
     padding: 20px 15px;
   }
@@ -4339,10 +4719,8 @@ body{
 }
 
 /* === Adjustments for 480px Devices === */
-@media (max-width: 480px) {
-  .mobileMenu-logo img {
-    width: 80px;
-  }
+@media screen and (max-width: 480px) {
+ 
 
   .content {
   display: flex;

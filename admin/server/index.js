@@ -16,7 +16,7 @@ const allowedOrigins = [
   'https://fantastic-couscous-q7xqw64rvx9vc4pqj-5501.app.github.dev'
 ];
 
-app.set('trust proxy', 1);
+
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -36,10 +36,15 @@ app.use(compression());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+app.set('trust proxy', 1);
+
 const limiter = rateLimit({
   windowMs: 60 * 1000,
   max: process.env.NODE_ENV === "production" ? 30 : 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
+
 
 app.use("/api/", limiter);
 app.use("/api/news", newsRoutes);

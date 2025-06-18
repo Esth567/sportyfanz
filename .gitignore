@@ -73,3 +73,4 @@ summarizer-api/env/
 __pycache__/
 admin/.env
 admin/.env
+admin/.env

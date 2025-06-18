@@ -80,10 +80,24 @@ const MAX_VISIBLE_NEWS = 5;
 async function loadNews() {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
+  //const baseURL =
+  //window.location.hostname === 'localhost'
+   // ? 'http://localhost:10000'
+   //: 'https://sports-news-api-a7gh.onrender.com'; // replace with actual Render backend URL
 
   try {
-    const response = await fetch('/api/news');
-    const { trending, updates } = await response.json();
+    
+   const response = await fetch(`https://friendly-parakeet-jwqpvgwxjqvf5464-3000.app.github.dev/api/news`);
+    if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+  const { trending, updates } = await response.json();
+
+    // ✅ Save globally so showFullNews() can access them
+    window.trendingNews = trending;
+    window.updatesNews = updates;
+
     populateNewsSection('trending-news', trending);
     populateNewsSection('updates-news', updates);
   } catch (error) {
@@ -94,31 +108,33 @@ async function loadNews() {
   }
 }
 
-
 // ========== POPULATE NEWS ========== //
 function populateNewsSection(sectionId, newsList) {
     const container = document.getElementById(sectionId);
     if (!container) return;
 
-    container.innerHTML = newsList.map((item, index) => `
-        <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
-            <h1 class="news-title">${item.title}</h1>
-            <div class="news-meta">
-                <p class="news-desc">${enhanceSportsDescription(item.description)}</p>
-                <span class="news-time" data-posted="${item.pubDate}">Just now</span>
-            </div>
+container.innerHTML = newsList.map((item, index) => {
+  return `
+    <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
+        <h1 class="news-title">${item.title}</h1>
+        ${item.image ? `<div class="news-image">
+          <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"> 
+          alt="Image for ${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
+        </div>` : ''}
+        <div class="news-meta">
+            <p class="news-desc">${item.description.slice(0, 150)}...</p>
+            <span class="news-time" data-posted="${item.pubDate}">Just now</span>
         </div>
-    `).join('');
+    </div>`;
+   }).join('');
 
-    // Add event listeners to each item
-    container.querySelectorAll('.news-infomat').forEach(item => {
-        item.addEventListener('click', () => {
-            showFullNews(item);
-        });
-    });
+  container.querySelectorAll('.news-infomat').forEach((el, i) => {
+     el.addEventListener('click', () => {
+        showFullNews(el);
+     });
+  });
+
 }
-
-
 
 // ========== SHOW FULL NEWS ========== //
 function showFullNews(clickedItem) {
@@ -130,10 +146,40 @@ function showFullNews(clickedItem) {
         child.style.display = 'none';
     });
 
+    // Get data from clicked item
+    const index = clickedItem.dataset.index;
+    const section = clickedItem.dataset.section;
+    const newsList = section === 'trending-news' ? window.trendingNews : window.updatesNews;
+    const newsItem = newsList[parseInt(index)];
+
+    // Format description into paragraphs
+    const formattedDesc = newsItem.description
+        .split('\n\n')
+        .map(p => `<p>${p.trim()}</p>`)
+        .join('');
+
     // Create and display the full view container
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
-    fullView.innerHTML = clickedItem.innerHTML;
+    fullView.innerHTML = `
+        <article class="blog-post">
+            <h1 class="blog-title">${newsItem.title}</h1>
+
+            ${newsItem.image ? `
+                <div class="blog-image-wrapper">
+                    <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
+                </div>` : ''
+            }
+
+            <div class="blog-meta">
+                <span class="blog-date">${new Date(newsItem.pubDate).toLocaleDateString()}</span>
+            </div>
+
+            <div class="blog-content">
+                ${formattedDesc}
+            </div>
+        </article>
+    `;
 
     // Add back button
     const backButton = document.createElement('button');
@@ -141,42 +187,17 @@ function showFullNews(clickedItem) {
     backButton.className = 'back-button';
     backButton.onclick = () => {
         fullView.remove();
-
-        // Restore all children inside middle-layer
-        children.forEach(child => {
-            child.style.display = '';
-        });
-
+        children.forEach(child => child.style.display = '');
         showInitialNews("trending-news");
         showInitialNews("updates-news");
         updateRelativeTime();
     };
 
     fullView.prepend(backButton);
-
-    // Append fullView inside the middle-layer
     middleLayer.appendChild(fullView);
 }
 
 
-
-function enhanceSportsDescription(text) {
-  const ytMatch = text.match(/https:\/\/(?:www\.)?youtube\.com\/watch\?v=([\w-]+)/);
-  if (ytMatch) {
-    const videoId = ytMatch[1];
-    return `
-      <div class="video-embed">
-        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" 
-                frameborder="0" allowfullscreen></iframe>
-      </div>
-      <p>This match or update is turning heads online. Watch the analysis and reactions from fans and pundits in this exclusive clip.</p>
-    `;
-  }
-
-  // Fallback to enhanced plain description
-  const plain = text.replace(/<\/?[^>]+(>|$)/g, '').replace(/[^a-zA-Z0-9 .,?!]/g, '');
-  return `${plain} Expect intense matchups, bold predictions, and tactical breakdowns — your go-to hub for all football insights.`;
-}
 
 
 

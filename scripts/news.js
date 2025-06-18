@@ -76,65 +76,87 @@ function updateRelativeTime() {
 
 const MAX_VISIBLE_NEWS = 5;
 
- // ========== LoAD NEWS ========== //
+// ========== LOAD NEWS ==========
 async function loadNews() {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
-  //const baseURL =
-  //window.location.hostname === 'localhost'
-   // ? 'http://localhost:10000'
-   //: 'https://sports-news-api-a7gh.onrender.com'; // replace with actual Render backend URL
 
   try {
-    
-   const response = await fetch(`https://friendly-parakeet-jwqpvgwxjqvf5464-3000.app.github.dev/api/news`);
+    const response = await fetch('https://fantastic-couscous-q7xqw64rvx9vc4pqj-3000.app.github.dev/api/news');
+
     if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Error ${response.status}: ${errorText}`);
+      const text = await response.text();
+      throw new Error(`Failed to fetch news: ${response.status}\n${text}`);
     }
-  const { trending, updates } = await response.json();
 
-    // ✅ Save globally so showFullNews() can access them
-    window.trendingNews = trending;
-    window.updatesNews = updates;
+    const text = await response.text();
+    if (!text || text.trim() === '') {
+      throw new Error("Empty response from server");
+    }
 
-    populateNewsSection('trending-news', trending);
-    populateNewsSection('updates-news', updates);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON received from server");
+    }
+
+    if (!Array.isArray(data.trending) || !Array.isArray(data.updates)) {
+      throw new Error("Invalid or incomplete news structure from API");
+    }
+
+    window.trendingNews = data.trending;
+    window.updatesNews = data.updates;
+
+    populateNewsSection('trending-news', data.trending);
+    populateNewsSection('updates-news', data.updates);
+
   } catch (error) {
     console.error('Failed to load news:', error);
-    alert("Failed to load the latest news.");
+    alert("⚠️ Could not load news: " + error.message);
   } finally {
     if (loader) loader.style.display = 'none';
   }
 }
 
-// ========== POPULATE NEWS ========== //
+
+
+// ========== POPULATE NEWS ==========
 function populateNewsSection(sectionId, newsList) {
-    const container = document.getElementById(sectionId);
-    if (!container) return;
+  const container = document.getElementById(sectionId);
+  if (!container || !Array.isArray(newsList)) return;
 
-container.innerHTML = newsList.map((item, index) => {
-  return `
-    <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
+  container.innerHTML = newsList.map((item, index) => {
+    const imageHtml = item.image
+      ? `<div class="news-image">
+           <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+                alt="Image for ${item.title}" 
+                loading="lazy" 
+                onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
+         </div>`
+      : '';
+
+    return `
+      <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
         <h1 class="news-title">${item.title}</h1>
-        ${item.image ? `<div class="news-image">
-          <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"> 
-          alt="Image for ${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
-        </div>` : ''}
+        ${imageHtml}
         <div class="news-meta">
-            <p class="news-desc">${item.description.slice(0, 150)}...</p>
-            <span class="news-time" data-posted="${item.pubDate}">Just now</span>
+          <p class="news-desc">${item.description?.slice(0, 150) || 'No description'}...</p>
+          <span class="news-time" data-posted="${item.pubDate}">Just now</span>
         </div>
-    </div>`;
-   }).join('');
+      </div>
+    `;
+  }).join('');
 
-  container.querySelectorAll('.news-infomat').forEach((el, i) => {
-     el.addEventListener('click', () => {
-        showFullNews(el);
-     });
+  container.querySelectorAll('.news-infomat').forEach((el) => {
+    el.addEventListener('click', () => {
+      showFullNews(el);
+    });
   });
-
 }
+
+
+
 
 // ========== SHOW FULL NEWS ========== //
 function showFullNews(clickedItem) {

@@ -1,33 +1,76 @@
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import router
-from app.utils import fetch_and_process_feeds
-from fastapi.staticfiles import StaticFiles
-from apscheduler.schedulers.background import BackgroundScheduler
-from app.utils import fetch_and_process_feeds
+from pydantic import BaseModel
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import torch
+import os
+from dotenv import load_dotenv
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(fetch_and_process_feeds, 'interval', minutes=10)
-scheduler.start()
-
-
-
+# Load .env file
+load_dotenv()
 
 app = FastAPI()
 
+# CORS settings (adjust origin for production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://sportyfanz.com"],  # Use ["https://yourdomain.com"] in production
+    allow_origins=["*"],  # Replace with your frontend domain in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(router)
+# ✅ Get token securely from .env
+hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
+if not hf_token:
+    raise EnvironmentError("Missing HUGGINGFACE_HUB_TOKEN in .env")
 
-@app.on_event("startup")
-async def startup_event():
-    fetch_and_process_feeds()
+# ✅ Load model with authentication
+model_name = "mistral-7b-instruct"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Pydantic models for request schema
+class Message(BaseModel):
+    role: str
+    content: str
+
+class CompletionRequest(BaseModel):
+    model: str
+    messages: list[Message]
+    temperature: float = 0.7
+    max_tokens: int = 256
+
+
+@app.post("/v1/chat/completions")
+async def chat_completion(req: CompletionRequest):
+    prompt = ""
+    for msg in req.messages:
+        prompt += f"{msg.role}: {msg.content}\n"
+    prompt += "assistant:"
+
+    inputs = tokenizer(prompt, return_tensors="pt").to("cpu")
+
+    outputs = model.generate(
+        **inputs,
+        max_new_tokens=req.max_tokens,
+        do_sample=True,
+        temperature=req.temperature,
+    )
+
+    output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    assistant_reply = output_text.split("assistant:")[-1].strip()
+
+    return {
+        "id": "chatcmpl-123",
+        "object": "chat.completion",
+        "choices": [
+            {
+                "index": 0,
+                "message": {"role": "assistant", "content": assistant_reply},
+                "finish_reason": "stop",
+            }
+        ],
+        "model": req.model,
+    }

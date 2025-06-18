@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sports-news-api
+    env: node
+    plan: starter  # or whatever plan fits you
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: GROQ_API_KEY
+        fromSecret: groq_api_key  # store your secrets securely in Render dashboard
+      - key: REDIS_URL
+        fromSecret: redis_url
+
+databases:
+  - name: redis-database
+    type: redis
+    plan: starter

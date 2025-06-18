@@ -1706,7 +1706,6 @@ body{
 }
 
 
-
 .back-button {
   margin-bottom: 1rem;
   background-color: #ddd;
@@ -1722,6 +1721,7 @@ body{
   padding: 1.5rem;
   font-family: 'Georgia', serif;
   line-height: 1.8;
+   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 

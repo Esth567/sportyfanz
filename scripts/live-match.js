@@ -69,7 +69,7 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
                         </div>
                     </div>
                     <div class="arrow-direct">
-                        <img src="assets/icons/Arrow - Right 2.png" alt="Arrow">
+                        <img src="/assets/icons/Arrow - Right 2.png" alt="Arrow">
                     </div>`;
 
                 leagueElement.addEventListener("click", function () {
@@ -173,6 +173,7 @@ function updateMatches(matches) {
         allHighlights: []
     };
 
+    
     const now = luxon.DateTime.utc();  // Get the current time in UTC
     const oneWeekAgo = now.minus({ days: 7 });
 
@@ -941,18 +942,26 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
      
   
   // ✅ Fetch lineup and dynamically infer formation
-function fetchAndRenderLineups(match_id, match) {
+     function fetchAndRenderLineups(match_id, match) {
     fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${match_id}&APIkey=${APIkey}`)
         .then(res => res.json())
         .then(data => {
+            const container = document.getElementById("football-field");
+            container.innerHTML = ""; // Clear previous content
+
             const lineups = data[match_id]?.lineup;
             if (!lineups) {
-                console.warn("No lineup data found for match_id:", match_id);
+                displayNoLineupMessage(container, "No lineup data found.");
                 return;
             }
 
             const homePlayers = lineups.home?.starting_lineups || [];
             const awayPlayers = lineups.away?.starting_lineups || [];
+
+            if (homePlayers.length === 0 && awayPlayers.length === 0) {
+                displayNoLineupMessage(container, "No lineup formation available.");
+                return;
+            }
 
             const homeFormation = inferFormation(homePlayers);
             const awayFormation = inferFormation(awayPlayers);
@@ -960,8 +969,25 @@ function fetchAndRenderLineups(match_id, match) {
             renderPlayersOnField("home", homePlayers, homeFormation, "home");
             renderPlayersOnField("away", awayPlayers, awayFormation, "away");
         })
-        .catch(err => console.error("Error fetching lineups:", err));
+        .catch(err => {
+            console.error("Error fetching lineups:", err);
+            const container = document.getElementById("football-field");
+            displayNoLineupMessage(container, "Error loading lineups.");
+        });
 }
+
+
+function displayNoLineupMessage(container, message) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("no-lineup-message");
+    msgDiv.textContent = message;
+    msgDiv.style.textAlign = "center";
+    msgDiv.style.marginTop = "20px";
+    msgDiv.style.color = "#888";
+    msgDiv.style.fontSize = "1.2em";
+    container.appendChild(msgDiv);
+}
+
 
 // ✅ Parse inferred formation or fallback string-based one
 function parseFormation(formation, players) {
@@ -1024,12 +1050,13 @@ function renderPlayersOnField(team, players, formation, side = "home") {
 
     const formationArray = parseFormation(formation, players);
     const isHome = side === "home";
+    const vertical = isVerticalMode();
 
-    // Goalkeeper
+    // Goalkeeper position
     const goalkeeper = players.find(p => p.lineup_position === "1");
     if (goalkeeper) {
-        const gkX = isHome ? 10 : 90;
-        const gkY = 50;
+        const gkX = vertical ? 50 : (isHome ? 10 : 90);
+        const gkY = vertical ? (isHome ? 10 : 90) : 50;
         const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
         container.appendChild(gkDiv);
     }
@@ -1037,17 +1064,19 @@ function renderPlayersOnField(team, players, formation, side = "home") {
     // Outfield players
     const outfield = players.filter(p => p.lineup_position !== "1");
     let currentIndex = 0;
-
     formationArray.forEach((playersInLine, lineIndex) => {
         const totalLines = formationArray.length;
-        const x = isHome
-            ? ((lineIndex + 1) / (totalLines + 1)) * 45 + 5
-            : ((lineIndex + 1) / (totalLines + 1)) * 45 + 50;
+
+        // Calculate line position (X in horizontal, Y in vertical)
+        const linePos = ((lineIndex + 1) / (totalLines + 1)) * 45 + 5;
+        const lineCoord = isHome ? linePos : linePos + 50;
 
         for (let j = 0; j < playersInLine; j++) {
-            const y = ((j + 1) / (playersInLine + 1)) * 100;
+            const spread = ((j + 1) / (playersInLine + 1)) * 100;
             const player = outfield[currentIndex];
             if (player) {
+                const x = vertical ? spread : lineCoord;
+                const y = vertical ? lineCoord : spread;
                 const div = createPlayerDiv({ ...player, team_type: side }, x, y);
                 container.appendChild(div);
                 currentIndex++;
@@ -1055,6 +1084,7 @@ function renderPlayersOnField(team, players, formation, side = "home") {
         }
     });
 }
+
 
 // ✅ Create player dot element
 function createPlayerDiv(player, xPercent, yPercent) {
@@ -1117,7 +1147,18 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebar.style.display = "none";
     });
 });
- 
+
+window.addEventListener('resize', () => {
+    // Optionally clear and re-render field
+    const container = document.getElementById("football-field");
+    if (container) container.innerHTML = '';
+    fetchAndRenderLineups(match_id, match); // re-render
+});
+
+function isVerticalMode() {
+    return window.innerWidth <= 768; // match CSS media query
+}
+
 
   
 

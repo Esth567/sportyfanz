@@ -9,13 +9,26 @@ const newsRoutes = require("../routes/news");
 const imageProxyRoutes = require("../routes/imageProxy");
 
 const app = express();
+
 const port = process.env.PORT || 3000;
 
+const allowedOrigins = [
+  'https://fantastic-couscous-q7xqw64rvx9vc4pqj-5501.app.github.dev'
+];
+
+app.set('trust proxy', 1);
+
 app.use(cors({
-  origin: 'https://friendly-parakeet-jwqpvgwxjqvf5464-5500.app.github.dev',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Not allowed by CORS: ${origin}`));
+    }
+  },
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
-  credentials: false  // only true if you're using cookies/auth
+  credentials: false
 }));
 
 

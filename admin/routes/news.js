@@ -5,17 +5,24 @@ const { fetchNews } = require("../utils/fetchNews");
 
 router.get("/", async (req, res) => {
   try {
-    const force = req.query.force === "true"; // /api/news?force=true
+    const force = req.query.force === "true";
     const news = await fetchNews(force);
+
+    if (!news || !news.trending || !news.updates) {
+      throw new Error("Invalid or empty news data");
+    }
+
     res.json(news);
   } catch (err) {
     console.error("❌ Failed to fetch news:", err.message);
 
-    // Optional fallback: load from disk cache
     try {
-      const fallback = require("fs").readFileSync(require("path").join(__dirname, "../utils/cache/news.json"));
-      res.json(JSON.parse(fallback).data);
+      const fallback = require("fs").readFileSync(
+        require("path").join(__dirname, "../utils/cache/news.json")
+      );
+      res.json(JSON.parse(fallback));
     } catch (fsErr) {
+      console.error("❌ Failed to read fallback cache:", fsErr.message);
       res.status(500).json({ error: "Failed to load news" });
     }
   }

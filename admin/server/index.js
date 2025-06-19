@@ -12,10 +12,10 @@ const app = express();
 
 const port = process.env.PORT || 3000;
 
+
 const allowedOrigins = [
   'https://fantastic-couscous-q7xqw64rvx9vc4pqj-5501.app.github.dev'
 ];
-
 
 
 app.use(cors({

@@ -7,6 +7,7 @@ const klaw = require('klaw');
 
 const { extractImageFromURL } = require('./extractImageFromURL');
 const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
+const { extractFullArticle } = require('./extractFullText');
 
 const openaiKey = process.env.OPENAI_API_KEY;
 if (!openaiKey) console.warn("⚠️ Missing OpenAI API key — generation will be disabled.");
@@ -68,13 +69,15 @@ function sanitize(input = '') {
   return input.replace(/"/g, "'").replace(/\n/g, ' ').trim();
 }
 
+//function to generate article
 async function generateArticleFromItem(item, sourceTitle) {
   const pubDate = safeDate(item.pubDate);
-  const title = sanitize(item.title || 'Untitled');
+  const title = item.title || 'Untitled';
   const slug = slugify(title.toLowerCase(), { lower: true });
   const leagueFolder = inferLeagueFolder(title);
   const folderPath = path.join(OUTPUT_DIR, leagueFolder);
-  const filePath = path.join(folderPath, `${pubDate}-${slug}.md`);
+  const filename = `${pubDate}-${slug}.md`;
+  const filePath = path.join(folderPath, filename);
 
   await fs.ensureDir(folderPath);
   if (await fs.pathExists(filePath)) {
@@ -82,35 +85,49 @@ async function generateArticleFromItem(item, sourceTitle) {
     return;
   }
 
-  if (!openai || process.env.USE_OPENAI !== "true" || isOpenAIDisabled()) {
+  if (process.env.USE_OPENAI !== "true" || isOpenAIDisabled()) {
     console.warn(`⚠️ Skipping OpenAI for ${title}`);
     return;
   }
 
-  const link = sanitize(item.link || '');
+  const link = item.link;
   const mode = process.env.ARTICLE_MODE || "summarize";
 
+  const fullContent = await extractFullArticle(link);
+  if (!fullContent || fullContent.length < 300) {
+    console.warn(`⚠️ Skipping "${title}" — article content too short or failed to extract.`);
+    return;
+  }
+
   const prompt = mode === "summarize"
-    ? `Summarize this in 5 bullet points:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`
-    : `You're a journalist. Write a 3-paragraph article:\n\nTitle: ${title}\nSource: ${sourceTitle}`;
+    ? `Summarize the following article into 4-5 bullet points or short paragraphs:\n\n${fullContent}`
+    : `You're a journalist. Rewrite the following article into 3 informative and engaging paragraphs:\n\n${fullContent}`;
 
-  const response = await withRetry(() =>
-    openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-    })
-  );
+  let content;
+  try {
+    const response = await withRetry(() =>
+      openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+      })
+    );
+    content = response.choices[0].message.content.trim();
+  } catch (err) {
+    recordOpenAIError(err); // optional if you use your own logging
+    throw err;
+  }
 
-  const content = response.choices[0].message.content;
   const image = await extractImageFromURL(link);
 
-  const markdown = `---\ntitle: "${title}"\ndate: "${pubDate}"\nslug: "${slug}"\nsource: "${sanitize(sourceTitle)}"\noriginal_link: "${link}"\nmode: "${mode}"\nimage: "${image || ''}"\n---\n\n${content}`;
+  const markdown = `---\ntitle: "${title}"\ndate: "${pubDate}"\nslug: "${slug}"\nsource: "${sourceTitle}"\noriginal_link: "${link}"\nmode: "${mode}"\nimage: "${image || ''}"\n---\n\n${content}`;
 
   await fs.writeFile(filePath, markdown);
   console.log(`✅ Saved: ${filePath}`);
 }
 
+
+//function to read Articles From Disk
 async function readArticlesFromDisk() {
   await fs.ensureDir(OUTPUT_DIR);
   const articles = [];

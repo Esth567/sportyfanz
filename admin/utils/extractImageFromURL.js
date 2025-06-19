@@ -1,16 +1,12 @@
 const got = require('got');
-const metascraper = require('metascraper')([
-  require('metascraper-image')(),
-  require('metascraper-logo')(),
-  require('metascraper-logo-favicon')(),
-  require('metascraper-clearbit')(),
-]);
+const html = await got(url).text();
 
-async function extractImageFromURL(url) {
+import got from 'got'; // ✅ modern ESM import
+
+export async function extractImageFromURL(url) {
   try {
-    const { body: html, url: finalUrl } = await got(url, { timeout: 10000 });
-    const metadata = await metascraper({ html, url: finalUrl });
-    return metadata.image || metadata.logo || null;
+    const html = await got(url).text(); // ✅ FIX: Await the text body
+    // ... proceed to extract <img> or OpenGraph tag
   } catch (err) {
     console.warn(`⚠️ Failed to extract image from ${url}: ${err.message}`);
     return null;

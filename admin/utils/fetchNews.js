@@ -74,6 +74,19 @@ function inferLeagueFolder(title = '') {
   return 'general';
 }
 
+
+function inferTags(text) {
+  const tags = [];
+
+  if (/transfer|signed|deal/i.test(text)) tags.push('transfer');
+  if (/score|win|match|defeat|draw/i.test(text)) tags.push('match');
+  if (/injur(y|ies)|out for|rupture/i.test(text)) tags.push('injury');
+  if (/preview|predicted/i.test(text)) tags.push('preview');
+
+  return tags;
+}
+
+
 async function generateArticleFromItem(item, sourceTitle) {
   const pubDate = safeDate(item.pubDate);
   const title = item.title || 'Untitled';
@@ -103,8 +116,17 @@ async function generateArticleFromItem(item, sourceTitle) {
     return;
   }
 
+  // 💬 Enhanced prompt for better structure
   const prompt = mode === "summarize"
-    ? `Summarize the following article into 4-5 bullet points or short paragraphs:\n\n${fullContent}`
+    ? `Read the article below and generate a structured summary:
+
+1. A short 1–2 sentence summary paragraph introducing the story.
+2. Followed by 4–5 bullet points with key factual highlights.
+
+Avoid fluff. Do not copy the original sentences directly.
+
+Article:
+${fullContent}`
     : `You're a journalist. Rewrite the following article into 3 informative and engaging paragraphs:\n\n${fullContent}`;
 
   let content;
@@ -123,13 +145,45 @@ async function generateArticleFromItem(item, sourceTitle) {
     return;
   }
 
+  // 🛠 Normalize fallback if OpenAI only returns bullet points
+  if (
+    !content.includes('\n\n') &&
+    content.split('\n').every(line => /^[-•*]\s+/.test(line))
+  ) {
+    content = `Summary:\n\n${content}`;
+  }
+
+  // ✂️ Extract the first non-bullet line as the description
+  const description = (
+    content
+      .split('\n')
+      .find(line => line && !/^[-•*]/.test(line)) || ''
+  ).replace(/"/g, "'").slice(0, 200);
+
+  // 🏷️ Basic tag inference
+  const tags = inferTags(fullContent + ' ' + content);
+
+  // 🖼️ Image scraping
   const image = await extractImageFromURL(link).catch(() => null);
 
-  const markdown = `---\ntitle: "${title}"\ndate: "${pubDate}"\nslug: "${slug}"\nsource: "${sourceTitle}"\noriginal_link: "${link}"\nmode: "${mode}"\nimage: "${image || ''}"\n---\n\n${content}`;
+  // 📝 Final markdown
+  const markdown = `---\n` +
+    `title: "${title}"\n` +
+    `date: "${pubDate}"\n` +
+    `slug: "${slug}"\n` +
+    `source: "${sourceTitle}"\n` +
+    `original_link: "${link}"\n` +
+    `mode: "${mode}"\n` +
+    `image: "${image || ''}"\n` +
+    `description: "${description}"\n` +
+    `tags: [${tags.map(t => `"${t}"`).join(', ')}]\n` +
+    `---\n\n` +
+    `${content}`;
 
   await fs.writeFile(filePath, markdown);
   console.log(`✅ Saved: ${filePath}`);
 }
+
 
 async function readArticlesFromDisk() {
   await fs.ensureDir(OUTPUT_DIR);

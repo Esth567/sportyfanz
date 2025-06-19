@@ -16,7 +16,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "nodemon server/index.js"
+    "dev": "NODE_ENV=development node server/index.js"
   },
   "dependencies": {
     "@extractus/article-extractor": "^8.0.19",
@@ -37,6 +37,7 @@
     "jsdom": "^26.1.0",
     "jsonwebtoken": "^9.0.2",
     "klaw": "^4.1.0",
+    "marked": "^15.0.12",
     "metascraper": "^5.47.1",
     "metascraper-clearbit": "^5.47.1",
     "metascraper-image": "^5.47.1",

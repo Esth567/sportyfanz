@@ -83,7 +83,7 @@ async function loadNews() {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch("https://fantastic-couscous-q7xqw64rvx9vc4pqj-5500.app.github.dev/api/news");
+    const response = await fetch("/api/news");
 
     if (!response.ok) {
       const text = await response.text();
@@ -142,8 +142,9 @@ function populateNewsSection(sectionId, newsList) {
         <h1 class="news-title">${item.title}</h1>
         ${imageHtml}
         <div class="news-meta">
-          <p class="news-desc">${item.description?.slice(0, 150) || 'No description'}...</p>
-          <span class="news-time" data-posted="${item.pubDate}">Just now</span>
+          <p class="news-desc">${item.description?.slice(0, 150) ||(item.content?.split('\n').find(line => /^[-•*]\s+/.test(line))?.replace(/^[-•*]\s+/, '').slice(0, 150) || 'No description')
+          }...</p>
+          <span class="news-time" data-posted="${item.date}">Just now</span>
         </div>
       </div>
     `;
@@ -157,6 +158,32 @@ function populateNewsSection(sectionId, newsList) {
 }
 
 
+// ========== format Content ========== //
+function formatContentAsHTML(text) {
+  const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
+  const html = [];
+  let inList = false;
+
+  for (const line of lines) {
+    if (/^[-•*]\s+/.test(line)) {
+      if (!inList) {
+        html.push('<ul>');
+        inList = true;
+      }
+      html.push(`<li>${line.replace(/^[-•*]\s+/, '')}</li>`);
+    } else {
+      if (inList) {
+        html.push('</ul>');
+        inList = false;
+      }
+      html.push(`<p>${line}</p>`);
+    }
+  }
+
+  if (inList) html.push('</ul>');
+
+  return html.join('\n');
+}
 
 
 // ========== SHOW FULL NEWS ========== //
@@ -176,10 +203,7 @@ function showFullNews(clickedItem) {
     const newsItem = newsList[parseInt(index)];
 
     // Format description into paragraphs
-    const formattedDesc = newsItem.description
-        .split('\n\n')
-        .map(p => `<p>${p.trim()}</p>`)
-        .join('');
+    const formattedDesc = formatContentAsHTML(newsItem.content || '');
 
     // Create and display the full view container
     const fullView = document.createElement('div');
@@ -195,7 +219,7 @@ function showFullNews(clickedItem) {
             }
 
             <div class="blog-meta">
-                <span class="blog-date">${new Date(newsItem.pubDate).toLocaleDateString()}</span>
+                <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
             </div>
 
             <div class="blog-content">

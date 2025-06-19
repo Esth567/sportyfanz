@@ -1,12 +1,11 @@
+// extractImageFromURL.js (CommonJS)
 const got = require('got');
-const html = await got(url).text();
 
-import got from 'got'; // ✅ modern ESM import
-
-export async function extractImageFromURL(url) {
+async function extractImageFromURL(url) {
   try {
-    const html = await got(url).text(); // ✅ FIX: Await the text body
-    // ... proceed to extract <img> or OpenGraph tag
+    const html = await got(url).text();
+    // TODO: parse and extract image here
+    return null;
   } catch (err) {
     console.warn(`⚠️ Failed to extract image from ${url}: ${err.message}`);
     return null;

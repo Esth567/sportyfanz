@@ -1,4 +1,3 @@
-// routes/news.js
 const express = require("express");
 const router = express.Router();
 const { fetchNews } = require("../utils/fetchNews");
@@ -8,15 +7,15 @@ router.get("/", async (req, res) => {
     const force = req.query.force === "true";
     const news = await fetchNews(force);
 
-    // ✅ Extract the correct shape
-    const trending = news?.data?.trending;
-    const updates = news?.data?.updates;
+    // ✅ FIXED: direct access
+    const trending = news?.trending;
+    const updates = news?.updates;
 
     if (!Array.isArray(trending) || !Array.isArray(updates)) {
       throw new Error("Invalid or empty news data");
     }
 
-    res.json({ trending, updates }); // ✅ only send required structure
+    res.json({ trending, updates });
   } catch (err) {
     console.error("❌ Failed to fetch news:", err.message);
 
@@ -26,8 +25,9 @@ router.get("/", async (req, res) => {
       );
       const fallback = JSON.parse(fallbackRaw);
 
-      const trending = fallback?.data?.trending;
-      const updates = fallback?.data?.updates;
+      // ✅ FIXED: direct access again
+      const trending = fallback?.trending;
+      const updates = fallback?.updates;
 
       if (!Array.isArray(trending) || !Array.isArray(updates)) {
         throw new Error("Fallback cache also has invalid structure");
@@ -40,6 +40,5 @@ router.get("/", async (req, res) => {
     }
   }
 });
-
 
 module.exports = router;

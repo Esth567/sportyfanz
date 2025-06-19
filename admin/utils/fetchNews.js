@@ -9,14 +9,23 @@ const { extractImageFromURL } = require('./extractImageFromURL');
 const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
 const { extractFullArticle } = require('./extractFullText');
 
+const OUTPUT_DIR = path.join(__dirname, 'articles');
+const CACHE_PATH = path.join(__dirname, 'cache/news.json');
+
+const FEED_URLS = [
+  'https://www.espn.com/espn/rss/news',
+  'https://feeds.bbci.co.uk/sport/rss.xml?edition=uk',
+  'https://www.skysports.com/rss/12040',
+  'https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml',
+  'https://www.cbssports.com/rss/headlines/',
+  'https://www.theguardian.com/uk/sport/rss',
+];
+
 const openaiKey = process.env.OPENAI_API_KEY;
 if (!openaiKey) console.warn("⚠️ Missing OpenAI API key — generation will be disabled.");
 
 const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
 const parser = new Parser();
-
-const OUTPUT_DIR = path.join(__dirname, 'articles');
-const CACHE_PATH = path.join(__dirname, 'cache/news.json');
 
 let openAIDisabledUntil = null;
 
@@ -65,11 +74,6 @@ function inferLeagueFolder(title = '') {
   return 'general';
 }
 
-function sanitize(input = '') {
-  return input.replace(/"/g, "'").replace(/\n/g, ' ').trim();
-}
-
-//function to generate article
 async function generateArticleFromItem(item, sourceTitle) {
   const pubDate = safeDate(item.pubDate);
   const title = item.title || 'Untitled';
@@ -114,11 +118,12 @@ async function generateArticleFromItem(item, sourceTitle) {
     );
     content = response.choices[0].message.content.trim();
   } catch (err) {
-    recordOpenAIError(err); // optional if you use your own logging
-    throw err;
+    recordOpenAIError(err);
+    console.error(`❌ OpenAI error for "${title}": ${err.message}`);
+    return;
   }
 
-  const image = await extractImageFromURL(link);
+  const image = await extractImageFromURL(link).catch(() => null);
 
   const markdown = `---\ntitle: "${title}"\ndate: "${pubDate}"\nslug: "${slug}"\nsource: "${sourceTitle}"\noriginal_link: "${link}"\nmode: "${mode}"\nimage: "${image || ''}"\n---\n\n${content}`;
 
@@ -126,8 +131,6 @@ async function generateArticleFromItem(item, sourceTitle) {
   console.log(`✅ Saved: ${filePath}`);
 }
 
-
-//function to read Articles From Disk
 async function readArticlesFromDisk() {
   await fs.ensureDir(OUTPUT_DIR);
   const articles = [];
@@ -149,7 +152,6 @@ async function readArticlesFromDisk() {
         );
 
         const category = path.relative(OUTPUT_DIR, path.dirname(item.path));
-
         articles.push({
           title: frontMatter.title,
           date: frontMatter.date,
@@ -174,61 +176,46 @@ async function readArticlesFromDisk() {
 }
 
 async function fetchNews(force = false) {
- if (!force && await fs.pathExists(CACHE_PATH)) {
-  try {
-    const cached = await fs.readJson(CACHE_PATH);
-    const cachedDate = cached?.trending?.[0]?.date;
-
-    const today = new Date().toISOString().split('T')[0];
-    if (cachedDate === today) {
-      return cached;
-    } else {
-      console.log("🔁 Cache is stale. Fetching fresh news...");
-    }
-  } catch {
-    console.warn("⚠️ Failed to read cache, will refetch");
-  }
-}
-
-
-  const feedUrls = [
-    'https://www.espn.com/espn/rss/news',
-    'https://feeds.bbci.co.uk/sport/rss.xml?edition=uk',
-    'https://www.skysports.com/rss/12040',
-    'https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml',
-    'https://www.cbssports.com/rss/headlines/',
-    'https://www.theguardian.com/uk/sport/rss',
-  ];
-
   const todayISO = new Date().toISOString().split('T')[0];
 
-  for (const url of feedUrls) {
+  if (!force && await fs.pathExists(CACHE_PATH)) {
+    try {
+      const cached = await fs.readJson(CACHE_PATH);
+      const cachedDate = cached?.trending?.[0]?.date;
+      if (cachedDate === todayISO) return cached;
+      else console.log("🔁 Cache is stale. Fetching fresh news...");
+    } catch {
+      console.warn("⚠️ Failed to read cache, will refetch");
+    }
+  }
+
+  let success = false;
+
+  for (const url of FEED_URLS) {
     try {
       const feed = await withRetry(() => parser.parseURL(url));
       const source = feed.title;
 
       for (const item of feed.items) {
-        const pubDate = new Date(item.pubDate);
-        const pubDateISO = pubDate.toISOString().split('T')[0];
-
-        // ✅ Only generate articles for today's news
-        if (pubDateISO === todayISO) {
+        const pubDateSafe = safeDate(item.pubDate);
+        if (pubDateSafe === todayISO) {
           await generateArticleFromItem(item, source);
         } else {
-          console.log(`⏭️ Skipped old article (${pubDateISO}): ${item.title}`);
+          console.log(`⏭️ Skipped old article (${pubDateSafe}): ${item.title}`);
         }
       }
+
+      success = true;
     } catch (err) {
       console.error(`❌ Failed to fetch from ${url}: ${err.message}`);
     }
   }
 
   let articles = await readArticlesFromDisk();
-
-  // ✅ Filter only today's articles
   articles = articles.filter(a => a.date === todayISO);
 
-  // ✅ Deduplicate by slug
+  console.log(`📰 Found ${articles.length} valid articles for today.`);
+
   const seen = new Set();
   articles = articles.filter(a => {
     if (seen.has(a.slug)) return false;
@@ -236,8 +223,21 @@ async function fetchNews(force = false) {
     return true;
   });
 
-  if (articles.length < 6) {
-    console.warn(`⚠️ Only ${articles.length} unique articles from today`);
+  if (!success && articles.length === 0) {
+    console.warn("⚠️ All RSS feeds failed. Using stale cache...");
+    try {
+      const fallback = await fs.readJson(CACHE_PATH);
+      if (
+        !Array.isArray(fallback?.trending) ||
+        !Array.isArray(fallback?.updates) ||
+        fallback.trending.length === 0
+      ) {
+        throw new Error("Fallback cache also has invalid structure");
+      }
+      return fallback;
+    } catch {
+      throw new Error("❌ No fresh articles and no valid cache.");
+    }
   }
 
   const structured = {
@@ -245,8 +245,13 @@ async function fetchNews(force = false) {
     updates: articles.slice(3, 6),
   };
 
-  if (!Array.isArray(structured.trending) || !Array.isArray(structured.updates)) {
-    throw new Error("❌ Invalid structure: missing trending or updates");
+  // 🚨 Validate structure before caching
+  if (
+    !Array.isArray(structured.trending) ||
+    !Array.isArray(structured.updates) ||
+    structured.trending.length === 0
+  ) {
+    throw new Error("❌ Invalid or empty news data");
   }
 
   await fs.ensureDir(path.dirname(CACHE_PATH));

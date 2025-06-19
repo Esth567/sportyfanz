@@ -1,12 +1,13 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    await loadNews(); // Make sure news loads first
-    showInitialNews("trending-news");
-    showInitialNews("updates-news");
-    updateRelativeTime();
+  await loadNews(); // Ensure news has loaded
+  showInitialNews("trending-news");
+  showInitialNews("updates-news");
+  updateRelativeTime();
 
-    // Ensure .middle-layer is available before modifying
-    const middleLayer = document.querySelector(".middle-layer");
-    if (middleLayer) middleLayer.style.display = "block";
+  const middleLayer = document.querySelector(".middle-layer");
+  if (middleLayer) {
+    middleLayer.style.display = "block";
+  }
 });
 
 
@@ -82,7 +83,7 @@ async function loadNews() {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('https://fantastic-couscous-q7xqw64rvx9vc4pqj-3000.app.github.dev/api/news');
+    const response = await fetch("https://fantastic-couscous-q7xqw64rvx9vc4pqj-5500.app.github.dev/api/news");
 
     if (!response.ok) {
       const text = await response.text();

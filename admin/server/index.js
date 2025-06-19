@@ -5,8 +5,9 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
 
-const newsRoutes = require("../routes/news");
-const imageProxyRoutes = require("../routes/imageProxy");
+const newsRoutes = require(path.join(__dirname, "../routes/news"));
+
+const imageProxyRoutes = require(path.join(__dirname, "../routes/imageProxy"));
 
 const app = express();
 

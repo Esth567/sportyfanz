@@ -1,3 +1,4 @@
+
 const OpenAI = require('openai');
 const Parser = require('rss-parser');
 const slugify = require('slugify');
@@ -5,13 +6,16 @@ const fs = require('fs-extra');
 const path = require('path');
 const klaw = require('klaw');
 
+
 const { extractImageFromURL } = require('./extractImageFromURL');
 const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
+
 
 const openaiKey = process.env.OPENAI_API_KEY;
 if (!openaiKey) console.warn("⚠️ Missing OpenAI API key — generation will be disabled.");
 
 const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
+
 const parser = new Parser();
 
 const OUTPUT_DIR = path.join(__dirname, 'articles');
@@ -30,15 +34,19 @@ function disableOpenAITemporarily(minutes = 15) {
 }
 
 async function withRetry(fn, retries = 3, delay = 1000) {
+
   if (isOpenAIDisabled()) throw new Error("OpenAI temporarily disabled");
+
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
       return await fn();
     } catch (err) {
+
       if (err.status === 429 && attempt >= retries - 1) disableOpenAITemporarily(15);
       if (attempt < retries - 1) {
         console.warn(`🔁 Retry ${attempt + 1}/${retries}`);
+
         await new Promise(res => setTimeout(res, delay));
       } else {
         throw err;
@@ -52,19 +60,42 @@ function safeDate(dateString) {
   return isNaN(parsed.getTime()) ? new Date().toISOString().split('T')[0] : parsed.toISOString().split('T')[0];
 }
 
+
+function detectCategory(title) {
+  const mappings = {
+    "premier-league": ["premier league", "man united", "arsenal", "liverpool"],
+    "nba": ["nba", "basketball", "lakers", "celtics"],
+    "tennis": ["tennis", "wimbledon", "djokovic", "nadal"],
+    "formula-1": ["formula 1", "f1", "verstappen", "hamilton"],
+    "nfl": ["nfl", "super bowl", "patriots", "chiefs"],
+  };
+
+  const lower = title.toLowerCase();
+  for (const [category, keywords] of Object.entries(mappings)) {
+    if (keywords.some(keyword => lower.includes(keyword))) {
+      return category;
+    }
+  }
+
+  return "general";
+}
+
+  
 function inferLeagueFolder(title = '') {
   const lower = title.toLowerCase();
   if (lower.includes('premier league')) return 'premier-league';
   if (lower.includes('nba')) return 'nba';
   if (lower.includes('nfl')) return 'nfl';
   if (lower.includes('mlb')) return 'mlb';
+
   if (lower.includes('formula 1') || lower.includes('f1')) return 'f1';
+
   if (lower.includes('tennis')) return 'tennis';
   if (lower.includes('golf')) return 'golf';
   return 'general';
 }
 
-function sanitize(input = '') {
+nction sanitize(input = '') {
   return input.replace(/"/g, "'").replace(/\n/g, ' ').trim();
 }
 
@@ -76,23 +107,25 @@ async function generateArticleFromItem(item, sourceTitle) {
   const folderPath = path.join(OUTPUT_DIR, leagueFolder);
   const filePath = path.join(folderPath, `${pubDate}-${slug}.md`);
 
+
   await fs.ensureDir(folderPath);
   if (await fs.pathExists(filePath)) {
     console.log(`🟡 Skipped (cached): ${filePath}`);
     return;
   }
 
-  if (!openai || process.env.USE_OPENAI !== "true" || isOpenAIDisabled()) {
-    console.warn(`⚠️ Skipping OpenAI for ${title}`);
-    return;
-  }
 
+  if (!openai || process.env.USE_OPENAI !== "true" || isOpenAIDisabled()) {
+
+    
   const link = sanitize(item.link || '');
   const mode = process.env.ARTICLE_MODE || "summarize";
 
   const prompt = mode === "summarize"
     ? `Summarize this in 5 bullet points:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`
     : `You're a journalist. Write a 3-paragraph article:\n\nTitle: ${title}\nSource: ${sourceTitle}`;
+
+ 
 
   const response = await withRetry(() =>
     openai.chat.completions.create({
@@ -106,6 +139,8 @@ async function generateArticleFromItem(item, sourceTitle) {
   const image = await extractImageFromURL(link);
 
   const markdown = `---\ntitle: "${title}"\ndate: "${pubDate}"\nslug: "${slug}"\nsource: "${sanitize(sourceTitle)}"\noriginal_link: "${link}"\nmode: "${mode}"\nimage: "${image || ''}"\n---\n\n${content}`;
+
+
 
   await fs.writeFile(filePath, markdown);
   console.log(`✅ Saved: ${filePath}`);
@@ -138,12 +173,14 @@ async function readArticlesFromDisk() {
           date: frontMatter.date,
           slug: frontMatter.slug,
           source: frontMatter.source,
+
           original_link: frontMatter.original_link,
           content: match[2],
           image: frontMatter.image,
           category
         });
       })
+
       .on('end', () => {
         if (articles.length === 0) console.warn("⚠️ No articles found in disk");
         resolve(
@@ -152,11 +189,13 @@ async function readArticlesFromDisk() {
             .sort((a, b) => new Date(b.date) - new Date(a.date))
         );
       })
+
       .on('error', reject);
   });
 }
 
 async function fetchNews(force = false) {
+
  if (!force && await fs.pathExists(CACHE_PATH)) {
   try {
     const cached = await fs.readJson(CACHE_PATH);
@@ -172,6 +211,7 @@ async function fetchNews(force = false) {
     console.warn("⚠️ Failed to read cache, will refetch");
   }
 }
+
 
 
   const feedUrls = [
@@ -190,6 +230,7 @@ async function fetchNews(force = false) {
       const feed = await withRetry(() => parser.parseURL(url));
       const source = feed.title;
 
+
       for (const item of feed.items) {
         const pubDate = new Date(item.pubDate);
         const pubDateISO = pubDate.toISOString().split('T')[0];
@@ -200,11 +241,13 @@ async function fetchNews(force = false) {
         } else {
           console.log(`⏭️ Skipped old article (${pubDateISO}): ${item.title}`);
         }
+
       }
     } catch (err) {
       console.error(`❌ Failed to fetch from ${url}: ${err.message}`);
     }
   }
+
 
   let articles = await readArticlesFromDisk();
 
@@ -223,14 +266,17 @@ async function fetchNews(force = false) {
     console.warn(`⚠️ Only ${articles.length} unique articles from today`);
   }
 
+
   const structured = {
     trending: articles.slice(0, 3),
     updates: articles.slice(3, 6),
   };
 
+
   if (!Array.isArray(structured.trending) || !Array.isArray(structured.updates)) {
     throw new Error("❌ Invalid structure: missing trending or updates");
   }
+
 
   await fs.ensureDir(path.dirname(CACHE_PATH));
   await fs.writeJson(CACHE_PATH, structured, { spaces: 2 });

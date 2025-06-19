@@ -1706,15 +1706,6 @@ body{
 }
 
 
-.news-full-view {
-    padding: 1rem;
-    background: white;
-    font-size: 1.1rem;
-    width: 100%;
-    box-sizing: border-box;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
 
 .back-button {
   margin-bottom: 1rem;
@@ -1731,8 +1722,6 @@ body{
   padding: 1.5rem;
   font-family: 'Georgia', serif;
   line-height: 1.8;
-  background-color: #fff;
-  border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
@@ -1768,7 +1757,7 @@ body{
 }
 
 .blog-content {
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: #333;
   white-space: pre-wrap;
 }

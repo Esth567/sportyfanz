@@ -227,7 +227,6 @@ ${fullContent}
   // ✂️ Extract the first non-bullet line as the description
   const description = generateDescription(content, title);
 
-
   //Basic tag inference
   const tags = inferTags(fullContent + ' ' + content);
 
@@ -236,17 +235,17 @@ ${fullContent}
 
   //Final markdown
   const markdown = `---\n` +
-    `title: "${title}"\n` +
-    `date: "${pubDate}"\n` +
-    `slug: "${slug}"\n` +
-    `source: "${sourceTitle}"\n` +
-    `original_link: "${link}"\n` +
-    `mode: "${mode}"\n` +
-    `image: "${image || ''}"\n` +
-    `description: "${description}"\n` +
-    `tags: [${tags.map(t => `"${t}"`).join(', ')}]\n` +
-    `---\n\n` +
-    `${content}`;
+  `title: "${title}"\n` +
+  `date: "${pubDate}"\n` +
+  `slug: "${slug}"\n` +
+  `source: "${sourceTitle}"\n` +
+  `original_link: "${link}"\n` +
+  `mode: "${mode}"\n` +
+  `image: "${image || ''}"\n` +
+  `description: "${description}"\n` +
+  `tags: [${tags.map(t => `"${t}"`).join(', ')}]\n` +
+  `---\n\n` +
+  `${content}`;
 
   await fs.writeFile(filePath, markdown);
   console.log(`Saved: ${filePath}`);

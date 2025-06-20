@@ -87,10 +87,49 @@ function inferTags(text) {
 }
 
 
+//function for weak content
+function isWeakContent(text) {
+  return text.length < 300 ||
+         !/[a-zA-Z]/.test(text) ||
+         text.includes("As an AI") ||
+         text.includes("Sorry, I can't") ||
+         !text.includes('\n\n');
+}
+
+//function to validate article
+function validateArticleContent(content) {
+  return content.length >= 400 &&
+         /\b(match|score|win|defeat|player|team|coach)\b/i.test(content) &&
+         content.split(/\s+/).length >= 300;
+}
+
+function generateDescription(content, title) {
+  const lines = content
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line && !/^[-•*]/.test(line));
+
+  let desc = lines[0] || '';
+  if (!desc || desc.length < 30) {
+    // fallback if description is too short
+    desc = content.slice(0, 200);
+  }
+
+  // last resort fallback
+  if (!desc || desc.length < 10) {
+    desc = `Latest update on: ${title}`;
+  }
+
+  return desc.replace(/"/g, "'");
+}
+
+
+//function to generate article
 async function generateArticleFromItem(item, sourceTitle) {
   const pubDate = safeDate(item.pubDate);
   const title = item.title || 'Untitled';
-  const slug = slugify(title.toLowerCase(), { lower: true });
+  const seoTitle = title.replace(/[^\w\s]/g, '').trim();
+  const slug = slugify(seoTitle.toLowerCase(), { lower: true });
   const leagueFolder = inferLeagueFolder(title);
   const folderPath = path.join(OUTPUT_DIR, leagueFolder);
   const filename = `${pubDate}-${slug}.md`;
@@ -110,24 +149,39 @@ async function generateArticleFromItem(item, sourceTitle) {
   const link = item.link;
   const mode = process.env.ARTICLE_MODE || "summarize";
 
-  const fullContent = await extractFullArticle(link);
+  let fullContent = await extractFullArticle(link);
+
   if (!fullContent || fullContent.length < 300) {
-    console.warn(`⚠️ Skipping "${title}" — article content too short or failed to extract.`);
+   console.warn(`⚠️ Primary extract failed. Falling back to RSS content for "${title}"`);
+
+  fullContent = item.contentSnippet || item.summary || '';
+  if (fullContent.length < 100) {
+    console.warn(`⚠️ Skipping "${title}" — fallback content also too short.`);
     return;
   }
+}
+
 
   // 💬 Enhanced prompt for better structure
-  const prompt = mode === "summarize"
-    ? `Read the article below and generate a structured summary:
+ const prompt = `
+You're a professional sports journalist writing for platforms like BBC Sport or ESPN.
 
-1. A short 1–2 sentence summary paragraph introducing the story.
-2. Followed by 4–5 bullet points with key factual highlights.
+Write a **complete, engaging** sports article of **400–800 words** based on the source content below.
 
-Avoid fluff. Do not copy the original sentences directly.
+Structure:
+- 🔥 **Lede**: 1–2 line punchy intro
+- 🧠 **Context**: explain what's happening, relevant teams/players/events
+- 🎤 **Quotes**: rephrase any athlete/coach statements if found
+- 📊 **Stats/Details**: include key numbers or analysis
+- ✅ **Conclusion**: sum up significance or what's next
 
-Article:
-${fullContent}`
-    : `You're a journalist. Rewrite the following article into 3 informative and engaging paragraphs:\n\n${fullContent}`;
+**DO NOT copy exact text**. Rephrase with professional journalistic tone. Keep paragraphs tight and readable.
+
+Article content:
+\`\`\`
+${fullContent}
+\`\`\`
+`;
 
   let content;
   try {
@@ -138,35 +192,49 @@ ${fullContent}`
         temperature: 0.7,
       })
     );
+
     content = response.choices[0].message.content.trim();
+
+    // Normalize if bullet-only
+    if (
+      !content.includes('\n\n') &&
+      content.split('\n').every(line => /^[-•*]\s+/.test(line))
+    ) {
+      content = `Summary:\n\n${content}`;
+    }
+
+    // content generation
+    if (content.split(/\s+/).length < 400) {
+     console.warn(`⚠️ Article too short (${content.length} chars). Skipping.`);
+     return;
+    }
+
+
+     // 🔍 Check for weak content
+     if (isWeakContent(content) || !validateArticleContent(content)) {
+      console.warn("⚠️ OpenAI response weak or failed validation. Using summarization fallback.");
+      content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link)}`;
+     }
+    
+
   } catch (err) {
     recordOpenAIError(err);
     console.error(`❌ OpenAI error for "${title}": ${err.message}`);
     return;
   }
 
-  // 🛠 Normalize fallback if OpenAI only returns bullet points
-  if (
-    !content.includes('\n\n') &&
-    content.split('\n').every(line => /^[-•*]\s+/.test(line))
-  ) {
-    content = `Summary:\n\n${content}`;
-  }
 
   // ✂️ Extract the first non-bullet line as the description
-  const description = (
-    content
-      .split('\n')
-      .find(line => line && !/^[-•*]/.test(line)) || ''
-  ).replace(/"/g, "'").slice(0, 200);
+  const description = generateDescription(content, title);
 
-  // 🏷️ Basic tag inference
+
+  //Basic tag inference
   const tags = inferTags(fullContent + ' ' + content);
 
-  // 🖼️ Image scraping
+  //Image scraping
   const image = await extractImageFromURL(link).catch(() => null);
 
-  // 📝 Final markdown
+  //Final markdown
   const markdown = `---\n` +
     `title: "${title}"\n` +
     `date: "${pubDate}"\n` +
@@ -181,7 +249,7 @@ ${fullContent}`
     `${content}`;
 
   await fs.writeFile(filePath, markdown);
-  console.log(`✅ Saved: ${filePath}`);
+  console.log(`Saved: ${filePath}`);
 }
 
 
@@ -228,6 +296,8 @@ async function readArticlesFromDisk() {
       .on('error', reject);
   });
 }
+
+
 
 async function fetchNews(force = false) {
   const todayISO = new Date().toISOString().split('T')[0];

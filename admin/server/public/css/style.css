@@ -1622,21 +1622,27 @@ body{
     font-family: 'Lato';
 }
 
-.see-more {
-    cursor: pointer;
+.more-news p {
+    color: #fff;
+    font-size: 0.70rem;
+    font-family: 'Lato';
+    font-weight: 400;
+    color: #fff;
+    outline: none;
+    text-decoration: none;
+}
+
+.more-news {
     display: flex;
     align-items: center;
     gap: 5px;
-    color: #fff;
-    font-size: 0.70rem;   
-    font-family: 'Lato';
-    font-weight: 300;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-.see-more img {
-    width: 10px; /* Adjust size */
-    height: 10px; /* Maintain aspect ratio */
-    object-fit: contain;
+.more-news img {
+    height: 5px;
+    width: 5px;
 }
 
 
@@ -1803,9 +1809,6 @@ body{
     padding-top: 10px;
 }
 
-.see-more ion-icon {
-    font-size: 0.8rem;
-}
 
 #back-button .search-icon {
     margin-right: 7px; /* Space between arrow and text */

@@ -32,7 +32,7 @@ function showInitialNews(sectionId) {
 function toggleNews(section) {
     const newsSection = document.getElementById(`${section}-news`);
     const seeMoreText = document.getElementById(`${section}-text`);
-    const icon = document.querySelector(`#${section} .see-more ion-icon`);
+    const icon = document.querySelector(`#${section} .more-news ion-icon`);
 
     if (!newsSection || !seeMoreText || !icon) return;
 
@@ -43,7 +43,7 @@ function toggleNews(section) {
         item.style.display = expanded ? (index < MAX_VISIBLE_NEWS ? 'flex' : 'none') : 'flex';
     });
 
-    seeMoreText.innerText = expanded ? 'See more' : 'See less';
+    seeMoreText.innerText = expanded ? 'more-news' : 'See less';
     icon.name = expanded ? 'caret-down-outline' : 'caret-up-outline';
 }
   
@@ -138,16 +138,20 @@ function populateNewsSection(sectionId, newsList) {
       : '';
 
     return `
-      <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
-        <h1 class="news-title">${item.title}</h1>
-        ${imageHtml}
-        <div class="news-meta">
-          <p class="news-desc">${item.description?.slice(0, 150) ||(item.content?.split('\n').find(line => /^[-•*]\s+/.test(line))?.replace(/^[-•*]\s+/, '').slice(0, 150) || 'No description')
-          }...</p>
-          <span class="news-time" data-posted="${item.date}">Just now</span>
-        </div>
-      </div>
-    `;
+    <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
+    <h1 class="news-title">${item.title}</h1>
+    ${imageHtml}
+    <div class="news-meta">
+      <p class="news-desc">${
+        item.description?.trim()
+          ? item.description.slice(0, 150)
+          : item.content?.split('\n').find(line => line.trim() && !/^[-•*]/.test(line))?.slice(0, 150)
+          || `Read more: ${item.title}`
+      }...</p>
+      <span class="news-time" data-posted="${item.date}">Just now</span>
+     </div>
+    </div>
+  `;
   }).join('');
 
   container.querySelectorAll('.news-infomat').forEach((el) => {

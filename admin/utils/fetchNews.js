@@ -4,10 +4,13 @@ const slugify = require('slugify');
 const fs = require('fs-extra');
 const path = require('path');
 const klaw = require('klaw');
+const TextStatistics = require('text-statistics');
 
 const { extractImageFromURL } = require('./extractImageFromURL');
 const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
 const { extractFullArticle } = require('./extractFullText');
+const { rewriteWithOpenAI } = require('./rewriteWithOpenAI ');
+
 
 const OUTPUT_DIR = path.join(__dirname, 'articles');
 const CACHE_PATH = path.join(__dirname, 'cache/news.json');
@@ -87,9 +90,17 @@ function inferTags(text) {
 }
 
 
+function inferTagsBySource(source, text) {
+  const tags = inferTags(text);
+  if (source.includes('BBC') && text.includes('England')) tags.push('england');
+  if (source.includes('ESPN') && text.includes('Lakers')) tags.push('nba', 'lakers');
+  return [...new Set(tags)];
+}
+
+
 //function for weak content
 function isWeakContent(text) {
-  return text.length < 300 ||
+  return text.length < 100 ||
          !/[a-zA-Z]/.test(text) ||
          text.includes("As an AI") ||
          text.includes("Sorry, I can't") ||
@@ -98,10 +109,20 @@ function isWeakContent(text) {
 
 //function to validate article
 function validateArticleContent(content) {
-  return content.length >= 400 &&
+  return content.length >= 250 &&
          /\b(match|score|win|defeat|player|team|coach)\b/i.test(content) &&
-         content.split(/\s+/).length >= 300;
+         content.split(/\s+/).length >= 150;
 }
+
+const SKIPPED_PATH = path.join(__dirname, 'skipped.json');
+async function logSkippedArticle(title, link, reason) {
+  const entry = { title, link, reason, timestamp: new Date().toISOString() };
+  let log = [];
+  try { log = await fs.readJson(SKIPPED_PATH); } catch {}
+  log.push(entry);
+  await fs.writeJson(SKIPPED_PATH, log, { spaces: 2 });
+}
+
 
 function generateDescription(content, title) {
   const lines = content
@@ -121,6 +142,33 @@ function generateDescription(content, title) {
   }
 
   return desc.replace(/"/g, "'");
+}
+
+
+function shouldFlagAsSummaryStyle(content) {
+  const wordCount = content.trim().split(/\s+/).length;
+  const sentenceCount = (content.match(/[.!?]\s/g) || []).length;
+  const bulletPointCount = (content.match(/^[-*•]\s+/gm) || []).length;
+  const hasSummaryKeyword = /TL;DR|summary|key takeaways/i.test(content);
+
+  const stats = new TextStatistics(content);
+  const readingEase = stats.fleschKincaidReadingEase(); // 0–100 scale
+  const isEasyToRead = readingEase > 70;
+
+  const isShort = wordCount < 400;
+  const isBulletHeavy = bulletPointCount > 3;
+  const isVeryConcise = sentenceCount < 5;
+
+  return (
+    (isShort && isVeryConcise && isEasyToRead) ||
+    hasSummaryKeyword ||
+    (isShort && isBulletHeavy)
+  );
+}
+
+if (shouldFlagAsSummaryStyle(content)) {
+  console.warn(`⚠️ Detected summary-style article (${content.length} chars). Flagging as summary.`);
+  content = `## Summary\n\n${content}`;
 }
 
 
@@ -152,9 +200,11 @@ async function generateArticleFromItem(item, sourceTitle) {
   let fullContent = await extractFullArticle(link);
 
   if (!fullContent || fullContent.length < 300) {
-   console.warn(`⚠️ Primary extract failed. Falling back to RSS content for "${title}"`);
+   await logSkippedArticle(title, link, 'Primary extract failed');
 
-  fullContent = item.contentSnippet || item.summary || '';
+   const stripHTML = str => str.replace(/<\/?[^>]+(>|$)/g, '');
+
+  fullContent = stripHTML(item.contentSnippet || item.summary || '');
   if (fullContent.length < 100) {
     console.warn(`⚠️ Skipping "${title}" — fallback content also too short.`);
     return;
@@ -205,17 +255,17 @@ ${fullContent}
 
     // content generation
     if (content.split(/\s+/).length < 400) {
-     console.warn(`⚠️ Article too short (${content.length} chars). Skipping.`);
-     return;
-    }
+      console.warn(`⚠️ Article too short (${content.length} chars). Rewriting with summary...`);
+      content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link)}`;
+     }
 
 
      // 🔍 Check for weak content
-     if (isWeakContent(content) || !validateArticleContent(content)) {
-      console.warn("⚠️ OpenAI response weak or failed validation. Using summarization fallback.");
-      content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link)}`;
-     }
-    
+      if (!validateArticleContent(fullContent)) {
+       console.warn(`⚠️ Content failed validation. Using fallback summary.`);
+       content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link)}`;
+      }
+
 
   } catch (err) {
     recordOpenAIError(err);
@@ -228,10 +278,12 @@ ${fullContent}
   const description = generateDescription(content, title);
 
   //Basic tag inference
-  const tags = inferTags(fullContent + ' ' + content);
+  const tags = inferTagsBySource(sourceTitle, fullContent + ' ' + content);
 
   //Image scraping
-  const image = await extractImageFromURL(link).catch(() => null);
+  let image = await extractImageFromURL(link).catch(() => null);
+    if (!image) image = '/images/placeholder.jpg'; // Your default image path
+
 
   //Final markdown
   const markdown = `---\n` +

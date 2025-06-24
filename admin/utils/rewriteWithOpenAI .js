@@ -1,6 +1,10 @@
 // utils/rewriteWithOpenAI.js
 const OpenAI = require("openai");
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+const openaiKey = process.env.OPENAI_API_KEY;
+if (!openaiKey) console.warn("⚠️ Missing OpenAI API key — rewriteWithOpenAI will be disabled.");
+
+const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
 
 let openAIDisabledUntil = null;
 
@@ -15,20 +19,24 @@ function disableOpenAITemporarily(minutes = 10) {
 }
 
 async function rewriteWithOpenAI(title, content, link) {
-  if (process.env.USE_OPENAI !== "true" || isOpenAIDisabled()) {
-    console.warn("⚠️ OpenAI is disabled or blocked. Skipping summarization.");
-    return content;
+  if (!openai || isOpenAIDisabled()) {
+    console.warn("⚠️ Skipping rewrite — OpenAI disabled or unavailable.");
+    return `Summary not available for: ${title}\n\nRead more: ${link}`;
+  }
+
+  if (!content || content.trim().length < 50) {
+    console.warn("⚠️ Content too short to rewrite meaningfully.");
+    return `Summary not available for: ${title}\n\nRead more: ${link}`;
   }
 
   const prompt = `
-Summarize the article below in 5 key bullet points using clear, non-jargon language.
-Avoid copying text. Use short, factual points.
+The following content is all that could be extracted from an article. Please summarize it in 5 factual bullet points. If the content is too short, you may expand slightly based on the title.
 
-Facts:
-- Title: ${title}
-- Source Link: ${link}
-- Content: ${content}
-  `.trim();
+Title: ${title}
+Link: ${link}
+Content:
+${content}
+`.trim();
 
   try {
     const completion = await openai.chat.completions.create({
@@ -48,4 +56,5 @@ Facts:
 }
 
 module.exports = { rewriteWithOpenAI };
+
 

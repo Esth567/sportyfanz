@@ -1,5 +1,6 @@
 const OpenAI = require('openai');
 const Parser = require('rss-parser');
+const fetch = require('node-fetch');
 const slugify = require('slugify');
 const fs = require('fs-extra');
 const path = require('path');
@@ -11,6 +12,17 @@ const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
 const { extractFullArticle } = require('./extractFullText');
 const { rewriteWithOpenAI } = require('./rewriteWithOpenAI ');
 
+const parser = new Parser({
+  customFetch: (url, options = {}) =>
+    fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+    }),
+});
 
 const OUTPUT_DIR = path.join(__dirname, 'articles');
 const CACHE_PATH = path.join(__dirname, 'cache/news.json');
@@ -28,7 +40,6 @@ const openaiKey = process.env.OPENAI_API_KEY;
 if (!openaiKey) console.warn("⚠️ Missing OpenAI API key — generation will be disabled.");
 
 const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
-const parser = new Parser();
 
 let openAIDisabledUntil = null;
 
@@ -60,6 +71,11 @@ async function withRetry(fn, retries = 3, delay = 1000) {
   }
 }
 
+
+function stripHTML(html) {
+  return html.replace(/<[^>]+>/g, '').trim();
+}
+
 function safeDate(dateString) {
   const parsed = new Date(dateString);
   return isNaN(parsed.getTime()) ? new Date().toISOString().split('T')[0] : parsed.toISOString().split('T')[0];
@@ -77,18 +93,14 @@ function inferLeagueFolder(title = '') {
   return 'general';
 }
 
-
 function inferTags(text) {
   const tags = [];
-
   if (/transfer|signed|deal/i.test(text)) tags.push('transfer');
   if (/score|win|match|defeat|draw/i.test(text)) tags.push('match');
   if (/injur(y|ies)|out for|rupture/i.test(text)) tags.push('injury');
   if (/preview|predicted/i.test(text)) tags.push('preview');
-
   return tags;
 }
-
 
 function inferTagsBySource(source, text) {
   const tags = inferTags(text);
@@ -97,21 +109,12 @@ function inferTagsBySource(source, text) {
   return [...new Set(tags)];
 }
 
-
-//function for weak content
 function isWeakContent(text) {
-  return text.length < 100 ||
-         !/[a-zA-Z]/.test(text) ||
-         text.includes("As an AI") ||
-         text.includes("Sorry, I can't") ||
-         !text.includes('\n\n');
+  return text.length < 100 || !/[a-zA-Z]/.test(text) || text.includes("As an AI") || text.includes("Sorry, I can't") || !text.includes('\n\n');
 }
 
-//function to validate article
 function validateArticleContent(content) {
-  return content.length >= 250 &&
-         /\b(match|score|win|defeat|player|team|coach)\b/i.test(content) &&
-         content.split(/\s+/).length >= 150;
+  return content.length >= 400 && content.split(/\s+/).length >= 150 && /(?:match|score|win|defeat|player|team|coach|game|fixture)/i.test(content);
 }
 
 const SKIPPED_PATH = path.join(__dirname, 'skipped.json');
@@ -123,56 +126,31 @@ async function logSkippedArticle(title, link, reason) {
   await fs.writeJson(SKIPPED_PATH, log, { spaces: 2 });
 }
 
-
 function generateDescription(content, title) {
-  const lines = content
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line && !/^[-•*]/.test(line));
-
+  const lines = content.split('\n').map(line => line.trim()).filter(line => line && !/^[-•*]/.test(line));
   let desc = lines[0] || '';
-  if (!desc || desc.length < 30) {
-    // fallback if description is too short
-    desc = content.slice(0, 200);
-  }
-
-  // last resort fallback
-  if (!desc || desc.length < 10) {
-    desc = `Latest update on: ${title}`;
-  }
-
+  if (!desc || desc.length < 30) desc = content.slice(0, 200);
+  if (!desc || desc.length < 10) desc = `Latest update on: ${title || "Sports Event"}`;
   return desc.replace(/"/g, "'");
 }
-
 
 function shouldFlagAsSummaryStyle(content) {
   const wordCount = content.trim().split(/\s+/).length;
   const sentenceCount = (content.match(/[.!?]\s/g) || []).length;
   const bulletPointCount = (content.match(/^[-*•]\s+/gm) || []).length;
   const hasSummaryKeyword = /TL;DR|summary|key takeaways/i.test(content);
-
   const stats = new TextStatistics(content);
-  const readingEase = stats.fleschKincaidReadingEase(); // 0–100 scale
+  const readingEase = stats.fleschKincaidReadingEase();
   const isEasyToRead = readingEase > 70;
-
   const isShort = wordCount < 400;
   const isBulletHeavy = bulletPointCount > 3;
   const isVeryConcise = sentenceCount < 5;
 
   return (
-    (isShort && isVeryConcise && isEasyToRead) ||
-    hasSummaryKeyword ||
-    (isShort && isBulletHeavy)
+    (isShort && isVeryConcise && isEasyToRead) || hasSummaryKeyword || (isShort && isBulletHeavy)
   );
 }
 
-if (shouldFlagAsSummaryStyle(content)) {
-  console.warn(`⚠️ Detected summary-style article (${content.length} chars). Flagging as summary.`);
-  content = `## Summary\n\n${content}`;
-}
-
-
-//function to generate article
 async function generateArticleFromItem(item, sourceTitle) {
   const pubDate = safeDate(item.pubDate);
   const title = item.title || 'Untitled';
@@ -196,113 +174,60 @@ async function generateArticleFromItem(item, sourceTitle) {
 
   const link = item.link;
   const mode = process.env.ARTICLE_MODE || "summarize";
-
   let fullContent = await extractFullArticle(link);
 
   if (!fullContent || fullContent.length < 300) {
-   await logSkippedArticle(title, link, 'Primary extract failed');
-
-   const stripHTML = str => str.replace(/<\/?[^>]+(>|$)/g, '');
-
-  fullContent = stripHTML(item.contentSnippet || item.summary || '');
-  if (fullContent.length < 100) {
-    console.warn(`⚠️ Skipping "${title}" — fallback content also too short.`);
-    return;
+    await logSkippedArticle(title, link, 'Primary and Puppeteer extract failed');
+    const fallback = stripHTML(item.contentSnippet || item.summary || '');
+    if (fallback.length < 100) {
+      console.warn(`⚠️ Skipping "${title}" — fallback also too short.`);
+      return;
+    }
+    fullContent = fallback;
   }
-}
 
-
-  // 💬 Enhanced prompt for better structure
- const prompt = `
-You're a professional sports journalist writing for platforms like BBC Sport or ESPN.
-
-Write a **complete, engaging** sports article of **400–800 words** based on the source content below.
-
-Structure:
-- 🔥 **Lede**: 1–2 line punchy intro
-- 🧠 **Context**: explain what's happening, relevant teams/players/events
-- 🎤 **Quotes**: rephrase any athlete/coach statements if found
-- 📊 **Stats/Details**: include key numbers or analysis
-- ✅ **Conclusion**: sum up significance or what's next
-
-**DO NOT copy exact text**. Rephrase with professional journalistic tone. Keep paragraphs tight and readable.
-
-Article content:
-\`\`\`
-${fullContent}
-\`\`\`
-`;
+  const prompt = `You're a professional sports journalist writing for outlets like ESPN, Goal.com, or Sky Sports News.\n\nWrite a sharp, compelling, and professional match or event article of 400–800 words. DO NOT summarize or use academic or blog-style phrasing. Write as if it's going live on a breaking sports desk.\n\n📌 Guidelines:\n- Headline-style **lede** — punchy intro within 1–2 sentences\n- Add real **context** — team history, player form, coach pressure, etc.\n- Use **active voice**, strong verbs (e.g. “smashed”, “rallied”, “clinched”)\n- Quote or paraphrase any statements from players, coaches, or officials if present\n- Incorporate key **stats**, **milestones**, or **tactical notes**\n- End with **what's next** — upcoming fixtures, implications, playoff chances\n- Avoid generic phrases like: "This article discusses", "In summary", "Here is"\n\nContent to base article on:\n\\\n${fullContent}\n\\\n`;
 
   let content;
   try {
-    const response = await withRetry(() =>
-      openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-      })
-    );
+    const response = await withRetry(() => openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    }));
 
     content = response.choices[0].message.content.trim();
 
-    // Normalize if bullet-only
-    if (
-      !content.includes('\n\n') &&
-      content.split('\n').every(line => /^[-•*]\s+/.test(line))
-    ) {
+    if (!content.includes('\n\n') && content.split('\n').every(line => /^[-•*]\s+/.test(line))) {
       content = `Summary:\n\n${content}`;
     }
 
-    // content generation
-    if (content.split(/\s+/).length < 400) {
-      console.warn(`⚠️ Article too short (${content.length} chars). Rewriting with summary...`);
-      content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link)}`;
-     }
+    if (shouldFlagAsSummaryStyle(content) || !validateArticleContent(content)) {
+      console.warn(`⚠️ Content flagged or invalid. Using fallback summary.`);
+      content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link) || 'Summary unavailable.'}`;
+    }
 
-
-     // 🔍 Check for weak content
-      if (!validateArticleContent(fullContent)) {
-       console.warn(`⚠️ Content failed validation. Using fallback summary.`);
-       content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link)}`;
-      }
-
-
+    const weakPhrases = [/^in summary/i, /^overall/i, /^this article/i, /^as an ai/i, /^to summarize/i, /^here (is|are)/i];
+    if (weakPhrases.some(rx => rx.test(content.toLowerCase()))) {
+      console.warn("⚠️ Detected weak lead-in. Rewriting...");
+      content = `## Summary\n\n${await rewriteWithOpenAI(title, fullContent, link) || 'Summary unavailable.'}`;
+    }
   } catch (err) {
     recordOpenAIError(err);
     console.error(`❌ OpenAI error for "${title}": ${err.message}`);
     return;
   }
 
-
-  // ✂️ Extract the first non-bullet line as the description
   const description = generateDescription(content, title);
-
-  //Basic tag inference
   const tags = inferTagsBySource(sourceTitle, fullContent + ' ' + content);
-
-  //Image scraping
   let image = await extractImageFromURL(link).catch(() => null);
-    if (!image) image = '/images/placeholder.jpg'; // Your default image path
+  if (!image) image = '/images/placeholder.jpg';
 
-
-  //Final markdown
-  const markdown = `---\n` +
-  `title: "${title}"\n` +
-  `date: "${pubDate}"\n` +
-  `slug: "${slug}"\n` +
-  `source: "${sourceTitle}"\n` +
-  `original_link: "${link}"\n` +
-  `mode: "${mode}"\n` +
-  `image: "${image || ''}"\n` +
-  `description: "${description}"\n` +
-  `tags: [${tags.map(t => `"${t}"`).join(', ')}]\n` +
-  `---\n\n` +
-  `${content}`;
+  const markdown = `---\ntitle: "${title}"\ndate: "${pubDate}"\nslug: "${slug}"\nsource: "${sourceTitle}"\noriginal_link: "${link}"\nmode: "${mode}"\nimage: "${image || ''}"\ndescription: "${description}"\ntags: [${tags.map(t => `"${t}"`).join(', ')}]\n---\n\n${content}`;
 
   await fs.writeFile(filePath, markdown);
   console.log(`Saved: ${filePath}`);
 }
-
 
 async function readArticlesFromDisk() {
   await fs.ensureDir(OUTPUT_DIR);
@@ -312,43 +237,23 @@ async function readArticlesFromDisk() {
     klaw(OUTPUT_DIR)
       .on('data', async item => {
         if (!item.path.endsWith('.md')) return;
-
         const raw = await fs.readFile(item.path, 'utf-8');
         const match = raw.match(/^---\n([\s\S]+?)\n---\n\n([\s\S]*)$/);
         if (!match) return;
-
-        const frontMatter = Object.fromEntries(
-          match[1].split('\n').map(line => {
-            const [key, ...rest] = line.split(':');
-            return [key.trim(), rest.join(':').trim().replace(/^"|"$/g, '')];
-          })
-        );
-
+        const frontMatter = Object.fromEntries(match[1].split('\n').map(line => {
+          const [key, ...rest] = line.split(':');
+          return [key.trim(), rest.join(':').trim().replace(/^"|"$/g, '')];
+        }));
         const category = path.relative(OUTPUT_DIR, path.dirname(item.path));
-        articles.push({
-          title: frontMatter.title,
-          date: frontMatter.date,
-          slug: frontMatter.slug,
-          source: frontMatter.source,
-          original_link: frontMatter.original_link,
-          content: match[2],
-          image: frontMatter.image,
-          category
-        });
+        articles.push({ title: frontMatter.title, date: frontMatter.date, slug: frontMatter.slug, source: frontMatter.source, original_link: frontMatter.original_link, content: match[2], image: frontMatter.image, category });
       })
       .on('end', () => {
         if (articles.length === 0) console.warn("⚠️ No articles found in disk");
-        resolve(
-          articles
-            .filter(a => !!a.slug)
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
-        );
+        resolve(articles.filter(a => !!a.slug).sort((a, b) => new Date(b.date) - new Date(a.date)));
       })
       .on('error', reject);
   });
 }
-
-
 
 async function fetchNews(force = false) {
   const todayISO = new Date().toISOString().split('T')[0];
@@ -365,12 +270,10 @@ async function fetchNews(force = false) {
   }
 
   let success = false;
-
   for (const url of FEED_URLS) {
     try {
       const feed = await withRetry(() => parser.parseURL(url));
       const source = feed.title;
-
       for (const item of feed.items) {
         const pubDateSafe = safeDate(item.pubDate);
         if (pubDateSafe === todayISO) {
@@ -379,7 +282,6 @@ async function fetchNews(force = false) {
           console.log(`⏭️ Skipped old article (${pubDateSafe}): ${item.title}`);
         }
       }
-
       success = true;
     } catch (err) {
       console.error(`❌ Failed to fetch from ${url}: ${err.message}`);
@@ -388,25 +290,15 @@ async function fetchNews(force = false) {
 
   let articles = await readArticlesFromDisk();
   articles = articles.filter(a => a.date === todayISO);
-
   console.log(`📰 Found ${articles.length} valid articles for today.`);
-
   const seen = new Set();
-  articles = articles.filter(a => {
-    if (seen.has(a.slug)) return false;
-    seen.add(a.slug);
-    return true;
-  });
+  articles = articles.filter(a => !seen.has(a.slug) && seen.add(a.slug));
 
   if (!success && articles.length === 0) {
     console.warn("⚠️ All RSS feeds failed. Using stale cache...");
     try {
       const fallback = await fs.readJson(CACHE_PATH);
-      if (
-        !Array.isArray(fallback?.trending) ||
-        !Array.isArray(fallback?.updates) ||
-        fallback.trending.length === 0
-      ) {
+      if (!Array.isArray(fallback?.trending) || !Array.isArray(fallback?.updates) || fallback.trending.length === 0) {
         throw new Error("Fallback cache also has invalid structure");
       }
       return fallback;
@@ -420,19 +312,14 @@ async function fetchNews(force = false) {
     updates: articles.slice(3, 6),
   };
 
-  // 🚨 Validate structure before caching
-  if (
-    !Array.isArray(structured.trending) ||
-    !Array.isArray(structured.updates) ||
-    structured.trending.length === 0
-  ) {
+  if (!Array.isArray(structured.trending) || !Array.isArray(structured.updates) || structured.trending.length === 0) {
     throw new Error("❌ Invalid or empty news data");
   }
 
   await fs.ensureDir(path.dirname(CACHE_PATH));
   await fs.writeJson(CACHE_PATH, structured, { spaces: 2 });
-
   return structured;
 }
+
 
 module.exports = { fetchNews };

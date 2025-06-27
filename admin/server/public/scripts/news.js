@@ -90,14 +90,12 @@ async function loadNews() {
       throw new Error(`Failed to fetch news: ${response.status}\n${text}`);
     }
 
-    const text = await response.text();
-    if (!text || text.trim() === '') {
-      throw new Error("Empty response from server");
-    }
+    const text = await response.text(); // ✅ This line is correct
+    console.log("Raw response text from /api/news:", text);
 
     let data;
     try {
-      data = JSON.parse(text);
+      data = JSON.parse(text); // ✅ ONLY parse once
     } catch {
       throw new Error("Invalid JSON received from server");
     }
@@ -114,7 +112,7 @@ async function loadNews() {
 
   } catch (error) {
     console.error('Failed to load news:', error);
-    alert("⚠️ Could not load news: " + error.message);
+    alert("Failed to load news.");
   } finally {
     if (loader) loader.style.display = 'none';
   }

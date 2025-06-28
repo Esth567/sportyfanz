@@ -71,4 +71,3 @@ staticfiles/
 *.tflite
 summarizer-api/env/
 __pycache__/
-

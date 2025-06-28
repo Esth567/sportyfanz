@@ -4,6 +4,9 @@ const slugify = require('slugify');
 const fs = require('fs-extra');
 const path = require('path');
 const klaw = require('klaw');
+const matter = require("gray-matter");
+
+const ARTICLES_DIR = path.join(__dirname, "articles");
 
 const { extractImageFromURL } = require('./extractImageFromURL');
 const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
@@ -146,6 +149,15 @@ async function generateArticleFromItem(item, sourceTitle) {
     }
   }
 
+   // ✅ Rewrite with OpenAI if enabled
+  if (usedOpenAI && content && process.env.ENABLE_REWRITE === "true") {
+    try {
+      content = await rewriteWithOpenAI(title, content, link);
+    } catch (err) {
+      console.warn("⚠️ Failed to rewrite content with OpenAI");
+    }
+  }
+
   let image = await extractImageFromURL(link);
   const fallbackImage = 'https://example.com/default-news.jpg';
   if (!image || image.trim() === '') {
@@ -179,37 +191,69 @@ async function generateArticleFromItem(item, sourceTitle) {
 
 
 async function readArticlesFromDisk() {
+  await fs.ensureDir(OUTPUT_DIR);
   const articles = [];
-  try {
-    for await (const file of klaw(OUTPUT_DIR)) {
-      if (file.stats.isFile() && file.path.endsWith('.md')) {
-        const content = await fs.readFile(file.path, 'utf8');
-        const match = content.match(/---\n([\s\S]*?)\n---/);
-        if (match) {
-          const frontmatter = match[1];
-          const metadata = Object.fromEntries(
-            frontmatter.split('\n').map(line => {
-              const [key, ...rest] = line.split(':');
-              return [key.trim(), rest.join(':').trim().replace(/^"|"$/g, '')];
-            })
-          );
-          articles.push({
-            title: metadata.title,
-            date: metadata.date,
-            slug: metadata.slug,
-            source: metadata.source,
-            description: metadata.description,
-            image: metadata.image,
-          });
-        }
-      }
-    }
-  } catch (err) {
-    console.error("❌ Failed to read articles from disk:", err.message);
-  }
-  return articles;
-}
+  const fileReadPromises = [];
 
+  return new Promise((resolve, reject) => {
+    klaw(OUTPUT_DIR)
+      .on("data", item => {
+        if (!item.path.endsWith(".md")) return;
+
+        const promise = fs.readFile(item.path, "utf-8")
+          .then(raw => {
+            const match = raw.match(/^---\n([\s\S]+?)\n---\n\n([\s\S]*)$/);
+            if (!match) {
+              console.warn(`⚠️ Skipping malformed file: ${item.path}`);
+              return;
+            }
+
+            const frontMatter = Object.fromEntries(
+              match[1].split("\n").map(line => {
+                const [key, ...rest] = line.split(":");
+                return [key.trim(), rest.join(":").trim().replace(/^"|"$/g, "")];
+              })
+            );
+
+            const body = match[2].trim();
+            const fallbackImage = "https://example.com/default-news.jpg";
+            const category = path.relative(OUTPUT_DIR, path.dirname(item.path));
+
+            articles.push({
+              title: frontMatter.title || "",
+              date: frontMatter.date || "",
+              slug: frontMatter.slug || "",
+              source: frontMatter.source || "",
+              original_link: frontMatter.original_link || "",
+              content: body,
+              description: frontMatter.description || body.slice(0, 200) + "...",
+              image: frontMatter.image || fallbackImage,
+              category: frontMatter.category || category || "general",
+            });
+          })
+          .catch(err => {
+            console.error(`❌ Failed to parse article at ${item.path}`, err);
+          });
+
+        fileReadPromises.push(promise);
+      })
+
+      .on("end", async () => {
+        await Promise.all(fileReadPromises); // Wait for all async reads to finish
+        if (articles.length === 0) {
+          console.warn("⚠️ No articles found in disk");
+        }
+
+        const sorted = articles
+          .filter(a => !!a.slug && !!a.date && !!a.title && !!a.content)
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        resolve(sorted);
+      })
+
+      .on("error", reject);
+  });
+}
 
 
 async function fetchNews(force = false) {
@@ -290,7 +334,10 @@ async function fetchNews(force = false) {
     throw new Error("❌ Invalid structure: missing trending or updates");
   }
 
+  
   await fs.ensureDir(path.dirname(CACHE_PATH));
+  console.log("🧾 Final structured JSON:", JSON.stringify(structured, null, 2));
+
   await fs.writeJson(CACHE_PATH, structured, { spaces: 2 });
   return structured;
 }

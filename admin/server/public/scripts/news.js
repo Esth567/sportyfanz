@@ -97,6 +97,10 @@ async function loadNews() {
     let data;
     try {
       data = JSON.parse(text);
+      console.log("Received news:", data);
+      console.log("Trending:", data.trending.length, data.trending[0]);
+      console.log("Updates:", data.updates.length, data.updates[0]);
+
     } catch {
       throw new Error("Invalid JSON received from server");
     }
@@ -125,6 +129,8 @@ async function loadNews() {
 function populateNewsSection(sectionId, newsList) {
   const container = document.getElementById(sectionId);
   if (!container || !Array.isArray(newsList)) return;
+  console.log("Populating:", sectionId, "with", newsList.length, "items");
+
 
   container.innerHTML = newsList.map((item, index) => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
@@ -201,7 +207,7 @@ function showFullNews(clickedItem) {
           </div>` : ''
         }
         <div class="blog-meta">
-          <span class="blog-date">${new Date(newsItem.pubDate).toLocaleDateString()}</span>
+          <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
         </div>
         <div class="blog-content">
           ${formattedDesc}

@@ -1707,14 +1707,6 @@ body{
 
 
 
-.back-button {
-  margin-bottom: 1rem;
-  background-color: #ddd;
-  border: none;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 1rem;
-}
 
 .blog-post {
   max-width: 800px;
@@ -1820,8 +1812,9 @@ body{
     padding-top: 10px;
 }
 
-.see-more ion-icon {
+.see-more img {
     font-size: 0.8rem;
+    margin-top: 5px;
 }
 
 #back-button .search-icon {

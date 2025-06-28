@@ -82,7 +82,7 @@ async function loadNews() {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('https://fantastic-couscous-q7xqw64rvx9vc4pqj-3000.app.github.dev/api/news');
+    const response = await fetch('/api/news');
 
     if (!response.ok) {
       const text = await response.text();
@@ -127,14 +127,20 @@ function populateNewsSection(sectionId, newsList) {
   if (!container || !Array.isArray(newsList)) return;
 
   container.innerHTML = newsList.map((item, index) => {
-    const imageHtml = item.image
-      ? `<div class="news-image">
-           <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
-                alt="Image for ${item.title}" 
-                loading="lazy" 
-                onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
-         </div>`
-      : '';
+    const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+    const imageHtml = isValidImage
+       ? `<div class="news-image">
+        <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+              alt="Image for ${item.title}" 
+              loading="lazy" 
+              onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
+        </div>`
+       : `<div class="news-image">
+        <img src="https://via.placeholder.com/600x400?text=No+Image" 
+              alt="Image not available for ${item.title}" 
+              loading="lazy" />
+        </div>`;
+
 
     return `
       <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
@@ -142,7 +148,7 @@ function populateNewsSection(sectionId, newsList) {
         ${imageHtml}
         <div class="news-meta">
           <p class="news-desc">${item.description?.slice(0, 150) || 'No description'}...</p>
-          <span class="news-time" data-posted="${item.pubDate}">Just now</span>
+          <span class="news-time" data-posted="${item.date}">Just now</span>
         </div>
       </div>
     `;
@@ -160,12 +166,13 @@ function populateNewsSection(sectionId, newsList) {
 
 // ========== SHOW FULL NEWS ========== //
 function showFullNews(clickedItem) {
+  try {
     const middleLayer = document.querySelector('.middle-layer');
 
     // Hide all children inside middle-layer
     const children = Array.from(middleLayer.children);
     children.forEach(child => {
-        child.style.display = 'none';
+      child.style.display = 'none';
     });
 
     // Get data from clicked item
@@ -175,32 +182,31 @@ function showFullNews(clickedItem) {
     const newsItem = newsList[parseInt(index)];
 
     // Format description into paragraphs
-    const formattedDesc = newsItem.description
-        .split('\n\n')
-        .map(p => `<p>${p.trim()}</p>`)
-        .join('');
+    const formattedDesc = typeof newsItem.description === 'string'
+      ? newsItem.description
+          .split('\n\n')
+          .map(p => `<p>${p.trim()}</p>`)
+          .join('')
+      : '<p>No content available.</p>';
 
     // Create and display the full view container
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
-        <article class="blog-post">
-            <h1 class="blog-title">${newsItem.title}</h1>
-
-            ${newsItem.image ? `
-                <div class="blog-image-wrapper">
-                    <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-                </div>` : ''
-            }
-
-            <div class="blog-meta">
-                <span class="blog-date">${new Date(newsItem.pubDate).toLocaleDateString()}</span>
-            </div>
-
-            <div class="blog-content">
-                ${formattedDesc}
-            </div>
-        </article>
+      <article class="blog-post">
+        <h1 class="blog-title">${newsItem.title}</h1>
+        ${newsItem.image ? `
+          <div class="blog-image-wrapper">
+            <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
+          </div>` : ''
+        }
+        <div class="blog-meta">
+          <span class="blog-date">${new Date(newsItem.pubDate).toLocaleDateString()}</span>
+        </div>
+        <div class="blog-content">
+          ${formattedDesc}
+        </div>
+      </article>
     `;
 
     // Add back button
@@ -208,17 +214,21 @@ function showFullNews(clickedItem) {
     backButton.textContent = '← Back to news';
     backButton.className = 'back-button';
     backButton.onclick = () => {
-        fullView.remove();
-        children.forEach(child => child.style.display = '');
-        showInitialNews("trending-news");
-        showInitialNews("updates-news");
-        updateRelativeTime();
+      fullView.remove();
+      children.forEach(child => child.style.display = '');
+      showInitialNews("trending-news");
+      showInitialNews("updates-news");
+      updateRelativeTime();
     };
 
     fullView.prepend(backButton);
     middleLayer.appendChild(fullView);
-}
 
+  } catch (err) {
+    console.error("Failed to render full news view", err);
+    alert("Something went wrong displaying the full article.");
+  }
+}
 
 
 

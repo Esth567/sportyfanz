@@ -17,10 +17,12 @@ router.get("/", async (req, res) => {
     }
 
     res.json({ trending, updates }); // ✅ only send required structure
+
   } catch (err) {
     console.error("❌ Failed to fetch news:", err.message);
 
     try {
+<
       const fallbackRaw = require("fs").readFileSync(
         require("path").join(__dirname, "../utils/cache/news.json")
       );
@@ -34,6 +36,7 @@ router.get("/", async (req, res) => {
       }
 
       res.json({ trending, updates });
+
     } catch (fsErr) {
       console.error("❌ Failed to read fallback cache:", fsErr.message);
       res.status(500).json({ error: "Failed to load news" });

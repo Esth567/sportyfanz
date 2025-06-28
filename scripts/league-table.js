@@ -410,6 +410,7 @@ async function getTeamDetailsByKey(teamKey) {
 
 
  
+
 // menu toggle button for sidebar for mobile view
 document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.getElementById("sidebar");
@@ -441,6 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
             sidebar.style.display = sidebar.classList.contains("active") ? "block" : "none";
         }
     }
+
 
     // Attach toggle function to both buttons/icons
     if (menuLogo) {
@@ -474,8 +476,6 @@ document.addEventListener("DOMContentLoaded", function () {
     updateSidebarVisibility();
     window.addEventListener("resize", updateSidebarVisibility);
 });
-
-
 
   
 

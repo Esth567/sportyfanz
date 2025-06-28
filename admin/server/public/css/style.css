@@ -1712,16 +1712,16 @@ body{
   max-width: 800px;
   margin: 2rem auto;
   padding: 1.5rem;
-  font-family: 'Georgia', serif;
-  line-height: 1.8;
+  font-family: 'Lato';
+  line-height: 1.5;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 .blog-title {
-  font-size: 2rem;
+  font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: #222;
+  color: #fff;
 }
 
 .blog-image-wrapper {
@@ -1744,30 +1744,19 @@ body{
 
 .blog-meta {
   font-size: 0.9rem;
-  color: #888;
-  margin-bottom: 1.5rem;
+  color: #f1e7e7;
+  margin-bottom: 1.8rem;
 }
 
 .blog-content {
-  font-size: 1rem;
+  font-size: 0.80rem;
   color: #333;
   white-space: pre-wrap;
 }
 
-.back-button {
-  display: inline-block;
-  margin: 1rem 0;
-  padding: 0.6rem 1.2rem;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
 
 .back-button:hover {
-  background: #444;
+  color: #0A131F;
 }
 
 .news-thumb {
@@ -1814,7 +1803,7 @@ body{
 
 .see-more img {
     font-size: 0.8rem;
-    margin-top: 5px;
+    margin-top: 15px;
 }
 
 #back-button .search-icon {

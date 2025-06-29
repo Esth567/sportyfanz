@@ -42,8 +42,8 @@ function displayMatchesByLeagueId(leagueId, leagueName, category) {
 }
 
 
-
-fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
+//function to dispay listed league name
+  fetch('/api/leagues_name')
     .then(res => res.json())
     .then(leagues => {
         const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
@@ -121,46 +121,33 @@ fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
         }
     }
 
-//function to fetch matches
+//function to render matches
 async function fetchAndRenderMatches() {
-    const spinner = document.getElementById("loading-spinner");
-    spinner.style.display = "flex";
+  const spinner = document.getElementById("loading-spinner");
+  spinner.style.display = "flex";
 
-    try {
-        const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-7)}&to=${getTodayDate(7)}&APIkey=${APIkey}`);
-        const data = await response.json();
+  try {
+    const response = await fetch('/api/matches');
+    const data = await response.json();
 
-        // Debugging: Check the raw data
-        console.log("Fetched Match Data: ", data);
+    matchesData = {
+      live: data.live,
+      highlight: data.highlight,
+      upcoming: data.upcoming
+    };
 
-        matchesData = {
-            live: data.filter(match => {
-                // Ensure that match_status is an integer or has valid values for live matches
-                const status = match.match_status.trim().toLowerCase();
-                return status === "live" || (parseInt(status) > 0 && parseInt(status) < 90); // Or another appropriate condition
-            }),
-            highlight: data.filter(match => match.match_status === "Finished"),
-            upcoming: data.filter(match => match.match_status === "" || match.match_status === null),
-        };
-        
+    selectedLeagueId = null;
+    selectedLeagueName = null;
 
-        // Debugging: Check the categorized data
-        console.log("Live Matches: ", matchesData.live);
-        console.log("Highlight Matches: ", matchesData.highlight);
-        console.log("Upcoming Matches: ", matchesData.upcoming);
-
-        // Reset selected league
-        selectedLeagueId = null;
-        selectedLeagueName = null;
-
-        renderMatches(matchesData, "live");
-    } catch (error) {
-        console.error("Error fetching match data:", error);
-        document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
-    } finally {
-        spinner.style.display = "none";
-    }
+    renderMatches(matchesData, "live");
+  } catch (error) {
+    console.error("Error fetching match data:", error);
+    document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+  } finally {
+    spinner.style.display = "none";
+  }
 }
+
 
 
 
@@ -361,42 +348,17 @@ document.querySelectorAll(".match-category-btn").forEach(button => {
 });
 
 
-
-
-
 // Function to filter matches by the selected date
 function filterByDate(category) {
     const selectedDate = document.getElementById("match-date").value;
     if (!selectedDate) return;
 
-    const from = selectedDate;
-    const to = selectedDate;
-
-    fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`)
+    fetch(`/api/matches-by-date?date=${selectedDate}`)
         .then(res => res.json())
-        .then(data => {
-            const filtered = {
-                live: [],
-                highlight: [],
-                upcoming: []
-            };
-
-            data.forEach(match => {
-                const status = match.match_status.toLowerCase();
-
-                if (status.includes("ht") || parseInt(status) > 0) {
-                    filtered.live.push(match);
-                } else if (status === "ft") {
-                    filtered.highlight.push(match);
-                } else {
-                    filtered.upcoming.push(match);
-                }
-            });
-
-            // Save new filtered dataset
+        .then(filtered => {
             matchesData = filtered;
 
-            // Filter by current league if one is selected
+            // Apply league filter if a league is selected
             let filteredData = filtered;
             if (selectedLeagueId) {
                 filteredData = Object.fromEntries(
@@ -415,6 +377,7 @@ function filterByDate(category) {
 }
 
 
+
 // Function to toggle calendar visibility
 function toggleCalendar() {
     const dateInput = document.getElementById("match-date");
@@ -428,18 +391,14 @@ function toggleCalendar() {
 // Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
     try {
-        let response = await fetch(`https://apiv3.apifootball.com/?action=get_videos&match_id=${matchId}&APIkey=${APIkey}`);
-        let data = await response.json();
+        const response = await fetch(`/api/match-video/${matchId}`);
+        const data = await response.json();
 
         console.log("🎥 Video Data:", data);
 
-        if (Array.isArray(data) && data.length > 0) {
-            return data[0].video_url; // Assuming the first video is the main highlight
-        } else {
-            return null;
-        }
+        return data.videoUrl || null;
     } catch (error) {
-        console.error("❌ Error fetching match video:", error);                 
+        console.error("❌ Error fetching match video:", error);
         return null;
     }
 }
@@ -711,11 +670,12 @@ async function displayLiveMatch(matchId, category) {
 
 
 //function to load statistic
-async function loadMatchStatistics(match_id, APIkey, match) {
+async function loadMatchStatistics(match_id, match) {
     try {
-        const response = await fetch(`https://apiv3.apifootball.com/?action=get_statistics&match_id=${match_id}&APIkey=${APIkey}`);
+        const response = await fetch(`/api/match/statistics?matchId=${match_id}`);
         const data = await response.json();
-        const stats = data[match_id]?.statistics || [];
+        const stats = data.statistics || [];
+
         document.getElementById("statistics-spinner").style.display = "block";
         document.querySelector(".statistics-list").innerHTML = "";
 
@@ -741,13 +701,13 @@ async function loadMatchStatistics(match_id, APIkey, match) {
         document.querySelector(".statistics-list").innerHTML = statsHTML;
         document.getElementById("statistics-spinner").style.display = "none";
 
-        document.querySelector('.statistics-list').innerHTML = statsHTML;
     } catch (error) {
         console.error("Statistics Error:", error);
+        document.querySelector('.statistics-list').innerHTML = statsHTML;
     }
 }
 
-function loadH2HData(APIkey, homeTeam, awayTeam) {
+function loadH2HData(homeTeam, awayTeam) {
     const spinner = document.querySelector("#h2h-spinner");
     const h2hMatchesContainer = document.querySelector("#h2h-matches");
 
@@ -758,17 +718,12 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
 
     spinner.style.display = "block";
 
-    const url = `https://apiv3.apifootball.com/?action=get_H2H&firstTeam=${encodeURIComponent(homeTeam)}&secondTeam=${encodeURIComponent(awayTeam)}&APIkey=${APIkey}`;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
+    fetch(`/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
+        .then(res => res.json())
         .then(data => {
             spinner.style.display = "none";
 
-            const h2hArray = data.firstTeam_VS_secondTeam;
+            const h2hArray = data.matches;
 
             if (!Array.isArray(h2hArray) || !h2hArray.length) {
                 h2hMatchesContainer.innerHTML = "<p>No H2H data available.</p>";
@@ -876,7 +831,7 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
 
 
     //function to load standings
-    async function loadStandings(match, APIkey) {
+    async function loadStandings(match) {
         const tableContainer = document.getElementById("standing-table");
         const spinner = document.getElementById("standing-spinner");
     
@@ -888,8 +843,8 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
         try {
             spinner.style.display = "block";
     
-            const response = await fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${match.league_id}&APIkey=${APIkey}`);
-            const data = await response.json();
+             const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
+             const { standings } = await response.json();
     
             const tableHTML = `
                 <table class="standing-table">
@@ -899,7 +854,7 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.map(team => {
+                        ${standings.map(team => {
                             const isHome = team.team_name === match.match_hometeam_name;
                             const isAway = team.team_name === match.match_awayteam_name;
                             const highlightTeam = isHome || isAway ? 'highlight-team' : '';
@@ -943,20 +898,19 @@ function loadH2HData(APIkey, homeTeam, awayTeam) {
   
   // ✅ Fetch lineup and dynamically infer formation
      function fetchAndRenderLineups(match_id, match) {
-    fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${match_id}&APIkey=${APIkey}`)
+      fetch(`/api/lineups?matchId=${match_id}`)
         .then(res => res.json())
-        .then(data => {
+        .then(({ lineup }) => {
             const container = document.getElementById("football-field");
             container.innerHTML = ""; // Clear previous content
 
-            const lineups = data[match_id]?.lineup;
-            if (!lineups) {
+            if (!lineup) {
                 displayNoLineupMessage(container, "No lineup data found.");
                 return;
             }
 
-            const homePlayers = lineups.home?.starting_lineups || [];
-            const awayPlayers = lineups.away?.starting_lineups || [];
+            const homePlayers = lineup.home?.starting_lineup || [];
+            const awayPlayers = lineup.away?.starting_lineup || [];
 
             if (homePlayers.length === 0 && awayPlayers.length === 0) {
                 displayNoLineupMessage(container, "No lineup formation available.");

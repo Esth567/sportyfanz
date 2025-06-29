@@ -21,13 +21,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetch the league names
     async function fetchLeagues() {
         try {
-            const response = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
+            const response = await fetch("/api/leagues");
             const leagues = await response.json();
             leaguesContainer.innerHTML = ""; // Clear existing content
     
             let firstLeagueId = null;
     
-            // Loop through API response and match selected leagues by BOTH name & country
+            
             leagues.forEach(league => {
                 Object.entries(selectedLeagues).forEach(([leagueName, leagueInfo]) => {
                     if (league.league_name === leagueName && league.country_name === leagueInfo.country) {
@@ -86,11 +86,13 @@ const leagueLogos = {
     // Add other leagues here...
 };
 
+//update league table
 async function updateLeagueTable(leagueName, leagueId) {
     try {
         const [standingsResponse, formMap] = await Promise.all([
-            fetch(`https://apiv3.apifootball.com/?action=get_standings&league_id=${leagueId}&APIkey=${APIkey}`).then(res => res.json()),
-            getRecentForms(leagueId)
+            fetch(`/standings/${leagueId}`)
+             .then(res => res.json()),
+             getRecentForms(leagueId)
         ]);
 
         const leagueData = standingsResponse;
@@ -135,15 +137,15 @@ async function updateLeagueTable(leagueName, leagueId) {
             expanded = !expanded;
             const leagueTablesDetails = document.querySelector(".league-tables-details");
 
-            if (expanded) {
-                leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap, leagueName, leagueData);
-                seeMoreButton.querySelector(".see-more-text").textContent = "See Less";
-                seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-back-outline");
-            } else {
-                leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap, leagueName, leagueData);
-                seeMoreButton.querySelector(".see-more-text").textContent = "See More";
-                seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-forward-outline");
-            }
+            leagueTablesDetails.innerHTML = generateTableHTML(
+                expanded ? leagueData : initialData,
+                formMap,
+                leagueName,
+                leagueData
+            );
+
+            seeMoreButton.querySelector(".see-more-text").textContent = expanded ? "See Less" : "See More";
+            seeMoreButton.querySelector("ion-icon").setAttribute("name", expanded ? "arrow-back-outline" : "arrow-forward-outline");
         });
 
     } catch (err) {
@@ -278,65 +280,30 @@ function getTodayDate(offset = 0) {
 
 
 // Fetch recent match results and build form per team
-async function getRecentForms(leagueId) {
-    const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-30)}&to=${getTodayDate()}&league_id=${leagueId}&APIkey=${APIkey}`);
-    const data = await response.json();
-
-    const formMap = {};
-
-    data.forEach(match => {
-        const homeTeam = match.match_hometeam_name;
-        const awayTeam = match.match_awayteam_name;
-        const homeScore = parseInt(match.match_hometeam_score);
-        const awayScore = parseInt(match.match_awayteam_score);
-
-        if (!formMap[homeTeam]) formMap[homeTeam] = [];
-        if (!formMap[awayTeam]) formMap[awayTeam] = [];
-
-        if (!isNaN(homeScore) && !isNaN(awayScore)) {
-            formMap[homeTeam].push(homeScore > awayScore ? "W" : homeScore === awayScore ? "D" : "L");
-            formMap[awayTeam].push(awayScore > homeScore ? "W" : awayScore === homeScore ? "D" : "L");
-        }
-    });
-
-    // Keep only last 5 results per team
-    Object.keys(formMap).forEach(team => {
-        formMap[team] = formMap[team].slice(-5).reverse().join("");
-    });
-
-    return formMap;
+async function getRecentForms(leagueId) {   
+   try {
+    const res = await fetch(`/api/forms/${leagueId}`);
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching recent forms:", err);
+    return {};
+  }
 }
 
-// Fetch recent matches for a team from January 2025 and generate the form
-function updateTeamForm(teamId) {
-    // Define start date as January 1, 2025
-    const startDate = "2025-01-01";
+// function to update team frm
+async function updateTeamForm(teamId) {
+  try {
+    const res = await fetch(`/api/teams/form/${teamId}`);
+    const { form } = await res.json();
 
-    // Fetch team matches from API
-    fetch(`https://apiv3.apifootball.com/?action=get_events&team_id=${teamId}&from=${startDate}&APIkey=${APIkey}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data && Array.isArray(data) && data.length > 0) {
-                // Extract match results (Win, Loss, Draw)
-                const form = data.map(match => {
-                    if (match.status === "Finished") {
-                        if (match.home_team_score > match.away_team_score) {
-                            return "W"; // Win
-                        } else if (match.home_team_score < match.away_team_score) {
-                            return "L"; // Loss
-                        } else {
-                            return "D"; // Draw
-                        }
-                    }
-                    return ""; // For ongoing or future matches
-                }).filter(result => result !== ""); // Remove non-completed matches
-
-                // Update the form HTML with the generated form
-                const formStatElement = document.querySelector(`#team-${teamId} .form-stat`);
-                formStatElement.innerHTML = generateFormHTML(form.join(""), 5);
-            }
-        })
-        .catch(error => console.error("Error fetching team events:", error));
+    const formStatElement = document.querySelector(`#team-${teamId} .form-stat`);
+    if (formStatElement) {
+      formStatElement.innerHTML = generateFormHTML(form, 5);
+    }
+  } catch (error) {
+    console.error("Error fetching team form:", error);
+  }
 }
 
 // Helper function to generate form HTML
@@ -397,16 +364,16 @@ function attachTeamClickListeners() {
 
 // Placeholder function to fetch team details by team key
 async function getTeamDetailsByKey(teamKey) {
-    const url = `https://apiv3.apifootball.com/?action=get_teams&team_id=${teamKey}&APIkey=${APIkey}`;
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data[0]; // the API returns an array
-    } catch (error) {
-        console.error("Error fetching team details:", error);
-        return null;
-    }
+  try {
+    const response = await fetch(`/api/teams/details/${teamKey}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching team details:", error);
+    return null;
+  }
 }
+
 
 
  

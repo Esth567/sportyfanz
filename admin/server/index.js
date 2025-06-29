@@ -7,6 +7,12 @@ const path = require("path");
 
 const newsRoutes = require("../routes/news");
 const imageProxyRoutes = require("../routes/imageProxy");
+const dashboardRoutes = require('../routes/dashboard');
+const leagueRoutes = require('../routes/leagueRoutes');
+const matchesRoutes = require('../routes/matchesRoutes');
+const videoRoutes = require('../routes/videoRoutes')
+
+
 
 const app = express();
 
@@ -49,6 +55,11 @@ const limiter = rateLimit({
 app.use("/api/", limiter);
 app.use("/api/news", newsRoutes);
 app.use("/api", imageProxyRoutes);
+
+app.use('/api',dashboardRoutes);
+app.use('/api',leagueRoutes);
+app.use('/api',matchesRoutes);
+app.use('/api', videoRoutes);
 
 app.get("/", (req, res) => res.send("✅ API is live."));
 

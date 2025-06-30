@@ -21,6 +21,9 @@ if (!openaiKey) {
 
 
 const openai = openaiKey ? new OpenAI({ apiKey: openaiKey }) : null;
+
+const descriptionMode = process.env.DESCRIPTION_MODE || 'auto';
+
 const parser = new Parser();
 
 const OUTPUT_DIR = path.join(__dirname, 'articles');
@@ -80,6 +83,32 @@ function inferLeagueFolder(title = '') {
 
 function sanitize(input = '') {
   return input.replace(/"/g, "'").replace(/\n/g, ' ').trim();
+}
+
+async function getDescription({ content, item, usedOpenAI }) {
+  const fallback = sanitize(item.contentSnippet || item.summary || item.description || content.split('\n')[0].slice(0, 200) + '...');
+
+  if (descriptionMode === 'lead-paragraph') {
+    return sanitize(content.split('\n').find(p => p.trim().length > 50) || fallback);
+  }
+
+  if (descriptionMode === 'gpt' || (descriptionMode === 'auto' && usedOpenAI)) {
+    try {
+      const summaryRes = await withRetry(() =>
+        openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: `Summarize this in one concise sentence:\n\n${content}` }],
+          temperature: 0.5,
+        })
+      );
+      const aiSummary = sanitize(summaryRes?.choices?.[0]?.message?.content);
+      if (aiSummary && aiSummary.length > 20) return aiSummary;
+    } catch (err) {
+      console.warn("⚠️ Failed to generate summary description via OpenAI");
+    }
+  }
+
+  return fallback;
 }
 
 async function generateArticleFromItem(item, sourceTitle) {
@@ -165,14 +194,15 @@ async function generateArticleFromItem(item, sourceTitle) {
     image = fallbackImage;
   }
 
-  let description = sanitize(item.contentSnippet || item.summary || item.description || content.split('\n')[0].slice(0, 200) + '...');
+  const description = await getDescription({ content, item, usedOpenAI });
 
   if (usedOpenAI && content) {
     try {
       const summaryRes = await withRetry(() =>
         openai.chat.completions.create({
           model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: `Summarize this in one concise sentence:\n\n${content}` }],
+          messages: [{ role: 'user', 
+            content: `Summarize the following article in 3-4 sentences, journalistic tone:\n\n${content}`}],
           temperature: 0.5,
         })
       );

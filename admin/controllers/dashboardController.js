@@ -1,29 +1,40 @@
 
 const fetch = require('node-fetch');
 const NodeCache = require("node-cache");
+const playerImageMap = require('../utils/playerImageMap');
 
 
 const APIkey = process.env.FOOTBALL_API_KEY;
 
 // Controller 1: Get Matches
 exports.getMatches = async (req, res) => {
-  const { from, to, leagueIDs } = req.query;
+  const { from, to } = req.query;
 
-  if (!from || !to || !leagueIDs) {
+  if (!from || !to) {
     return res.status(400).json({ error: 'Missing query parameters' });
   }
 
   try {
-    const ids = leagueIDs.split(',');
+    const leaguesRes = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
+    const leagues = await leaguesRes.json();
+
+    if (!Array.isArray(leagues)) {
+      return res.status(500).json({ error: 'Failed to retrieve leagues' });
+    }
+
     let matchesList = [];
 
-    for (let id of ids) {
-      const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${id}&timezone=Europe/Berlin&APIkey=${APIkey}`;
-      const response = await fetch(url);
-      const data = await response.json();
+    for (const league of leagues) {
+      try {
+        const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${league.league_id}&timezone=Europe/Berlin&APIkey=${APIkey}`;
+        const response = await fetch(url);
+        const data = await response.json();
 
-      if (Array.isArray(data)) {
-        matchesList = [...matchesList, ...data];
+        if (Array.isArray(data)) {
+          matchesList.push(...data);
+        }
+      } catch (err) {
+        console.warn(`Failed to fetch matches for league ${league.league_name}:`, err.message);
       }
     }
 
@@ -33,49 +44,64 @@ exports.getMatches = async (req, res) => {
       return aTime - bTime;
     });
 
-    res.json(matchesList);
+    //Apply limit before sending the response
+    const limit = parseInt(req.query.limit) || 100;
+    res.json(matchesList.slice(0, limit));
+
   } catch (err) {
     console.error('Error fetching matches:', err);
     res.status(500).json({ error: 'Failed to fetch matches' });
   }
 };
 
+
 // Controller 2: Get Top Scorers
 exports.getTopScorers = async (req, res) => {
   try {
-    const topLeagues = [
-      "Premier League", "La Liga", "Bundesliga", "Serie A", "Ligue 1"
-    ];
+    const limitPerLeague = parseInt(req.query.limitPerLeague) || 3;
+    const globalLimit = parseInt(req.query.limit) || 100;
 
     const leaguesRes = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
     const leaguesData = await leaguesRes.json();
 
-    let topScorers = [];
+    let allScorers = [];
 
     for (const league of leaguesData) {
-      if (!topLeagues.includes(league.league_name)) continue;
-
       const leagueId = league.league_id;
-      const scorerRes = await fetch(`https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&APIkey=${APIkey}`);
-      const scorers = await scorerRes.json();
+      const leagueName = league.league_name;
 
-      if (!Array.isArray(scorers) || scorers.length === 0) continue;
+      try {
+        const scorerRes = await fetch(`https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&APIkey=${APIkey}`);
+        const scorers = await scorerRes.json();
 
-      const topScorer = scorers.sort((a, b) => b.goals - a.goals)[0];
-      if (topScorer.goals < 15) continue;
+        if (!Array.isArray(scorers) || scorers.length === 0) continue;
 
-      topScorers.push({
-        player_name: topScorer.player_name,
-        player_image: topScorer.player_image,
-        team_name: topScorer.team_name,
-        league_name: league.league_name,
-        goals: topScorer.goals
-      });
+        const filteredScorers = scorers
+          .filter(p => parseInt(p.goals) >= 10)
+          .slice(0, limitPerLeague)
+          .map(p => ({
+            player_name: p.player_name,
+            player_image: p.player_image || (playerImageMap[p.player_name]
+              ? `/assets/players/${playerImageMap[p.player_name]}`
+              : ''),
+            team_name: p.team_name,
+            league_name: leagueName,
+            goals: parseInt(p.goals)
+          }));
+
+        allScorers.push(...filteredScorers);
+      } catch (innerErr) {
+        console.warn(`Failed league ${leagueName}:`, innerErr.message);
+      }
     }
 
-    res.json(topScorers);
+    // Sort globally by goals scored, descending
+    allScorers.sort((a, b) => b.goals - a.goals);
+
+    // Optional: Limit final list to top N scorers globally
+    res.json(allScorers.slice(0, globalLimit));
   } catch (err) {
-    console.error("Error fetching top scorers:", err);
+    console.error("Error fetching global top scorers:", err);
     res.status(500).json({ error: "Failed to fetch top scorers" });
   }
 };

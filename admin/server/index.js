@@ -5,7 +5,9 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
 
-const newsRoutes = require("../routes/news");
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+const newsRoutes = require("../routes/newsRoutes");
 const imageProxyRoutes = require("../routes/imageProxy");
 const dashboardRoutes = require('../routes/dashboard');
 const leagueRoutes = require('../routes/leagueRoutes');
@@ -53,9 +55,8 @@ const limiter = rateLimit({
 
 
 app.use("/api/", limiter);
-app.use("/api/news", newsRoutes);
+app.use("/api", newsRoutes);
 app.use("/api", imageProxyRoutes);
-
 app.use('/api',dashboardRoutes);
 app.use('/api',leagueRoutes);
 app.use('/api',matchesRoutes);

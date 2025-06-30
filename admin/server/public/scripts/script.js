@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const from = new Date().toISOString().split('T')[0]; // today's date
     const to = from;
-    const leagueIDs = ["3", "152", "302", "207", "168", "175", "135", "162", "275", "61"]; //major leagues
 
     let matchesList = [];
     let currentMatchIndex = 0;
@@ -122,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const params = new URLSearchParams({
             from,
             to,
-            leagueIDs: leagueIDs.join(','),
+            limit: 100
         });
 
         const res = await fetch(`/api/matches?${params}`);
@@ -171,33 +170,199 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Start
     loadMatches();
+})
+
+
+// trending news display in the first layer
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadNews(); 
 });
 
+// ========== RELATIVE TIME ========== //
+function updateRelativeTime() {
+    const timeElements = document.querySelectorAll('.news-time');
+    const now = new Date();
+
+    timeElements.forEach(el => {
+        const posted = new Date(el.dataset.posted);
+        if (isNaN(posted.getTime())) {
+            el.textContent = 'Invalid time';
+            return;
+        }
+
+        const diff = Math.floor((now.getTime() - posted.getTime()) / 1000);
+        let text;
+
+        if (diff < 0) text = 'Just now'; // Future-published feeds
+        else if (diff < 60) text = `${diff} seconds ago`;
+        else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
+        else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
+        else text = `${Math.floor(diff / 86400)} day(s) ago`;
+
+        el.textContent = text;
+    });
+}
+
+// ========== LOAD NEWS DETAILS==========
+async function loadNews() {
+  const loader = document.querySelector('.loading-indicator');
+  if (loader) loader.style.display = 'block';
+
+  try {
+    const response = await fetch('/api/topStories');
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to fetch top stories: ${response.status}\n${text}`);
+    }
+
+    const text = await response.text();
+    if (!text || text.trim() === '') {
+      throw new Error("Empty response from server");
+    }
+
+    let data;
+    try {
+      data = JSON.parse(text);
+      console.log("Trending News:", data.trending);
+    } catch {
+      throw new Error("Invalid JSON received from /api/topStories");
+    }
+
+    if (!Array.isArray(data.trending)) {
+      throw new Error("Invalid trending news structure from API");
+    }
+
+    window.trendingNews = data.trending;
+
+    // Assuming you use this function to populate the UI
+    populateNewsSection('top-stories', data.trending);
+
+  } catch (error) {
+    console.error('Failed to load top stories:', error);
+    alert("⚠️ Could not load trending news: " + error.message);
+  } finally {
+    if (loader) loader.style.display = 'none';
+  }
+}
+
+
+// ========== POPULATE NEWS ==========
+function populateNewsSection(sectionId, newsList) {
+  const container = document.getElementById(sectionId);
+  if (!container || !Array.isArray(newsList)) return;
+  console.log("Populating:", sectionId, "with", newsList.length, "items");
+
+
+  container.innerHTML = newsList.map((item, index) => {
+    const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+    const imageHtml = isValidImage
+       ? `<div class="news-image">
+        <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+              alt="Image for ${item.title}" 
+              loading="lazy" 
+              onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
+        </div>`
+       : `<div class="news-image">
+        <img src="https://via.placeholder.com/600x400?text=No+Image" 
+              alt="Image not available for ${item.title}" 
+              loading="lazy" />
+        </div>`;
+
+
+    return `
+      <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
+        <h1 class="news-title">${item.title}</h1>
+        ${imageHtml}
+        <div class="news-meta">
+          <p class="news-desc">${item.description?.slice(0, 150) || 'No description'}...</p>
+          <span class="news-time" data-posted="${item.date}">Just now</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.news-infomat').forEach((el) => {
+    el.addEventListener('click', () => {
+      showFullNews(el);
+    });
+  });
+}
 
 
 
 
+// ========== SHOW FULL NEWS ========== //
+function showFullNews(clickedItem) {
+  try {
+    const middleLayer = document.querySelector('.middle-layer');
 
-// Top scorer slider
-const playerImageMap = {
-    "A. Alipour": "A.Alipour.png",
-    "R. Lewandowski": "R.Lewandowski.png",
-    "M. Retegui": "M.Retegui.png",
-    "O. Dembélé": "O.Dembl.png",
-    "Mohamed Salah": "MohamedSalah.png",
-    "Serhou Guirassy": "S.Guirassy.png",
-    "D, Selke": "D.Selke.png"
-    // Add more players here...
-};
+    // Hide all children inside middle-layer
+    const children = Array.from(middleLayer.children);
+    children.forEach(child => {
+      child.style.display = 'none';
+    });
+
+    // Get data from clicked item
+    const index = clickedItem.dataset.index;
+    const section = clickedItem.dataset.section;
+    const newsList = section === 'top-stories' && Array.isArray(window.trendingNews)
+      ? window.trendingNews
+     : [];
+    const newsItem = newsList[parseInt(index)];
+
+    // Format description into paragraphs
+    const formattedDesc = typeof newsItem.description === 'string'
+      ? newsItem.description
+          .split('\n\n')
+          .map(p => `<p>${p.trim()}</p>`)
+          .join('')
+      : '<p>No content available.</p>';
+
+    // Create and display the full view container
+    const fullView = document.createElement('div');
+    fullView.className = 'news-full-view';
+    fullView.innerHTML = `
+      <article class="blog-post">
+        <h1 class="blog-title">${newsItem.title}</h1>
+        ${newsItem.image ? `
+          <div class="blog-image-wrapper">
+            <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
+          </div>` : ''
+        }
+        <div class="blog-meta">
+          <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
+        </div>
+        <div class="blog-content">
+          ${formattedDesc}
+        </div>
+      </article>
+    `;
+
+    // Add back button
+    const backButton = document.createElement('button');
+    backButton.textContent = '← Back to news';
+    backButton.className = 'back-button';
+    backButton.onclick = () => {
+      fullView.remove();
+      children.forEach(child => child.style.display = '');
+      updateRelativeTime();
+    };
+
+    fullView.prepend(backButton);
+    middleLayer.appendChild(fullView);
+
+  } catch (err) {
+    console.error("Failed to render full news view", err);
+    alert("Something went wrong displaying the full article.");
+  }
+}
+
+
+
 
 // List of top leagues (IDs can be replaced with actual IDs or names)
-const topLeagues = [
-    "Premier League", // England
-    "La Liga",
-    "Bundesliga",
-    "Serie A",
-    "Ligue 1"
-];
 
 async function fetchTopScorers() {
     try {

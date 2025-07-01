@@ -5,8 +5,6 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
 
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
-
 const newsRoutes = require("../routes/newsRoutes");
 const imageProxyRoutes = require("../routes/imageProxy");
 const dashboardRoutes = require('../routes/dashboard');
@@ -17,6 +15,7 @@ const videoRoutes = require('../routes/videoRoutes')
 
 
 const app = express();
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 const port = process.env.PORT || 3000;
 

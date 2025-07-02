@@ -56,6 +56,7 @@ exports.getMatches = async (req, res) => {
 
 
 // Controller 2: Get Top Scorers
+
 exports.getTopScorers = async (req, res) => {
   try {
     const limitPerLeague = parseInt(req.query.limitPerLeague) || 3;

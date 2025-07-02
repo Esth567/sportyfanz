@@ -15,7 +15,8 @@ const videoRoutes = require('../routes/videoRoutes')
 
 
 const app = express();
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/assets/players', express.static(path.join(__dirname, 'public/assets/players')));
+
 
 const port = process.env.PORT || 3000;
 

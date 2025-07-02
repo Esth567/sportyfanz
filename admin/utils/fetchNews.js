@@ -97,7 +97,7 @@ async function getDescription({ content, item, usedOpenAI }) {
       const summaryRes = await withRetry(() =>
         openai.chat.completions.create({
           model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: `Summarize this in one concise sentence:\n\n${content}` }],
+          messages: [{ role: 'user', content: `Summarize the following article in 3-4 sentences, journalistic tone:\n\n${content}`}],
           temperature: 0.5,
         })
       );
@@ -135,8 +135,8 @@ async function generateArticleFromItem(item, sourceTitle) {
   if (openai && process.env.USE_OPENAI === "true") {
     try {
       const prompt = mode === "summarize"
-        ? `Summarize this in 5 bullet points:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`
-        : `You're a sports journalist. Write a 3-paragraph news article in neutral tone:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`;
+        ? `Summarize the article in exactly 5 clear and informative bullet points. Each point should be a complete sentence. The total length should be at least 100 words:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`
+        : `You are a professional sports journalist. Write a well-structured news article in 5 concise paragraphs. Use a neutral tone. The article should be at least 300 words. Avoid repetition and include relevant context from the source:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`;
 
         console.log("📝 OpenAI Prompt:\n", prompt);
         console.log("🔁 Waiting for OpenAI response...");
@@ -195,23 +195,6 @@ async function generateArticleFromItem(item, sourceTitle) {
   }
 
   const description = await getDescription({ content, item, usedOpenAI });
-
-  if (usedOpenAI && content) {
-    try {
-      const summaryRes = await withRetry(() =>
-        openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', 
-            content: `Summarize the following article in 3-4 sentences, journalistic tone:\n\n${content}`}],
-          temperature: 0.5,
-        })
-      );
-      const aiSummary = sanitize(summaryRes?.choices?.[0]?.message?.content);
-      if (aiSummary && aiSummary.length > 20) description = aiSummary;
-    } catch (err) {
-      console.warn("⚠️ Failed to generate summary description via OpenAI");
-    }
-  }
 
   const markdown = `---\ntitle: "${title}"\ndate: "${pubDate}"\nslug: "${slug}"\nsource: "${sanitize(sourceTitle)}"\noriginal_link: "${link}"\ndescription: "${description}"\nmode: "${mode}"\nused_openai: "${usedOpenAI}"\nimage: "${image}"\n---\n\n${content}`;
 

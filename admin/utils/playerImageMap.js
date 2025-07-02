@@ -1,3 +1,4 @@
+//utils/playerImageMap.js
 const playerImageMap = {
   "A. Alipour": "A.Alipour.png",
   "R. Lewandowski": "R.Lewandowski.png",

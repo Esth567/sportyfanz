@@ -255,35 +255,33 @@ function populateNewsSection(sectionId, newsList) {
   console.log("Populating:", sectionId, "with", newsList.length, "items");
 
 
-  container.innerHTML = newsList.map((item, index) => {
-    const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
-    const imageHtml = isValidImage
-       ? `<div class="news-image">
-        <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+ container.innerHTML = newsList.map((item, index) => {
+  const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+  const imageHtml = isValidImage
+    ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
               alt="Image for ${item.title}" 
               loading="lazy" 
-              onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
-        </div>`
-       : `<div class="news-image">
-        <img src="https://via.placeholder.com/600x400?text=No+Image" 
+              onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
+    : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
               alt="Image not available for ${item.title}" 
-              loading="lazy" />
-        </div>`;
+              loading="lazy" />`;
 
-
-    return `
-      <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
-        <h1 class="news-title">${item.title}</h1>
-        ${imageHtml}
-        <div class="news-meta">
-          <p class="news-desc">${item.description?.slice(0, 150) || 'No description'}...</p>
-          <span class="news-time" data-posted="${item.date}">Just now</span>
+  return `
+    <div class="news-update" data-index="${index}" data-section="${sectionId}">   
+      <div class="news-container">
+        <div class="news-image">
+          ${imageHtml}
+        </div>
+        <div class="news-info">
+          <h3 class="news-headline">${item.title}</h3>
         </div>
       </div>
-    `;
-  }).join('');
+    </div>
+  `;
+}).join('');
 
-  container.querySelectorAll('.news-infomat').forEach((el) => {
+
+  container.querySelectorAll('.news-update').forEach((el) => {
     el.addEventListener('click', () => {
       showFullNews(el);
     });
@@ -386,9 +384,7 @@ async function fetchTopScorers() {
         for (const topScorer of topScorers) {
             const goals = topScorer.goals || 0;
             const playerName = topScorer.player_name || "Unknown Player";
-            const apiImage = topScorer.player_image;
-            const localImage = getLocalPlayerImage(playerName);
-            const playerImage = apiImage && apiImage !== '' ? apiImage : localImage || 'assets/images/default-player.png';
+            const playerImage = topScorer.player_image || 'assets/images/default-player.png';
             const teamName = topScorer.team_name || "Unknown Team";
             const leagueName = topScorer.league_name || "Unknown League";
 
@@ -436,11 +432,6 @@ async function fetchTopScorers() {
     }
 }
 
-
-// Fetch player image from local assets using the player name
-function getLocalPlayerImage(playerName) {
-    return playerImageMap[playerName] ? `assets/images/${playerImageMap[playerName]}` : null;
-}
 
 // Slider functionality
 let currentPlayer = 0;
@@ -1726,10 +1717,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const parent = document.querySelector(".content");
 
           
+          const textCont1 = document.querySelector(".text-cont1");
+          const newsUpdate = document.querySelector(".news-update");
           const textCont = document.querySelector(".text-cont");
           const liveMatchDemo = document.querySelector(".live-match-demo");
-          const textCont2 = document.querySelector(".text-cont2");
-          const matchLatest = document.querySelector(".match-latest");
           const textCont3 = document.querySelector(".text-cont3");
           const slider = document.querySelector(".slider");
           const advertPodcast = document.querySelector(".advert");
@@ -1740,16 +1731,15 @@ document.addEventListener("DOMContentLoaded", () => {
           const leagueTableDemo = document.querySelector(".league-table-demo");
           const advert1Podcast = document.querySelector(".advert1");
           const newsPodcast = document.querySelector(".news-podcast");
-          const textCont1 = document.querySelector(".text-cont1");
-          const newsUpdate = document.querySelector(".news-update");
+          
 
          
  
           // Append in the correct order
+           if (textCont1) parent.appendChild(textCont1);
+          if (newsUpdate) parent.appendChild(newsUpdate);
           if (textCont) parent.appendChild(textCont);
           if (liveMatchDemo) parent.appendChild(liveMatchDemo);
-          if (textCont2) parent.appendChild(textCont2);
-          if (matchLatest) parent.appendChild(matchLatest);
           if (textCont3) parent.appendChild(textCont3);
           if (slider) parent.appendChild(slider);
           if (advertPodcast) parent.appendChild(advertPodcast);
@@ -1760,8 +1750,6 @@ document.addEventListener("DOMContentLoaded", () => {
           if (leagueTableDemo) parent.appendChild(leagueTableDemo);
           if (advert1Podcast) parent.appendChild(advert1Podcast);
           if (newsPodcast) parent.appendChild(newsPodcast);
-          if (textCont1) parent.appendChild(textCont1);
-          if (newsUpdate) parent.appendChild(newsUpdate);
       }
   }
 

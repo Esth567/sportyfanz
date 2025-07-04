@@ -674,49 +674,55 @@ body{
   border-radius: 10px;
   color: white;
   max-width: 800px;
-  padding: 13px;
+  padding: 5px;
+  margin-top: -8px;
 }
 
 /* News Container */
 .news-container {
   display: flex;
   align-items: center;
-  gap: 10px; /* Adds spacing between image and text */
-  overflow: hidden;
+  gap: 8px;
 }
+
 
 .news-image img {
   width: 90px;
   height: 90px;
   object-fit: cover;
   border-radius: 8px;
+ 
 }
 
 /* News Info */
 .news-info {
-    flex: 2;
+    flex: 3;
     display: flex;
-    flex-direction: column;
-    padding: 8px;
+    flex-direction: column;  
+    margin-top: -5px
 }
 
 /* Headline */
 .news-headline {
-    font-size: 0.10px;
-    font-family: 'Lato';
-    word-spacing: 1.5px;
-    color: #ffffffe7;
-    font-weight: 400;
-    line-height: 1.5; /* Adjust the spacing between lines */
-    overflow: hidden; /* Ensures text doesn't overflow its container */
-    min-width: 100px;
-    display: -webkit-box; /* Enables the multi-line truncation */
-    -webkit-line-clamp: 3; /* Limits text to 3 lines */
-    -webkit-box-orient: vertical; /* Ensures text is vertically oriented */
-    text-overflow: ellipsis; /* Adds ellipsis at the end if text overflows */
-    white-space: normal; /* Allows wrapping for multi-line text */
-    
+  font-size: 0.7rem;
+  font-family: 'Lato';
+  font-weight: 400;
+  line-height: 1.4;
+  color: white;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  white-space: normal;
 }
+
+.news-container:hover {
+    background: #70c17125; /* Subtle hover effect */
+    transform: scale(1.05); /* Slightly enlarges on hover */
+    padding: 5px;
+}
+
 
 /* Middle Layer */
 .middle-layer {
@@ -816,7 +822,7 @@ body{
 }
 
 
-.top-stories {
+.topUpdate-stories {
     border-radius: 10px;
     flex: 1;
 }
@@ -4144,21 +4150,29 @@ body{
     
 
 
-   .match-card {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 0px;
-  }
+   .match-card > .match-col {
+    margin: 0;
+    padding: 0 4px; /* Small side padding, optional */
+   }
+
+.Matchteam {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0 4px; /* Keeps a small breathing space */
+  font-size: 0.75rem;
+}
 
   .match-details {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     white-space: nowrap; /* Prevent the text from wrapping to the next line */
-        overflow: hidden;  /* Hide any overflow if the name is too long */
-        text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
-        justify-content: flex-start;
+    overflow: hidden;  /* Hide any overflow if the name is too long */
+    text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
+    justify-content: flex-start;
   }
 
   .match-time-country {
@@ -4464,6 +4478,22 @@ body{
        font-size: 0.75rem;
    
      }
+
+      /* Team Names */
+    .Matchteam {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        font-size: 0.70rem;
+        font-family: 'Lato';
+        white-space: nowrap; /* Prevent the text from wrapping to the next line */
+        overflow: hidden;  /* Hide any overflow if the name is too long */
+        text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
+        justify-content: flex-start;
+       
+    }
+
+
 
 
        .match-category-btn {

@@ -86,7 +86,16 @@ function sanitize(input = '') {
 }
 
 async function getDescription({ content, item, usedOpenAI }) {
-  const fallback = sanitize(item.contentSnippet || item.summary || item.description || content.split('\n')[0].slice(0, 200) + '...');
+  let fallback = '';
+if (item.contentSnippet || item.summary || item.description) {
+  fallback = sanitize(item.contentSnippet || item.summary || item.description);
+} else if (typeof content === 'string' && content.length > 0) {
+  const firstLine = content.split('\n').find(line => line.trim().length > 0) || '';
+  fallback = sanitize(firstLine.slice(0, 200) + '...');
+} else {
+  fallback = 'No summary available.';
+}
+
 
   if (descriptionMode === 'lead-paragraph') {
     return sanitize(content.split('\n').find(p => p.trim().length > 50) || fallback);

@@ -6,7 +6,7 @@ const playerImageMap = {
   "O. Dembélé": "O.Dembl.png",
   "Mohamed Salah": "MohamedSalah.png",
   "Serhou Guirassy": "S.Guirassy.png",
-  "D, Selke": "D.Selke.png"
+  "D. Selke": "D.Selke.png"
 };
 
 module.exports = playerImageMap;

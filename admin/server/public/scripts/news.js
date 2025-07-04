@@ -221,14 +221,11 @@ function showFullNews(clickedItem) {
     backButton.className = 'back-button';
     backButton.onclick = () => {
       fullView.remove();
-      children.forEach(child => child.style.display = '');
-      showInitialNews("trending-news");
-      showInitialNews("updates-news");
       updateRelativeTime();
     };
 
     fullView.prepend(backButton);
-    middleLayer.appendChild(fullView);
+    middleLayer.insertBefore(fullView, middleLayer.firstChild);
 
   } catch (err) {
     console.error("Failed to render full news view", err);

@@ -83,4 +83,46 @@ exports.getTopstories = async (req, res) => {
   }
 };
 
+//update highlight news
+exports.getUpdatestories = async (req, res) => {
+  try {
+    const force = req.query.force === "true";
+    const news = await fetchNews(force);
+
+    const updates = fallback?.updates;
+    
+
+   if (!Array.isArray(updates)) {
+      throw new Error("Invalid or empty news data");
+    }
+
+    res.json({ updates });
+
+  } catch (err) {
+    console.error("❌ Failed to fetch news:", err.message);
+
+    try {
+      const fallbackRaw = require("fs").readFileSync(
+        require("path").join(__dirname, "../utils/cache/news.json")
+      );
+      const fallback = JSON.parse(fallbackRaw);
+
+      const updates = fallback?.updates;
+      
+
+      if (!Array.isArray(updates)) {
+        throw new Error("Fallback cache also has invalid structure");
+       }
+
+
+      res.json({ updates });
+
+    } catch (fsErr) {
+      console.error("❌ Failed to read fallback cache:", fsErr.message);
+      res.status(500).json({ error: "Failed to load news" });
+    }
+  }
+};
+
+
 

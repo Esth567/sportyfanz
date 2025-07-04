@@ -210,7 +210,7 @@ async function loadNews() {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/topStories');
+    const response = await fetch('/api/trendStories');
 
     if (!response.ok) {
       const text = await response.text();
@@ -227,7 +227,7 @@ async function loadNews() {
       data = JSON.parse(text);
       console.log("Trending News:", data.trending);
     } catch {
-      throw new Error("Invalid JSON received from /api/topStories");
+      throw new Error("Invalid JSON received from /api/trendStories");
     }
 
     if (!Array.isArray(data.trending)) {
@@ -267,13 +267,13 @@ function populateNewsSection(sectionId, newsList) {
               loading="lazy" />`;
 
   return `
-    <div class="news-update" data-index="${index}" data-section="${sectionId}">   
+    <div class="news-trend" data-index="${index}" data-section="${sectionId}">   
       <div class="news-container">
         <div class="news-image">
           ${imageHtml}
         </div>
         <div class="news-info">
-          <h3 class="news-headline">${item.title}</h3>
+          <p class="news-headline">${item.description?.slice(0, 150) || 'No description'}...</p>
         </div>
       </div>
     </div>
@@ -281,7 +281,7 @@ function populateNewsSection(sectionId, newsList) {
 }).join('');
 
 
-  container.querySelectorAll('.news-update').forEach((el) => {
+  container.querySelectorAll('.news-trend').forEach((el) => {
     el.addEventListener('click', () => {
       showFullNews(el);
     });
@@ -362,6 +362,22 @@ function showFullNews(clickedItem) {
 
 // List of top leagues (IDs can be replaced with actual IDs or names)
 
+let playerImageMap = {};
+
+async function init() {
+  try {
+    const res = await fetch('/api/player-image-map');
+    playerImageMap = await res.json();
+    await fetchTopScorers(); // Now run after map is loaded
+  } catch (err) {
+    console.error("Failed to load player image map:", err);
+    await fetchTopScorers(); // fallback even if image map fails
+  }
+}
+
+init();
+
+
 async function fetchTopScorers() {
     try {
         const res = await fetch('/api/topscorers');
@@ -384,9 +400,19 @@ async function fetchTopScorers() {
         for (const topScorer of topScorers) {
             const goals = topScorer.goals || 0;
             const playerName = topScorer.player_name || "Unknown Player";
-            const playerImage = topScorer.player_image || 'assets/images/default-player.png';
             const teamName = topScorer.team_name || "Unknown Team";
             const leagueName = topScorer.league_name || "Unknown League";
+
+            let playerImage = topScorer.player_image;
+
+             if (!playerImage) {
+                const localImage = playerImageMap[playerName];
+              if (localImage) {
+                 playerImage = `/assets/players/${localImage}`;
+               } else {
+                  playerImage = 'assets/images/default-player.png';
+               }
+              }
 
             const playerItem = document.createElement("div");
             playerItem.classList.add("player-item");
@@ -473,65 +499,107 @@ document.addEventListener("DOMContentLoaded", fetchTopScorers);
 
 
 //league table for 5 team beased on ranking
-const leagueId = 152;
 
-async function fetchTopFourStandings() {
-    try {
-        const response = await fetch(`/api/standings/${leagueId}`);
-        const data = await response.json();
+const DEFAULT_LEAGUE_ID = 152; // Premier League
+const BACKUP_LEAGUE_IDS = [168, 169]; // Example: Euro, Copa America (update as needed)
 
-        const leagueTableDemo = document.querySelector(".league-table-demo");
+// Get the active league ID based on date
+async function getActiveLeagueId() {
+  try {
+    const leagues = await fetch("/api/leagues").then(r => r.json());
+    const now = new Date();
 
-        if (!Array.isArray(data) || data.length === 0) {
-            leagueTableDemo.innerHTML = `<p>No data available for this league.</p>`;
-            return;
-        }
-
-        // Extract top 4 teams
-        const topFourTeams = data.slice(0, 5);
-
-        // Generate HTML for the top 5 teams
-        let tableHTML = `
-            <h3 class="league-title">${topFourTeams[0].league_name}</h3>
-            <div class="table-header">
-                <span class="team-head">Team</span>
-                <span class="stats-header">W</span>
-                <span class="stats-header">D</span>
-                <span class="stats-header">L</span>
-                <span class="stats-header">GA</span>
-                <span class="stats-header">GD</span>
-                <span class="stats-header">PTS</span>
-            </div>
-        `;
-
-        topFourTeams.forEach(team => {
-            console.log("Team Data:", team); // Debugging
-
-            tableHTML += `
-                <div class="team-row">
-                    <div class="team-info">
-                        <img src="${team.team_badge || 'assets/images/default-logo.png'}" alt="${team.team_name} Logo" class="team-logo">
-                        <span class="teamName-header">${team.team_name || 'N/A'}</span>
-                    </div>
-                    <span class="team-stats">${team.overall_league_W || 0}</span>
-                    <span class="team-stats">${team.overall_league_D || 0}</span>
-                    <span class="team-stats">${team.overall_league_L || 0}</span>
-                    <span class="team-stats">${team.overall_league_GA || 0}</span>
-                    <span class="team-stats">${(team.overall_league_GF - team.overall_league_GA) || 0}</span>
-                    <span class="team-stats">${team.overall_league_PTS || 0}</span>
-                </div>
-            `;
-        });
-
-        // Update the HTML
-        leagueTableDemo.innerHTML = tableHTML;
-    } catch (error) {
-        console.error("Error fetching standings:", error);
+    // 1. Check for Club World Cup in existing league data
+    const club = leagues.find(l => l.league_name.includes("FIFA Club World Cup"));
+    if (club) {
+      const start = new Date(club.season_start);
+      const end = new Date(club.season_end);
+      if (now >= start && now <= end) return club.league_id;
     }
+
+    // 2. Check other backup leagues
+    for (let id of BACKUP_LEAGUE_IDS) {
+      const backupLeague = leagues.find(l => l.league_id == id);
+      if (backupLeague) {
+        const start = new Date(backupLeague.season_start);
+        const end = new Date(backupLeague.season_end);
+        if (now >= start && now <= end) return id;
+      }
+    }
+
+    // 3. Default to Premier League
+    return DEFAULT_LEAGUE_ID;
+
+  } catch (err) {
+    console.error("Error determining league ID:", err);
+    return DEFAULT_LEAGUE_ID;
+  }
 }
 
-// Call the function to fetch and display the standings
-fetchTopFourStandings();
+
+// Render the top 5 standings for a league
+async function fetchTopFourStandings(leagueId) {
+  try {
+    const response = await fetch(`/api/standings/${leagueId}`);
+    const data = await response.json();
+
+    const leagueTableDemo = document.querySelector(".league-table-demo");
+
+    if (!Array.isArray(data) || data.length === 0) {
+      leagueTableDemo.innerHTML = `<p>No data available for this league.</p>`;
+      return;
+    }
+
+    const topFive = data.slice(0, 5);
+
+    let tableHTML = `
+      <h3 class="league-title">${topFive[0]?.league_name || "League Standings"}</h3>
+      <div class="table-header">
+        <span class="team-head">Team</span>
+        <span class="stats-header">W</span>
+        <span class="stats-header">D</span>
+        <span class="stats-header">L</span>
+        <span class="stats-header">GA</span>
+        <span class="stats-header">GD</span>
+        <span class="stats-header">PTS</span>
+      </div>
+    `;
+
+    topFive.forEach(team => {
+      const badge = team.team_badge || "assets/images/default-logo.png";
+      const gd = (team.overall_league_GF - team.overall_league_GA) || 0;
+
+      tableHTML += `
+        <div class="team-row">
+          <div class="team-info">
+            <img src="${badge}" alt="${team.team_name}" class="team-logo">
+            <span class="teamName-header">${team.team_name}</span>
+          </div>
+          <span class="team-stats">${team.overall_league_W || 0}</span>
+          <span class="team-stats">${team.overall_league_D || 0}</span>
+          <span class="team-stats">${team.overall_league_L || 0}</span>
+          <span class="team-stats">${team.overall_league_GA || 0}</span>
+          <span class="team-stats">${gd}</span>
+          <span class="team-stats">${team.overall_league_PTS || 0}</span>
+        </div>
+      `;
+    });
+
+    leagueTableDemo.innerHTML = tableHTML;
+
+  } catch (error) {
+    console.error("Error fetching standings:", error);
+    document.querySelector(".league-table-demo").innerHTML = `<p>Error loading league standings.</p>`;
+  }
+}
+
+// Run it on load
+(async () => {
+  const activeLeagueId = await getActiveLeagueId();
+  console.log("Using league ID:", activeLeagueId);
+  fetchTopFourStandings(activeLeagueId);
+})();
+
 
 
 
@@ -561,6 +629,170 @@ function autoSlide() {
 // Start the slider
 showSlide(currentIndex);
 setInterval(autoSlide, 4000); // Change slides every 3 seconds
+
+
+
+//news update display in the middle layer
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadNews(); 
+});
+
+
+// ========== LOAD NEWS DETAILS==========
+async function loadNews() {
+  const loader = document.querySelector('.loading-indicator');
+  if (loader) loader.style.display = 'block';
+
+  try {
+    const response = await fetch('/api/updateStories');
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to fetch top stories: ${response.status}\n${text}`);
+    }
+
+    const text = await response.text();
+    if (!text || text.trim() === '') {
+      throw new Error("Empty response from server");
+    }
+
+    let data;
+    try {
+      data = JSON.parse(text);
+      console.log("News Update:", data.updates);
+    } catch {
+      throw new Error("Invalid JSON received from /api/updateStories");
+    }
+
+    if (!Array.isArray(data.updates)) {
+      throw new Error("Invalid trending news structure from API");
+    }
+
+    window.updatesNews = data.updates;
+
+    // Assuming you use this function to populate the UI
+    populateNewsSection('newsUpdate-stories', data.updates);
+
+  } catch (error) {
+    console.error('Failed to load top stories:', error);
+    alert("⚠️ Could not load trending news: " + error.message);
+  } finally {
+    if (loader) loader.style.display = 'none';
+  }
+}
+
+
+// ========== POPULATE NEWS ==========
+function populateNewsSection(sectionId, newsList) {
+  const container = document.getElementById(sectionId);
+  if (!container || !Array.isArray(newsList)) return;
+  console.log("Populating:", sectionId, "with", newsList.length, "items");
+
+
+ container.innerHTML = newsList.map((item, index) => {
+  const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+  const imageHtml = isValidImage
+    ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+              alt="Image for ${item.title}" 
+              loading="lazy" 
+              onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
+    : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
+              alt="Image not available for ${item.title}" 
+              loading="lazy" />`;
+
+  return `
+    <div class="newsUpdate-highlight" data-index="${index}" data-section="${sectionId}">   
+      <div class="topUpdate-stories">
+        <div class="news-image">
+          ${imageHtml}
+        </div>
+        <div class="news-info">
+          <p class="news-headline">${item.description?.slice(0, 150) || 'No description'}...</p>
+        </div>
+      </div>
+    </div>
+  `;
+}).join('');
+
+
+  container.querySelectorAll('.newsUpdate-highlight').forEach((el) => {
+    el.addEventListener('click', () => {
+      showFullNews(el);
+    });
+  });
+}
+
+
+
+
+// ========== SHOW FULL NEWS ========== //
+function showFullNews(clickedItem) {
+  try {
+    const middleLayer = document.querySelector('.middle-layer');
+
+    // Hide all children inside middle-layer
+    const children = Array.from(middleLayer.children);
+    children.forEach(child => {
+      child.style.display = 'none';
+    });
+
+    // Get data from clicked item
+    const index = clickedItem.dataset.index;
+    const section = clickedItem.dataset.section;
+    const newsList = section === 'newsUpdate-stories' && Array.isArray(window.updatesNews)
+      ? window.updatesNews
+     : [];
+    const newsItem = newsList[parseInt(index)];
+
+    // Format description into paragraphs
+    const formattedDesc = typeof newsItem.description === 'string'
+      ? newsItem.description
+          .split('\n\n')
+          .map(p => `<p>${p.trim()}</p>`)
+          .join('')
+      : '<p>No content available.</p>';
+
+    // Create and display the full view container
+    const fullView = document.createElement('div');
+    fullView.className = 'news-full-view';
+    fullView.innerHTML = `
+      <article class="blog-post">
+        <h1 class="blog-title">${newsItem.title}</h1>
+        ${newsItem.image ? `
+          <div class="blog-image-wrapper">
+            <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
+          </div>` : ''
+        }
+        <div class="blog-meta">
+          <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
+        </div>
+        <div class="blog-content">
+          ${formattedDesc}
+        </div>
+      </article>
+    `;
+
+    // Add back button
+    const backButton = document.createElement('button');
+    backButton.textContent = '← Back to news';
+    backButton.className = 'back-button';
+    backButton.onclick = () => {
+      fullView.remove();
+      children.forEach(child => child.style.display = '');
+      updateRelativeTime();
+    };
+
+    fullView.prepend(backButton);
+    middleLayer.appendChild(fullView);
+
+  } catch (err) {
+    console.error("Failed to render full news view", err);
+    alert("Something went wrong displaying the full article.");
+  }
+}
+
+
 
 
 
@@ -614,7 +846,7 @@ function formatToUserLocalTime(dateStr, timeStr) {
 //function to fetch matches
 async function fetchMatchesData() {
   try {
-    const response = await fetch('/api/matches');
+    const response = await fetch('/api/all_matches');
     const data = await response.json();
 
     console.log("Live Matches: ", data.live);

@@ -107,6 +107,24 @@ exports.getTopScorers = async (req, res) => {
   }
 };
 
+//get all leagues
+exports.getLeagues = async (req, res) => {
+  try {
+    const response = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
+    const data = await response.json();
+
+    if (!Array.isArray(data)) {
+      return res.status(500).json({ error: 'Failed to fetch leagues' });
+    }
+
+    res.json(data);
+  } catch (err) {
+    console.error("Error fetching leagues:", err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 // Controller 3: Get Standings
 exports.getTopStandings = async (req, res) => {
   const { leagueId } = req.params;
@@ -119,13 +137,13 @@ exports.getTopStandings = async (req, res) => {
       return res.status(404).json({ error: 'No standings data found.' });
     }
 
-    const topFive = data.slice(0, 5);
-    res.json(topFive);
+    res.json(data.slice(0, 5));
   } catch (error) {
     console.error("Error fetching standings:", error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 
 //function to fetch matches

@@ -3,13 +3,15 @@ const router = express.Router();
 
 const {
   getNews,
-  getTopstories 
+  getTopstories,
+  getUpdatestories 
 } = require('../controllers/newsController');
 
 
 
 router.get('/news', getNews);
-router.get('/topStories', getTopstories);
+router.get('/trendStories', getTopstories);
+router.get('/updateStories', getUpdatestories);
 
 
 

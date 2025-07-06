@@ -1,8 +1,10 @@
-
+//controller
 const fetch = require("node-fetch");
 const NodeCache = require("node-cache");
 
 const API_KEY = process.env.API_KEY;
+
+// league cache (5 min)
 const getLeagueCache = new NodeCache({ stdTTL: 600 }); // Cache for 10 minutes
 
 //function to dispay listed league name
@@ -16,8 +18,9 @@ exports.getLeaguesNames = async (req, res) => {
     const data = await response.json();
 
     if (!Array.isArray(data)) {
-      return res.status(500).json({ error: "Invalid response from API" });
-    }
+      console.error("⚠️ Unexpected response:", data);
+      return res.status(500).json({ error: "Invalid response from API", raw: data });
+     }
 
     getLeagueCache.set(cacheKey, data);
     res.json(data);
@@ -26,6 +29,7 @@ exports.getLeaguesNames = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch leagues" });
   }
 };
+
 
 
 const matchCache = new NodeCache({ stdTTL: 300 }); // Cache for 5 minutes
@@ -49,6 +53,11 @@ exports.getMatches = async (req, res) => {
     const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${fromDate}&to=${toDate}&APIkey=${API_KEY}`);
     const data = await response.json();
 
+    if (!API_KEY) {
+      return res.status(500).json({ error: "Missing API key" });
+     }
+
+
     if (!Array.isArray(data)) {
       return res.status(500).json({ error: "Invalid match data" });
     }
@@ -69,6 +78,7 @@ exports.getMatches = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch match data" });
   }
 };
+
 
 // Function to filter matches by the selected date
 exports.getMatchesByDate = async (req, res) => {

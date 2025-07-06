@@ -204,31 +204,20 @@ function updateRelativeTime() {
     });
 }
 
-// ========== LOAD NEWS DETAILS==========
+// ========== LOAD NEWS DETAILS ==========
 async function loadNews() {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/trendStories');
+    const response = await fetch('/api/trendstories');
 
     if (!response.ok) {
-      const text = await response.text();
+      const text = await response.text(); // Only read body if you need to show the error
       throw new Error(`Failed to fetch top stories: ${response.status}\n${text}`);
     }
 
-    const text = await response.text();
-    if (!text || text.trim() === '') {
-      throw new Error("Empty response from server");
-    }
-
-    let data;
-    try {
-      data = JSON.parse(text);
-      console.log("Trending News:", data.trending);
-    } catch {
-      throw new Error("Invalid JSON received from /api/trendStories");
-    }
+    const data = await response.json();
 
     if (!Array.isArray(data.trending)) {
       throw new Error("Invalid trending news structure from API");
@@ -236,7 +225,6 @@ async function loadNews() {
 
     window.trendingNews = data.trending;
 
-    // Assuming you use this function to populate the UI
     populateNewsSection('top-stories', data.trending);
 
   } catch (error) {
@@ -267,7 +255,7 @@ function populateNewsSection(sectionId, newsList) {
               loading="lazy" />`;
 
   return `
-    <div class="news-trend" data-index="${index}" data-section="${sectionId}">   
+    <div class="news-update" data-index="${index}" data-section="${sectionId}">   
       <div class="news-container">
         <div class="news-image">
           ${imageHtml}
@@ -281,7 +269,7 @@ function populateNewsSection(sectionId, newsList) {
 }).join('');
 
 
-  container.querySelectorAll('.news-trend').forEach((el) => {
+  container.querySelectorAll('.news-update').forEach((el) => {
     el.addEventListener('click', () => {
       showFullNews(el);
     });
@@ -635,17 +623,17 @@ setInterval(autoSlide, 4000); // Change slides every 3 seconds
 //news update display in the middle layer
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadNews(); 
+  loadUpdatedNews(); 
 });
 
 
 // ========== LOAD NEWS DETAILS==========
-async function loadNews() {
+async function loadUpdatedNews() {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/updateStories');
+    const response = await fetch('/api/updatestories');
 
     if (!response.ok) {
       const text = await response.text();
@@ -814,13 +802,15 @@ function getTodayDate(offset = 0) {
     const matchDateTime = DateTime.fromFormat(
         `${matchDate} ${matchTime}`,
         "yyyy-MM-dd HH:mm",
-        { zone: "Europe/Berlin" }
+        { zone: "utc" } // match time is assumed to be UTC
     );
 
-    const now = DateTime.now().setZone("Europe/Berlin");
+    const now = DateTime.utc(); // Compare in UTC
+
     const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
     return diffInMinutes > 0 ? diffInMinutes : 0;
 }
+
 
 function formatToUserLocalTime(dateStr, timeStr) {
     try {
@@ -834,7 +824,7 @@ function formatToUserLocalTime(dateStr, timeStr) {
 
         return berlinTime
             .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-            .toFormat("h:mm");
+            .toFormat("h:mm a"); // AM/PM format
     } catch (e) {
         console.error("Time conversion error:", e);
         return "TBD";
@@ -980,7 +970,7 @@ function showMatches(matchesData, category) {
 
         const matchDay = matchLocal.toFormat("MMM d");
         const matchTime = match.match_time || "Time TBA";
-        const country = match.country_name || "Unknown Country";
+        const country = match.country_name && match.country_name.trim() !== "" ? match.country_name : "Unknown Country";
         const score1 = match.match_hometeam_score || "0";
         const score2 = match.match_awayteam_score || "0";
         const matchRound = match.league_round || "";

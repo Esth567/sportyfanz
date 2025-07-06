@@ -10,8 +10,8 @@ const {
 
 
 router.get('/news', getNews);
-router.get('/trendStories', getTopstories);
-router.get('/updateStories', getUpdatestories);
+router.get('/trendstories', getTopstories);
+router.get('/updatestories', getUpdatestories);
 
 
 

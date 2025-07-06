@@ -48,10 +48,9 @@ exports.getTopstories = async (req, res) => {
     const force = req.query.force === "true";
     const news = await fetchNews(force);
 
-    const trending = fallback?.trending;
-    
+    const trending = news?.trending; // ✅ Use news, not fallback
 
-   if (!Array.isArray(trending)) {
+    if (!Array.isArray(trending)) {
       throw new Error("Invalid or empty news data");
     }
 
@@ -67,12 +66,10 @@ exports.getTopstories = async (req, res) => {
       const fallback = JSON.parse(fallbackRaw);
 
       const trending = fallback?.trending;
-      
 
       if (!Array.isArray(trending)) {
         throw new Error("Fallback cache also has invalid structure");
-       }
-
+      }
 
       res.json({ trending });
 
@@ -83,16 +80,16 @@ exports.getTopstories = async (req, res) => {
   }
 };
 
+
 //update highlight news
 exports.getUpdatestories = async (req, res) => {
   try {
     const force = req.query.force === "true";
     const news = await fetchNews(force);
 
-    const updates = fallback?.updates;
-    
+    const updates = news?.updates; // ✅ use news, not fallback
 
-   if (!Array.isArray(updates)) {
+    if (!Array.isArray(updates)) {
       throw new Error("Invalid or empty news data");
     }
 
@@ -108,12 +105,10 @@ exports.getUpdatestories = async (req, res) => {
       const fallback = JSON.parse(fallbackRaw);
 
       const updates = fallback?.updates;
-      
 
       if (!Array.isArray(updates)) {
         throw new Error("Fallback cache also has invalid structure");
-       }
-
+      }
 
       res.json({ updates });
 
@@ -123,6 +118,5 @@ exports.getUpdatestories = async (req, res) => {
     }
   }
 };
-
 
 

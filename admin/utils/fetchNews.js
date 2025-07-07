@@ -383,7 +383,7 @@ async function readArticlesFromDisk() {
 
 
 async function fetchNews(force = false) {
-  const NEWS_WINDOW_HOURS = parseInt(process.env.NEWS_TIME_WINDOW_HOURS || '72');
+  const NEWS_WINDOW_HOURS = parseInt(process.env.NEWS_TIME_WINDOW_HOURS || '12');
   const maxAge = 1000 * 60 * 60 * NEWS_WINDOW_HOURS;
   const now = new Date();
   const cutoffTime = new Date(now.getTime() - NEWS_WINDOW_HOURS * 60 * 60 * 1000);

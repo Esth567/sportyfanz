@@ -1,6 +1,23 @@
+//utils/ redisClient.js
+const redis = require('redis');
+require('dotenv').config();
 
-const Redis = require("ioredis");
+const client = redis.createClient({
+  url: process.env.REDIS_URL,
+  socket: {
+    tls: true, // ✅ Important for Upstash
+  },
+});
 
-const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
+client.on('error', err => console.error('Redis error:', err));
 
-module.exports = redis;
+(async () => {
+  try {
+    await client.connect();
+    console.log('Redis connected ✅');
+  } catch (err) {
+    console.error('Redis connection error:', err);
+  }
+})();
+
+module.exports = client;

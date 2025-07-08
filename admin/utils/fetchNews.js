@@ -247,19 +247,27 @@ async function generateArticleFromItem(item, sourceTitle) {
   }
 
   if (!content) {
-    try {
-      const extracted = await extractArticle(link);
-      if (extracted && extracted.length >= 400) {
-        content = extracted;
-      } else {
-        console.warn("⚠️ Extracted article too short. Skipping.");
+  try {
+    const extracted = await extractArticle(link);
+    if (extracted && extracted.length >= 400) {
+      content = extracted;
+    } else {
+      console.warn("⚠️ Extracted article too short. Using RSS snippet as final fallback.");
+      content = sanitize(item.contentSnippet || item.summary || item.description || title);
+      if (content.length < 100) {
+        console.warn("❌ Fallback content too short. Skipping.");
         return;
       }
-    } catch (err) {
-      console.warn("❌ Failed to extract article as fallback.");
+    }
+  } catch (err) {
+    console.warn("❌ Failed to extract article. Using RSS snippet as final fallback.");
+    content = sanitize(item.contentSnippet || item.summary || item.description || title);
+    if (content.length < 100) {
+      console.warn("❌ Fallback content too short. Skipping.");
       return;
     }
   }
+}
 
   // ✅ Rewrite with OpenAI if enabled
   if (usedOpenAI && content && process.env.ENABLE_REWRITE === "true") {

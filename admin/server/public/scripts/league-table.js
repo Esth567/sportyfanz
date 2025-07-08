@@ -89,7 +89,7 @@ const leagueLogos = {
 async function updateLeagueTable(leagueName, leagueId) {
     try {
         const [standingsResponse, formMap] = await Promise.all([
-            fetch(`/api//standings/:leagueId`).then(res => res.json()),
+            fetch(`/api/standings/${leagueId}`).then(res => res.json()),
             getRecentForms(leagueId)
         ]);
 
@@ -268,76 +268,29 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
   }
 
 
-
- // Helper to get date in yyyy-mm-dd format
-function getTodayDate(offset = 0) {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    return date.toISOString().split("T")[0];
-}
-
-
 // Fetch recent match results and build form per team
 async function getRecentForms(leagueId) {
-    const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-30)}&to=${getTodayDate()}&league_id=${leagueId}&APIkey=${APIkey}`);
+    const response = await fetch(`/api/recent-form/${leagueId}`);
     const data = await response.json();
-
-    const formMap = {};
-
-    data.forEach(match => {
-        const homeTeam = match.match_hometeam_name;
-        const awayTeam = match.match_awayteam_name;
-        const homeScore = parseInt(match.match_hometeam_score);
-        const awayScore = parseInt(match.match_awayteam_score);
-
-        if (!formMap[homeTeam]) formMap[homeTeam] = [];
-        if (!formMap[awayTeam]) formMap[awayTeam] = [];
-
-        if (!isNaN(homeScore) && !isNaN(awayScore)) {
-            formMap[homeTeam].push(homeScore > awayScore ? "W" : homeScore === awayScore ? "D" : "L");
-            formMap[awayTeam].push(awayScore > homeScore ? "W" : awayScore === homeScore ? "D" : "L");
-        }
-    });
-
-    // Keep only last 5 results per team
-    Object.keys(formMap).forEach(team => {
-        formMap[team] = formMap[team].slice(-5).reverse().join("");
-    });
-
-    return formMap;
+    return data;
 }
+
+
 
 // Fetch recent matches for a team from January 2025 and generate the form
-function updateTeamForm(teamId) {
-    // Define start date as January 1, 2025
-    const startDate = "2025-01-01";
+async function updateTeamForm(teamId) {
+  try {
+    const res = await fetch(`/api/team-form/${teamId}`);
+    const { form } = await res.json();
 
-    // Fetch team matches from API
-    fetch(`https://apiv3.apifootball.com/?action=get_events&team_id=${teamId}&from=${startDate}&APIkey=${APIkey}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data && Array.isArray(data) && data.length > 0) {
-                // Extract match results (Win, Loss, Draw)
-                const form = data.map(match => {
-                    if (match.status === "Finished") {
-                        if (match.home_team_score > match.away_team_score) {
-                            return "W"; // Win
-                        } else if (match.home_team_score < match.away_team_score) {
-                            return "L"; // Loss
-                        } else {
-                            return "D"; // Draw
-                        }
-                    }
-                    return ""; // For ongoing or future matches
-                }).filter(result => result !== ""); // Remove non-completed matches
-
-                // Update the form HTML with the generated form
-                const formStatElement = document.querySelector(`#team-${teamId} .form-stat`);
-                formStatElement.innerHTML = generateFormHTML(form.join(""), 5);
-            }
-        })
-        .catch(error => console.error("Error fetching team events:", error));
+    const formStatElement = document.querySelector(`#team-${teamId} .form-stat`);
+    formStatElement.innerHTML = generateFormHTML(form, 5);
+  } catch (err) {
+    console.error("Failed to fetch team form:", err);
+  }
 }
+
+
 
 // Helper function to generate form HTML
 function generateFormHTML(formString, maxLength = 5) {
@@ -397,16 +350,16 @@ function attachTeamClickListeners() {
 
 // Placeholder function to fetch team details by team key
 async function getTeamDetailsByKey(teamKey) {
-    const url = `https://apiv3.apifootball.com/?action=get_teams&team_id=${teamKey}&APIkey=${APIkey}`;
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data[0]; // the API returns an array
-    } catch (error) {
-        console.error("Error fetching team details:", error);
-        return null;
-    }
+  try {
+    const res = await fetch(`/api/team/${teamKey}`);
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching team details:", error);
+    return null;
+  }
 }
+
 
 
  

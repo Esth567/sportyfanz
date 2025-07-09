@@ -1,19 +1,3 @@
-
-
-
-// List of leagues to display
-const leaguesSelected = {
-    "Premier League": { country: "England" },
-    "La Liga": { country: "Spain" },
-    "Ligue 1": { country: "France" },
-    "Ligue 2": { country: "France" },
-    "Serie A": { country: "Italy" },
-    "NPFL": { country: "Nigeria" },
-    "Bundesliga": { country: "Germany" },
-    "UEFA Champions League": { country: "eurocups" },
-    "Africa Cup of Nations Qualification": { country: "intl" }
-};
-
 let selectedLeagueId = null;
 let selectedLeagueName = null;
 let matchesData = {
@@ -44,129 +28,125 @@ function displayMatchesByLeagueId(leagueId, leagueName, category) {
     renderMatches(leagueMatches, category);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Function to display listed league names
-  fetch('/api/leagues_name')
+
+
+fetch(`/api/leagues_names`)
     .then(res => res.json())
     .then(leagues => {
-      // Check if leagues is actually an array
-      if (!Array.isArray(leagues)) {
-        console.error("🚨 leagues is not an array:", leagues);
-        return;
-      }
+        const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
+        if (!liveMatchesContainer) return;
 
-      const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
-      if (!liveMatchesContainer) return;
+        liveMatchesContainer.innerHTML = "";
+        leagues.forEach(league => {
+            const leagueName = league.league_name.trim();
+            const leagueCountry = league.country_name.trim().toLowerCase();
 
-      liveMatchesContainer.innerHTML = "";
+            if (leaguesSelected[leagueName] && leaguesSelected[leagueName].country.toLowerCase() === leagueCountry) {
+                const leagueElement = document.createElement("div");
+                leagueElement.classList.add("leagues-matches");
+                leagueElement.setAttribute("data-league-id", league.league_id);
+                leagueElement.setAttribute("data-league-name", league.league_name);
 
-      leagues.forEach(league => {
-        const leagueName = league.league_name.trim();
-        const leagueCountry = league.country_name.trim().toLowerCase();
+                leagueElement.innerHTML = `
+                    <div class="leags-country">
+                        <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league_name} Logo">
+                        <div class="leagues-info">
+                            <h3>${league.league_name}</h3>
+                            <p>${league.country_name}</p>
+                        </div>
+                    </div>
+                    <div class="arrow-direct">
+                        <img src="assets/icons/Arrow - Right 2.png" alt="Arrow">
+                    </div>`;
 
-        if (leaguesSelected[leagueName] && leaguesSelected[leagueName].country.toLowerCase() === leagueCountry) {
-          const leagueElement = document.createElement("div");
-          leagueElement.classList.add("leagues-matches");
-          leagueElement.setAttribute("data-league-id", league.league_id);
-          leagueElement.setAttribute("data-league-name", league.league_name);
+                leagueElement.addEventListener("click", function () {
+                    selectedLeagueId = this.getAttribute("data-league-id");
+                    selectedLeagueName = this.getAttribute("data-league-name");
+                    displayMatchesByLeagueId(selectedLeagueId, selectedLeagueName, "live");
+                });
 
-          leagueElement.innerHTML = `
-            <div class="leags-country">
-              <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league_name} Logo">
-              <div class="leagues-info">
-                <h3>${league.league_name}</h3>
-                <p>${league.country_name}</p>
-              </div>
-            </div>
-            <div class="arrow-direct">
-              <img src="/assets/icons/Arrow - Right 2.png" alt="Arrow">
-            </div>`;
+                liveMatchesContainer.appendChild(leagueElement);
+            }
+        });
 
-          leagueElement.addEventListener("click", function () {
-            selectedLeagueId = this.getAttribute("data-league-id");
-            selectedLeagueName = this.getAttribute("data-league-name");
-            displayMatchesByLeagueId(selectedLeagueId, selectedLeagueName, "live");
-          });
-
-          liveMatchesContainer.appendChild(leagueElement);
-        }
-      });
-
-      fetchAndRenderMatches();
-    })
-    .catch(err => {
-      console.error("❌ Failed to load leagues:", err);
+        fetchAndRenderMatches();
     });
-});
-
 
 
     // === LUXON Time Functions ===
-    function getMinutesSince(matchDate, matchTime) {
-        const { DateTime } = luxon;
-    
-        const matchBerlin = luxon.DateTime.fromFormat(
-           `${match.match_date} ${match.match_time}`,
-             "yyyy-MM-dd h:mm a",
-            { zone: "Europe/Berlin" }
-         );
-     
-    
-        const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-        const diffInMinutes = Math.floor(now.diff(matchBerlin, "minutes").minutes);
-        return diffInMinutes > 0 ? diffInMinutes : 0;
-    }
-    
-    function formatToUserLocalTime(dateStr, timeStr) {
-        try {
-            const { DateTime } = luxon;
-    
-            const berlinTime = DateTime.fromFormat(
-                `${dateStr} ${timeStr}`,
-                "yyyy-MM-dd HH:mm",
-                { zone: "Europe/Berlin" }
-            );
-    
-            return berlinTime
-                .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-                .toFormat("hh:mm");
-        } catch (e) {
-            console.error("Time conversion error:", e);
-            return "TBD";
-        }
-    }
+let selectedLeagueId = null;
+let selectedLeagueName = null;
+let matchesData = {
+    live: [],
+    highlight: [],
+    upcoming: [],
+    allHighlights: []
+};
 
-
-    document.addEventListener("DOMContentLoaded", () => {
-  fetchAndRenderMatches(); 
-});
-
-//function to render matches
-async function fetchAndRenderMatches() {
-  const spinner = document.getElementById("loading-spinner");
-  spinner.style.display = "flex";
-
-  try {
-    const response = await fetch('/api/matches');
-    const data = await response.json();
-
-    matchesData = {
-      live: data.live,
-      highlight: data.highlight,
-      upcoming: data.upcoming
-    };
-
-    selectedLeagueId = null;
-    selectedLeagueName = null;
-
-    renderMatches(matchesData, "live");
-  } catch (error) {
-    console.error("Error fetching match data:", error);
-    document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
-  } finally {
-    spinner.style.display = "none";
-  }
+function getTodayDate(offset = 0) {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split("T")[0];
 }
+
+function displayMatchesByLeagueId(leagueId, leagueName, category) {
+    selectedLeagueId = leagueId;
+    selectedLeagueName = leagueName;
+
+    // Refetch if necessary, or filter from existing global matchesData
+    const leagueMatches = Object.fromEntries(
+        Object.entries(matchesData).map(([key, matches]) => [
+            key,
+            matches.filter(match => match.league_id === leagueId)
+        ])
+    );
+
+    renderMatches(leagueMatches, category);
+}
+
+
+
+fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`)
+    .then(res => res.json())
+    .then(leagues => {
+        const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
+        if (!liveMatchesContainer) return;
+
+        liveMatchesContainer.innerHTML = "";
+        leagues.forEach(league => {
+            const leagueName = league.league_name.trim();
+            const leagueCountry = league.country_name.trim().toLowerCase();
+
+            if (leaguesSelected[leagueName] && leaguesSelected[leagueName].country.toLowerCase() === leagueCountry) {
+                const leagueElement = document.createElement("div");
+                leagueElement.classList.add("leagues-matches");
+                leagueElement.setAttribute("data-league-id", league.league_id);
+                leagueElement.setAttribute("data-league-name", league.league_name);
+
+                leagueElement.innerHTML = `
+                    <div class="leags-country">
+                        <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league_name} Logo">
+                        <div class="leagues-info">
+                            <h3>${league.league_name}</h3>
+                            <p>${league.country_name}</p>
+                        </div>
+                    </div>
+                    <div class="arrow-direct">
+                        <img src="assets/icons/Arrow - Right 2.png" alt="Arrow">
+                    </div>`;
+
+                leagueElement.addEventListener("click", function () {
+                    selectedLeagueId = this.getAttribute("data-league-id");
+                    selectedLeagueName = this.getAttribute("data-league-name");
+                    displayMatchesByLeagueId(selectedLeagueId, selectedLeagueName, "live");
+                });
+
+                liveMatchesContainer.appendChild(leagueElement);
+            }
+        });
+
+        fetchAndRenderMatches();
+    });
 
 
 

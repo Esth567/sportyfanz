@@ -293,23 +293,20 @@ async function updateTeamForm(teamId) {
 
 
 // Helper function to generate form HTML
-function generateFormHTML(formString, maxLength = 5) {
-    const results = formString.split("").slice(0, maxLength);
-    const padded = Array.from({ length: maxLength }, (_, i) => results[i] || "");
+function generateFormHTML(formString = "", maxLength = 5) {
+  const results = formString.split("").slice(0, maxLength);
+  const padded = Array.from({ length: maxLength }, (_, i) => results[i] || "");
 
-    return padded.map(result => {
-        let colorClass = "";
-        if (result === "W") colorClass = "form-win";
-        else if (result === "D") colorClass = "form-draw";
-        else if (result === "L") colorClass = "form-loss";
-        else colorClass = "form-empty";
+  return padded.map(result => {
+    let colorClass = "";
+    if (result === "W") colorClass = "form-win";
+    else if (result === "D") colorClass = "form-draw";
+    else if (result === "L") colorClass = "form-loss";
+    else colorClass = "form-empty";
 
-        return `<span class="form-box ${colorClass}">${result || ""}</span>`;
-    }).join("");
+    return `<span class="form-box ${colorClass}">${result || ""}</span>`;
+  }).join("");
 }
-
-// Example of using updateTeamForm for a team with ID 141 (Arsenal)
-updateTeamForm(141);
 
 
 // Function to display detailed team info

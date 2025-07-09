@@ -2,15 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 const { 
-  getLeaguesNames,
-  getMatches,
-  getMatchesByDate
-
+  getSelectedLeagues,
+  getMatches 
 } = require('../controllers/matchesController');
 
-router.get('/leagues_name', getLeaguesNames);
-router.get('/matches', getMatches);
-router.get('/matches-by-date', getMatchesByDate);
+router.get('/leagues_names', getSelectedLeagues);
+router.get("/matches", getMatches);
 
 
 

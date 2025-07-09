@@ -165,13 +165,19 @@ exports.getTeamForm = async (req, res) => {
     }
 
     const url = `https://apiv3.apifootball.com/?action=get_events&team_id=${teamId}&from=${startDate}&APIkey=${API_KEY}`;
-    const { data } = await axios.get(url);
+    const response = await axios.get(url);
+    const data = response.data;
 
     if (!Array.isArray(data)) {
       return res.status(500).json({ error: "Invalid response from external API" });
     }
 
     const form = buildForm(data, teamId);
+    console.log('Built form:', form); // DEBUG
+
+    if (!form || typeof form !== 'string') {
+      return res.status(500).json({ error: "Failed to build valid form string" });
+    }
 
     // Cache the result
     await cache.set(cacheKey, form, TEAMS_TTL);

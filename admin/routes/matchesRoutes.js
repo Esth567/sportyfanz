@@ -1,14 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
+const {
+  getLeagues,
+  getMatches,
+  getMatchVideo
+} = require("../controllers/matchesController");
 
-const { 
-  getSelectedLeagues,
-  getMatches 
-} = require('../controllers/matchesController');
-
-router.get('/leagues_names', getSelectedLeagues);
+router.get("/leagues", getLeagues);
 router.get("/matches", getMatches);
-
-
+router.get("/video/:matchId", getMatchVideo);
 
 module.exports = router;

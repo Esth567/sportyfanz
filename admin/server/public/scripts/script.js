@@ -1225,7 +1225,7 @@ async function displayLiveMatch(matchId, category) {
     
             // ✅ Pass APIkey to getTabContent
             const tab = this.dataset.tab;
-            tabContentDiv.innerHTML = getTabContent(tab, match, APIkey);
+            tabContentDiv.innerHTML = getTabContent(tab, match);
     
     
             if (tab === "lineups") {
@@ -1253,7 +1253,7 @@ async function displayLiveMatch(matchId, category) {
   
 
     // Function to update tab content dynamically
-    function getTabContent(tab, match, APIkey) {
+    function getTabContent(tab, match) {
         const renderPlayers = (players) =>
             players?.length
                 ? players.map(player => `
@@ -1344,14 +1344,14 @@ async function displayLiveMatch(matchId, category) {
 
             // Fetch H2H using team names, not match ID
             if (match.match_hometeam_name && match.match_awayteam_name) {
-                setTimeout(() => loadH2HData(APIkey, match.match_hometeam_name, match.match_awayteam_name, 10), 0);
+                setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
             }
 
             case "h2h":
     console.log("📦 Full match object for H2H:", match);
 
     if (match.match_hometeam_name && match.match_awayteam_name) {
-        setTimeout(() => loadH2HData(APIkey, match.match_hometeam_name, match.match_awayteam_name, 10), 0);
+        setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
     }
 
     return `
@@ -1367,7 +1367,7 @@ async function displayLiveMatch(matchId, category) {
 
                 case "statistics":
                     // Trigger statistics loading before returning the UI container
-                    loadMatchStatistics(match.match_id, APIkey, match);
+                    loadMatchStatistics(match.match_id, match);
                     return `
                         <div class="statistics-container">
                             <h3>Match Statistics</h3>
@@ -1384,7 +1384,7 @@ async function displayLiveMatch(matchId, category) {
 
                     case "standing":
         // 🔄 Load standing and highlight teams
-        setTimeout(() => loadStandings(match, APIkey), 0); 
+        setTimeout(() => loadStandings(match), 0); 
         return `
             <div class="standing-header">                         
                 <div class="standings-wrapper">

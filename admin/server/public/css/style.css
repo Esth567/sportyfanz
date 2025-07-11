@@ -2413,7 +2413,7 @@ body{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-family: 'Lato';
     font-weight: 400;
     gap: 5px;
@@ -2587,7 +2587,7 @@ body{
   }
 
   .matches-teams span {
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
   }
 

@@ -233,8 +233,6 @@ exports.getTopStandings = async (req, res) => {
 };
 
 
-
-
 // Function to fetch all matches with caching
 
 const allMatchesCache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes

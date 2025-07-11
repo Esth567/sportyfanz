@@ -33,6 +33,7 @@ exports.getMatches = async (req, res) => {
     const url = `${baseUrl}/?action=get_events&from=${from}&to=${to}&APIkey=${API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
+
     cache.set(cacheKey, data);
     res.json(data);
   } catch (err) {
@@ -40,6 +41,7 @@ exports.getMatches = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch match data" });
   }
 };
+
 
 exports.getMatchVideo = async (req, res) => {
   const { matchId } = req.params;

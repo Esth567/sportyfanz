@@ -9,7 +9,6 @@ const newsRoutes = require("../routes/newsRoutes");
 const imageProxyRoutes = require("../routes/imageProxy");
 const dashboardRoutes = require('../routes/dashboard');
 const leagueRoutes = require('../routes/leagueRoutes');
-const matchesRoutes = require('../routes/matchesRoutes');
 const videoRoutes = require('../routes/videoRoutes');
 const playerImageRoutes = require('../routes/playerImageRoutes');
 
@@ -59,7 +58,6 @@ app.use("/api", newsRoutes);
 app.use("/api", imageProxyRoutes);
 app.use('/api',dashboardRoutes);
 app.use('/api',leagueRoutes);
-app.use('/api',matchesRoutes);
 app.use('/api', videoRoutes);
 app.use('/api', playerImageRoutes);
 

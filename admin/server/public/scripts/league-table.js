@@ -270,26 +270,42 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
 
 // Fetch recent match results and build form per team
 async function getRecentForms(leagueId) {
-    const response = await fetch(`/api/recent-form/${leagueId}`);
+    const response = await fetch(`/api/recent_form/${leagueId}`);
     const data = await response.json();
     return data;
 }
 
 
 
-// Fetch recent matches for a team from January 2025 and generate the form
-async function updateTeamForm(teamId) {
-  try {
-    const res = await fetch(`/api/team-form/${teamId}`);
-    const { form } = await res.json();
+function updateTeamForm(teamId) {
+    fetch(`/api/team-form/${teamId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && Array.isArray(data) && data.length > 0) {
+                const form = data.map(match => {
+                    if (match.match_status === "Finished") {
+                        const homeScore = parseInt(match.match_hometeam_score);
+                        const awayScore = parseInt(match.match_awayteam_score);
+                        const isHome = parseInt(match.match_hometeam_id) === parseInt(teamId);
 
-    const formStatElement = document.querySelector(`#team-${teamId} .form-stat`);
-    formStatElement.innerHTML = generateFormHTML(form, 5);
-  } catch (err) {
-    console.error("Failed to fetch team form:", err);
-  }
+                        const teamScore = isHome ? homeScore : awayScore;
+                        const opponentScore = isHome ? awayScore : homeScore;
+
+                        if (teamScore > opponentScore) return "W";
+                        else if (teamScore < opponentScore) return "L";
+                        else return "D";
+                    }
+                    return "";
+                }).filter(result => result !== "");
+
+                const formStatElement = document.querySelector(`#team-${teamId} .form-stat`);
+                if (formStatElement) {
+                    formStatElement.innerHTML = generateFormHTML(form.join(""), 5);
+                }
+            }
+        })
+        .catch(error => console.error("Error fetching team events:", error));
 }
-
 
 
 // Helper function to generate form HTML

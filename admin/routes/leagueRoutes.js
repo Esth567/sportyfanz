@@ -12,7 +12,7 @@ const {
 router.get('/leagues', getLeagues);
 router.delete('/leagues/cache', clearLeaguesCache); 
 router.get('/standings/:leagueId', getStandings);
-router.get('/recent-form/:leagueId', getRecentForms);
+router.get('/recent_form/:leagueId', getRecentForms);
 router.get('/team-form/:teamId', getTeamForm);
 router.get('/team/:teamId', getTeamDetails);
 

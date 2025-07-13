@@ -5,13 +5,15 @@ const fs = require('fs-extra');
 const path = require('path');
 const klaw = require('klaw');
 const matter = require("gray-matter");
+const frontMatter = require('front-matter');
+const { parse } = require('date-fns')
 
 const ARTICLES_DIR = path.join(__dirname, "articles");
 
 const { extractImageFromURL } = require('./extractImageFromURL');
 const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
 const { rewriteWithOpenAI } = require('../utils/rewriteWithOpenAI');
-const { extractArticle } = require('./extractArticle'); 
+const { extractArticle } = require('../utils/extractArticle'); 
 
 const openaiKey = process.env.OPENAI_API_KEY;
 if (!openaiKey) {
@@ -73,10 +75,10 @@ function safeDate(dateString) {
 
 function inferLeagueFolder(title = '') {
   const lower = title.toLowerCase();
-  if (/\b(premier league)\b/.test(lower)) return 'premier-league';
-  if (lower.includes('nfl')) return 'nfl';
-  if (lower.includes('nba')) return 'nba';
-  if (lower.includes('mlb')) return 'mlb';
+  if (/\b(premier league|champions league|europa league|epl|mls)\b/.test(lower)) return 'football';
+  if (lower.includes('nfl')) return 'american-football';
+  if (lower.includes('nba')) return 'basketball';
+  if (lower.includes('mlb')) return 'baseball';
   if (lower.includes('formula 1') || lower.includes('f1')) return 'f1';
   if (lower.includes('tennis')) return 'tennis';
   if (lower.includes('golf')) return 'golf';
@@ -95,7 +97,8 @@ function getTitleFromContent(content = '') {
     if (
       /^[A-Z]/.test(line) &&
       !line.endsWith('.') && // Avoid full sentences
-      line.length >= 30 && line.length <= 120 // Title-like range
+      line.length >= 30 && line.length <= 120 && // Title-like range
+      !line.includes('<') && !line.includes('>') // Ignore lines with HTML tags
     ) {
       return sanitize(line);
     }
@@ -105,7 +108,8 @@ function getTitleFromContent(content = '') {
 
 
 // get description function
-async function getDescription({ content, item, usedOpenAI }) {
+async function getDescription({ content, item }) {
+   const descriptionMode = process.env.DESCRIPTION_MODE || 'auto';
   let fallback = 'No summary available.';
 
   // 🧼 Step 1: Try fallback summary from RSS fields
@@ -125,46 +129,43 @@ async function getDescription({ content, item, usedOpenAI }) {
   }
 
   // 🤖 Step 4: GPT Mode
-  if (descriptionMode === 'gpt' || (descriptionMode === 'auto' && usedOpenAI)) {
-    try {
-      const summaryRes = await withRetry(() =>
-        openai.chat.completions.create({
-          model: "gpt-4-turbo",
-          messages: [{
-            role: 'user',
-            content: `Summarize this sports article in 80 to 100 words, in a concise, journalistic tone. Highlight the key event, result, and standout player or moment:\n\n${content}`
-          }],
-          temperature: 0.7,
-        })
-      );
-      const aiSummary = sanitize(summaryRes?.choices?.[0]?.message?.content);
+ // if (descriptionMode === 'gpt' || (descriptionMode === 'auto' && usedOpenAI)) {
+   // try {
+     // const summaryRes = await withRetry(() =>
+      //  openai.chat.completions.create({
+          //model: "gpt-4-turbo",
+          //messages: [{
+          //  role: 'user',
+          //  content: `Summarize this sports article in 80 to 100 words, in a concise, journalistic tone. Highlight the key event, result, and standout player or moment:\n\n${content}`
+         // }],
+         // temperature: 0.7,
+       // })
+      //);
+      //const aiSummary = sanitize(summaryRes?.choices?.[0]?.message?.content);
 
-      if (aiSummary && aiSummary.length >= 200) {
-        return aiSummary;
-      } else {
-        console.warn("⚠️ GPT summary too short. Using fallback.");
-      }
-     }  catch (err) {
-      console.warn("⚠️ OpenAI failed:", err?.response?.data || err.message);
-    }
+      //if (aiSummary && aiSummary.length >= 200) {
+     //   return aiSummary;
+      //} else {
+      //  console.warn("⚠️ GPT summary too short. Using fallback.");
+      //}
+    // }  catch (err) {
+    //  console.warn("⚠️ OpenAI failed:", err?.response?.data || err.message);
+   //}
 
-  }
+ // }
 
   // ⛑️ Step 5: Fallback return
   return fallback || 'No summary available.';
 }
 
-
-
 async function generateArticleFromItem(item, sourceTitle) {
   const pubDate = safeDate(item.pubDate);
   if (!pubDate) {
-  console.warn("⚠️ Invalid pubDate, skipping article:", item.title);
-  return;
-}
+    console.warn("⚠️ Invalid pubDate, skipping article:", item.title);
+    return;
+  }
 
-  let title = sanitize(item.title || 'Untitled'); // ✅ Moved to top
-
+  let title = sanitize(item.title || 'Untitled');
   const slug = slugify(title.toLowerCase(), { lower: true });
   const leagueFolder = inferLeagueFolder(title);
   const folderPath = path.join(OUTPUT_DIR, leagueFolder);
@@ -179,11 +180,11 @@ async function generateArticleFromItem(item, sourceTitle) {
 
   const link = sanitize(item.link || '');
 
-  // 🔍 Smart ARTICLE_MODE detection
+  // Smart mode detection
   const lowerTitle = title.toLowerCase();
   const snippet = (item.contentSnippet || item.summary || item.description || '').toLowerCase();
 
-  let mode = "summarize"; // default
+  let mode = "summarize";
   if (
     lowerTitle.includes("final") ||
     lowerTitle.includes("championship") ||
@@ -203,79 +204,19 @@ async function generateArticleFromItem(item, sourceTitle) {
   console.log(`🧠 ARTICLE_MODE detected: ${mode}`);
 
   let content = '';
-  let usedOpenAI = false;
 
-  if (openai && process.env.USE_OPENAI === "true") {
-    try {
-      const prompt = (() => {
-        switch (mode) {
-          case "summarize":
-            return `Summarize the article in exactly 5 clear and informative bullet points. Each point should be a complete sentence. The total length should be at least 100 words:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`;
-          case "article":
-            return `You are a professional sports journalist. Write a well-structured news article in 5 concise paragraphs. Use a neutral tone. The article should be at least 300 words. Avoid repetition and include relevant context from the source:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`;
-          case "in_depth":
-            return `Create an in-depth sports news article, focusing on the topic implied by the title or content snippet. Use the following news snippet as a starting point:\n\n${item.contentSnippet || item.summary || item.description || title}\n\nWrite in a style similar to top sports news outlets like ESPN, The Athletic, or BBC Sport. Structure the piece into 4-5 paragraphs, include analysis, commentary, and relevant factual detail to make the article both engaging and informative.\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`;
-          default:
-            return `You are a professional sports journalist. Write a well-structured news article in 5 concise paragraphs. Use a neutral tone. The article should be at least 300 words. Avoid repetition and include relevant context from the source:\n\nTitle: ${title}\nDate: ${pubDate}\nSource: ${sourceTitle}\nLink: ${link}`;
-        }
-      })();
-
-      console.log("📝 OpenAI Prompt:\n", prompt);
-      console.log("🔁 Waiting for OpenAI response...");
-
-      const response = await withRetry(() =>
-        openai.chat.completions.create({
-          model: "gpt-4-turbo",
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
-        })
-      );
-
-      const draft = response?.choices?.[0]?.message?.content?.trim();
-      console.log("📤 OpenAI Response:\n", draft);
-
-      if (draft && draft.length >= 400 && draft.split(/\s+/).length >= 150) {
-        content = draft;
-        usedOpenAI = true;
-      } else {
-        console.warn("⚠️ GPT output too short or malformed. Will attempt fallback.");
-      }
-     } catch (err) {
-      console.warn("⚠️ OpenAI failed:", err?.response?.data || err.message);
-    }
-
-  }
-
-  if (!content) {
+  // Try to extract article first
   try {
     const extracted = await extractArticle(link);
     if (extracted && extracted.length >= 400) {
       content = extracted;
     } else {
-      console.warn("⚠️ Extracted article too short. Using RSS snippet as final fallback.");
-      content = sanitize(item.contentSnippet || item.summary || item.description || title);
-      if (content.length < 100) {
-        console.warn("❌ Fallback content too short. Skipping.");
-        return;
-      }
+      console.warn("⚠️ Extracted article too short. Using RSS snippet as fallback.");
+      content = getMinimalContentFallback(item, title);
     }
   } catch (err) {
-    console.warn("❌ Failed to extract article. Using RSS snippet as final fallback.");
-    content = sanitize(item.contentSnippet || item.summary || item.description || title);
-    if (content.length < 100) {
-      console.warn("❌ Fallback content too short. Skipping.");
-      return;
-    }
-  }
-}
-
-  // ✅ Rewrite with OpenAI if enabled
-  if (usedOpenAI && content && process.env.ENABLE_REWRITE === "true") {
-    try {
-      content = await rewriteWithOpenAI(title, content, link);
-    } catch (err) {
-      console.warn("⚠️ Failed to rewrite content with OpenAI");
-    }
+    console.warn("❌ Failed to extract article. Using RSS snippet as fallback.");
+    content = getMinimalContentFallback(item, title);
   }
 
   let image = await extractImageFromURL(link);
@@ -285,16 +226,9 @@ async function generateArticleFromItem(item, sourceTitle) {
     image = fallbackImage;
   }
 
+  const description = await getDescription({ content, item });
 
-  const description = await getDescription({
-    content,
-    item,
-    usedOpenAI,
-    descriptionMode: process.env.DESCRIPTION_MODE || 'auto'
-   });
-
-
-  // Try to override title based on content if cleaner
+  // Try to override title if content-derived one is better
   let cleanedTitle = getTitleFromContent(content);
   if (cleanedTitle && cleanedTitle.length >= 20 && cleanedTitle.length <= 120) {
     console.log(`✂️ Overriding title with content-derived title:\n→ "${cleanedTitle}"`);
@@ -302,27 +236,36 @@ async function generateArticleFromItem(item, sourceTitle) {
   }
 
   const domain = new URL(link).hostname.replace(/^www\./, '');
-  const tags = [leagueFolder]; // Optionally enhance with keyword detection
+  const tags = [leagueFolder];
 
   const markdown = `---
-   title: "${title}"
-   date: "${pubDate}"
-   slug: "${slug}"
-   source: "${sanitize(sourceTitle)}"
-   original_link: "${link}"
-   description: "${description}"
-   mode: "${mode}"
-   used_openai: "${usedOpenAI}"
-   image: "${image}"
-   tags: ["${leagueFolder}"]
-   domain: "${domain}"
-  ---
-  ${content}`;
+title: "${title}"
+date: "${pubDate}"
+slug: "${slug}"
+source: "${sanitize(sourceTitle)}"
+original_link: "${link}"
+description: "${description}"
+mode: "${mode}"
+image: "${image}"
+category: "${leagueFolder}"
+tags: ["${leagueFolder}"]
+domain: "${domain}"
+---
+${content}`;
 
   await fs.writeFile(filePath, markdown);
   console.log(`✅ Saved: ${filePath}`);
 }
 
+// 🔧 Helper for fallback content
+function getMinimalContentFallback(item, title) {
+  let fallback = sanitize(item.contentSnippet || item.summary || item.description || title);
+  if (!fallback || fallback.length < 100) {
+    console.warn("⚠️ Fallback content too short, using title only.");
+    fallback = title;
+  }
+  return fallback;
+}
 
 async function readArticlesFromDisk() {
   await fs.ensureDir(OUTPUT_DIR);
@@ -336,34 +279,25 @@ async function readArticlesFromDisk() {
 
         const promise = fs.readFile(item.path, "utf-8")
           .then(raw => {
-            const match = raw.match(/^---\n([\s\S]+?)\n---\n\n([\s\S]*)$/);
-            if (!match) {
+            try {
+              const { attributes, body } = frontMatter(raw);
+              const fallbackImage = "https://example.com/default-news.jpg";
+              const category = path.relative(OUTPUT_DIR, path.dirname(item.path));
+
+              articles.push({
+                title: attributes.title || "",
+                date: attributes.date || "",
+                slug: attributes.slug || "",
+                source: attributes.source || "",
+                original_link: attributes.original_link || "",
+                content: body.trim(),
+                description: attributes.description || body.slice(0, 200).trim() + "...",
+                image: attributes.image || fallbackImage,
+                category: attributes.category || category || "general",
+              });
+            } catch (err) {
               console.warn(`⚠️ Skipping malformed file: ${item.path}`);
-              return;
             }
-
-            const frontMatter = Object.fromEntries(
-              match[1].split("\n").map(line => {
-                const [key, ...rest] = line.split(":");
-                return [key.trim(), rest.join(":").trim().replace(/^"|"$/g, "")];
-              })
-            );
-
-            const body = match[2].trim();
-            const fallbackImage = "https://example.com/default-news.jpg";
-            const category = path.relative(OUTPUT_DIR, path.dirname(item.path));
-
-            articles.push({
-              title: frontMatter.title || "",
-              date: frontMatter.date || "",
-              slug: frontMatter.slug || "",
-              source: frontMatter.source || "",
-              original_link: frontMatter.original_link || "",
-              content: body,
-              description: frontMatter.description || body.slice(0, 200) + "...",
-              image: frontMatter.image || fallbackImage,
-              category: frontMatter.category || category || "general",
-            });
           })
           .catch(err => {
             console.error(`❌ Failed to parse article at ${item.path}`, err);
@@ -378,9 +312,9 @@ async function readArticlesFromDisk() {
           console.warn("⚠️ No articles found in disk");
         }
 
-        const sorted = articles
-          .filter(a => !!a.slug && !!a.date && !!a.title && !!a.content)
-          .sort((a, b) => new Date(b.date) - new Date(a.date));
+       const sorted = articles
+        .filter(a => !!a.slug && !!a.date && !!a.title && !!a.content && !isNaN(new Date(a.date).getTime()))
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
 
         resolve(sorted);
       })
@@ -391,10 +325,9 @@ async function readArticlesFromDisk() {
 
 
 async function fetchNews(force = false) {
-  const NEWS_WINDOW_HOURS = parseInt(process.env.NEWS_TIME_WINDOW_HOURS || '12');
-  const maxAge = 1000 * 60 * 60 * NEWS_WINDOW_HOURS;
-  const now = new Date();
-  const cutoffTime = new Date(now.getTime() - NEWS_WINDOW_HOURS * 60 * 60 * 1000);
+  const NEWS_WINDOW_HOURS = parseInt(process.env.NEWS_TIME_WINDOW_HOURS || '24');
+  const cutoffDate = new Date();
+  cutoffDate.setHours(0, 0, 0, 0); // Set to start of day
 
   if (!force && await fs.pathExists(CACHE_PATH)) {
     try {
@@ -402,6 +335,7 @@ async function fetchNews(force = false) {
       const cachedDateStr = cached?.trending?.[0]?.date;
       if (cachedDateStr) {
         const cacheAge = Date.now() - new Date(cachedDateStr).getTime();
+        const maxAge = 1000 * 60 * 60 * 24; // 24 hours
         if (cacheAge < maxAge) {
           console.log("✅ Using fresh cache");
           return cached;
@@ -428,28 +362,33 @@ async function fetchNews(force = false) {
   for (const url of feedUrls) {
     await new Promise(res => setTimeout(res, 1000)); 
     try {
-      const feed = await withRetry(() => parser.parseURL(url));
+      const feed = await parser.parseURL(url);
       const source = feed.title;
       for (const item of feed.items) {
-        const pubDate = new Date(item.pubDate);
-        if (pubDate > cutoffTime) {
+        const pubDate = item.pubDate.replace(/ BST$/, ''); // Remove BST timezone
+        const date = new Date(pubDate);
+        if (isNaN(date.getTime())) {
+          console.warn(`⚠️ Invalid pubDate: ${item.pubDate}. Skipping article: ${item.title}`);
+          continue;
+        }
+        if (date >= cutoffDate) {
           try {
             await generateArticleFromItem(item, source);
           } catch (err) {
             console.warn(`⚠️ Failed to process article "${item.title}": ${err.message}`);
           }
         } else {
-          console.log(`⏭️ Skipped older article (${pubDate.toISOString()}): ${item.title}`);
+          console.log(`⏭️ Skipped older article (${date.toISOString()}): ${item.title}`);
         }
       }
     } catch (err) {
       const msg = err?.stack || err?.message || String(err) || "Unknown error";
       console.error(`❌ Failed to fetch news: ${msg}`);
     }
-  }
+  } 
 
   let articles = await readArticlesFromDisk();
-  articles = articles.filter(a => new Date(a.date) > cutoffTime);
+  articles = articles.filter(a => new Date(a.date) >= cutoffDate);
   const seen = new Set();
   articles = articles.filter(a => {
     if (seen.has(a.slug)) return false;
@@ -457,11 +396,18 @@ async function fetchNews(force = false) {
     return true;
   });
 
+  // Prioritize football news
+  articles.sort((a, b) => {
+    if (a.category === 'football' && b.category !== 'football') return -1;
+    if (a.category !== 'football' && b.category === 'football') return 1;
+    return new Date(b.date) - new Date(a.date);
+  });
+
   if (articles.length < 6) {
     console.warn(`⚠️ Only ${articles.length} unique recent articles`);
   }
 
-  const TRENDING_COUNT = 10;
+  const TRENDING_COUNT = Math.min(10, articles.length);
   const trending = articles.slice(0, TRENDING_COUNT);
   const updates = articles.slice(TRENDING_COUNT);
 
@@ -477,9 +423,13 @@ async function fetchNews(force = false) {
   await fs.ensureDir(path.dirname(CACHE_PATH));
   console.log("🧾 Final structured JSON:", JSON.stringify(structured, null, 2));
 
-  await fs.writeJson(CACHE_PATH, structured, { spaces: 2 });
+  if (trending.length > 0 && updates.length > 0) {
+    await fs.writeJson(CACHE_PATH, structured, { spaces: 2 });
+  } else {
+    console.warn("⚠️ No articles to cache. Skipping cache write.");
+  }
+
   return structured;
 }
-
 
 module.exports = { fetchNews };

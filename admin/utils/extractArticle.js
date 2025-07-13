@@ -3,7 +3,8 @@ const fetch = require('node-fetch');
 const { JSDOM } = require('jsdom');
 const { Readability } = require('@mozilla/readability');
 
-async function extractFullArticle(url) {
+async function extractArticle(url) {
+
   try {
     const response = await fetch(url, {
       headers: {
@@ -22,5 +23,5 @@ async function extractFullArticle(url) {
   }
 }
 
-module.exports = { extractFullArticle };
+module.exports = { extractArticle };
 

@@ -1,0 +1,14 @@
+---
+   title: "Jamie George called up as Lions lose Cowan-Dickie and Ringrose for first Australia Test"
+   date: "2025-07-12T15:37:47.000Z"
+   slug: "jamie-george-called-up-as-lions-lose-cowan-dickie-and-ringrose-for-first-australia-test"
+   source: "Sport | The Guardian"
+   original_link: "https://www.theguardian.com/sport/2025/jul/12/jamie-george-lions-luke-cowan-dickie-garry-ringrose-first-australia-test"
+   description: "Farrell is facing fresh selection problems for Brisbane  England hooker George is flying from tour of Argentina  Andy Farrell is facing fresh selection problems, with Garry Ringrose and Luke Cowan-Dickie out of the Lions’ first Test against the Wallabies. The centre Ringrose and the hooker Cowan-Dickie have been sidelined by concussion, with England’s Jamie George flying to Australia from Argentina as cover for the latter and to bolster the squad for the final three weeks of the tour. Ringrose’s misfortune has come at a pivotal juncture and is likely to propel Scotland’s Huw Jones into the starting XV to face Australia in Brisbane next Saturday. Farrell, consequently, may be tempted to unite him with his Glasgow teammate Sione Tuipulotu after the pair’s successful outing in a 48-0 thrashing of a combined Australia & New Zealand Invitational XV.  Continue reading..."
+   mode: "summarize"
+   image: "https://i.guim.co.uk/img/media/5f9f2563c72175852094710ff132d3e967e0b2a5/147_0_1644_1315/master/1644.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=056e3ff534ac532e39fd5268f0841257"
+   category: "general"
+   tags: ["general"]
+   domain: "theguardian.com"
+  ---
+  Farrell is facing fresh selection problems for Brisbane  England hooker George is flying from tour of Argentina  Andy Farrell is facing fresh selection problems, with Garry Ringrose and Luke Cowan-Dickie out of the Lions’ first Test against the Wallabies. The centre Ringrose and the hooker Cowan-Dickie have been sidelined by concussion, with England’s Jamie George flying to Australia from Argentina as cover for the latter and to bolster the squad for the final three weeks of the tour. Ringrose’s misfortune has come at a pivotal juncture and is likely to propel Scotland’s Huw Jones into the starting XV to face Australia in Brisbane next Saturday. Farrell, consequently, may be tempted to unite him with his Glasgow teammate Sione Tuipulotu after the pair’s successful outing in a 48-0 thrashing of a combined Australia & New Zealand Invitational XV.  Continue reading...

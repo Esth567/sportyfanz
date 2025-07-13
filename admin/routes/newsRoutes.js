@@ -2,16 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  getNews,
-  getTopstories,
-  getUpdatestories 
+  getNews
 } = require('../controllers/newsController');
 
 
-
 router.get('/news', getNews);
-router.get('/trendstories', getTopstories);
-router.get('/updatestories', getUpdatestories);
 
 
 

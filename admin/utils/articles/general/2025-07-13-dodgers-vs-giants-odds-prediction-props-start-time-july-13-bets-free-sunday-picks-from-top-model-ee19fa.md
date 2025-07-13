@@ -1,0 +1,29 @@
+---
+title: "Dodgers vs. Giants odds, prediction, props, start time, July 13 bets: Free Sunday picks from top model"
+date: "2025-07-13T14:11:38.000Z"
+slug: "dodgers-vs.-giants-odds-prediction-props-start-time-july-13-bets:-free-sunday-picks-from-top-model"
+source: "CBSSports.com Headlines"
+original_link: "https://www.cbssports.com/mlb/news/dodgers-vs-giants-odds-prediction-props-start-time-july-13-bets-free-sunday-picks-from-top-model/"
+description: "SportsLine's proven model has simulated Los Angeles Dodgers vs. San Francisco Giants 10,000 times and released its MLB picks for Sunday's game at Oracle Park in San Francisco"
+mode: "summarize"
+image: "https://sportshub.cbsistatic.com/i/r/2025/07/10/4bcb809b-8db5-4f17-99aa-29de09630382/thumbnail/1200x675/7afc13a4fe1db9c210c2d07aeaf77d18/ohtani-imagn.png"
+category: "general"
+tags: ["general"]
+domain: "cbssports.com"
+---
+<div id="readability-page-1" class="page"><div>
+        
+        
+                            
+                
+        <p>The <a href="https://www.cbssports.com/mlb/teams/LAD/los-angeles-dodgers/">Los Angeles Dodgers</a> meet the <a href="https://www.cbssports.com/mlb/teams/SF/san-francisco-giants/">San Francisco Giants</a> in the third and deciding game of their weekend series on Sunday. Los Angeles snapped a seven-game losing streak with a 2-1 win on Saturday, after San Francisco recorded an 8-7 win on Friday. The Dodgers (57-39) will start right-hander <a href="https://www.cbssports.com/mlb/players/29313209/yoshinobu-yamamoto/">Yoshinobu Yamamoto</a> (8-7, 2.77 ERA), while the Giants (52-44) will counter with left-hander <a href="https://www.cbssports.com/mlb/players/1947846/robbie-ray/">Robbie Ray</a> (9-3, 2.63 ERA). &nbsp;</p><p>First pitch from Oracle Park in San Francisco is set for 4:05 p.m. ET. Los Angeles is -144 on the money line (risk $144 to win $100) in the latest <a href="https://www.sportsline.com/mlb/game-forecast/MLB_20250713_LAD@SF/" target="_blank">Dodgers vs. Giants</a> odds from <a href="https://www.cbssports.com/betting/news/draftkings-promo-code/">DraftKings Sportsbook</a>, while San Francisco is a +118 underdog (risk $100 to win $118). The over/under for total runs scored is 7.5.&nbsp;</p><p>The SportsLine Projection Model simulates every <a href="https://cbssports.com/mlb/">MLB</a> game 10,000 times. It enters Week 16 of the 2025 <a href="https://cbssports.com/mlb/">MLB</a> season 45-38 on top-rated MLB&nbsp;<a href="https://www.cbssports.com/betting/" target="_blank">betting</a>&nbsp;picks. It has excelled in making home run prop picks, returning more than 28 units of profit. Anybody following at&nbsp;<a href="https://www.cbssports.com/betting/news/sportsbook-promos/" target="_blank">sportsbooks</a>&nbsp;and on&nbsp;<a href="https://www.cbssports.com/betting/news/best-betting-apps/" target="_blank">betting apps</a>, or new users taking advantage of the latest <span><a href="https://www.cbssports.com/betting/news/draftkings-promo-code/" target="_blank">DraftKings promo code</a></span> or <span><a href="https://www.cbssports.com/betting/news/fanatics-promo-code/" target="_blank">Fanatics Sportsbook promo code</a></span> could have seen strong returns.</p><p><strong>Here are the model's three best bets for Dodgers vs. Giants (odds subject to change):</strong></p>
+        
+
+<ul><li>Giants ML (+118)</li><li>Dodgers run line +1.5 (+122)</li><li><a href="https://www.cbssports.com/mlb/players/2901324/shohei-ohtani/">Shohei Ohtani</a>, Dodgers, over 1.5 total bases (+105)</li></ul><h2>Giants to win (+118)</h2><p>San Francisco has played well of late, winning seven of their past 10 games. Los Angeles, meanwhile, has struggled, losing seven of their past eight games, including four of five on their road trip to close out the first half of the season. The model favors San Francisco, which has a money line probability of well over 50%, bringing an A-rating. DraftKings is one of the books with a +118 price on the Giants, and new users can unlock even more value with a <span><a href="https://www.cbssports.com/betting/news/draftkings-promo-code/" target="_blank">DraftKings promo code</a></span>:</p><h2>Dodgers run line +1.5 (+122)</h2><p>The model has simulated the game 10,000 times. It suggests Los Angeles will cover the run line,   and has San Francisco winning the game by an average score of 4.5 to 4.4, with the Dodgers covering nearly 70% of the time, making it the better value. The Dodgers are 24-22 on the road, while the Giants are 28-19 on their home field in 2025. New users can instantly receive $150 in bonus bets by wagering at least $5 on any bet with this <span><a href="https://www.cbssports.com/betting/news/bet365-promo-code/" target="_blank">bet365 bonus code</a></span>.&nbsp;</p><h2>Shohei Ohtani, Dodgers, over 1.5 total bases (+105)</h2><p>Ohtani has hits in three of his last five games, including a 2-for-4 performance in Monday's 9-1 loss to the <a href="https://www.cbssports.com/mlb/teams/MIL/milwaukee-brewers/">Milwaukee Brewers</a>. He homered for the Dodgers' lone run in a 3-1 defeat to the Brewers on Tuesday. In 94 games this season, Ohtani is batting .275 with 12 doubles, seven triples, 32 homers and 60 RBI. In 28 career games against the Giants, he is hitting .272 with five doubles, seven homers and 16 RBI.</p>
+        
+
+<p>The model is projecting 1.9 total bases for Ohtani, and gives this prop a 4.5-star rating. <a href="https://www.cbssports.com/betting/news/fanduel-promo-code/">FanDuel</a> has this line at -130, with the best way of making this play being via a&nbsp;<span><a href="https://www.cbssports.com/betting/news/fanduel-promo-code/" target="_blank">FanDuel promo code</a></span>.</p>
+
+
+        
+            </div></div>

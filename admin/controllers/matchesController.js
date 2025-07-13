@@ -31,8 +31,12 @@ exports.getMatches = async (req, res) => {
 
   try {
     const url = `${baseUrl}/?action=get_events&from=${from}&to=${to}&APIkey=${API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
+    const response = await fetch(url, {
+      headers: { 'Accept-Encoding': 'identity' } // Prevent gzip issues
+    });
+
+    const text = await response.text();
+    const data = JSON.parse(text);
 
     cache.set(cacheKey, data);
     res.json(data);

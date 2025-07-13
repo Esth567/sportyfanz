@@ -306,7 +306,7 @@ function populateNewsSection(sectionId, newsList) {
               ${imageHtml}
             </div>
             <div class="news-info">
-             <h2 class="transferNews-header">${item.title}</h2>
+              <h2 class="transferNews-header">${item.title}</h2>
               <p class="transferNews-description">${item.description?.slice(0, 150) || 'No description'}...</p>
             </div>
           </div>
@@ -319,7 +319,42 @@ function populateNewsSection(sectionId, newsList) {
         showFullNews(el);
       });
     });
-  }
+  } else if (sectionId === 'sliderNews-stories') {
+  const container = document.querySelector('.header-slider');
+  const newsSlides = newsList.slice(0, 5); // Show 5 sport news
+
+  // Remove old dynamically generated news slides (optional cleanup)
+  container.querySelectorAll('.sliderNews-dynamic').forEach(el => el.remove());
+
+  newsSlides.forEach((item, index) => {
+    const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+    const imageHtml = isValidImage
+      ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+            alt="Image for ${item.title}" 
+            loading="lazy" 
+            onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
+      : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
+            alt="Image not available for ${item.title}" 
+            loading="lazy" />`;
+
+    const slide = document.createElement('div');
+    slide.className = 'slider-content sliderNews-dynamic'; // Add class for cleanup
+    slide.innerHTML = `
+      <div class="sliderNews-image">
+        ${imageHtml}
+        <div class="sliderNews-info">
+          <h2 class="sliderNews-header">${item.title}</h2>
+        </div>
+      </div>
+    `;
+
+    slide.addEventListener('click', () => showFullNews(item));
+    container.appendChild(slide);
+  });
+
+   // Re-initialize slider after inserting slides
+   initSlider();
+ }
 }
 
 
@@ -338,17 +373,27 @@ function showFullNews(clickedItem) {
     // Get data from clicked item
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
-    const newsList = section === 'trending-stories' && Array.isArray(window.trendingNews)
-      ? window.trendingNews
-      : section === 'newsUpdate-stories' && Array.isArray(window.updatesNews)
-        ? window.updatesNews
-        : [];
-    const newsItem = newsList[parseInt(index)];
+    let newsList = [];
 
+    if (section === 'trending-stories' && Array.isArray(window.trendingNews)) {
+       newsList = window.trendingNews;
+     } else if (
+        (section === 'newsUpdate-stories' || section === 'sliderNews-stories') &&
+        Array.isArray(window.updatesNews)
+      ) {
+        newsList = window.updatesNews;
+     }
 
-    // Format description into paragraphs
-    const formattedDesc = typeof newsItem.description === 'string'
-      ? newsItem.description
+      const newsItem = newsList[parseInt(index)];
+
+      if (!newsItem) {
+        alert("News item not found.");
+        return;
+      }
+
+      // Format description into paragraphs
+      const formattedDesc = typeof newsItem.description === 'string'
+        ? newsItem.description
           .split('\n\n')
           .map(p => `<p>${p.trim()}</p>`)
           .join('')
@@ -397,6 +442,7 @@ function showFullNews(clickedItem) {
 document.addEventListener("DOMContentLoaded", () => {
   loadNews('trending-stories', '/api/news'); 
   loadNews('newsUpdate-stories', '/api/news'); 
+  loadNews('sliderNews-stories', '/api/news');
 });
 
 
@@ -529,7 +575,7 @@ function setActiveSlide(index) {
     clearInterval(sliderInterval); // Stop automatic sliding
     currentPlayer = index;
     showNextPlayer();
-    sliderInterval = setInterval(showNextPlayer, 3000); // Restart auto-slide
+    sliderInterval = setInterval(showNextPlayer, 5000); // Restart auto-slide
 }
 
 // Fetch top scorers on page load
@@ -645,32 +691,23 @@ async function fetchTopFourStandings(leagueId) {
 
 
 // middle hero banner header slider
-let currentIndex = 0;
-const slides = document.querySelectorAll(".slider-content");
-const totalSlides = slides.length;
+function initSlider() {
+  let currentIndex = 0;
+  const slides = document.querySelectorAll(".header-slider .slider-content");
 
-function showSlide(index) {
-  slides.forEach((slide, i) => {
-    if (i === index) {
-      slide.classList.add("active");
-      slide.style.display = "flex"; // Show active slide
-    } else {
-      slide.classList.remove("active");
-      slide.style.display = "none"; // Hide inactive slides
-    }
-  });
-}
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("active", i === index);
+    });
+  }
 
-// Auto-slide functionality
-function autoSlide() {
-  currentIndex = (currentIndex + 1) % totalSlides; // Loop back to the first slide
   showSlide(currentIndex);
+
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % slides.length;
+    showSlide(currentIndex);
+  }, 4000);
 }
-
-// Start the slider
-showSlide(currentIndex);
-setInterval(autoSlide, 4000); // Change slides every 3 seconds
-
 
 
 

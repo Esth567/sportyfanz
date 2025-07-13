@@ -1,6 +1,7 @@
 
 const fetch = require('node-fetch');
 const NodeCache = require("node-cache");
+const cache = require('../utils/cache/redisCache');
 const playerImageMap = require('../utils/playerImageMap');
 
 
@@ -73,6 +74,7 @@ exports.getMatches = async (req, res) => {
     console.error('Error fetching matches:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
+    
 };
 
 

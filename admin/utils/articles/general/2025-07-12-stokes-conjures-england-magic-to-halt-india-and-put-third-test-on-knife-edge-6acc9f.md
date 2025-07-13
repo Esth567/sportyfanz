@@ -1,0 +1,14 @@
+---
+   title: "Stokes conjures England magic to halt India and put third Test on knife-edge"
+   date: "2025-07-12T18:11:47.000Z"
+   slug: "stokes-conjures-england-magic-to-halt-india-and-put-third-test-on-knife-edge"
+   source: "Sport | The Guardian"
+   original_link: "https://www.theguardian.com/sport/2025/jul/12/stokes-conjures-england-magic-to-halt-india-and-put-third-test-on-knife-edge"
+   description: "Third Test D3: England 387 & 2-0; India 387  England bat out one over after bowling India out  It has been a tough old series for England’s bowlers. As well as wrestling with docile pitches and doughy Dukes balls in a lengthy heatwave, they have come up against an India batting lineup that is rich with talent and seriously gutsy with it. The upshot has been perspiration outstripping inspiration for long passages of play. Not that those two elements are mutually exclusive and in Ben Stokes, England have a cricketer who thrives on delivering both. On a gripping third day of this third Test, as India were bowled out for 387 in 119.2 overs to leave the scores level on first innings, the hosts were thankful for their captain’s ability to conjure something from nothing. At stumps, on two for no loss, England had just about returned to the box seat because of it.  Continue reading..."
+   mode: "summarize"
+   image: "https://i.guim.co.uk/img/media/6dc6572b70ed9d42cf007f919ae0affe905a7baa/205_182_1834_1467/master/1834.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=00baa4464862291faa445005af78ac9a"
+   category: "general"
+   tags: ["general"]
+   domain: "theguardian.com"
+  ---
+  Third Test D3: England 387 & 2-0; India 387  England bat out one over after bowling India out  It has been a tough old series for England’s bowlers. As well as wrestling with docile pitches and doughy Dukes balls in a lengthy heatwave, they have come up against an India batting lineup that is rich with talent and seriously gutsy with it. The upshot has been perspiration outstripping inspiration for long passages of play. Not that those two elements are mutually exclusive and in Ben Stokes, England have a cricketer who thrives on delivering both. On a gripping third day of this third Test, as India were bowled out for 387 in 119.2 overs to leave the scores level on first innings, the hosts were thankful for their captain’s ability to conjure something from nothing. At stumps, on two for no loss, England had just about returned to the box seat because of it.  Continue reading...

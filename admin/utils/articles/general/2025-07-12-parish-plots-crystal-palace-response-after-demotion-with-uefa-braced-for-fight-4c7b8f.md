@@ -1,0 +1,14 @@
+---
+   title: "Parish plots Crystal Palace response after demotion with Uefa braced for fight"
+   date: "2025-07-12T15:04:41.000Z"
+   slug: "parish-plots-crystal-palace-response-after-demotion-with-uefa-braced-for-fight"
+   source: "Sport | The Guardian"
+   original_link: "https://www.theguardian.com/football/2025/jul/12/steve-parish-crystal-palace-uefa-john-textor-football-politics"
+   description: "FA Cup winners feel hard done by after being banned from Europa League due to a breach of multi-club ownership rules As an emotional Steve Parish said, it felt like “winning the lottery and going to the counter and you don’t get the prize”. Confirmation from Uefa on Friday of Crystal Palace’s demotion from the Europa League to Conference League had been expected since European football’s governing body delayed its decision to await the outcome of Lyon’s appeal against being relegated to Ligue 2. That did not make it any easier for Parish, who has proudly overseen Palace’s rise from the brink of extinction in 2010 to a first major trophy. When the final whistle blew at Wembley to seal Palace’s FA Cup final victory against Manchester City eight weeks ago, Parish was greeted by a massive bear hug from John Textor, who at that stage was Palace’s largest shareholder, but had spectacularly fallen out with the chair over not being allowed more of an influence.  Continue reading..."
+   mode: "summarize"
+   image: "https://i.guim.co.uk/img/media/490a5dcda672fd4260da7595a162892798e03916/317_0_3169_2535/master/3169.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=4ca877e999f8ede06de5b6ff1be35fec"
+   category: "general"
+   tags: ["general"]
+   domain: "theguardian.com"
+  ---
+  FA Cup winners feel hard done by after being banned from Europa League due to a breach of multi-club ownership rules As an emotional Steve Parish said, it felt like “winning the lottery and going to the counter and you don’t get the prize”. Confirmation from Uefa on Friday of Crystal Palace’s demotion from the Europa League to Conference League had been expected since European football’s governing body delayed its decision to await the outcome of Lyon’s appeal against being relegated to Ligue 2. That did not make it any easier for Parish, who has proudly overseen Palace’s rise from the brink of extinction in 2010 to a first major trophy. When the final whistle blew at Wembley to seal Palace’s FA Cup final victory against Manchester City eight weeks ago, Parish was greeted by a massive bear hug from John Textor, who at that stage was Palace’s largest shareholder, but had spectacularly fallen out with the chair over not being allowed more of an influence.  Continue reading...

@@ -1,0 +1,15 @@
+---
+title: "Konerko receives autographed jersey from pope"
+date: "2025-07-13T00:07:36.000Z"
+slug: "konerko-receives-autographed-jersey-from-pope"
+source: "www.espn.com - TOP"
+original_link: "https://www.espn.com/mlb/story/_/id/45726045/white-sox-great-konerko-receives-gift-pope-leo-xiv"
+description: "White Sox great Paul Konerko received a present -- a jersey signed by noted Chicago fan Pope Leo XIV -- on Saturday afternoon, in honor of the 20th anniversary of the franchise's 2005 World Series championship run."
+mode: "summarize"
+image: "https://a2.espncdn.com/combiner/i?img=%2Fphoto%2F2025%2F0712%2Fr1518238_1296x729_16%2D9.jpg"
+category: "general"
+tags: ["general"]
+domain: "espn.com"
+---
+<div id="readability-page-1" class="page"><section id="article-feed" data-behavior="author_overlay article_header_news_feed_item_meta article_legal_footer"><article data-id="45726045" data-behavior="story_scroll story_progress" data-src="/mlb/story/_/id/45726045/white-sox-great-konerko-receives-gift-pope-leo-xiv"><div><header></header><div><div><ul><li><p>Associated Press</p></li></ul><p><span>Jul 12, 2025, 06:08 PM ET</span></p></div><p>CHICAGO -- <a data-clubhouse-guid="8f4800c6-3c05-b3d5-8186-9750cd72a3c2" href="https://www.espn.com/mlb/team/_/name/chw/chicago-white-sox">Chicago White Sox</a> great Paul Konerko got a present from one No. 14 to another in honor of the 20th anniversary of the 2005 World Series championship run: a jersey signed by noted Chicago fan Pope Leo XIV.</p><p>Cardinal Blase Cupich, the archbishop of Chicago, presented Konerko a jersey with the new pontiff's signature on the back during a ceremony prior to the game against the <a data-clubhouse-guid="6ad8fa03-36bc-baab-c76a-345b6544424d" href="https://www.espn.com/mlb/team/_/name/cle/cleveland-guardians">Cleveland Guardians</a>. It had the six-time All-Star's last name and "Pope Leo" above the No. 14.</p><p>Robert Prevost became the first pope from the U.S. in the history of the Catholic Church when he was elected on May 8. The Chicago-born missionary, who took the name Leo XIV, is a White Sox fan.</p><p>Prevost attended the 2005 World Series opener against Houston in Chicago. He watched from Section 140, Row 19, Seat 2 as the White Sox beat the Astros 5-3 on the way to a four-game sweep and their first title since 1917.</p><p>In May, the team unveiled a graphic installation near the seat paying tribute to Pope Leo and that moment. The pillar artwork features a waving Pope Leo XIV, along with a picture from the TV broadcast of the future pope sitting with good friend Ed Schmit and his grandson, Eddie.</p><p>Members of the 2005 team are in Chicago this weekend to celebrate the 20th anniversary of the championship run. The White Sox debuted uniform patches honoring late closer Bobby Jenks, who died last week in Portugal, where he was being treated for stomach cancer. On Friday, the team unveiled a statue of former ace Mark Buehrle.</p>
+</div></div></article></section></div>

@@ -42,10 +42,7 @@ async function rewriteWithOpenAI(title, content, link) {
   const originalReadability = getReadabilityScore(content);
 
   const prompt = `
-Summarize the following article in a professional journalistic tone, similar to reporting on ESPN, BBC Sport, or Sky Sports.
-Use a confident, neutral, and informative style.
-Keep paragraphs short, clear, and free of jargon or overly casual language.
-End the piece with 3 to 5 key bullet-point takeaways.
+Rewrite the following sports news article to match the style of popular sports news outlets. Focus on recent football matches (90% of content) and include other sports news (10% of content). Structure the piece into sections with headings. Ensure the article is engaging, informative, and includes relevant quotes from experts or players. Aim for a length of 500-1000 words.
 
 ---
 Title: ${title}

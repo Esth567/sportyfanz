@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             return berlinTime
                 .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-                .toFormat("h:mm a");
+                .toFormat("h:mm");
         } catch (e) {
             console.error("Time conversion error:", e);
             return "TBD";
@@ -175,10 +175,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // trending news display in the first layer
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadNews(); 
-});
-
 // ========== RELATIVE TIME ========== //
 function updateRelativeTime() {
     const timeElements = document.querySelectorAll('.news-time');
@@ -205,31 +201,44 @@ function updateRelativeTime() {
 }
 
 // ========== LOAD NEWS DETAILS ==========
-async function loadNews() {
+async function loadNews(sectionId, endpoint) {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/trendstories');
+    const response = await fetch(endpoint);
 
     if (!response.ok) {
-      const text = await response.text(); // Only read body if you need to show the error
-      throw new Error(`Failed to fetch top stories: ${response.status}\n${text}`);
+      const text = await response.text(); 
+      throw new Error(`Failed to fetch news: ${response.status}\n${text}`);
     }
 
-    const data = await response.json();
-
-    if (!Array.isArray(data.trending)) {
-      throw new Error("Invalid trending news structure from API");
+    const text = await response.text();
+    if (!text || text.trim() === '') {
+      throw new Error("Empty response from server");
     }
 
-    window.trendingNews = data.trending;
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON received from server");
+    }
 
-    populateNewsSection('top-stories', data.trending);
+    const newsData = sectionId === 'trending-stories' ? data.trending : data.updates;
+    const newsKey = sectionId === 'trending-stories' ? 'trendingNews' : 'updatesNews';
+
+    if (!Array.isArray(newsData)) {
+      throw new Error("Invalid news structure from API");
+    }
+
+    window[newsKey] = newsData;
+
+    populateNewsSection(sectionId, newsData);
 
   } catch (error) {
-    console.error('Failed to load top stories:', error);
-    alert("⚠️ Could not load trending news: " + error.message);
+    console.error('Failed to load news:', error);
+    alert("⚠️ Could not load news: " + error.message);
   } finally {
     if (loader) loader.style.display = 'none';
   }
@@ -242,40 +251,76 @@ function populateNewsSection(sectionId, newsList) {
   if (!container || !Array.isArray(newsList)) return;
   console.log("Populating:", sectionId, "with", newsList.length, "items");
 
+  if (sectionId === 'trending-stories') {
+    container.innerHTML = newsList.map((item, index) => {
+      const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+      const imageHtml = isValidImage
+        ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+                  alt="Image for ${item.title}" 
+                  loading="lazy" 
+                  onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
+        : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
+                  alt="Image not available for ${item.title}" 
+                  loading="lazy" />`;
 
- container.innerHTML = newsList.map((item, index) => {
-  const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
-  const imageHtml = isValidImage
-    ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
-              alt="Image for ${item.title}" 
-              loading="lazy" 
-              onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
-    : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
-              alt="Image not available for ${item.title}" 
-              loading="lazy" />`;
-
-  return `
-    <div class="news-update" data-index="${index}" data-section="${sectionId}">   
-      <div class="news-container">
-        <div class="news-image">
-          ${imageHtml}
+      return `
+        <div class="news-update" data-index="${index}" data-section="${sectionId}">   
+          <div class="news-container">
+            <div class="news-image">
+              ${imageHtml}
+            </div>
+            <div class="news-info">
+              <p class="news-headline">${item.description?.slice(0, 150) || 'No description'}...</p>
+            </div>
+          </div>
         </div>
-        <div class="news-info">
-          <p class="news-headline">${item.description?.slice(0, 150) || 'No description'}...</p>
-        </div>
-      </div>
-    </div>
-  `;
-}).join('');
+      `;
+    }).join('');
 
-
-  container.querySelectorAll('.news-update').forEach((el) => {
-    el.addEventListener('click', () => {
-      showFullNews(el);
+    container.querySelectorAll('.news-update').forEach((el) => {
+      el.addEventListener('click', () => {
+        showFullNews(el);
+      });
     });
-  });
-}
+  } else if (sectionId === 'newsUpdate-stories') {
+    const limitedNews = newsList.slice(0, 2); //LIMIT TO 2 ITEMS
+    container.innerHTML = limitedNews.map((item, index) => {
+      const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+      const imageHtml = isValidImage
+          ? `<div class="transferNews-image">
+              <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+               alt="Image for ${item.title}" 
+               loading="lazy" 
+               onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
+            </div>`
+          : `<div class="transferNews-image">
+            <img src="https://via.placeholder.com/600x400?text=No+Image" 
+             alt="Image not available for ${item.title}" 
+             loading="lazy" />
+        </div>`;
 
+      return `
+        <div class="transferNews" data-index="${index}" data-section="${sectionId}">   
+          <div class="news-short-message">
+            <div class="transferNews-image">
+              ${imageHtml}
+            </div>
+            <div class="news-info">
+             <h2 class="transferNews-header">${item.title}</h2>
+              <p class="transferNews-description">${item.description?.slice(0, 150) || 'No description'}...</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.transferNews').forEach((el) => {
+      el.addEventListener('click', () => {
+        showFullNews(el);
+      });
+    });
+  }
+}
 
 
 
@@ -293,10 +338,13 @@ function showFullNews(clickedItem) {
     // Get data from clicked item
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
-    const newsList = section === 'top-stories' && Array.isArray(window.trendingNews)
+    const newsList = section === 'trending-stories' && Array.isArray(window.trendingNews)
       ? window.trendingNews
-     : [];
+      : section === 'newsUpdate-stories' && Array.isArray(window.updatesNews)
+        ? window.updatesNews
+        : [];
     const newsItem = newsList[parseInt(index)];
+
 
     // Format description into paragraphs
     const formattedDesc = typeof newsItem.description === 'string'
@@ -333,7 +381,7 @@ function showFullNews(clickedItem) {
     backButton.onclick = () => {
       fullView.remove();
       children.forEach(child => child.style.display = '');
-      updateRelativeTime();
+      //updateRelativeTime();
     };
 
     fullView.prepend(backButton);
@@ -345,6 +393,11 @@ function showFullNews(clickedItem) {
   }
 }
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadNews('trending-stories', '/api/news'); 
+  loadNews('newsUpdate-stories', '/api/news'); 
+});
 
 
 
@@ -620,169 +673,6 @@ setInterval(autoSlide, 4000); // Change slides every 3 seconds
 
 
 
-//news update display in the middle layer
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadUpdatedNews(); 
-});
-
-
-// ========== LOAD NEWS DETAILS==========
-async function loadUpdatedNews() {
-  const loader = document.querySelector('.loading-indicator');
-  if (loader) loader.style.display = 'block';
-
-  try {
-    const response = await fetch('/api/updatestories');
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Failed to fetch top stories: ${response.status}\n${text}`);
-    }
-
-    const text = await response.text();
-    if (!text || text.trim() === '') {
-      throw new Error("Empty response from server");
-    }
-
-    let data;
-    try {
-      data = JSON.parse(text);
-      console.log("News Update:", data.updates);
-    } catch {
-      throw new Error("Invalid JSON received from /api/updateStories");
-    }
-
-    if (!Array.isArray(data.updates)) {
-      throw new Error("Invalid trending news structure from API");
-    }
-
-    window.updatesNews = data.updates;
-
-    // Assuming you use this function to populate the UI
-    populateNewsSection('newsUpdate-stories', data.updates);
-
-  } catch (error) {
-    console.error('Failed to load top stories:', error);
-    alert("⚠️ Could not load trending news: " + error.message);
-  } finally {
-    if (loader) loader.style.display = 'none';
-  }
-}
-
-
-// ========== POPULATE NEWS ==========
-function populateNewsSection(sectionId, newsList) {
-  const container = document.getElementById(sectionId);
-  if (!container || !Array.isArray(newsList)) return;
-  console.log("Populating:", sectionId, "with", newsList.length, "items");
-
-
- container.innerHTML = newsList.map((item, index) => {
-  const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
-  const imageHtml = isValidImage
-    ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
-              alt="Image for ${item.title}" 
-              loading="lazy" 
-              onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
-    : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
-              alt="Image not available for ${item.title}" 
-              loading="lazy" />`;
-
-  return `
-    <div class="newsUpdate-highlight" data-index="${index}" data-section="${sectionId}">   
-      <div class="topUpdate-stories">
-        <div class="news-image">
-          ${imageHtml}
-        </div>
-        <div class="news-info">
-          <p class="news-headline">${item.description?.slice(0, 150) || 'No description'}...</p>
-        </div>
-      </div>
-    </div>
-  `;
-}).join('');
-
-
-  container.querySelectorAll('.newsUpdate-highlight').forEach((el) => {
-    el.addEventListener('click', () => {
-      showFullNews(el);
-    });
-  });
-}
-
-
-
-
-// ========== SHOW FULL NEWS ========== //
-function showFullNews(clickedItem) {
-  try {
-    const middleLayer = document.querySelector('.middle-layer');
-
-    // Hide all children inside middle-layer
-    const children = Array.from(middleLayer.children);
-    children.forEach(child => {
-      child.style.display = 'none';
-    });
-
-    // Get data from clicked item
-    const index = clickedItem.dataset.index;
-    const section = clickedItem.dataset.section;
-    const newsList = section === 'newsUpdate-stories' && Array.isArray(window.updatesNews)
-      ? window.updatesNews
-     : [];
-    const newsItem = newsList[parseInt(index)];
-
-    // Format description into paragraphs
-    const formattedDesc = typeof newsItem.description === 'string'
-      ? newsItem.description
-          .split('\n\n')
-          .map(p => `<p>${p.trim()}</p>`)
-          .join('')
-      : '<p>No content available.</p>';
-
-    // Create and display the full view container
-    const fullView = document.createElement('div');
-    fullView.className = 'news-full-view';
-    fullView.innerHTML = `
-      <article class="blog-post">
-        <h1 class="blog-title">${newsItem.title}</h1>
-        ${newsItem.image ? `
-          <div class="blog-image-wrapper">
-            <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-          </div>` : ''
-        }
-        <div class="blog-meta">
-          <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
-        </div>
-        <div class="blog-content">
-          ${formattedDesc}
-        </div>
-      </article>
-    `;
-
-    // Add back button
-    const backButton = document.createElement('button');
-    backButton.textContent = '← Back to news';
-    backButton.className = 'back-button';
-    backButton.onclick = () => {
-      fullView.remove();
-      children.forEach(child => child.style.display = '');
-      updateRelativeTime();
-    };
-
-    fullView.prepend(backButton);
-    middleLayer.appendChild(fullView);
-
-  } catch (err) {
-    console.error("Failed to render full news view", err);
-    alert("Something went wrong displaying the full article.");
-  }
-}
-
-
-
-
 
 //function to display matches for the middle layers in home page
 
@@ -824,7 +714,7 @@ function formatToUserLocalTime(dateStr, timeStr) {
 
         return berlinTime
             .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-            .toFormat("h:mm a"); // AM/PM format
+            .toFormat("h:mm");
     } catch (e) {
         console.error("Time conversion error:", e);
         return "TBD";
@@ -891,8 +781,8 @@ function updateTheMatches(matches) {
         if (isUpcoming) matchesData.upcoming.push(match);
 
         // Format the match time to the user's local time
-        const formattedMatchTime = matchDateTimeLocal.toFormat("h:mm a");  // Format the time in a readable local format
-
+        const formattedMatchTime = matchDateTimeLocal.toFormat("h:mm");  
+        
         console.log(`Match: ${match.match_hometeam_name} vs ${match.match_awayteam_name} - Time: ${formattedMatchTime}`);
     });
 

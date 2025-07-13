@@ -4,10 +4,11 @@ const cache = require('../utils/cache/redisCache');
 require('dotenv').config();
 
 const API_KEY = process.env.FOOTBALL_API_KEY;
+const API_URL = 'https://apiv3.apifootball.com/';
+
 const LEAGUE_TTL = 60 * 60;      // 1 hour
 const STANDINGS_TTL = 60 * 15;   // 15 minutes
 const FORMS_TTL = 60 * 15;
-const TEAMS_TTL = 60 * 10;   // 10 minutes
 const TTL = 60 * 60; // 1 hour cache
 
 // Fetch all leagues with Redis caching
@@ -20,7 +21,7 @@ exports.getLeagues = async (req, res) => {
             return res.status(200).json(JSON.parse(cached));
         }
 
-        const response = await axios.get(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${API_KEY}`);
+        const response = await axios.get(`${API_URL}?action=get_leagues&APIkey=${API_KEY}`);
         const data = response.data;
 
         await cache.set(cacheKey, JSON.stringify(data), LEAGUE_TTL);
@@ -54,7 +55,7 @@ exports.getStandings = async (req, res) => {
             return res.status(200).json(JSON.parse(cached));
         }
 
-        const response = await axios.get(`https://apiv3.apifootball.com/?action=get_standings&league_id=${leagueId}&APIkey=${API_KEY}`);
+        const response = await axios.get(`${API_URL}?action=get_standings&league_id=${leagueId}&APIkey=${API_KEY}`);
         const data = response.data;
 
         await cache.set(cacheKey, JSON.stringify(data), STANDINGS_TTL);
@@ -83,7 +84,7 @@ exports.getRecentForms = async (req, res) => {
     const cached = await cache.get(cacheKey);
     if (cached) return res.status(200).json(JSON.parse(cached));
 
-    const url = `https://apiv3.apifootball.com/?action=get_events&from=${getTodayDate(-30)}&to=${getTodayDate()}&league_id=${leagueId}&APIkey=${API_KEY}`;
+    const url = (`${API_URL}?action=get_events&from=${getTodayDate(-30)}&to=${getTodayDate()}&league_id=${leagueId}&APIkey=${API_KEY}`);
     const axiosResponse = await axios.get(url);
     const data = axiosResponse.data;
 
@@ -125,70 +126,47 @@ exports.getRecentForms = async (req, res) => {
 
 
 
-// Build match form (W/D/L) based on match results
-function buildForm(data, teamId) {
-  return data
-    .filter(match => match.match_status === "Finished")
-    .map(match => {
-      const isHome = match.match_hometeam_id === teamId;
-      const isAway = match.match_awayteam_id === teamId;
-
-      const homeScore = parseInt(match.match_hometeam_score);
-      const awayScore = parseInt(match.match_awayteam_score);
-
-      if (isNaN(homeScore) || isNaN(awayScore)) return null;
-
-      if (isHome) {
-        return homeScore > awayScore ? "W" : homeScore < awayScore ? "L" : "D";
-      } else if (isAway) {
-        return awayScore > homeScore ? "W" : awayScore < homeScore ? "L" : "D";
-      }
-      return null;
-    })
-    .filter(Boolean)
-    .slice(-5)
-    .reverse()
-    .join("");
-}
 
 //function to get team form
+
+const API_TIMEZONE = "Europe/Berlin";
+const SEASON_START_DATE = "2024-08-01";
+const CACHE_TTL_SECONDS = 3600; // 1 hour cache
+
 exports.getTeamForm = async (req, res) => {
-  const teamId = req.params.teamId;
-  const cacheKey = `form:team:${teamId}`;
-  const startDate = "2025-01-01";
+    const teamId = req.params.teamId;
+    const cacheKey = `teamForm-${teamId}`;
 
-  try {
-    // Check Redis cache
-    const cached = await cache.get(cacheKey);
-    if (cached) {
-      return res.status(200).json({ form: cached });
+    try {
+        // Try Redis cache
+        const cached = await cache.get(cacheKey);
+        if (cached) {
+            return res.json(JSON.parse(cached));
+        }
+
+        // Validate API key
+        if (!API_KEY) {
+            return res.status(500).json({ error: "Missing API key" });
+        }
+
+        // Fetch from API
+        const url = `${API_URL}?action=get_events&team_id=${teamId}&from=${SEASON_START_DATE}&timezone=${API_TIMEZONE}&APIkey=${API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+            return res.status(400).json({ error: "Invalid data received from API" });
+        }
+
+        // Cache the response
+        await cache.set(cacheKey, JSON.stringify(data), 'EX', CACHE_TTL_SECONDS);
+
+        res.json(data);
+    } catch (err) {
+        console.error("API Error:", err);
+        res.status(500).json({ error: "Failed to fetch team form data" });
     }
-
-    const url = `https://apiv3.apifootball.com/?action=get_events&team_id=${teamId}&from=${startDate}&APIkey=${API_KEY}`;
-    const response = await axios.get(url);
-    const data = response.data;
-
-    if (!Array.isArray(data)) {
-      return res.status(500).json({ error: "Invalid response from external API" });
-    }
-
-    const form = buildForm(data, teamId);
-    console.log('Built form:', form); // DEBUG
-
-    if (!form || typeof form !== 'string') {
-      return res.status(500).json({ error: "Failed to build valid form string" });
-    }
-
-    // Cache the result
-    await cache.set(cacheKey, form, TEAMS_TTL);
-
-    res.status(200).json({ form });
-  } catch (err) {
-    console.error('Error fetching team form:', err.message);
-    res.status(500).json({ error: 'Failed to fetch team form' });
-  }
 };
-
 
 
 // function to get team details
@@ -204,7 +182,7 @@ exports.getTeamDetails = async (req, res) => {
     }
 
     // Fetch from external API
-    const url = `https://apiv3.apifootball.com/?action=get_teams&team_id=${teamId}&APIkey=${API_KEY}`;
+    const url = `${API_URL}?action=get_teams&team_id=${teamId}&APIkey=${API_KEY}`;
     const { data } = await axios.get(url);
 
     if (!Array.isArray(data) || !data.length) {

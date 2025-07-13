@@ -1,0 +1,14 @@
+---
+   title: "Alessia Russo rises above insults to prove she’s worth her England place"
+   date: "2025-07-12T11:00:11.000Z"
+   slug: "alessia-russo-rises-above-insults-to-prove-she's-worth-her-england-place"
+   source: "Sport | The Guardian"
+   original_link: "https://www.theguardian.com/football/2025/jul/12/alessia-russo-rises-above-insults-to-prove-shes-worth-her-england-place"
+   description: "Online abuse of striker exposed as specious as selfless displays make her key to Lionesses’ success Dare mention Alessia Russo was a good pick for player of the match after her three assists against the Netherlands, without an afterword on Lauren James also being superb or highlighting the performances of Jess Carter or Hannah Hampton or any of the others in an all-around strong showing, and you will be accused of being influenced by PRusso. The not-so-witty merging of PR and the player’s name has become an insult online, used to denigrate anyone who suggests that Russo may be quite a good player. Your opinion cannot possibly be right; it’s Russo’s good PR team that has led you to believe that she is good. You have been influenced, you are a sheep, you have been blinded by the shiny Adidas adverts and the magazine cover shoots. Open your eyes, they scream into the online abyss, Russo is an average player, someone else was better, anyone else was better.  Continue reading..."
+   mode: "summarize"
+   image: "https://i.guim.co.uk/img/media/d6061745701139f1e5eb71f037ec71c767edcbfe/672_243_4013_3211/master/4013.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=46587c69ed543964749f5cf128ea76c0"
+   category: "general"
+   tags: ["general"]
+   domain: "theguardian.com"
+  ---
+  Online abuse of striker exposed as specious as selfless displays make her key to Lionesses’ success Dare mention Alessia Russo was a good pick for player of the match after her three assists against the Netherlands, without an afterword on Lauren James also being superb or highlighting the performances of Jess Carter or Hannah Hampton or any of the others in an all-around strong showing, and you will be accused of being influenced by PRusso. The not-so-witty merging of PR and the player’s name has become an insult online, used to denigrate anyone who suggests that Russo may be quite a good player. Your opinion cannot possibly be right; it’s Russo’s good PR team that has led you to believe that she is good. You have been influenced, you are a sheep, you have been blinded by the shiny Adidas adverts and the magazine cover shoots. Open your eyes, they scream into the online abyss, Russo is an average player, someone else was better, anyone else was better.  Continue reading...

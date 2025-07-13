@@ -1,0 +1,24 @@
+---
+   title: "Phillies vs. Padres predictions, odds, props, best bets: Free 2025 MLB picks for Saturday, July 12"
+   date: "2025-07-12T21:00:46.000Z"
+   slug: "phillies-vs.-padres-predictions-odds-props-best-bets:-free-2025-mlb-picks-for-saturday-july-12"
+   source: "CBSSports.com Headlines"
+   original_link: "https://www.cbssports.com/mlb/news/phillies-vs-padres-predictions-odds-props-best-bets-free-2025-mlb-picks-for-saturday-july-12/"
+   description: "SportsLine's proven model has simulated Philadelphia vs. San Diego 10,000 times and released its MLB best bets for Zack Wheeler vs. Yu Darvish on Saturday"
+   mode: "summarize"
+   image: "https://sportshub.cbsistatic.com/i/r/2025/06/30/d3f757b0-ff3b-4d82-8bb6-c2e419b66f05/thumbnail/1200x675/8d9c4539721838c29bc2d72ccd11825c/zack-wheeler.jpg"
+   category: "baseball"
+   tags: ["baseball"]
+   domain: "cbssports.com"
+  ---
+  <div id="readability-page-1" class="page"><div>
+        
+        
+        
+                
+        
+<p>The Philadelphia Phillies (54-40) and the San Diego Padres (51-43) match up in an NL contest on Saturday. The series opened up on Friday, where San Diego came out with a 4-2 victory. Philadelphia has dropped three of its last four games. Meanwhile, San Diego is on a two-game win streak. Zack Wheeler (9-3, 2.17 ERA) gets the start for Philadelphia. Yu Darvish (0-1, 4.91 ERA) takes the hill for the Padres.&nbsp;</p><p>First pitch from Petco Park in San Diego is set for 7:35 p.m. ET. Philadelphia is a -161 favorite (risk $161 to win $100) in the latest Phillies vs. Padres odds from DraftKings Sportsbook, while San Diego is a +135 underdog (risk $100 to win $135). The over/under for total runs scored is 7.5. Before making any Phillies vs. Padres picks, be sure to see the MLB predictions from SportsLine's proven model.</p><p>The SportsLine Projection Model simulates every MLB game 10,000 times. It enters Week 16 of the 2025 MLB season 45-38 on top-rated MLB picks. It has excelled in making home run prop picks this season, returning more than 40 units of profit. Anybody following at&nbsp;<a href="https://www.cbssports.com/betting/news/sportsbook-promos/" target="_blank">sportsbooks</a>&nbsp;and on&nbsp;<a href="https://www.cbssports.com/betting/news/best-betting-apps/" target="_blank">betting apps</a>&nbsp;could have seen strong returns, especially when paired with the latest&nbsp;<span><a href="https://www.cbssports.com/betting/news/betmgm-promo-code/" target="_blank">BetMGM promo code</a></span>&nbsp;and&nbsp;<span><a href="https://www.cbssports.com/betting/news/fanduel-promo-code/" target="_blank">FanDuel promo code</a></span>, just to name a few.&nbsp;</p><p><strong>Here are the model's three best bets for Phillies vs. Padres on Saturday:</strong></p><ul><li>Trea Turner Over 0.5 hits (-265)</li><li>Fernando Tatis Jr. Over 1.5 hits + runs + RBIs (-140)</li><li>Zack Wheeler Over 6.5 strikeouts (+115)</li></ul><h2>Trea Turner Over 0.5 hits (-265)</h2><p>Turner is first on the team in batting average (.292) and hits (111) entering this contest against San Diego. The 32-year-old has gone over 0.5 hits in 10 of his last 15 matchups. The model projects him to finish with 1.1 hits in Saturday's game against San Diego.</p><p><em>Bruce Marshall has returned more than 12 units on his last 102 MLB run-line picks.&nbsp;</em><a href="https://www.sportsline.com/experts/51297150/bruce-marshall/?league=MLB#ttag=07122025_agg_cbssports_picks_baseball_mlb_model_philliespadresFREE" target="_blank"><em>Get his best bet for Saturday's MLB action at SportsLine right here</em></a><em>.</em></p><h2>Fernando Tatis Jr. Over 1.5 hits + runs + RBIs (-140)</h2><p>Tatis Jr. has consistently found a way to get on base throughout the season. He has a .266 batting average with 16 home runs, 42 RBI and 64 runs scored. He's on a four-game hitting streak, while driving in an RBI in two straight games. In addition, he's scored a run in two of his last three games against Philadelphia. New users can get $150 in bonus bets with a $5 wager using the latest&nbsp;<span><a href="https://www.cbssports.com/betting/news/bet365-promo-code/" target="_blank">bet365 bonus code</a></span>.</p><h2>Zack Wheeler Over 6.5 strikeouts (+115)</h2><p>Wheeler steps on the mound, ranking second in the majors in ERA (2.17) and third in strikeouts (148). Wheeler has cleared 6.5 strikeouts in six straight games and 10 of his last 15 games at a line of 6.5. In his last start, he had 12 K's, and the SportsLine model projects him to toss 7.2 K's on Saturday. New users can use the latest <span><a href="https://www.cbssports.com/betting/news/fanduel-promo-code/" target="_blank">FanDuel promo code</a></span>, which offers $150 in bonus bets if your first bet of $5 or more wins.&nbsp;</p>
+
+
+        
+            </div></div>

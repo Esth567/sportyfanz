@@ -1,0 +1,15 @@
+---
+   title: "Twins' Buxton, Derby participant, hits for cycle"
+   date: "2025-07-12T22:13:10.000Z"
+   slug: "twins'-buxton-derby-participant-hits-for-cycle"
+   source: "www.espn.com - TOP"
+   original_link: "https://www.espn.com/mlb/story/_/id/45725727/twins-all-star-byron-buxton-hits-cycle-vs-pirates"
+   description: "Minnesota Twins All-Star center fielder Byron Buxton, who will participate in the Home Run Derby, hit for the cycle Saturday in a 12-4 win over the Pittsburgh Pirates, the first cycle hit at Target Field since it opened in 2010."
+   mode: "summarize"
+   image: "https://example.com/default-news.jpg"
+   category: "general"
+   tags: ["general"]
+   domain: "espn.com"
+  ---
+  <div id="readability-page-1" class="page"><div><div><ul><li><p>Associated Press</p></li></ul><p><span>Jul 12, 2025, 05:06 PM ET</span></p></div><p>MINNEAPOLIS -- <a data-clubhouse-guid="a6e97b3f-4244-98be-79a2-f4b33f3365e6" href="https://www.espn.com/mlb/team/_/name/min/minnesota-twins">Minnesota Twins</a> All-Star center fielder <a data-player-guid="615b99eb-8129-09f0-e7f9-8841982a341a" href="https://www.espn.com/mlb/player/_/id/32655/byron-buxton">Byron Buxton</a> hit for the cycle Saturday in a <a href="https://www.espn.com/mlb/game/_/gameId/401696336/pirates-twins">12-4 victory</a> over the <a data-clubhouse-guid="5b8fc9be-4020-52c6-aa28-9a0f2d4383e0" href="https://www.espn.com/mlb/team/_/name/pit/pittsburgh-pirates">Pittsburgh Pirates</a>.</p><p>The cycle was the first at Target Field since the ballpark opened in 2010. It was the first cycle by a Twins player since <a data-player-guid="ddce8b46-7c9e-20b5-7e99-56723808563b" href="https://www.espn.com/mlb/player/_/id/32525/jorge-polanco">Jorge Polanco</a> had one in 2019.</p><p>Buxton had three hits through three innings -- a single in the first, a triple in the six-run second and a double in the third. After singling again in the fifth, he had one more opportunity in the bottom of the seventh.</p><p>Buxton, who will participate in next week's Home Run Derby, crushed a 427-foot solo homer off Pirates reliever <a data-player-guid="d29f257c-2b4a-fcbc-3a30-a5914381e53f" href="https://www.espn.com/mlb/player/_/id/32672/andrew-heaney">Andrew Heaney</a> with two outs in the seventh to make it an 11-3 game and complete the cycle. That brought the Target Field crowd to its feet, many of which had received a Buxton bobblehead giveaway at the park.</p><p>The cycle was the first for any player in Target Field history since the ballpark opened in 2010. It was the first cycle by a Twins player since Jorge Polanco had one in 2019.</p><p>The cycle-completing homer for Buxton was his 21st of the season, tied for fifth-most in the American League.</p><p>Buxton was replaced in center field after the seventh inning, but not before receiving a standing ovation curtain call from the Twins fans in attendance.</p>
+</div></div>

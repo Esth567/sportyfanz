@@ -590,18 +590,8 @@ async function displayLiveMatch(matchId, category) {
                     </div>
 
                    
-                   <div id="football-field" class="field">
-                     <!-- Center line and circle -->
-                     <div class="center-line"></div>
-                     <div class="center-circle"></div>
-                     <!-- Left Goal and Penalty Area -->
-                     <div class="penalty-arc left-arc"></div>
-                     <div class="penalty-arc right-arc"></div>
-                     <div class="penalty-box left-box"></div>
-                     <div class="penalty-box right-box"></div>
-                     <div class="goal left-goal"></div>
-                     <div class="goal right-goal"></div>  
-                    </div>
+                   <div id="football-field-wrapper"></div>
+
 
                     <div class="lineup-players-names">
                         <h4>Players</h4>
@@ -915,36 +905,55 @@ function loadH2HData(homeTeam, awayTeam) {
   
   // ✅ Fetch lineup and dynamically infer formation
      function fetchAndRenderLineups(match_id, match) {
-      fetch(`/api/lineups?matchId=${match_id}`)
-        .then(res => res.json())
-        .then(({ lineup }) => {
-            const container = document.getElementById("football-field");
-            container.innerHTML = ""; // Clear previous content
+  const containerWrapper = document.getElementById("football-field-wrapper");
 
-            if (!lineup) {
-                displayNoLineupMessage(container, "No lineup data found.");
-                return;
-            }
+  fetch(`/api/lineups?matchId=${match_id}`)
+    .then(res => res.json())
+    .then(({ lineup }) => {
+      containerWrapper.innerHTML = ""; // Clear previous content
 
-            const homePlayers = lineup.home?.starting_lineup || [];
-            const awayPlayers = lineup.away?.starting_lineup || [];
+      if (!lineup) {
+        displayNoLineupMessage(containerWrapper, "No lineup data found.");
+        return;
+      }
 
-            if (homePlayers.length === 0 && awayPlayers.length === 0) {
-                displayNoLineupMessage(container, "No lineup formation available.");
-                return;
-            }
+      const homePlayers = lineup.home?.starting_lineups || lineup.home?.starting_lineup || [];
+      const awayPlayers = lineup.away?.starting_lineups || lineup.away?.starting_lineup || [];
 
-            const homeFormation = inferFormation(homePlayers);
-            const awayFormation = inferFormation(awayPlayers);
 
-            renderPlayersOnField("home", homePlayers, homeFormation, "home");
-            renderPlayersOnField("away", awayPlayers, awayFormation, "away");
-        })
-        .catch(err => {
-            console.error("Error fetching lineups:", err);
-            const container = document.getElementById("football-field");
-            displayNoLineupMessage(container, "Error loading lineups.");
-        });
+      if (homePlayers.length === 0 && awayPlayers.length === 0) {
+        displayNoLineupMessage(containerWrapper, "No lineup formation available.");
+        return;
+      }
+
+      // If we got here, lineup exists. Now render the field and players.
+      containerWrapper.innerHTML = `
+        <div id="football-field" class="field">
+          <div class="center-line"></div>
+          <div class="center-circle"></div>
+          <div class="penalty-arc left-arc"></div>
+          <div class="penalty-arc right-arc"></div>
+          <div class="penalty-box left-box"></div>
+          <div class="penalty-box right-box"></div>
+          <div class="goal left-goal"></div>
+          <div class="goal right-goal"></div>  
+        </div>
+      `;
+
+      const container = document.getElementById("football-field");
+      const homeFormation = match?.match_hometeam_system ?? inferFormation(homePlayers);
+      const awayFormation = match?.match_awayteam_system ?? inferFormation(awayPlayers);
+
+
+
+      renderPlayersOnField("home", homePlayers, homeFormation, "home");
+      renderPlayersOnField("away", awayPlayers, awayFormation, "away");
+    })
+    .catch(err => {
+      console.error("Error fetching lineups:", err);
+      containerWrapper.innerHTML = "";
+      displayNoLineupMessage(containerWrapper, "Error loading lineups.");
+    });
 }
 
 
@@ -986,8 +995,15 @@ function parseFormation(formation, players) {
 }
 
 // ✅ Inference: derive formation from lineup_position
-function inferFormation(players) {
-    const outfield = players.filter(p => p.lineup_position !== "1");
+function inferFormation(players, fallbackFormationStr) {
+    const outfield = players
+     .filter(p => p.lineup_position !== "1")
+     .sort((a, b) => parseInt(a.lineup_position) - parseInt(b.lineup_position));
+
+
+    if (outfield.length === 0 && fallbackFormationStr) {
+        return parseFormation(fallbackFormationStr);
+    }
 
     const grouped = {
         defense: [],
@@ -1001,16 +1017,15 @@ function inferFormation(players) {
         if (pos <= 4) grouped.defense.push(p);
         else if (pos <= 7) grouped.midfield.push(p);
         else if (pos <= 10) grouped.attack.push(p);
-        else grouped.extra.push(p); // Position 11+
+        else grouped.extra.push(p);
     });
 
     const result = [];
     if (grouped.defense.length) result.push(grouped.defense.length);
     if (grouped.midfield.length) result.push(grouped.midfield.length);
     if (grouped.attack.length) result.push(grouped.attack.length);
-    if (grouped.extra.length) result.push(grouped.extra.length); // e.g. a 3-4-1-2 shape
+    if (grouped.extra.length) result.push(grouped.extra.length);
 
-    console.log("🔧 Inferred formation:", result);
     return result;
 }
 
@@ -1019,7 +1034,7 @@ function renderPlayersOnField(team, players, formation, side = "home") {
     const container = document.getElementById("football-field");
     if (!container || !formation) return;
 
-    const formationArray = parseFormation(formation, players);
+    const formationArray = parseFormation(formation);
     const isHome = side === "home";
     const vertical = isVerticalMode();
 

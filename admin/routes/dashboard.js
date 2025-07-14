@@ -20,7 +20,7 @@ const {
 router.get('/matches', getMatches);
 router.get('/topscorers', getTopScorers);
 router.get('/leagues', getLeagues);
-router.get('/standings/:leagueId', getTopStandings);
+router.get('/topstandings/:leagueId', getTopStandings);
 router.get('/all_matches', getAllMatches);
 router.get('/matches/by-date', getMatchesByDate);
 router.get('/match/statistics', getMatchStatistics);

@@ -79,7 +79,7 @@ exports.getMatches = async (req, res) => {
 
 
 
-// Controller 2: Get Top Scorers
+
 // matches cache (5 min)
 const topScorersCache = new NodeCache({ stdTTL: 300 });
 
@@ -466,13 +466,17 @@ exports.getStandings = async (req, res) => {
     const data = await response.json();
 
     if (!Array.isArray(data)) {
-      return res.status(500).json({ error: "Invalid API response" });
-    }
+       console.warn("⚠️ Invalid API response structure:", data);
+       standingsCache.set(cacheKey, []); // still cache empty to avoid repeated bad calls
+      return res.json({ standings: [] }); // ensure consistent response
+     }
 
-    // ✅ Save to cache
-    standingsCache.set(cacheKey, data);
+     // ✅ Save to cache
+      standingsCache.set(cacheKey, data);
 
-    res.json({ standings: data });
+      // ✅ Always return consistent shape
+    res.json({ standings: Array.isArray(data) ? data : [] });
+
   } catch (error) {
     console.error("❌ Standings fetch error (backend):", error);
     res.status(500).json({ error: "Server error fetching standings" });

@@ -14,7 +14,7 @@ const playerImageRoutes = require('../routes/playerImageRoutes');
 
 
 const app = express();
-app.use('/assets/players', express.static(path.join(__dirname, 'public/assets/players')));
+app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 
 
 const port = process.env.PORT || 3000;

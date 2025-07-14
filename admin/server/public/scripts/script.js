@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Match phase determination
         if (isFinished) {
             displayTime = "FT";  // Final Time
-            ellipseImg = "assets/icons/Ellipse 1.png";
+            ellipseImg = "/assets/icons/Ellipse 1.png";
         } else if (hasStarted) {
             const minutes = getMinutesSince(match.match_date, startTime);
             if (minutes <= 90) {
@@ -87,10 +87,10 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 displayTime = `${minutes - 120}' (AET)`;  // After Extra Time
             }
-            ellipseImg = "assets/icons/Ellipse2.png";
+            ellipseImg = "/assets/icons/Ellipse2.png";
         } else {
             displayTime = formatToUserLocalTime(match.match_date, startTime);
-            ellipseImg = "assets/icons/Ellipse 1.png";
+            ellipseImg = "/assets/icons/Ellipse 1.png";
         }
 
         return `
@@ -321,12 +321,17 @@ function populateNewsSection(sectionId, newsList) {
     });
   } else if (sectionId === 'sliderNews-stories') {
   const container = document.querySelector('.header-slider');
-  const newsSlides = newsList.slice(0, 5); // Show 5 sport news
+
+  const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+  const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+  
+  const combinedNews = [...trending, ...updates].slice(0, 10); // Limit to 10 combined items
+
 
   // Remove old dynamically generated news slides (optional cleanup)
   container.querySelectorAll('.sliderNews-dynamic').forEach(el => el.remove());
 
-  newsSlides.forEach((item, index) => {
+  combinedNews.forEach((item, index) => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     const imageHtml = isValidImage
       ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
@@ -375,14 +380,16 @@ function showFullNews(clickedItem) {
     const section = clickedItem.dataset.section;
     let newsList = [];
 
-    if (section === 'trending-stories' && Array.isArray(window.trendingNews)) {
-       newsList = window.trendingNews;
-     } else if (
-        (section === 'newsUpdate-stories' || section === 'sliderNews-stories') &&
-        Array.isArray(window.updatesNews)
-      ) {
-        newsList = window.updatesNews;
+    if (section === 'trending-stories') {
+        newsList = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+     } else if (section === 'newsUpdate-stories') {
+        newsList = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+     } else if (section === 'sliderNews-stories') {
+       const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+       const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+       newsList = [...trending, ...updates];
      }
+
 
       const newsItem = newsList[parseInt(index)];
 
@@ -497,7 +504,7 @@ async function fetchTopScorers() {
               if (localImage) {
                  playerImage = `/assets/players/${localImage}`;
                } else {
-                  playerImage = 'assets/images/default-player.png';
+                  playerImage = '/assets/images/default-player.png';
                }
               }
 
@@ -627,7 +634,7 @@ async function getActiveLeagueId() {
 // Render the top 5 standings for a league
 async function fetchTopFourStandings(leagueId) {
   try {
-    const response = await fetch(`/api/standings/${leagueId}`);
+    const response = await fetch(`/api/topstandings/${leagueId}`);
     const data = await response.json();
 
     const leagueTableDemo = document.querySelector(".league-table-demo");
@@ -653,7 +660,7 @@ async function fetchTopFourStandings(leagueId) {
     `;
 
     topFive.forEach(team => {
-      const badge = team.team_badge || "assets/images/default-logo.png";
+      const badge = team.team_badge || "/assets/images/default-logo.png";
       const gd = (team.overall_league_GF - team.overall_league_GA) || 0;
 
       tableHTML += `
@@ -944,17 +951,17 @@ function showMatches(matchesData, category) {
                     </div>
                     </div>
                     <div class="match-col match-time-country">
-                      <div class="match-time"><img src="assets/icons/clock.png" alt="Clock">${formattedTime}</div>
-                     <div class="match-country"><img src="assets/icons/map-pin.png" alt="Map">${country}</div>
+                      <div class="match-time"><img src="/assets/icons/clock.png" alt="Clock">${formattedTime}</div>
+                     <div class="match-country"><img src="/assets/icons/map-pin.png" alt="Map">${country}</div>
                    
                       ${matchRound ? `
                     <div class="match-col match-round">
-                        <img src="assets/icons/trophy.png" alt="Round">
+                        <img src="/assets/icons/trophy.png" alt="Round">
                         ${matchRound}
                     </div>` : ""}
                     <div class="match-col match-btn">  
                 <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
-                    <img src="assets/icons/arrow-up.png" alt="Round">
+                    <img src="/assets/icons/arrow-up.png" alt="Round">
                   View Details
                   </button>
                 </div>
@@ -1087,7 +1094,7 @@ async function displayLiveMatch(matchId, category) {
 
     const teamHTML = `
         <div class="live-match-team">
-            <img src="${match.team_home_badge || 'assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
+            <img src="${match.team_home_badge || '/assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
             <span>${match.match_hometeam_name}</span>
         </div>
         <div class="match-time-scores">
@@ -1102,7 +1109,7 @@ async function displayLiveMatch(matchId, category) {
             </div>
         </div>
         <div class="live-match-team">
-            <img src="${match.team_away_badge || 'assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
+            <img src="${match.team_away_badge || '/assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
             <span>${match.match_awayteam_name}</span>
         </div>`;
 
@@ -1115,7 +1122,7 @@ async function displayLiveMatch(matchId, category) {
             <button class="tab-btn" data-tab="standing">Standing</button>
         </div>`;
 
-    const adHTML = `<img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">`;
+    const adHTML = `<img src="/assets/images/Ad5.png" alt="Ad5" class="ad5-logo">`;
 
     const contentHTML = `
         <div class="live-match-info">
@@ -1200,12 +1207,12 @@ async function displayLiveMatch(matchId, category) {
                         </div>
                         <div class="infoMatch-details">
                             <div class="infoLeft-wing">
-                                <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.match_time}</p>
-                                <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
+                                <p><strong><img src="/assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.match_time}</p>
+                                <p><strong><img src="/assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
                             </div>
                             <div class="infoRight-wing">
-                                <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
-                                <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
+                                <p><strong><img src="/assets/icons/gprIcon.png" class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
+                                <p><strong><img src="/assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
                             </div>
                         </div>
                     </div>
@@ -1265,32 +1272,23 @@ async function displayLiveMatch(matchId, category) {
                     </div>
                 `;
 
-                case "h2h":
-            // Dynamically fetch H2H data
-            console.log("📦 Full match object for H2H:", match);
+             case "h2h":
+                console.log("📦 Full match object for H2H:", match);
 
-            // Fetch H2H using team names, not match ID
-            if (match.match_hometeam_name && match.match_awayteam_name) {
-                setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
+               if (match.match_hometeam_name && match.match_awayteam_name) {
+               setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
             }
 
-            case "h2h":
-    console.log("📦 Full match object for H2H:", match);
-
-    if (match.match_hometeam_name && match.match_awayteam_name) {
-        setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
-    }
-
-    return `
-        <div class="h2h-header">
-            <h3>H2H</h3>
-            <h4>${match.match_hometeam_name}</h4>
-            <h4>${match.match_awayteam_name}</h4>
-        </div>
-        <div class="h2h-header-line"></div>
-        <div class="spinner" id="h2h-spinner"></div>
-        <div class="h2h-matches-container" id="h2h-matches"></div>
-    `;
+         return `
+           <div class="h2h-header">
+             <h3>H2H</h3>
+             <h4>${match.match_hometeam_name}</h4>
+             <h4>${match.match_awayteam_name}</h4>
+          </div>
+          <div class="h2h-header-line"></div>
+          <div class="spinner" id="h2h-spinner"></div>
+         <div class="h2h-matches-container" id="h2h-matches"></div>
+        `;
 
                 case "statistics":
                     // Trigger statistics loading before returning the UI container
@@ -1503,6 +1501,10 @@ function loadH2HData(homeTeam, awayTeam) {
     
             const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
             const { standings } = await response.json();
+
+            if (!Array.isArray(standings)) {
+               throw new Error("Standings data is missing or invalid");
+             }
     
             const tableHTML = `
                 <table class="standing-table">
@@ -1816,7 +1818,7 @@ function startPredictionSlider(container, matches) {
             <div class="team-nam">
               <span>${match.home}</span>
               <div class="team-logo">
-                <img src="${match.homeLogo || 'assets/images/default-logo.png'}" alt="${match.home}">
+                <img src="${match.homeLogo || '/assets/images/default-logo.png'}" alt="${match.home}">
               </div>
               <div class="prediction-number">${odd1}</div>
             </div>
@@ -1830,7 +1832,7 @@ function startPredictionSlider(container, matches) {
             <div class="team-nam">
               <span>${match.away}</span>
               <div class="team-logo">
-                <img src="${match.awayLogo || 'assets/images/default-logo.png'}" alt="${match.away}">
+                <img src="${match.awayLogo || '/assets/images/default-logo.png'}" alt="${match.away}">
               </div>
               <div class="prediction-number">${odd2}</div>
             </div>
@@ -1857,6 +1859,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+//function for fixed advert
+ function closeFixedAd() {
+    const ad = document.getElementById("fixedAd");
+    if (ad) ad.style.display = "none";
+  }
 
 
 // css code to restructure page layout for mobile and tablet view
@@ -1880,9 +1887,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const leagueTableDemo = document.querySelector(".league-table-demo");
           const advert1Podcast = document.querySelector(".advert1");
           const newsPodcast = document.querySelector(".news-podcast");
-          
-
-         
+           
  
           // Append in the correct order
            if (textCont1) parent.appendChild(textCont1);
@@ -1905,6 +1910,7 @@ document.addEventListener("DOMContentLoaded", () => {
   reorderElements();
   window.addEventListener("resize", reorderElements);
 });
+
 
 // menu toggle button for sidebar for mobile view
 document.addEventListener("DOMContentLoaded", function () {

@@ -136,7 +136,7 @@
    
     <!-- Main Content -->
     <div class="content">
-        <div class="layer">        
+        <div class="layer first-layer">        
             <div class="text-cont">
                 <h4 class="live-matches">Live Matches</h4>
                 <div class="more">
@@ -171,23 +171,21 @@
         <div class="layer middle-layer">
             
             <!-- Place this in your base HTML outside of .matches -->
-<div id="loading-spinner" style="display: none; text-align: center; padding: 20px;">
-    <div class="spinner" style="
-        width: 40px;
-        height: 40px;
-        border: 4px solid #28a745;
-        border-top-color: #1A2F4B;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: auto;
-    "></div>
-  </div>
+         <div id="loading-spinner" style="display: none; text-align: center; padding: 20px;">
+            <div class="spinner" style="
+               width: 40px;
+               height: 40px;
+               border: 4px solid #28a745;
+               border-top-color: #1A2F4B;
+               border-radius: 50%;
+               animation: spin 1s linear infinite;
+              margin: auto;
+            "></div>
+         </div>
   
             <div class="matches"></div>
             
-            <div class="advert-container">
-                <p>Advertisement</p>
-            </div>
+            
         </div>
         <div class="layer third-layer"> 
             <div class="text-cont">
@@ -254,5 +252,12 @@
     </div>
     <p style="margin-top: 1rem; font-size: 0.9rem;">SportyFanz &copy; 2025 The Ultimate Sports Hub. All rights reserved.</p>
   </footer>
+
+    <!-- Fixed Advert Container -->
+<div class="fixed-advert" id="fixedAd">
+  <h5>Advertisement</h5>
+  <button class="close-ad" onclick="closeFixedAd()">✕</button>
+</div>
+
 </body>
 </html>

@@ -499,3 +499,4 @@ function toggleFormColumn() {
         button.textContent = showingForm ? "Form" : "Form";
     }
 }
+ 

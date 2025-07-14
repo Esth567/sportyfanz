@@ -62,7 +62,7 @@ fetch(`/api/leagues`)
 
                 leagueElement.innerHTML = `
                     <div class="leags-country">
-                        <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league_name} Logo">
+                        <img src="${league.league_logo || '/assets/images/default-league.png'}" alt="${league.league_name} Logo">
                         <div class="leagues-info">
                             <h3>${league.league_name}</h3>
                             <p>${league.country_name}</p>
@@ -246,7 +246,7 @@ function renderMatches(matchesData, category) {
 
         html += `
         <div class="league-header">
-            <img src="${league.league_logo || 'assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
+            <img src="${league.league_logo || '/assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
             <div class="league-titleCountry">
                 <h4 class="league-title">${league.league}</h4>
                 <span class="league-country">${league.country}</span>
@@ -408,7 +408,7 @@ function toggleCalendar() {
 // Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
     try {
-        const response = await fetch(`api/video/${matchId}`);
+        const response = await fetch(`/api/video/${matchId}`);
         const data = await response.json();
 
         console.log("🎥 Video Data:", data);
@@ -452,7 +452,7 @@ async function displayLiveMatch(matchId, category) {
 
     const teamHTML = `
         <div class="live-match-team">
-            <img src="${match.team_home_badge || 'assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
+            <img src="${match.team_home_badge || '/assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
             <span>${match.match_hometeam_name}</span>
         </div>
         <div class="match-time-scores">
@@ -467,7 +467,7 @@ async function displayLiveMatch(matchId, category) {
             </div>
         </div>
         <div class="live-match-team">
-            <img src="${match.team_away_badge || 'assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
+            <img src="${match.team_away_badge || '/assets/images/default-team.png'}" alt="${match.match_awayteam_name} Logo">
             <span>${match.match_awayteam_name}</span>
         </div>`;
 
@@ -480,7 +480,7 @@ async function displayLiveMatch(matchId, category) {
             <button class="tab-btn" data-tab="standing">Standing</button>
         </div>`;
 
-    const adHTML = `<img src="assets/images/Ad5.png" alt="Ad5" class="ad5-logo">`;
+    const adHTML = `<img src="/assets/images/Ad5.png" alt="Ad5" class="ad5-logo">`;
 
     const contentHTML = `
         <div class="live-match-info">
@@ -559,12 +559,12 @@ async function displayLiveMatch(matchId, category) {
                         </div>
                         <div class="infoMatch-details">
                             <div class="infoLeft-wing">
-                                <p><strong><img src="assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.match_time}</p>
-                                <p><strong><img src="assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
+                                <p><strong><img src="/assets/icons/arrow-colorIcon.png" class="info-colorIcon"></strong> ${match.match_time}</p>
+                                <p><strong><img src="/assets/icons/calender-colorIcon.png" class="info-colorIcon"></strong> ${match.match_date}</p>
                             </div>
                             <div class="infoRight-wing">
-                                <p><strong><img src="assets/icons/gprIcon.png" class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
-                                <p><strong><img src="assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
+                                <p><strong><img src="/assets/icons/gprIcon.png" class="info-colorIcon" alt="Venue icon"></strong> ${match.stadium || "Not available"}</p>
+                                <p><strong><img src="/assets/icons/locationIcon.png" class="info-colorIcon"></strong> ${match.country_name || "Not available"}</p>
                             </div>
                         </div>
                     </div>
@@ -614,32 +614,23 @@ async function displayLiveMatch(matchId, category) {
                     </div>
                 `;
 
-                case "h2h":
-            // Dynamically fetch H2H data
-            console.log("📦 Full match object for H2H:", match);
+             case "h2h":
+                console.log("📦 Full match object for H2H:", match);
 
-            // Fetch H2H using team names, not match ID
-            if (match.match_hometeam_name && match.match_awayteam_name) {
-                setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
-            }
+                if (match.match_hometeam_name && match.match_awayteam_name) {
+                  setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
+                }
 
-            case "h2h":
-    console.log("📦 Full match object for H2H:", match);
-
-    if (match.match_hometeam_name && match.match_awayteam_name) {
-        setTimeout(() => loadH2HData(match.match_hometeam_name, match.match_awayteam_name, 10), 0);
-    }
-
-    return `
-        <div class="h2h-header">
-            <h3>H2H</h3>
-            <h4>${match.match_hometeam_name}</h4>
-            <h4>${match.match_awayteam_name}</h4>
-        </div>
-        <div class="h2h-header-line"></div>
-        <div class="spinner" id="h2h-spinner"></div>
-        <div class="h2h-matches-container" id="h2h-matches"></div>
-    `;
+            return `
+              <div class="h2h-header">
+                <h3>H2H</h3>
+                <h4>${match.match_hometeam_name}</h4>
+                <h4>${match.match_awayteam_name}</h4>
+              </div>
+               <div class="h2h-header-line"></div>
+               <div class="spinner" id="h2h-spinner"></div>
+             <div class="h2h-matches-container" id="h2h-matches"></div>
+            `;
 
                 case "statistics":
                     // Trigger statistics loading before returning the UI container
@@ -658,22 +649,22 @@ async function displayLiveMatch(matchId, category) {
                         </div>
                     `;
 
-                    case "standing":
-        // 🔄 Load standing and highlight teams
-        setTimeout(() => loadStandings(match), 0); 
-        return `
-            <div class="standing-header">                         
-                <div class="standings-wrapper">
+             case "standing":
+                  // 🔄 Load standing and highlight teams
+                setTimeout(() => loadStandings(match), 0); 
+              return `
+                <div class="standing-header">                         
+                 <div class="standings-wrapper">
                     <div class="spinner" id="standing-spinner"></div>
                     <div class="standings-table-container" id="standing-table"></div>
-                </div>
-            </div>
-        `;
+                 </div>
+               </div>
+               `;
 
-            default:
+             default:
                 return "<p>No data available.</p>";
-        }
-    }
+           }
+         }
 
 
 //function to load statistic

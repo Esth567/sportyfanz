@@ -1,0 +1,35 @@
+---
+title: "Kyle Schwarber, fresh off an All-Star Game swing-off win, wants to be more than just a slugger"
+date: "2025-07-16T14:01:26.000Z"
+slug: "kyle-schwarber-fresh-off-an-all-star-game-swing-off-win-wants-to-be-more-than-just-a-slugger"
+source: "CBSSports.com Headlines"
+original_link: "https://www.cbssports.com/mlb/news/kyle-schwarber-fresh-off-an-all-star-game-swing-off-win-wants-to-be-more-than-just-a-slugger/"
+description: "The Phillies star has made his name off home runs but he knows he can do more"
+mode: "summarize"
+image: "https://sportshub.cbsistatic.com/i/r/2025/07/16/fdd1c1e7-5554-4ac9-9a00-0f7d9dc0ef01/thumbnail/1200x675/2526fb175a4f166bd4307b4bb5be89c8/schwarber-getty-3.png"
+category: "general"
+tags: ["general"]
+domain: "cbssports.com"
+---
+<div id="readability-page-1" class="page"><div>
+        
+        
+                            
+                
+        <p><span>ATLANTA --</span> It's been quite the journey in <a href="https://www.cbssports.com/mlb/players/2135243/kyle-schwarbers/">Kyle Schwarber's</a> career.&nbsp;</p><p>He was drafted fourth overall, as a catcher, when most mock drafts had him going around 20th. In some circles, the <a href="https://www.cbssports.com/mlb/teams/CHC/chicago-cubs/">Cubs</a> were said to have reached for him. He debuted just a year later and joined a playoff team in 2015 as a big-time power guy. He hit moonshot homers in the playoffs and become a cult hero in Wrigleyville. He tore his ACL in the first week of the 2016 season, but returned to DH in the World Series and etched his name forever in Fall Classic lore. He was a champion. Then a leadoff hitter. Then a minor-leaguer. Then a power stud again. The Cubs non-tendered him. The Nationals traded him at midseason for a minor-league pitcher who last appeared in the Mexican Pacific Winter League.</p><p>Today, Schwarber is a three-time All-Star. He was Tuesday night's <span><a href="https://www.cbssports.com/mlb/news/kyle-schwarber-named-mlb-all-star-game-mvp-phillies-slugger-leads-national-league-to-thrilling-swing-off-win/" target="_blank">All-Star Game MVP</a></span>, thanks to an <a href="https://www.cbssports.com/mlb/news/2025-mlb-all-star-game-score-national-league-wins-on-wild-home-run-derby-style-swing-off-tiebreaker/live/" target="_blank">exhilarating swing-off that gave the National League a rare win</a>.</p><p>At this point, he's a seasoned veteran. He's 1,225 games into his <a href="https://cbssports.com/mlb/">MLB</a> career and ranks fifth in WAR from players taken in the first round of the 2014 Draft. He's first, by a lot, in home runs. In fact, with 314 career homers at age 32, dare we dream that Schwarber could get all the way to 500 in his career? Using Bill James' favorite projection, Schwarber will end with 462 career homers with a 30% chance to reach 500. Even if he fell short of 500, only 39 players in history have hit 462 home runs. Schwarber's already 146th on the all-time list.</p><p>Schwarber is, of course, more than just the home runs. He has an excellent eye at the plate and routinely is among the league leaders in walks. He's a thoughtful hitter, but he also swings harder than most. His career .346 on-base percentage is better than league average since he debuted by a decent margin (the league average OBP this season is .315, for example). He's pacing toward his fifth season with more than 90 RBI and third with more than 100.&nbsp;</p>
+        
+
+<p>Still, Schwarber's best asset is his ability to stack up the home runs. After all, it is the best possible thing a hitter can do in any given plate appearance. He leads the Phillies this season with 30, more than double Nick Castellanos' second-place total of 12.</p><p>He's certainly a slugger, but that isn't necessarily all he is.&nbsp;</p><p>"It's a great question," he told CBS Sports asked if he considers himself a slugger. "I don't know. I mean, I would say that I would like to be known as more than just a guy who hits home runs. That's kind of been the grain that I've been working against. Obviously, home runs are great and if I can keep doing that and producing runs that's awesome, too, but I also want to be able to come up in situations and be able to come up with situational hits different than a home run."&nbsp;</p><p>He's been fighting the stigma that a "slugger" is someone who can only hit home runs and can't really do much else. A Rob Deer type or even Dave Kingman. Schwarber, though, is good enough at controlling the strike zone that the Phillies sometimes have him hit leadoff. Sure, he gets on base at a good clip, as noted, but still, we're talking about a guy who has hit 46 and 47 homers in a season before and is very likely to get in the same ballpark again this year. But he's hit leadoff 513 times, more than any other spot in the batting order. The second-highest total for a spot in the lineup is 153 in the two-hole.&nbsp;</p>
+        
+
+<p>For Schwarber, it doesn't matter where he hits.</p><p>"To be honest with you, I don't care," he said. "I just want to be playing. I've done it all. There was a year I hit 1-9 in the order. I just want to be playing and at the end of the day, it's about winning.</p><p>"Whatever the manager thinks is the best lineup for the game that day, that's what I'm gonna do."&nbsp;</p><p>Leadoff, cleanup, it doesn't matter to his approach.</p><p>"It's the same. It's more situational, the situation dictates it. That's the way I like to view it," Schwarber said. "Like, say, two quick outs for this guy pitching, then you might take that first pitch. We might try to work the count a little bit longer. Guy on third base, infield's back, I'm trying to make contact early and not being too selective in trying to hit. Things like that, the game situation dictates what I'm trying to do."</p>
+        
+
+<p>Much of the time, though, he's attempting to do some serious damage to the baseball. After all, that's what he does best. Can he do it enough to get to 500? That's long been a benchmark to immortality and even a ticket to Cooperstown for most. Can he get there? Has he even thought about it?&nbsp;</p><p>"I mean, if it happens, it happens and it would be great," he said. "The best words of advice I've ever gotten came from <a href="https://www.cbssports.com/mlb/players/580589/jon-lester/">Jon Lester</a>: 'To get paid or to be remembered, the best way to be known is to win.' That's stuck with me in my head since 2015 and I try to focus on doing that. If you're associated with winning that means you're probably doing something good."&nbsp;</p><p>Schwarber has won. He's homered in every single round of the playoffs in both leagues. He's been to the postseason nine times, playing in two World Series and winning it once. He has hit 21 home runs in 69 playoff games. The All-Star Game swing-off will go down in the annals of MLB history.</p>
+        
+
+<p>Schwarber may be more than just a home run hitter at the plate, but he sure does make his mark with the long ball. Maybe that gets him to the Hall of Fame. Maybe it just keeps helping him win.</p>
+
+
+        
+            </div></div>

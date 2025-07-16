@@ -1,0 +1,15 @@
+---
+title: "Check out all the 2025 ESPYS candidates and vote now"
+date: "2025-07-16T14:19:44.000Z"
+slug: "check-out-all-the-2025-espys-candidates-and-vote-now"
+source: "www.espn.com - TOP"
+original_link: "https://www.espn.com/espys/story/_/page/Voting2025/aja-wilson-josh-allen-more-vote-2025-espys-winners"
+description: "Vote today and determine which athletes and teams go home with an ESPY."
+mode: "summarize"
+image: "https://a4.espncdn.com/combiner/i?img=%2Fphoto%2F2025%2F0625%2Fr1510985_608x342_16%2D9.png"
+category: "general"
+tags: ["general"]
+domain: "espn.com"
+---
+<div id="readability-page-1" class="page"><div><div><ul><li><p>ESPN</p></li></ul><p><span>Jun 26, 2025, 06:00 AM ET</span></p></div><p>The 2025 ESPYS presented by Capital One are July 16. Vote and help decide which stars should go home with the show's biggest honors.</p><p>Fresh off an NBA championship, <a href="https://www.espn.com/nba/player/_/id/4278073/shai-gilgeous-alexander">Shai Gilgeous-Alexander</a> looks to add to his recent accolades, including regular-season MVP and Finals MVP. The <a href="https://www.espn.com/nba/team/_/name/okc/oklahoma-city-thunder">Oklahoma City Thunder </a>guard is nominated in two categories: Best Athlete - Men's Sports, and Best NBA Player. Meanwhile, the Thunder are among the nine nominees for Best Team after prevailing against the <a href="https://www.espn.com/nba/team/_/name/ind/indiana-pacers">Indiana Pacers</a> in Game 7.</p><p>Several nominees earned ESPYS nods for their outstanding Olympic and Paralympic performances in Paris. <a href="https://www.teamusa.com/profiles/simone-biles">Simone Biles</a> and <a href="http://teamusa.com/profiles/sydney-mclaughlin-levrone">Sydney McLaughlin-Levrone </a>are up for Best Athlete - Women's Sports, and <a href="https://www.teamusa.com/profiles/ilona-maher-1118568">Ilona Maher</a> and <a href="https://www.espn.com/college-sports/story?_slug_=paralympian-ezra-frech-track-field-first-season-usc&amp;id=45647323">Ezra Frech</a> represent in the Best Breakthrough Athlete and Best Athlete with a Disability categories, respectively.</p><p><a href="https://www.espn.com/wnba/player/_/id/3149391/aja-wilson">A'ja Wilson</a>, winner of the Best Athlete - Women's Sports and Best WNBA Player awards in 2024, headlines both categories again. <a href="https://www.espn.com/nfl/player/_/id/3929630/saquon-barkley">Saquon Barkley</a> earned nods in three categories: Best Athlete - Men's Sports, Best Play and Best NFL Player. <a href="https://www.espn.com/nfl/team/_/name/buf/buffalo-bills">Buffalo Bills </a>quarterback <a href="https://www.espn.com/nfl/player/_/id/3918298/josh-allen">Josh Allen</a> is the only other NFL player apart from Barkley named in both Best NFL Player and Best Athlete - Men's Sports categories.</p><p>Your vote helps to determine ESPY winners. So let your voice be heard! Cast it now and tune in July 16 at 8 p.m. ET on ABC to find out who brings home an ESPY.</p>
+</div></div>

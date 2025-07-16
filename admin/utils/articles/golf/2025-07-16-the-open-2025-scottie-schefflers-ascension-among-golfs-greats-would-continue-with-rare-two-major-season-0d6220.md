@@ -1,0 +1,48 @@
+---
+title: "The Open 2025: Scottie Scheffler's ascension among golf's greats would continue with rare two-major season"
+date: "2025-07-16T14:43:25.000Z"
+slug: "the-open-2025:-scottie-scheffler's-ascension-among-golf's-greats-would-continue-with-rare-two-major-season"
+source: "CBSSports.com Headlines"
+original_link: "https://www.cbssports.com/golf/news/the-open-2025-scottie-schefflers-ascension-among-golfs-greats-would-continue-with-rare-two-major-season/"
+description: "Scheffler may be indifferent to obtaining another accolade, but there appears to be no stopping his top-notch play"
+mode: "summarize"
+image: "https://sportshub.cbsistatic.com/i/r/2025/07/16/c57fc9db-2b82-443e-ab86-06dffdf65199/thumbnail/1200x675/c3478a74a9bef6637cd935850804a73a/scottie-scheffler-portrush-fans-g.jpg"
+category: "golf"
+tags: ["golf"]
+domain: "cbssports.com"
+---
+<div id="readability-page-1" class="page"><div>
+        
+        
+                            
+                
+        <p>The last four seasons have been filled with a series of firsts for Scottie Scheffler -- first win, first major championship triumph, first ascent to world No. 1, among others. The accolades keep stacking for the best player in the world, and it doesn't look like he is going to be slowing down anytime soon.</p><p>Scheffler's run has led to comparisons to all-time greats -- most noticeably Tiger Woods, given the proximity in time. Scheffler is on pace to become the first golfer to lead the PGA Tour in total strokes gained in three straight seasons since Woods did from 2005-07, and his 16 PGA Tour wins are the most in such a span since Woods from 2007-10.</p><p>Entering The Open Championship, Scheffler has the shortest odds in the field at 9/2, not quite the 5/2 favoritism Woods enjoyed in 2009 but nevertheless atop the board, per <a href="https://www.cbssports.com/betting/news/caesars-promo-code/">Caesars</a>.</p><p>"I could not care any less about being the favorite or not being the favorite," Scheffler said. "We all start even par and the tournament starts on Thursday. That's pretty much all that matters."</p>
+        
+
+<p><span><a href="https://www.cbssports.com/golf/news/scottie-scheffler-questions-why-he-chases-major-championships-ahead-of-the-open-2025-at-royal-portrush/" target="_blank">Scheffler contends his golf does not define him</a></span>, and this mindset is largely his superpower: The ability to give everything you have in a moment to the shot at hand and not care about the results. It's an enviable position from which to play golf. It is a place of no fear. The outcome truly does not matter in his mind.&nbsp;</p><p>"There's a lot of people that make it to what they thought was going to fulfill them in life, and you get there, you get to No. 1 in the world, and they're like, <em>what's the point?</em> I really do believe that because, what is the point?" Scheffler questioned. "Why do I want to win this tournament so bad? That's something that I wrestle with on a daily basis.</p><p>"It's like showing up at the Masters every year; why do I want to win this golf tournament so badly? Why do I want to win The Open Championship so badly? I don't know because, if I win, it's going to be awesome for two minutes. Then we're going to get to the next week, <em>hey, you won two majors this year; how important is it for you to win the FedExCup playoffs?</em> And we're back here again."</p>
+        
+
+<p>In between Scheffler's ears, there are no consequences to his on-course actions. Life rolls on outside golf.&nbsp;</p><p>But when stacked against the best to ever to do it inside the ropes, there are implications to his results. More trophies and more chatter. More accolades and more comparisons. This is sport after all. And one accomplishment the three-time major champion has yet to tick off on his to-do list is not only winning The Open but capturing winning more than one major championship in the same season.</p><h2>Players with multiple seasons of 2+ majors</h2><table data-title="12x2 Table"><tbody><tr><th>Player</th><th>Years</th></tr><tr><td><p>Gene Sarazen</p></td><td><p>1922, 1932</p></td></tr><tr><td><p>Bobby Jones</p></td><td><p>1926, 1930</p></td></tr><tr><td><p>Ben Hogan</p></td><td><p>1948, 1951, 1953</p></td></tr><tr><td><p>Arnold Palmer</p></td><td><p>1960, 1962</p></td></tr><tr><td><p>Jack Nicklaus</p></td><td><p>1963, 1966, 1972, 1975, 1980</p></td></tr><tr><td><p>Tom Watson</p></td><td><p>1977, 1982</p></td></tr><tr><td><p>Tiger Woods</p></td><td><p>2000, 2002, 2005, 2006</p></td></tr></tbody></table><p><br>Only seven players in the history of the game have accomplished the feat multiple times with only Woods, Jack Nicklaus and Ben Hogan being able to say they did it at least three times. These three are largely regarded as the greatest to ever play the game, and they are followed closely by some of the other names on the list.</p><p>The jump to that echelon will take time and a whole lot of winning for Scheffler, but even among his peers, there have been four players to win more than one major in the same season. Rory McIlroy (2014), Jordan Spieth (2015), Brooks Koepka (2018) and Xander Schauffele (2024) have all done it, but not Scheffler ... at least not yet.</p><p>The world No. 1 arrives at Royal Portrush with a rumble of form. He has not finished outside the top 10 since The Players Championship with contention runs at the Masters and the U.S. Open sandwiching his PGA Championship victory at Quail Hollow. His links golf record has been discussed as if it is poor, but it's not. In eight tournaments in this part of the world, the right hander from Texas has finished inside the top 25 in seven of them, which includes legitimate chances at events like last year's Open at Royal Troon.</p><p>"I love the style of golf," Scheffler said. "I think it's really fun and you have to be creative. You have to hit a lot of really good shots. There's a challenge to it, but I think it's a lot of fun.&nbsp;</p><p>"We'll see how the weather turns out this week. Weather has a pretty dramatic effect on how the golf course is going to play. You can play your practice rounds and prepare, but ultimately, when you step on the tee on Thursday, whatever the weather presents is going to be probably the strongest part of the test."</p><p>From tee to green, Scheffler should impress. It is what he is known for and it is why his floor is so high, but there are two areas which will ultimately define his Open week -- one external and one internal.&nbsp;</p><p>"I still get very frustrated. At times, I'm better at masking it. … At times this year, I may have gotten overly frustrated. It's just part of the game," Scheffler admitted. "Part of the game is controlling your emotions and controlling your mind. I've definitely gotten better at that over the years. I'd get a bit headless at times when I was growing up, especially when I was young."</p><a href="https://www.cbssports.com/golf/news/scottie-scheffler-questions-why-he-chases-major-championships-ahead-of-the-open-2025-at-royal-portrush/" target="_blank">
+        <div>
+            <div>
+                
+                <p>Scottie Scheffler questions why he chases major championships ahead of The Open 2025 at Royal Portrush</p>
+                <p>
+                    Patrick McDonald                </p>
+            </div>
+                            <div>
+                            
+                                                    
+                
+                        
+                                    
+    <figure><img alt="Scottie Scheffler questions why he chases major championships ahead of The Open 2025 at Royal Portrush" src="https://sportshub.cbsistatic.com/i/r/2025/07/15/90647861-84aa-400c-85f7-532586cdc76d/thumbnail/270x152/1750e172a7b51a7e718e3900ac50faed/scottie-scheffler-looking-open-g.jpg" loading="lazy" height="152" width="270"></figure>
+                        
+                </div>
+                    </div>
+    </a>
+<p>There will be frustrating times for Scheffler over the course of his 72 holes in Northern Ireland. A fan of "fair" golf courses that reward good shots and penalize poor ones, Scheffler's mettle will be tested by the variability of links golf. Weather draws, switch in wind directions and bad bounces are likely to stand in Scheffler's way. How he sidesteps them is crucial to his chances.</p><p>Tangibly -- as it often has the last few years -- Scheffler's putter will need to show some life as well. The worst inside 10 feet among those who made the cut at the Scottish Open, Scheffler was able to overcome this misdoing en route to a T8 finish, and that has more-or-less the story of his play on links golf courses.</p><p>Fantastic accuracy, pristine precision, uncanny control and underrated creativity best describes his abilities on these courses. But "lost" may ultimately be the best way to describe how he performs with the wand in hand as he has bled strokes on the greens in six straight links golf tournaments.</p><p>A flip from negative to positive may be all that is needed to flip Scheffler's major grand total to four. That goes for his putting, and his mentality, too, when adversity inevitably strikes and the top player in the game is left wondering how he can turn a situation up on its head.</p><p>"Now, I think I do a better job of holding it in," Scheffler continued, "but also getting it over to the next shot and almost sharpening my focus to where I'm in a better spot after a bit of frustration than I am before."</p>
+
+
+        
+            </div></div>

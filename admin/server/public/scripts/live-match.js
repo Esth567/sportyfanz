@@ -547,7 +547,7 @@ async function displayLiveMatch(matchId, category) {
                         <span class="listed-player-number">${player.lineup_number || "-"}</span>
                         <span class="listed-player-name">${player.lineup_player || "Unknown"}</span>
                     </li>`).join("")
-                : `<li><em>No data available</em></li>`;
+                : `<li><em>Not available</em></li>`;
 
         switch (tab) {
             case "info":
@@ -577,13 +577,13 @@ async function displayLiveMatch(matchId, category) {
                             <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="lineUpsteam-logo">
                             <div class="team-formation">
                                 <h3>${match.match_hometeam_name}</h3>
-                                <h4>${match.match_hometeam_system || "Unknown Formation"}</h4>
+                                <h4>${match.match_hometeam_system || "No Formation"}</h4>
                             </div>
                         </div>
                         <div class="lineUpsteam-info">
                             <div class="team-formation">
                                 <h3>${match.match_awayteam_name}</h3>
-                                <h4>${match.match_awayteam_system || "Unknown Formation"}</h4>
+                                <h4>${match.match_awayteam_system || "No Formation"}</h4>
                             </div>
                             <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="lineUpsteam-logo">
                         </div>
@@ -779,34 +779,35 @@ function loadH2HData(homeTeam, awayTeam) {
                     </div>
                 `;
 
-                const matchHTML = sortedMatches.map(match => `
-                    <div class="h2h-match">
-                        
-                        <div class="h2h-teams-info">
-                        <div class="h2h-match-meta">
-                            <p class="h2h-match-date">${match.match_date}</p>
-                            <p class="h2h-match-time">${
-                               (!isNaN(parseInt(match.match_hometeam_score)) && !isNaN(parseInt(match.match_awayteam_score)))
-                              ? "FT"
-                              : match.match_time
-                            }</p>
-
-                        </div>
-                            <div class="h2h-team">
-                                <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="h2h-badge">
-                                <p>${match.match_hometeam_name}</p>
-                            </div>
-                            <div class="h2h-score-column">
-                                <p class="score">${match.match_hometeam_score}</p>
-                                <p class="score">${match.match_awayteam_score}</p>
-                            </div>
-                            <div class="h2h-team">
-                                <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="h2h-badge">
-                                <p>${match.match_awayteam_name}</p>
-                            </div>
-                        </div>
-                    </div>
-                `).join("");
+               const matchHTML = sortedMatches.map(match => `
+                   <div class="h2h-match">
+                    <div class="h2h-teams-info">
+                     <div class="h2h-match-meta">
+                         <p class="h2h-match-date">${match.match_date}</p>
+                         <p class="h2h-match-time">${
+                         (!isNaN(parseInt(match.match_hometeam_score)) && !isNaN(parseInt(match.match_awayteam_score)))
+                         ? "FT"
+                         : match.match_time
+                        }</p>
+                     </div>
+                   <div class="h2h-teams-column">
+                      <div class="h2h-team">
+                        <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="h2h-badge">
+                        <p>${match.match_hometeam_name}</p>
+                   </div>
+                  <div class="h2h-team">
+                      <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="h2h-badge">
+                      <p>${match.match_awayteam_name}</p>
+                  </div>
+                 </div>
+                 <div class="h2h-score-column">
+                     <p class="score">${match.match_hometeam_score}</p>
+                     <p class="score">${match.match_awayteam_score}</p>
+                  </div>
+                </div>
+               </div>
+               `).join("");
+ 
 
                 return `
                     <div class="h2h-league-group">

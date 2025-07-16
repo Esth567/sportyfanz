@@ -2458,7 +2458,7 @@ body{
 }
 
  .leagues-info h3 {
-    font-size: 0.65rem;
+    font-size: 0.70rem;
     font-weight: 400;
     font-family: 'Lato';
     margin-top: -3px;
@@ -2493,7 +2493,7 @@ body{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.58rem;
+    font-size: 0.60rem;
     font-family: 'Lato';
     font-weight: 400;
     gap: 5px;
@@ -2593,7 +2593,7 @@ body{
   }
 
   .league-header .league-title {
-    font-size: 0.65rem;
+    font-size: 0.70rem;
     margin-top: 10px;
     font-family: 'Lato';
     font-weight: bold;
@@ -2608,7 +2608,7 @@ body{
   }
   
   .league-header .league-country {
-    font-size: 0.55rem;
+    font-size: 0.58rem;
     font-family: 'Lato';
     font-weight: 400;
     color: #ccccccd2;
@@ -2667,7 +2667,7 @@ body{
   }
 
   .matches-teams span {
-    font-size: 0.60rem;
+    font-size: 0.65rem;
     font-family: 'Lato';
   }
 
@@ -2741,7 +2741,7 @@ body{
   }
 
   .live-match-team span {
-    font-size: 0.65rem;
+    font-size: 0.70rem;
     font-family: 'Lato';
     margin-top: 2px;
   }
@@ -2802,7 +2802,7 @@ body{
 }
 
 .live-match-time {
-    font-size: 0.60rem;
+    font-size: 0.63rem;
     font-family: 'Lato';
     color: lightgray;
   }
@@ -2864,7 +2864,7 @@ body{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.60rem;
+    font-size: 0.62rem;
     font-family: 'Lato';
     font-weight: 500;
     gap: 5px;
@@ -2918,7 +2918,7 @@ body{
     display: flex;
     flex-direction: row;
     gap: 5px;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     font-weight: bold;
     margin-bottom: 10px;
@@ -2950,7 +2950,7 @@ body{
     display: flex;
     gap: 5px;
     margin: 0;
-    font-size: 0.75rem;
+    font-size: 0.70rem;
     font-family: 'Lato';
 }
 
@@ -2996,13 +2996,13 @@ body{
 }
 
 .team-formation h3{
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     font-weight: bold;
 }
 
 .team-formation h4{
-    font-size: 0.80rem;
+    font-size: 0.70rem;
     font-family: 'Lato';
     font-weight: 300;
     margin-left: -12px;
@@ -3136,7 +3136,7 @@ body{
 
 /* Ensuring both team containers take full width */
 .lineup-home-players, .lineup-away-players {
-    flex: 1; /* Make both take equal space */
+    flex: 1; 
     margin-top: 10px;
     border-radius: 8px;
 }
@@ -3144,7 +3144,7 @@ body{
 .lineup-players-names h4 {
     text-align: left;
     padding-top: 20px;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     font-weight: 400;
 }
@@ -3153,7 +3153,7 @@ body{
     text-align: center;
     color: #fbc02d;
     margin-bottom: 10px;
-    font-size: 0.90rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     font-weight: 400;
 }
@@ -3178,7 +3178,7 @@ body{
 .listed-player-number {
     flex: 0 0 40px; 
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.70rem;
     font-family: 'Lato';
     font-weight: 400;
     margin-left: -10px;
@@ -3189,7 +3189,7 @@ body{
     text-align: left;
     font-weight: 400;
     font-family: 'Lato';
-    font-size: 0.75rem;
+    font-size: 0.70rem;
     color: white;
     
 }
@@ -3202,7 +3202,7 @@ body{
     display: flex;
     flex-direction: row;
     gap: 10px;
-    font-size: 0.80rem;
+    font-size: 0.75rem;
     font-family: 'Lato';
     align-items: center;
     font-weight: 400;
@@ -3281,34 +3281,41 @@ body{
     margin-bottom: 6px;
     display: flex;
     flex-direction: column;
+    font-size: 0.70rem;
   }
   
   .h2h-teams-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 6px;
   }
-  
-  .h2h-team {
+
+  .h2h-teams-column {
     display: flex;
-    align-items: center;
-    flex-direction: row;
-    gap: 3px;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+}
+
+  .h2h-team {
+     display: flex;
+     flex-direction: row;
+     gap: 15px;
+     align-items: center;
+
   }
   
   .h2h-badge {
-    width: 17px;
-    height: 17px;
+    width: 15px;
+    height: 15px;
     object-fit: contain;
   }
   
   .h2h-score-column {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    font-weight: bold;
-    font-size: 0.75rem;
-    gap: 3px;
+    font-size: 0.65rem;
+    color: #fff;
+    font-family: 'Lato';
+    font-weight: 500;
   }
 
   .h2h-stats {
@@ -3918,6 +3925,34 @@ body{
 }
 
 
+/*  sample news */
+body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+    .news-card {
+      background: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .news-card h3 {
+      margin: 0 0 10px;
+    }
+    .meta {
+      font-size: 0.9em;
+      color: #666;
+    }
+    .entities, .sentiment {
+      margin-top: 10px;
+      font-size: 0.85em;
+    }
+    .paragraph {
+      margin-top: 10px;
+      line-height: 1.5;
+    }
 
 
 

@@ -11,6 +11,8 @@ const dashboardRoutes = require('../routes/dashboard');
 const leagueRoutes = require('../routes/leagueRoutes');
 const videoRoutes = require('../routes/videoRoutes');
 const playerImageRoutes = require('../routes/playerImageRoutes');
+const nlpfetchnews = require('../routes/fetchnlpnews'); 
+
 
 
 const app = express();
@@ -60,6 +62,7 @@ app.use('/api',dashboardRoutes);
 app.use('/api',leagueRoutes);
 app.use('/api', videoRoutes);
 app.use('/api', playerImageRoutes);
+app.use('/api', nlpfetchnews);
 
 app.get("/", (req, res) => res.send("✅ API is live."));
 

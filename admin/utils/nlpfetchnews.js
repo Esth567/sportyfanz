@@ -6,8 +6,11 @@ const sentiment = new Sentiment();
 
 exports.extractTextFromHtml = html => {
   const root = parse(html);
-  return root.text.trim().replace(/\s+/g, ' ');
+  const text = root.text.trim().replace(/\s+/g, ' ');
+  console.log('Extracted article text length:', text.length);
+  return text;
 };
+
 
 exports.extractEntities = text => {
   const doc = nlp(text);
@@ -27,13 +30,28 @@ exports.analyzeSentiment = text => {
   };
 };
 
-exports.chunkSummary = (text, paragraphCount = 4) => {
-  const sentences = text.split('. ');
-  const chunkSize = Math.ceil(sentences.length / paragraphCount);
-  const paragraphs = [];
-  for (let i = 0; i < paragraphCount; i++) {
-    const chunk = sentences.slice(i * chunkSize, (i + 1) * chunkSize).join('. ') + '.';
-    paragraphs.push(chunk.trim());
+exports.chunkSummary = (text, minWords = 300) => {
+  const sentences = text.split(/(?<=[.?!])\s+/);
+  const chunks = [];
+  let current = [];
+
+  for (const sentence of sentences) {
+    current.push(sentence);
+
+    const wordCount = current.join(' ').split(/\s+/).length;
+    if (wordCount >= minWords) {
+      chunks.push(current.join(' '));
+      current = [];
+    }
   }
-  return paragraphs;
+
+  // Add leftover
+  if (current.length > 0) {
+    chunks.push(current.join(' '));
+  }
+
+  return chunks.slice(0, 5); // limit to 5 paragraphs max
 };
+
+
+

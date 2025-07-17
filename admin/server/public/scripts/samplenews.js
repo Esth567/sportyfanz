@@ -1,15 +1,27 @@
 async function fetchNews() {
-      const container = document.getElementById('news-container');
+      const container = document.getElementById('sport-news');
+      console.log('Fetching news...');
       try {
         const res = await fetch('/api/sports-summaries');
+        console.log('Fetch response:', res);
+
+        if (!res.ok) {
+          throw new Error(`Fetch failed with status ${res.status}`);
+        }
+
         const data = await res.json();
+        console.log('Received data:', data);
+
+        
 
         container.innerHTML = ''; // Clear loading message
 
-        if (!data.results || data.results.length === 0) {
-          container.innerHTML = '<p>No news found.</p>';
-          return;
-        }
+       if (!data.results || data.results.length === 0) {
+         console.log('No results found in data:', data);
+         container.innerHTML = '<p>No news found.</p>';
+       return;
+      }
+
 
         data.results.forEach(news => {
           const card = document.createElement('div');
@@ -37,4 +49,5 @@ async function fetchNews() {
       }
     }
 
-    fetchNews();
+
+    document.addEventListener('DOMContentLoaded', fetchNews);

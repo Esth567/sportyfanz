@@ -271,6 +271,7 @@ function populateNewsSection(sectionId, newsList) {
             </div>
             <div class="news-info">
               <p class="news-headline">${item.description?.slice(0, 150) || 'No description'}...</p>
+              <span class="news-time" data-posted="${item.date}">Just now</span>
             </div>
           </div>
         </div>
@@ -308,6 +309,7 @@ function populateNewsSection(sectionId, newsList) {
             <div class="news-info">
               <h2 class="transferNews-header">${item.title}</h2>
               <p class="transferNews-description">${item.description?.slice(0, 150) || 'No description'}...</p>
+              <span class="news-time" data-posted="${item.date}">Just now</span>
             </div>
           </div>
         </div>
@@ -325,7 +327,7 @@ function populateNewsSection(sectionId, newsList) {
   const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
   const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
   
-  const combinedNews = [...trending, ...updates].slice(0, 10); // Limit to 10 combined items
+  const combinedNews = [...trending, ...updates].slice(0, 20); // Limit to 10 combined items
 
 
   // Remove old dynamically generated news slides (optional cleanup)

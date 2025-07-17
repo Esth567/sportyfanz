@@ -1,0 +1,89 @@
+---
+title: "2025 British Open picks, favorites: Ranking the top of the field from 1-25 with predictions for Royal Portrush"
+date: "2025-07-17T03:34:48.000Z"
+slug: "2025-british-open-picks-favorites:-ranking-the-top-of-the-field-from-1-25-with-predictions-for-royal-portrush"
+source: "CBSSports.com Headlines"
+original_link: "https://www.cbssports.com/golf/news/2025-british-open-picks-favorites-ranking-the-top-of-the-field-from-1-25-with-predictions-for-royal-portrush/"
+description: "Is Scottie Scheffler still the clear No. 1 entering The Open? Is Rory McIlroy ready to win in Northern Ireland?"
+mode: "summarize"
+image: "https://sportshub.cbsistatic.com/i/r/2025/07/15/cf97d259-bc34-4361-b77f-bd4e7b3ab63a/thumbnail/1200x675/9c9a10f3407086bb622784e0946c44fc/rankingthefield-v2.png"
+category: "general"
+tags: ["general"]
+domain: "cbssports.com"
+---
+<div id="readability-page-1" class="page"><div>
+        
+        
+                            
+                
+        <p>There is a different skillset needed to succeed at links golf. A different mindset as well. Toughness between the ears and willingness to forgive and forget is just as important as any additional ball speed a player may garnered around a course like Royal Portrush. Bad breaks are bound to come, and while the ways in which players address them will not show up in the strokes-gained data, they nevertheless prove vital to one's chances at raising the Claret Jug.</p><p>Bomb and gouge won't fly in this area of the world as a proper test is in store for players at the 2025 Open Championship. The last time the championship was held in these parts, it was a gritty Irishman who reigned supreme over a lovable Englishman and the baddest dude in major championships who was in the midst of an all-time major run.</p><p>Six years later, the field is headlined by the man <span><a href="https://www.cbssports.com/golf/news/the-open-2025-rory-mcilroy-hopes-to-wash-away-difficult-2019-memories-in-quest-for-home-win-at-royal-portrush/" target="_blank">who all eyes were on back in 2019, Rory McIlroy</a></span>. Returning to Royal Portrush as a career grand slam winner, the five-time major champion is looking to rediscover the game and wits that allowed him to slip on the green jacket only a handful of months ago.</p><p>Since reaching the mountaintop, McIlroy has been muddled with his thoughts, but he appears to have come out on the other side with his runner-up result at the Scottish Open.</p>
+        
+
+<p>McIlroy will be the man of the people, but it is Scottie Scheffler who enters as the man of the moment. The world No. 1 has not finished outside the top 10 in a golf tournament since The Players Championship and looks prepared to check off another first on his to-do list: win on a links-style golf course.</p><p>The three-time major champion has acquitted himself nicely, but not quite as well as another Masters champion in Jon Rahm. A win from either Scheffler or Rahm would turn 2026 into a grand slam opportunity as one of them caps off this calendar year holding the title Champion Golfer of the Year.</p><p>Of the 156 players in this stacked field, let's take a look the 25 most likely to be the last man standing as the week begins. CBS Sports has tightened the field even further tackling the <span><a href="https://www.cbssports.com/golf/news/2025-open-championship-picks-predictions-favorites-one-of-these-nine-golfers-will-win-at-royal-portrush/" target="_blank">nine golfers with the greatest chance to win The Open</a></span> along with a full slate of <span><a href="https://www.cbssports.com/golf/news/2025-british-open-picks-odds-expert-predictions-favorites-to-win-from-betting-field-at-royal-portrush/" target="_blank">Open Championship expert picks and predictions</a></span>.</p>
+        
+
+<h2>2025 Open Championship field, ranked</h2><p><strong>1. Scottie Scheffler (T7 in 2024):</strong> The Scottish Open felt like an ideal lead-in tournament as Scheffler dominated from tee to green only to be undone by his putter. The crusty surfaces of the Renaissance Club should be a thing of the past as forecasted rains should provide steadier greens on which players will navigate. He has the lowest cumulative score to par in major championship history with 19 top-25 finishes in his last 21 major starts, including four straight in The Open and is the shotmaker of all shotmakers. Scheffler has yet to finish outside the top 25 this season.</p><p><strong>2. Jon Rahm (T2 in 2023):</strong> Rahm was locked in during the final round of LIV Golf Valderrama in his native country but ultimately fell one stroke shy of forcing a playoff. He is dangerously close to the 2023 version of himself that saw Rahm win four times before the end of April, including at the Masters. In the last five big-time tournaments (four majors and the Olympics), the Spaniard has shown up, and it is expected that he does so again this week.&nbsp;</p>
+<p><strong>3. Rory McIlroy (Won in 2014):</strong> The game is in good order following a runner-up result at the Scottish Open, and the mentals seem refreshed given his candor with the media. McIlroy's Open record has been somewhat boom-or-bust throughout his career with seven top-six finishes and eight placements outside the top 20. He either contends or never gets out of the block -- like last season when he opened with a 78 following the devastating loss at the U.S. Open. The 36-year-old will be ready for this one.&nbsp;</p>
+        
+
+<a href="https://www.cbssports.com/golf/news/the-open-2025-rory-mcilroy-hopes-to-wash-away-difficult-2019-memories-in-quest-for-home-win-at-royal-portrush/" target="_blank">
+        <div>
+            <div>
+                
+                <p>The Open 2025: Rory McIlroy hopes to wash away difficult 2019 memories in quest for home win at Royal Portrush</p>
+                <p>
+                    Patrick McDonald                </p>
+            </div>
+                            <div>
+                            
+                                                    
+                
+                        
+                                    
+    <figure><img alt="The Open 2025: Rory McIlroy hopes to wash away difficult 2019 memories in quest for home win at Royal Portrush" src="https://sportshub.cbsistatic.com/i/r/2025/07/15/da17dd10-5a77-4172-b7a0-de90eddd3e84/thumbnail/270x152/efcd2c4ff77d325cc1dd9619aeb07872/rory-mcilroy-signing-open-portrush-g.jpg" loading="lazy" height="152" width="270"></figure>
+                        
+                </div>
+                    </div>
+    </a>
+<p><strong>4. Xander Schauffele (Won in 2024):</strong> He seems closer and closer by the week, but unfortunately for Schauffele, the weeks are running out. With only three tournaments between PGA Tour players and the postseason, the world No. 3 needs to get going and fast! The reigning Champion Golfer of the Year seems like a lock to finish inside the top 20 as he has done in five of his seven Open starts, but what will push him into contention for the first time all year? The answer is the putter as he is experiencing his worst season on the greens of his career.</p><p><strong>5. Viktor Hovland (T4 in 2022):</strong> Hovland is a player who knows how to play major championship golfer without his A-game, and lo and behold, he is approaching his apex at the exact right time. The Norwegian continues to strike the cover off the golf ball with his irons, and his driver is much improved since bemoaning its efforts at the U.S. Open where he finished third. Hovland will go as far as his short game allows him, and if adequate, that could be the winner's circle.</p><p><strong>6. Tyrrell Hatton (T5 in 2016):</strong> I've been higher on Hatton than most, but he was the preseason Open selection and we've got to stick to our morals. The Englishman threatened at Oakmont before a bogey-bogey finish saw him finish T4. He put together a quality outing on LIV Golf between that tournament and The Open, returning to the site of one of his best finishes in this championship -- a quiet T6 in 2019.</p>
+        
+
+<p><strong>7. Jordan Spieth (Won in 2017):</strong> Lucky No. 7 for the man who just welcomed another child into the world. When links golf season rolls around, Spieth always needs to be considered as he possesses the lowest score relative to par in Open history with seven straight top-25 finishes, including a close call at Royal St. George's. Before his withdrawal at the Travelers Championship -- from which he has fully recovered -- Spieth was rounding a corner in his game. If the hiccup didn't stop that momentum, he will be a factor one way or another.</p><p><strong>8. Robert MacIntyre (T6 in 2019):</strong> He was certifiably bummed out by his lackluster play at the Scottish Open and promised to do better at The Open. He started out this championship with a bang with a T6 finish at Royal Portrush in his debut and a T8 the following playing in 2021 at Royal St. George's. Since then, MacIntyre has struggled, but he has never been this quality of player. He's doing everything well at the moment, as proven by his runner-up finish at Oakmont.</p><p><strong>9. Russell Henley (5th in 2024):</strong>&nbsp;As steady as they come. Henley has his game back after a short lull in form in the spring thanks to three straight top-10 finishes, including one at the U.S. Open. He did not have much links golf form on his résumé before he stormed back over the weekend with rounds of 66-69 to climb inside the top five at Royal Troon. The uglier the conditions, the more he will thrive.&nbsp;</p>
+        
+
+<p><strong>10. Shane Lowry (Won in 2019):</strong> Lowry has cooled off since nearly winning at Philly Cricket Club in the middle of the spring. He was an omission from the weekend at the PGA Championship and the U.S. Open, but he has flipped the script with his Open résumé in recent years. Since missing four straight cuts at one point, Lowry has rattled together four top-21 finishes, including a solo sixth place last year at Royal Troon where he was the made atop the leaderboard for much of the week. He'll be given a hero's welcome when he steps to the first tee Thursday.</p><a href="https://www.cbssports.com/golf/news/2025-british-open-picks-odds-jordan-spieth-leads-five-sleepers-contending-with-favorites-at-royal-portrush/" target="_blank">
+        <div>
+            <div>
+                
+                <p>2025 British Open picks, odds: Jordan Spieth leads five sleepers contending with favorites at Royal Portrush</p>
+                <p>
+                    Robby Kalland                </p>
+            </div>
+                            <div>
+                            
+                                                    
+                
+                        
+                                    
+    <figure><img alt="2025 British Open picks, odds: Jordan Spieth leads five sleepers contending with favorites at Royal Portrush" src="https://sportshub.cbsistatic.com/i/r/2025/07/14/b2d5647c-bef8-4d08-9fa4-ad88d94a0d16/thumbnail/270x152/5391aaad9ee310983e6abc68badf5a57/jordan-spieth-open-2024-g.jpg" loading="lazy" height="152" width="270"></figure>
+                        
+                </div>
+                    </div>
+    </a>
+<p><strong>11. Matt Fitzpatrick (T20 in 2019):</strong> In possession of the clearest upward trajectory in golf at the moment. Fitzpatrick found something when he finished inside the top 10 at the PGA Championship and has since run with it. He now has three straight top-20 finishes following his T4 result at the Scottish Open. Entire game hasn't synced up quite yet, but if it does, he should be right in the thick of it. Has made five straight Open cuts.</p><p><strong>12. Tommy Fleetwood (2nd in 2019):</strong> Always the bridesmaid, never the bride. Fleetwood failed to impress at the Scottish Open, but he has largely been brilliant in 2025 as his iron play and his putter have taken steps in the right direction. Posed as Lowry's playing partner in the final round in 2019, he had a chance early to cut the deficit to two strokes but failed to put a solid roll on his birdie bid and never threatened. The Englishman has four top-12 finishes in his last six Opens.</p>
+        
+
+<p><strong>13. Ludvig Åberg (MC in 2024):</strong> The 25-year-old is making a lot of young man's mistakes in 2025, and the results are emblematic of it. Åberg has struggled in major championships outside of Augusta National, but he can change that narrative this week in what is only his second Open. His driver and iron play will be able to keep him afloat, but it is is decision making at crucial moments that will ultimately tell that tale of his time at Royal Portrush.</p><p><strong>14. Collin Morikawa (Won in 2021):</strong> Comes in following his first individual missed cut since last year's Arnold Palmer Invitational. With Billy Foster by his side, Morikawa's blend of accuracy off the tee and precision into the greens should set him up for success. Play in bad weather has been a question mark as has been his play in clutch time as he remains without a win since late 2023.</p><p><strong>15. Bryson DeChambeau (T8 in 2022):</strong> The two-time U.S. Open champion is top five in any other major but this one. DeChambeau has admitted he has not figured out links golf that is not "warm and not windy," and the results speaks to this. His driver and putter give him a high enough floor, but everything in between is not conducive for this test.&nbsp;</p>
+        
+
+<p><strong>16. Patrick Reed (10th in 2019):</strong> He knows what is at stake -- not only a Claret Jug but a possible addition to the U.S. Ryder Cup team -- with a win. Reed claimed his first LIV Golf title in Dallas a couple weeks after the U.S. Open and backed it up with a top-10 finish in Spain. His best Open result came at Royal Portrush, but play in this championship has been uninspiring outside of that week.</p><p><strong>17. Adam Scott (2nd in 2012):</strong> Seems like an Open champion, but sadly is not. The same can be said for the U.S. Open as well where Scott was in the final grouping on Sunday only to stumble down the back nine to a misleading T12 finish. The Australian grabbed a top-20 finish at the Scottish Open to show he is still in good form and spirits, and he looks to avenge a rare missed cut in this championship in 2019. He has 11 top 25s in his last 18 Opens.&nbsp;</p><p><strong>18. Justin Rose (T2 in 2024):</strong> A final-round 67 in the heat of contention is typically good enough to get the job done, but it was not last year for Rose, who looked up at only one name by week's end. Form has largely been horrendous since the playoff loss at the Masters, but he flashed Sunday at the Scottish Open with a bogey-free effort to shoot up inside the top 10. He knows how to play proper golf, and that is what is required this week. He has two runner-up finishes in the last five Opens.</p>
+        
+
+<p><strong>19. Hideki Matsuyama (T6 in 2013):</strong>&nbsp;A forgotten man at the moment. Matsuyama has only one top-10 finish this season with that coming in the first week of the year via his win at The Sentry. He looked more like his usual self in his T13 finish at the Rocket Classic, but the driver continues to pose problems. He's been trying to figure out that club all year as it was the main culprit behind his missed cut at the PGA Championship which snapped the longest active made-cut streak in majors at the time.&nbsp;</p><p><strong>20. Sepp Straka (T2 in 2023):</strong>&nbsp;Put up or shut up time for Straka in 2025 major championships. Twice a winner on the PGA Tour this season, Straka has been a weekend omission in all three majors so far. The Open could be the one to get him off the schneid as he factored with a top 10 at the Scottish Open and has acquitted himself nicely in the last two editions of this championship.</p><p><strong>21. Ben Griffin (MC in 2024):</strong> A missed cut at the John Deere Classic put a screeching halt to his summer scorcher that included three straight top 15s, including top-10 finishes at the U.S. Open and the PGA Championship. His added length has proven beneficial stateside, but it is unknown how his game will translate across the pond where he has two missed cuts in as many prior attempts.</p>
+        
+
+<p><strong>22. Justin Thomas (T11 in 2019):</strong> The world No. 4 needs a new game plan in majors because the current one is just not working. He has seven missed cuts in his last 13 major appearances since his win at Southern Hills, and despite links golf seeming to be perfect for his game on paper, he has not assimilated to this environment. The good news is his best finish came at Royal Portrush six years ago.</p><p><strong>23. Sam Burns (T31 in 2024):</strong>&nbsp;The 54-hole leader at the U.S. Open, Burns was in with a chance for his maiden major title before a late blowup upended it. Still, he has seven top-20 finishes in his last 10 tournaments thanks in large part to his putter but also a significant improvement in the ball-striking categories.&nbsp;</p><p><strong>24. Ryan Fox (T16 in 2019):</strong> One of the handful of multiple-time winners on the PGA Tour this season. Fox has flown up leaderboards as of late thanks to a two-pronged approach of stellar iron play and consistent putting. The Kiwi is capable of flighting his shots and changing trajectories as noted by a top 25 in this championship a season ago.</p><p><strong>25. Cameron Young (2nd in 2022):</strong> Nearly won in his debut at The Open where he played alongside eventual champion Cameron Smith in the final round. He has since added another top-10 finish to his tally and comes in having just finished inside the top five at the U.S. Open. His putter has improved significantly in 2025.</p>
+
+
+        
+            </div></div>

@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { fetchNews } = require("../utils/fetchNews");
 
+
 exports.getNews = async (req, res) => {
   try {
     const force = req.query.force === "true";

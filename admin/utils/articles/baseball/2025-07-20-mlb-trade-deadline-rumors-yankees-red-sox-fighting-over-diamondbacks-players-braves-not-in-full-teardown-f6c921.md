@@ -1,0 +1,20 @@
+---
+title: "MLB trade deadline rumors: Yankees, Red Sox fighting over Diamondbacks players; Braves not in full teardown"
+date: "2025-07-20T15:05:03.000Z"
+slug: "mlb-trade-deadline-rumors:-yankees-red-sox-fighting-over-diamondbacks-players-braves-not-in-full-teardown"
+source: "CBSSports.com Headlines"
+original_link: "https://www.cbssports.com/mlb/news/mlb-trade-deadline-rumors-yankees-red-sox-fighting-over-diamondbacks-players-braves-not-in-full-teardown/"
+description: "The deadline is set for July 31"
+mode: "in_depth"
+image: "https://sportshub.cbsistatic.com/i/r/2025/07/20/54826ed9-6a4a-4872-8350-5ce8395e9aaf/thumbnail/1200x675/5201162834e1bf8843cbcc9cc41f919c/kelly-getty.png"
+category: "baseball"
+tags: ["baseball"]
+domain: "cbssports.com"
+---
+We're clear of the All-Star break and the MLB Draft, and that means the next big date on the baseball calendar is the July 31 trade deadline. Speaking of which, each day leading up to the deadline brings us a fresh supply of deadline rumors, and you can find Sunday's just below. Yankees, Red Sox eyeing D-backsWill the Arizona Diamondbacks sell at the deadline? That's one of the biggest questions as we work our way toward July 31. If they do decide to cut bait on the thus-far disappointing 2025 season, then they have a number of alluring trade targets. Speaking of which, USA Today reports that the blood-rival New York Yankees and Boston Red Sox have designs on a D-back or three. Bob Nightengale writes: "The Yankees and Red Sox, each looking for a starting pitcher, have sent scouts to watch Diamondbacks starters Zac Gallen and Merrill Kelly in Phoenix, with the Yankees also keeping a close eye on third baseman Eugenio Suárez (32 homers, 80 RBI)."Gallen has endured uncharacteristic struggles this season, but deadline buyers might see the strong track record and bet on a rebound. Kelly has enjoyed a standout 2025 thus far, and his appeal is obvious. Suárez as a third baseman fills a role for a number of contenders, and he's been one of the most potent power hitters in baseball this season. Braves likely to sell but deeper teardown may waitThe Atlanta Braves were expected to contend for the NL East title this season, but instead they're presently in fourth place and on pace for 90 losses. As such, they're poised to trade away select veterans over the next several days, but a full reset probably isn't in the offing, at least for now. Here's Nightengale again: 
+        
+
+"Atlanta is expected to listen to trade offers for catcher second baseman Ozzie Albies, center fielder Michael Harris and catcher Sean Murphy, but not until this winter."They are letting teams know that DH Marcell Ozuna, closer Raisel Iglesias and reliever Pierce Johnson are all available."Ozuna, who has 10-and-5 rights, can veto any trade."Ozuna, as noted, has power over the process, and he's also shown some signs of decline in this, his age-34 season. Johnson should have plenty of interest, and Iglesias has out-pitched his ERA, which means interested parties may be on the underlying results to hold sway. By the sounds of it, though, the coming winter will be what determines the shape of the Braves' future. Deep sell by Rangers unlikelySpeaking of disappointing teams, the Rangers haven't bounced back to their 2023 championship form as hoped, and that could mean a soft pivot of sorts at the deadline. The emphasis, however, is on soft, as ESPN's Buster Olney reports: 
+        
+
+"If the Rangers do decide to trade away talent, however, they could make some more measured moves. Jacob deGrom and Nathan Eovaldi are not considered to be in play, at least by some other teams; Adolis García, on the other hand, could be."Texas at this writing is just 2 ½ games out of the final AL wild-card spot, so it's prudent not to slough off valuable contributors like deGrom and Eovaldi. García, though, may not be off limits.

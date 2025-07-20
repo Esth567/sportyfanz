@@ -20,70 +20,63 @@ const parser = new RSSParser();
 const CACHE_KEY = 'sports-news-cache';
 const TTL = 60 * 30; // 30 minutes
 
-function isFootballArticle(item) {
-  const title = item.title?.toLowerCase() || '';
-  const categories = item.categories?.join(' ').toLowerCase() || '';
-  const link = item.link?.toLowerCase() || '';
-
-  return (
-    title.includes('football') ||
-    title.includes('soccer') ||
-    categories.includes('football') ||
-    link.includes('/football') ||
-    link.includes('/soccer')
-  );
+function extractCategories(categoryList) {
+  if (!Array.isArray(categoryList)) return [];
+  return categoryList.map(cat => {
+    if (typeof cat === 'string') return cat;
+    if (typeof cat === 'object' && '_' in cat) return cat._;
+    return '';
+  }).filter(Boolean);
 }
 
+
 function isTopNewsArticle(article) {
+  const safeTitle = typeof article.title === 'string' ? article.title : '';
+  const safeSummary = typeof article.fullSummary === 'string' ? article.fullSummary : '';
+  const content = `${safeTitle} ${safeSummary}`.toLowerCase();
+
   const topNewsKeywords = [
-    'transfer', 'signing', 'departure', 'rumor',
-    'match preview', 'match result', 'score', 'analysis',
-    'injury', 'suspension', 'tactics', 'strategy', 'form',
+    'transfer', 'signing', 'departure', 'rumor', 
+    'match preview', 'match result', 'score', 'analysis','signing', 'record',
+    'injury', 'suspension', 'tactics', 'strategy', 'form',"title",
     'performance', 'milestone', 'award', 'manager', 'coach',
-    'appointed', 'sacked', 'tournament', 'world cup',
-    'champions league', 'euros', 'controversy', 'scandal',
-    'investigation', 'allegation', 'ballon d\'or', 'golden boot',
-    'speculation'
+    'appointed', 'sacked', 'tournament', 'world cup', 'win', 'victory',
+    'champions league', 'euros', 'controversy', 'scandal', 'championship', 'final',
+    'investigation', 'allegation', 'ballon d\'or', 'golden boot', 
+    'speculation', "defeat",
   ];
 
-  const content = `${article.title || ''} ${article.fullSummary || ''}`.toLowerCase();
   return topNewsKeywords.some(keyword => content.includes(keyword));
 }
 
-async function fetchArticleHtmlWithMercury(url) {
+const fetchArticleHtmlWithMercury = async (url) => {
   try {
-    const result = await Mercury.parse(url);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+    const result = await Mercury.parse(url, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    if (!result || !result.content) return null;
     return typeof result.content === 'string' ? result.content : null;
   } catch (err) {
-    console.warn('Mercury failed:', url, err.message);
+    console.error(`Error fetching article HTML from ${url}:`, err.message);
     return null;
   }
-}
+};
 
 router.get('/sports-summaries', async (req, res) => {
+  const allSummaries = [];
+
   try {
-    // Redis cache check
-    const cachedData = await redisClient.get(CACHE_KEY);
-    if (cachedData) {
-      const parsed = JSON.parse(cachedData);
-      if (parsed?.trending?.length || parsed?.updates?.length) {
-        console.log('⚡ Serving from Redis cache');
-        return res.status(200).json(parsed);
-      }
-      console.warn('⚠️ Redis cache was empty, refetching...');
-    }
-
-    const topNews = [];
-    const updates = [];
-
     for (const feedUrl of feedUrls) {
       try {
         const feed = await parser.parseURL(feedUrl);
 
-        for (const item of feed.items.slice(0, 2)) {
+        for (const item of feed.items) {
           try {
             const articleUrl = item.link;
-            if (!articleUrl || !/^https?:\/\//.test(articleUrl) || articleUrl.includes('/live/')) continue;
+            if (!articleUrl || !/^https?:\/\//.test(articleUrl)) continue;
 
             const articleHtml = await fetchArticleHtmlWithMercury(articleUrl);
             if (!articleHtml) continue;
@@ -91,73 +84,56 @@ router.get('/sports-summaries', async (req, res) => {
             const articleText = extractTextFromHtml(articleHtml);
             if (!articleText || articleText.length < 300) continue;
 
-            let imageUrl = await extractImageFromURL(articleUrl);
+            // ✅ Get image URL or fallback
+            let imageUrl = item.enclosure?.url || item.image || '';
             if (!imageUrl?.trim()) {
-              imageUrl = fallbackImage;
+              imageUrl = 'https://example.com/default-news.jpg'; // Replace with a real fallback image URL
             }
 
+            const title = cleanUnicode(item.title);
             const chunks = chunkSummary(articleText, 5);
             const fullSummary = chunks.join(' ');
-            const entities = extractEntities(articleText);
-            const sentiment = analyzeSentiment(fullSummary);
-            const seoTitle = slugify(item.title, { lower: true, strict: true });
+            if (!fullSummary || typeof fullSummary !== 'string') continue;
 
-            const articleData = {
-              title: cleanUnicode(item.title),
+            const description = cleanUnicode(chunks[0] || '');
+            const entities = extractEntities(articleText);
+            const sentiment = analyzeSentiment(articleText);
+            const seoTitle = slugify(title, { lower: true, strict: true });
+
+            allSummaries.push({
+              title,
               seoTitle,
-              link: item.link,
+              link: articleUrl,
               image: imageUrl,
               paragraphs: chunks.map(cleanUnicode),
               fullSummary: cleanUnicode(fullSummary),
-              description: cleanUnicode(chunks[0]),
+              description,
               date: item.isoDate || item.pubDate || new Date().toISOString(),
               entities,
               sentiment,
-            };
-
-            if (isFootballArticle(item)) {
-              if (isTopNewsArticle(articleData)) {
-                console.log('🔥 Top news match:', articleData.title);
-                topNews.push(articleData);
-              } else {
-                updates.push(articleData);
-              }
-            }
-          } catch (articleErr) {
-            console.warn(`❌ Article processing error: ${item.link}`, articleErr.message);
+            });
+          } catch (err) {
+            console.warn(`⚠️ Failed to process item from ${feedUrl}:`, err.message);
+            continue;
           }
         }
-      } catch (feedErr) {
-        console.warn(`⚠️ Failed to process ${feedUrl}:`, feedErr.message);
+      } catch (err) {
+        console.warn(`⚠️ Failed to parse feed ${feedUrl}:`, err.message);
+        continue;
       }
     }
 
-    const responseData = {
-      trending: topNews.slice(0, 10),
-      updates: updates.slice(0, 20),
-      count: topNews.length + updates.length,
-    };
-
-    // Save to Redis cache
-    try {
-      await redisClient.set(CACHE_KEY, JSON.stringify(responseData), { EX: TTL });
-      console.log('📝 Cached sports news in Redis');
-    } catch (redisErr) {
-      console.error('❌ Redis cache write error:', redisErr.message);
-    }
-
-    res.status(200).json(responseData);
+    res.status(200).json({ count: allSummaries.length, results: allSummaries });
   } catch (err) {
     console.error('🛑 Error in /sports-summaries route:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Cache clearing endpoint
+
 router.delete('/clear-cache', async (req, res) => {
   try {
     await redisClient.del(CACHE_KEY);
-    console.log('🧹 Cache cleared');
     res.status(200).json({ message: 'Cache cleared' });
   } catch (err) {
     console.error('❌ Failed to clear cache:', err.message);

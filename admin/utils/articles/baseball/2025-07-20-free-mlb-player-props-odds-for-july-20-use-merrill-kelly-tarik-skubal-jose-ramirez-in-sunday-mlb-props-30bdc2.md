@@ -1,0 +1,37 @@
+---
+title: "Free MLB player props, odds for July 20: Use Merrill Kelly, Tarik Skubal, Jose Ramirez in Sunday MLB props"
+date: "2025-07-20T13:54:49.000Z"
+slug: "free-mlb-player-props-odds-for-july-20:-use-merrill-kelly-tarik-skubal-jose-ramirez-in-sunday-mlb-props"
+source: "CBSSports.com Headlines"
+original_link: "https://www.cbssports.com/betting/news/free-mlb-player-props-odds-for-july-20-use-merrill-kelly-tarik-skubal-jose-ramirez-in-sunday-mlb-props/"
+description: "SportsLine's model is on a 46-43 roll on MLB picks and revealed its MLB prop picks and MLB betting picks for sites like PrizePicks, DraftKings and FanDuel"
+mode: "summarize"
+image: "https://sportshub.cbsistatic.com/i/r/2025/06/26/21bb6f44-adf9-450d-a35e-2fb112c18a1e/thumbnail/1200x675/094545de2704735577a6bff275e1e9a9/jose-ramirez-guardians.png"
+category: "baseball"
+tags: ["baseball"]
+domain: "cbssports.com"
+---
+Jose Ramirez is now a seven-time MLB All-Star, and he's well-established as one of the greatest players in franchise history in his 13th season with the Cleveland Guardians. The 32-year-old is having another sensational season, slashing .298/.368/.523 with 19 home runs, 52 RBI and 29 stolen bases. He's hitting .352 against left-handed pitching this season and he'll have a matchup with Athletics lefty Jeffrey Springs on Sunday, which is why our model is declaring Ramirez over 1.5 total bases (+100) as one of its top MLB prop picks. With all 30 teams in action, there are hundreds of MLB player props to wager on through various MLB betting sites. Targeting MLB player props is one way to approach MLB betting on Sunday's MLB schedule at online sports betting sites. With MLB props available for almost every player in every game at sportsbooks, SportsLine's proven computer model can help you find value to add to your MLB prop picks. They can also help new users take advantage of sportsbook promos like the latest Fanatics Sportsbook promo code. New users at Fanatics Sportsbook can get up to $1,000 in No Sweat Bets. The model simulates every game 10,000 times and is on a 46-43 run on all top-rated MLB picks. The model is up more than 51.4 units on home run prop picks this season. Now, the model and SportsLine's team of Data Scientists have revealed their projections for some of the most-bet MLB player props on Sunday.Best Sunday MLB player prop picks:Jose Ramirez, Guardians, over 1.5 total bases (+100)Tarik Skubal, Tigers, over 1.5 earned runs allowed (+105)Merrill Kelly, Diamondbacks, under 17.5 outs recorded (+130)Parlay these picks for +843 odds and get $150 in bonus bets with a DraftKings promo code (odds subject to change). Bet at DraftKings and get $150 in bonus bets instantly:Jose Ramirez, Guardians, Over 1.5 total bases (+100)Ramirez has posted nine seasons with an OPS of .800 or higher in his career with the Guardians and only two players have managed more in franchise history. He's well on his way to a 10th in 2025 and the extra-base machine has been on a tear of late. Ramirez has a homer, a triple and a double in his last two games and he's had at least four total bases in seven of his last 12 games.
+    
+    
+
+    
+
+
+    
+    
+Tarik Skubal, Tigers, Over 1.5 earned runs allowed (+103)  Skubal looks like he's well on his way to a second consecutive AL Cy Young award, but he has given up at least two earned runs on eight occasions this year and has done so in three of his last five starts. He gave up four earned runs in his last outing against the Mariners, and now he'll take on a Rangers offense that has been a bit disappointing this season but still features some tough outs. The model predicts that Skubal gives up a couple of earned runs on Sunday, and new users can use the latest Caesars Sportsbook promo code, which allows you to double your winnings on 10 bets after your first $1 bet.
+    
+    
+
+
+
+    
+Merrill Kelly, Diamondbacks, Under 17.5 outs recorded (+130)He'll become a free agent in 2026 and with the Diamondbacks disappointing, every start is likely an audition for Kelly going forward. However, the Arizona front office will probably want the coaching staff to be relatively conservative with one of their biggest trade assets. Kelly only went five innings despite giving up one hit and one earned run in his last start because four walks drove his pitch count up to 98. He's had eight starts this year where he hasn't completed the sixth inning and he's gone under in this market in four of his last five home games. 
+    
+    
+
+
+
+    
+Want more MLB player prop picks for Sunday?You've seen the model's MLB picks for some popular player props on Sunday. Now, get MLB projections for every player prop at SportsLine.Also at SportsLine:You can also see Jacob Fetner's and the Inside the Lines team's best bets for Sunday. Finally, SportsLine expert Bruce Marshall, who is 53-44-1 (+1418) over his last 98 MLB picks, has his MLB best bets locked in for Sunday. Visit SportsLine to see his best plays for today.

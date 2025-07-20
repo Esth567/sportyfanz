@@ -1,27 +1,22 @@
-const axios = require('axios');
 const fetch = require('node-fetch');
-const { JSDOM } = require('jsdom');
-const { Readability } = require('@mozilla/readability');
+const { processArticleHTML } = require('./nlpProcessor');
 
 async function extractArticle(url) {
-
   try {
     const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (NewsBot)'
-      }
+      headers: { 'User-Agent': 'Mozilla/5.0 (NewsBot)' }
     });
     const html = await response.text();
-    const dom = new JSDOM(html, { url });
-    const reader = new Readability(dom.window.document);
-    const article = reader.parse();
 
-    return article && article.content ? article.content : null;
+    const nlpData = await processArticleHTML(html, url);
+    return nlpData;  // Includes title, text, sentiment, entities, summaries
+
   } catch (err) {
-    console.warn('⚠️ Failed to extract article from:', url);
+    console.warn('⚠️ Failed to process article:', err.message);
     return null;
   }
 }
 
 module.exports = { extractArticle };
+
 

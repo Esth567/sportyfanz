@@ -53,17 +53,17 @@ function updateRelativeTime() {
     const now = new Date();
 
     timeElements.forEach(el => {
-        const posted = new Date(el.dataset.posted);
-        if (isNaN(posted.getTime())) {
+        const postedMs = Date.parse(el.dataset.posted); // 👈 parses ISO string
+        if (isNaN(postedMs)) {
             el.textContent = 'Invalid time';
             return;
         }
 
-        const diff = Math.floor((now.getTime() - posted.getTime()) / 1000);
+        const diff = Math.floor((now.getTime() - postedMs) / 1000);
         let text;
 
-        if (diff < 0) text = 'Just now'; // Future-published feeds
-        else if (diff < 60) text = `${diff} seconds ago`;
+        if (diff < 1) text = '0 second(s) ago';
+        else if (diff < 60) text = `${diff} second(s) ago`;
         else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
         else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
         else text = `${Math.floor(diff / 86400)} day(s) ago`;
@@ -71,6 +71,7 @@ function updateRelativeTime() {
         el.textContent = text;
     });
 }
+
 
 
 
@@ -82,7 +83,7 @@ async function loadNews() {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/news');
+    const response = await fetch('/api/sports-summaries');
 
     if (!response.ok) {
       const text = await response.text();
@@ -114,6 +115,7 @@ async function loadNews() {
 
     populateNewsSection('trending-news', data.trending);
     populateNewsSection('updates-news', data.updates);
+    updateRelativeTime();
 
   } catch (error) {
     console.error('Failed to load news:', error);
@@ -150,15 +152,26 @@ function populateNewsSection(sectionId, newsList) {
 
     return `
       <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
-        <h1 class="news-title">${item.title}</h1>
         ${imageHtml}
+        <div class="title-desc"> 
+        <h1 class="news-title">
+          <a href="/news/${item.seoTitle}" class="news-link">${item.title}</a>
+          </h1>
         <div class="news-meta">
-          <p class="news-desc">${item.description?.slice(0, 150) || 'No description'}...</p>
-          <span class="news-time" data-posted="${item.date}">Just now</span>
+          <p class="news-desc">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
+          <span class="news-time" data-posted="${item.date}"></span>
+        </div>
         </div>
       </div>
     `;
   }).join('');
+
+  if (newsList.length > 0) {
+     container.style.removeProperty('display');
+     container.hidden = false;
+     container.classList.remove('hidden');
+   }
+
 
   container.querySelectorAll('.news-infomat').forEach((el) => {
     el.addEventListener('click', () => {
@@ -188,8 +201,8 @@ function showFullNews(clickedItem) {
     const newsItem = newsList[parseInt(index)];
 
     // Format description into paragraphs
-    const formattedDesc = typeof newsItem.description === 'string'
-      ? newsItem.description
+    const formattedDesc = typeof newsItem.fullSummary === 'string'
+      ? newsItem.fullSummary
           .split('\n\n')
           .map(p => `<p>${p.trim()}</p>`)
           .join('')

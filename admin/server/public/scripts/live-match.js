@@ -1089,7 +1089,7 @@ function createPlayerDiv(player, xPercent, yPercent) {
 
     return div;
 }
- 
+
 
   window.addEventListener("DOMContentLoaded", () => {
     fetchAndRenderMatches(); // This ensures everything waits until the DOM is ready

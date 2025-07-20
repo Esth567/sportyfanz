@@ -14,15 +14,15 @@ const { isOnCooldown, recordOpenAIError } = require('../utils/openaiGuard');
 const { rewriteWithOpenAI } = require('../utils/rewriteWithOpenAI');
 const { extractArticle } = require('../utils/extractArticle'); 
 
-const openaiKey = process.env.OPENAI_API_KEY;
-if (!openaiKey) {
-  console.warn("⚠️ Missing OpenAI API key — generation will be disabled.");
-} else {
-  console.log("✅ OpenAI API key detected");
-}
+//const openaiKey = process.env.OPENAI_API_KEY;
+//if (!openaiKey) {
+ // console.warn("⚠️ Missing OpenAI API key — generation will be disabled.");
+//} else {
+ // console.log("✅ OpenAI API key detected");
+//}
 
 
-const openai = new OpenAI({ apiKey: openaiKey });
+//const openai = new OpenAI({ apiKey: openaiKey });
 
 
 const parser = new Parser();
@@ -177,6 +177,7 @@ async function generateArticleFromItem(item, sourceTitle) {
     return;
   }
 
+
   let title = sanitize(item.title || 'Untitled');
   const slug = slugify(title.toLowerCase(), { lower: true });
   const leagueFolder = inferLeagueFolder(title);
@@ -197,11 +198,26 @@ async function generateArticleFromItem(item, sourceTitle) {
 
   // 🧠 Intelligent mode detection
   let mode = detectArticleMode(lowerTitle, snippet);
-
   console.log(`🧠 ARTICLE_MODE detected: ${mode}`);
 
   // 📄 Extract article content
-  let content = await extractContentWithFallback(link, item, title);
+   let content = '';
+   let nlpData;
+
+    try {
+    nlpData = await extractArticle(link);
+    if (nlpData?.content?.length >= 400) {
+      content = nlpData.content;
+      // optionally: store nlpData.summarizedChunks, namedEntities, etc.
+    } else {
+      console.warn("⚠️ NLP content too short or missing, using fallback");
+      content = await extractContentWithFallback(link, item, title);
+    }
+  } catch (err) {
+    console.warn("❌ Failed to extract article via NLP:", err.message);
+    content = await extractContentWithFallback(link, item, title);
+  }
+  
 
   // 🖼️ Image handling
   let image = await extractImageFromURL(link);
@@ -229,6 +245,12 @@ async function generateArticleFromItem(item, sourceTitle) {
 
      const tags = [leagueFolder];
 
+     const formattedContent = content
+      .split('\n')
+      .map(p => p.trim())
+      .filter(p => p.length > 0)
+      .map(p => `<p>${p}</p>`)
+      .join('\n\n');
 
   // 📝 Markdown frontmatter
   const markdown = `---
@@ -244,7 +266,7 @@ category: "${leagueFolder}"
 tags: ["${leagueFolder}"]
 domain: "${domain}"
 ---
-${content}`;
+${formattedContent}`;
 
   await fs.writeFile(filePath, markdown);
   console.log(`✅ Saved: ${filePath}`);

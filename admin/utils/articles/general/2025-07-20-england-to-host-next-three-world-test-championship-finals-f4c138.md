@@ -1,0 +1,14 @@
+---
+title: "England to host next three World Test Championship finals"
+date: "2025-07-20T15:14:57.000Z"
+slug: "england-to-host-next-three-world-test-championship-finals"
+source: "BBC Sport"
+original_link: "https://www.bbc.com/sport/cricket/articles/c9qxrrqg43ro"
+description: "The International Cricket Council awards the next three World Test Championship finals to the England and Wales Cricket Board."
+mode: "in_depth"
+image: "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/3cbd/live/5ee79350-4b7f-11f0-86d5-3b52b53af158.jpg"
+category: "general"
+tags: ["general"]
+domain: "bbc.com"
+---
+Image source, Getty ImagesImage caption, South Africa beat Australia at Lord's to win their first global men's title since 1998Jack SkeltonBBC Sport senior journalistEngland will stage the next three editions of the World Test Championship finals in 2027, 2029 and 2031, the International Cricket Council has announced.All three WTC finals so far have been held in England, with South Africa beating Australia in the 2025 showpiece at Lord's last month. And at its  annual conference in Singapore, the ICC said it awarded hosting rights for the next three to the England and Wales Cricket Board (ECB) "following a successful track record in hosting recent finals".India had reportedly hoped to stage the next final in 2027., externalChief executive Richard Gould said the ECB was "absolutely delighted" to have been chosen again.The first WTC final in 2021 was held in biosecure conditions in Southampton, with New Zealand beating India.The 2023 final at The Oval, where Australia beat India, was sold out, while the first four days at Lord's this year were also sold out, with South Africa securing victory on day four.England have yet to reach the WTC final and finished fifth in the 2023-25 cycle.Gould said being awarded the next three finals was a "testament to the passion that fans in this country have for this treasured format of the game and the willingness of supporters from around the world to travel here for these games."He added: "Hosting these finals is a privilege, and we look forward to working with the ICC to build on the success of the previous editions."The ICC said its board also received an update on the support for Afghanistan women's cricketers.In April, the governing body announced a dedicated taskforce to support displaced female cricketers from Afghanistan, with the assistance of the ECB, Cricket Australia and the Board of Control for Cricket in India.Many of the Afghanistan's leading players fled following the Taliban's return to power in 2021, with female participation in sport effectively outlawed.The ICC said: "The programme aims to deliver structured support through high-performance initiatives, domestic playing opportunities, and engagement at key ICC global events, including the ICC Women's Cricket World Cup 2025 in India and the ICC Women's T20 World Cup 2026 in England."

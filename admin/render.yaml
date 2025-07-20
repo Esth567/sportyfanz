@@ -10,6 +10,8 @@ services:
         fromSecret: groq_api_key  # store your secrets securely in Render dashboard
       - key: REDIS_URL
         fromSecret: redis_url
+      - key: FOOTBALL_API_KEY
+        fromSecret: football_api_key
 
 databases:
   - name: redis-database

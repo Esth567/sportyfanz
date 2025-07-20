@@ -1,0 +1,14 @@
+---
+title: "💎 Eagles' Super Bowl ring has pop-out wings"
+date: "2025-07-20T12:35:22.000Z"
+slug: "eagles'-super-bowl-ring-has-pop-out-wings"
+source: "www.espn.com - TOP"
+original_link: "https://www.espn.com/nfl/story/_/id/45775422/eagles-get-super-bowl-lix-rings-sirianni-sayings"
+description: "The Eagles' Super Bowl LIX rings feature a hidden button that, when pressed, extends the wings on either side, revealing coach Nick Sirianni's saying, 'You can't be great without the greatness of others.'"
+mode: "summarize"
+image: "https://a3.espncdn.com/combiner/i?img=%2Fphoto%2F2025%2F0209%2Fnfl_fc3_eagles_cr_16x9.jpg"
+category: "general"
+tags: ["general"]
+domain: "espn.com"
+---
+playEagles reveal flashy Super Bowl ring (0:29)The Eagles unveil their new Super Bowl championship rings. (0:29)Tim McManusJul 19, 2025, 09:03 AM ETCloseTim McManus covers the Philadelphia Eagles for ESPN. He joined ESPN in 2016 after covering the Eagles for Philadelphia Magazine's Birds 24/7, a site he helped create, since 2010.The Philadelphia Eagles walked the red carpet Friday night and received Super Bowl rings fitting of a star-studded championship team.The Super Bowl LIX rings feature a hidden button that, when pressed, extends the wings on either side, revealing coach Nick Sirianni's saying, "You can't be great without the greatness of others."A ring fit for Champions@JasonofBH | #FlyEaglesFly pic.twitter.com/MTVkURY6rb— Philadelphia Eagles (@Eagles) July 19, 2025 Fine details can be found throughout, including:• 40 points of diamonds in "World Champions" for the 40 points scored against the Kansas City Chiefs in the title game.• 5 diamonds on the special feature button representing the 5 players who scored in the Super Bowl: Jalen Hurts, A.J. Brown, DeVonta Smith, Cooper DeJean and Jake Elliott.• 1 carat of marquise-shaped diamonds in the trophies for the No. 1 defense in 2024.• 0.9 carats in the wings for the six sacks and three turnovers against Kansas City.Scores from every playoff game can be found inside the ring, along with the number 145 -- marking the most points scored by one team in postseason history.Above it is another Sirianni mantra: Tough. Detailed. Together."Our Super Bowl LIX Championship Ring represents the commitment, determination, and sacrifice of every member of our organization who helped deliver another World Championship for Eagles fans everywhere," Eagles chairman and CEO Jeffrey Lurie said in a statement. "From the start of training camp to our celebration on Broad Street, this team was deeply connected on every level. Our players, coaches, and front office staff all worked so tirelessly throughout the season to raise another Lombardi Trophy."

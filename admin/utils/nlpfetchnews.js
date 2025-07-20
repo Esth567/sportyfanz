@@ -5,6 +5,7 @@ const Sentiment = require('sentiment');
 const compromise = require('compromise');
 const sentiment = new Sentiment();
 
+
 exports.extractTextFromHtml = html => {
   const root = parse(html);
   const article = root.querySelector('article') || root;

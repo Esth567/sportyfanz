@@ -1,0 +1,14 @@
+---
+title: "Sources: Smart agrees to buyout, to join Lakers"
+date: "2025-07-20T17:23:32.000Z"
+slug: "sources:-smart-agrees-to-buyout-to-join-lakers"
+source: "www.espn.com - TOP"
+original_link: "https://www.espn.com/nba/story/_/id/45775886/sources-marcus-smart-plans-join-lakers-wizards-buyout"
+description: "Marcus Smart has agreed to a contract buyout with the Wizards and plans to sign a two-year, $11 million deal with the Lakers after clearing waivers, sources told ESPN."
+mode: "summarize"
+image: "https://a3.espncdn.com/combiner/i?img=%2Fphoto%2F2025%2F0407%2Fr1474912_1296x729_16%2D9.jpg"
+category: "general"
+tags: ["general"]
+domain: "espn.com"
+---
+<p>playMarcus Smart's top plays from last two seasons (1:57)Take a look at Marcus Smart's best plays from the last two seasons as he plans to join the Lakers after a contract buyout with the Wizards. (1:57)Guard Marcus Smart has agreed to a contract buyout with the Washington Wizards and plans to sign a two-year, $11 million deal with the Los Angeles Lakers after clearing waivers, sources told ESPN on Saturday.Smart, the 2022 Defensive Player of the Year and a three-time All-Defense first-team member, will have a player option on his new Lakers deal to enter a more flush 2026 free agency, sources said.Lakers All-NBA star Luka Doncic reached out to Smart and made it clear that he wanted to play with the two-way stalwart, sources said.The planned move serves as a return to a grand stage for Smart, who made the playoffs in each of his first nine NBA seasons with the Boston Celtics. He missed the postseason over the past two years in Memphis and Washington.Smart has also been limited to 54 games over the past two seasons due to injuries, including to his right finger last season, and he averaged a career-low 20 minutes per game in 2024-25.The Lakers, Phoenix Suns and Milwaukee Bucks seriously pursued Smart, who received permission to speak to teams along with his agent, Jason Glushon, and had positive conversations with personnel from all three teams, sources said. After losing Dorian Finney-Smith, a point-of-attack wing defender was a major position of need for the Lakers.The Lakers plan to waive guard Shake Milton to create the roster spot to sign Smart, sources told ESPN. Milton's $3 million contract for next season would have become fully guaranteed Sunday.Milton, 28, was acquired by L.A. from the Brooklyn Nets as part of the Finney-Smith and D'Angelo Russell trade last December. The seven-year veteran averaged 3.9 points on 43.3% shooting, 1.8 rebounds and 1.3 assists in 30 appearances for the Lakers, making one start.ESPN's Dave McMenamin contributed to this report.</p>

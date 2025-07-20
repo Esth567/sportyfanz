@@ -181,17 +181,17 @@ function updateRelativeTime() {
     const now = new Date();
 
     timeElements.forEach(el => {
-        const posted = new Date(el.dataset.posted);
-        if (isNaN(posted.getTime())) {
+        const postedMs = Date.parse(el.dataset.posted); // 👈 parses ISO string
+        if (isNaN(postedMs)) {
             el.textContent = 'Invalid time';
             return;
         }
 
-        const diff = Math.floor((now.getTime() - posted.getTime()) / 1000);
+        const diff = Math.floor((now.getTime() - postedMs) / 1000);
         let text;
 
-        if (diff < 0) text = 'Just now'; // Future-published feeds
-        else if (diff < 60) text = `${diff} seconds ago`;
+        if (diff < 1) text = '0 second(s) ago';
+        else if (diff < 60) text = `${diff} second(s) ago`;
         else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
         else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
         else text = `${Math.floor(diff / 86400)} day(s) ago`;
@@ -199,6 +199,7 @@ function updateRelativeTime() {
         el.textContent = text;
     });
 }
+
 
 // ========== LOAD NEWS DETAILS ==========
 async function loadNews(sectionId, endpoint) {
@@ -235,6 +236,7 @@ async function loadNews(sectionId, endpoint) {
     window[newsKey] = newsData;
 
     populateNewsSection(sectionId, newsData);
+    updateRelativeTime();
 
   } catch (error) {
     console.error('Failed to load news:', error);
@@ -270,8 +272,8 @@ function populateNewsSection(sectionId, newsList) {
               ${imageHtml}
             </div>
             <div class="news-info">
-              <p class="news-headline">${item.description?.slice(0, 150) || 'No description'}...</p>
-              <span class="news-time" data-posted="${item.date}">Just now</span>
+              <p class="news-headline">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
+              <span class="news-time" data-posted="${item.date}"></span>
             </div>
           </div>
         </div>
@@ -307,9 +309,9 @@ function populateNewsSection(sectionId, newsList) {
               ${imageHtml}
             </div>
             <div class="news-info">
-              <h2 class="transferNews-header">${item.title}</h2>
-              <p class="transferNews-description">${item.description?.slice(0, 150) || 'No description'}...</p>
-              <span class="news-time" data-posted="${item.date}">Just now</span>
+              <h2 class=transferNews-header"><a href="/news/${item.seoTitle}" class="news-link">${item.title}</a></h2>
+              <p class="transferNews-description">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
+              <span class="news-time" data-posted="${item.date}"></span>
             </div>
           </div>
         </div>
@@ -350,7 +352,7 @@ function populateNewsSection(sectionId, newsList) {
       <div class="sliderNews-image">
         ${imageHtml}
         <div class="sliderNews-info">
-          <h2 class="sliderNews-header">${item.title}</h2>
+          <h2 class="sliderNews-header"><a href="/news/${item.seoTitle}" class="news-link">${item.title}</a></h2>
         </div>
       </div>
     `;
@@ -401,8 +403,8 @@ function showFullNews(clickedItem) {
       }
 
       // Format description into paragraphs
-      const formattedDesc = typeof newsItem.description === 'string'
-        ? newsItem.description
+      const formattedDesc = typeof newsItem.fullSummary === 'string'
+        ? newsItem.fullSummary
           .split('\n\n')
           .map(p => `<p>${p.trim()}</p>`)
           .join('')
@@ -449,9 +451,9 @@ function showFullNews(clickedItem) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadNews('trending-stories', '/api/news'); 
-  loadNews('newsUpdate-stories', '/api/news'); 
-  loadNews('sliderNews-stories', '/api/news');
+  loadNews('trending-stories', '/api/sports-summaries'); 
+  loadNews('newsUpdate-stories', '/api/sports-summaries'); 
+  loadNews('sliderNews-stories', '/api/sports-summaries');
 });
 
 

@@ -1,0 +1,29 @@
+---
+title: "2025 British Open tee times, pairings: Complete schedule, groupings in Round 3 on Saturday at Royal Portrush"
+date: "2025-07-19T13:15:28.000Z"
+slug: "2025-british-open-tee-times-pairings:-complete-schedule-groupings-in-round-3-on-saturday-at-royal-portrush"
+source: "CBSSports.com Headlines"
+original_link: "https://www.cbssports.com/golf/news/2025-british-open-tee-times-pairings-complete-schedule-groupings-in-round-3-on-saturday-at-royal-portrush/"
+description: "Scottie Scheffler and Matt Fitzpatrick will go off in the final game of Saturday's third round"
+mode: "in_depth"
+image: "https://sportshub.cbsistatic.com/i/r/2025/07/18/d11224fc-f540-42d9-90b1-04f05cd8baca/thumbnail/1200x675/d1337247bd1ee553a8c47356e3cbe3d4/open-flag-rory-mcilroy-g.jpg"
+category: "general"
+tags: ["general"]
+domain: "cbssports.com"
+---
+<div id="readability-page-1" class="page"><div>
+        
+        
+                            
+                
+        <p>Scottie Scheffler was the pre-tournament favorite entering the 2025 Open Championship, but Rory McIlroy was the big story as he looked to put the heartbreak from 2019 in the past and capture the Claret Jug in his home country of Northern Ireland. After two days of play, <span><a href="https://www.cbssports.com/golf/news/2025-open-takeaways-scottie-scheffler-appears-unstoppable-as-rory-mcilroy-eyes-weekend-run-at-royal-portrush/" target="_blank">Scheffler has made quite the statement</a></span> as the world No. 1 fired a second round 64 on Friday to jump into the lead alone at 10 under and shift the conversation to his continued ascent up the all-time ranks.</p><p>Scheffler will play in the final pairing on Saturday alongside Matt Fitzpatrick, who is one back at 9 under; they'll tee off at 10:35 a.m. ET.</p><p>Going into Moving Day at Royal Portrush, the rest of the field knows it will take something special to knock Scheffler off the top spot on the leaderboard. The penultimate group will feature the 2023 Open champion Brian Harman and Haotong Li teeing off at 10:25 a.m., as they begin the day at 8 under, two behind Scheffler but three clear of the group at T5 behind them.&nbsp;</p><p>While many of the top stars are making the weekend, the biggest perceived threats to Scheffler coming into the week are seven or more shots off the pace. At least one of them will need to try and match Scheffler's 64 on Saturday.&nbsp;</p><p>McIlroy leads that group at 3 under, and <span><a href="https://www.cbssports.com/golf/news/the-open-2025-rory-mcilroy-can-exhale-entering-weekend-at-royal-portrush-hunting-the-leaders-at-home/" target="_blank">he'll begin his pursuit</a></span> playing alongside Jordan Smith at 9:30 a.m. Ludvig Åberg and Justin Rose are back at 2 under and will tee off together at 9:00 a.m., while reigning Open champion Xander Schauffele will go off two games before them at 8:40 a.m.&nbsp;</p>
+        
+
+<p>Justin Thomas and Tommy Fleetwood will make up one of the marquee groups of the morning, as they are 1 under and will look to find some good mojo in the 8:05 a.m. tee time. Jordan Spieth and Viktor Hovland (7 a.m.) and Jon Rahm and Shane Lowry (6:30 a.m.) are back at even par and will also hope for some calm early conditions on Saturday to help them make a move.&nbsp;</p><p>Below you can find the complete slate of tee times for Saturday's third round as the 153rd Open Championship begins play at Royal Portrush. Don't forget to check out our&nbsp;<span><a href="https://www.cbssports.com/golf/news/2025-british-open-tv-schedule-coverage-channel-where-to-watch-live-stream-tee-times-at-royal-portrush/" target="_blank">2025 Open TV schedule and coverage guide</a></span>&nbsp;to ensure you catch all of the action, and be sure to follow along with our <span><a href="https://www.cbssports.com/" target="_blank">live updates for Round 3 at the Open Championship</a></span>.&nbsp;</p><p><em>All times Eastern</em></p>
+        
+
+<h2>2025 Open Championship tee times, Saturday pairings</h2><p>4:35 a.m. — Matti Schmid, Corey Conners<br>4:45 a.m. — Sepp Straka, Hideki Matsuyama<br>4:55 a.m. — Takumi Kanaya, Adrien Saddier<br>5:05 a.m. — Sebastian Soderberg, Henrik Stenson<br>5:15 a.m. — Thomas Detry, Jacob Skov Olesen<br>5:25 a.m. — Nathan Kimsey, Bryson DeChambeau<br>5:35 a.m. — Maverick McNealy, Thriston Lawrence<br>5:45 a.m. — Justin Leonard, John Parry<br>6:00 a.m. — Andrew Novak, Sergio Garcia<br>6:10 a.m. — Jesper Svensson, Francesco Molinari<br>6:20 a.m. — Riki Kawamoto, Wyndham Clark<br>6:30 a.m. — Jon Rahm, Shane Lowry<br>6:40 a.m. — J.J. Spaun, Dustin Johnson<br>6:50 a.m. — Phil Mickelson, Jhonattan Vegas<br>7:00 a.m. — Viktor Hovland, Jordan Spieth<br>7:15 a.m. — Russell Henley, Antoine Rozner<br>7:25 a.m. — Romain Langasque, Daniel Berger<br>7:35 a.m. — Sungjae Im, Dean Burmester<br>7:45 a.m. — Matt Wallace, Akshay Bhatia<br>7:55 a.m. — Jason Kokrak, Lucas Glover<br>8:05 a.m. — Tommy Fleetwood, Justin Thomas<br>8:15 a.m. — Aaron Rai, Rickie Fowler<br>8:30 a.m. — Marc Leishman, Oliver LIndell<br>8:40 a.m. — Ryggs Johnston, Xander Schauffele<br>8:50 a.m. — Kristoffer Reitan, Matthew Jordan<br>9:00 a.m. — Ludvig Åberg, Justin Rose<br>9:10 a.m. — Harry Hall, Christiaan Bezuidenhout<br>9:20 a.m. — Sam Burns, Lee Westwood<br>9:30 a.m. — Rory McIlroy, Jordan Smith<br>9:45 a.m. — Keegan Bradley, Nicolai Højgaard<br>9:55 a.m. — Tony Finau, Chris Gotterup<br>10:05 a.m. — Harris English, Robert MacIntyre<br>10:15 a.m. — Tyrrell Hatton, Rasmus Højgaard<br>10:25 a.m. — Brian Harman, Haotong Li<br>10:35 a.m. — Scottie Scheffler, Matt Fitzpatrick&nbsp;</p>
+
+
+        
+            </div></div>

@@ -23,6 +23,7 @@ async function extractImageFromURL(url) {
     const html = response.data;
     const $ = cheerio.load(html);
     const toAbsolute = (src) => {
+       if (!src || typeof src !== 'string' || !src.trim()) return null;
       try {
         return new URL(src, url).href;
       } catch {
@@ -73,7 +74,10 @@ async function extractImageFromURL(url) {
     if (image) return image.startsWith('http') ? image : toAbsolute(image);
 
     // 7. <article> img or any <img>
-    image = $('article img').first().attr('src') || $('img').first().attr('src');
+    image = $('article img').first().attr('src') || $('img').first().attr('src'); // 🆕 Skip base64 or garbage images
+        if (image && image.startsWith('data:')) {
+         image = null;
+        }
     if (image) return image.startsWith('http') ? image : toAbsolute(image);
 
     // 8. Fallback

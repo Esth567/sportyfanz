@@ -921,7 +921,7 @@ body{
 /* Description */
 .transferNews-description {
     color: #ffffffd0;
-    font-size: 0.6rem;
+    font-size: 0.8rem;
     font-family: 'Lato';
     font-weight: 400;
     line-height: 1.3;
@@ -1756,9 +1756,17 @@ body{
     font-weight: 'Lato';
 }
 
-.news-infomat .news-title {
+.news-title {
     font-size: 1.2rem;
 }
+
+.news-link {
+  text-decoration: none;
+  color: inherit; /* Optional: Keeps the text color consistent */
+}
+
+
+
 
 .feature-img img {
     width: 120px;
@@ -1775,7 +1783,7 @@ body{
     flex-direction: row;
 }
 
-.news-meta .news-desc {
+.news-desc {
     flex: 4;
     font-size: 0.75rem;
     line-height: 1.5;
@@ -1798,24 +1806,9 @@ body{
     white-space: nowrap;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-
-
 .blog-post {
   max-width: 800px;
   margin: 2rem auto;
-  padding: 1.5rem;
   font-family: 'Lato';
   line-height: 1.5;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
@@ -1913,11 +1906,6 @@ body{
 #back-button .search-icon {
     margin-right: 7px; /* Space between arrow and text */
 }
-
-
- 
-  
-  
 
 
   /* Fade out */
@@ -2851,7 +2839,6 @@ body{
     gap: 8px;
 
   }
-
 
   
   .tab-btn {
@@ -4109,7 +4096,7 @@ body{
    .header-topbar {
       display: flex;
       flex-direction: column;
-      align-items: flex-start; /* Align items to the left */
+      align-items: flex-start; 
       width: 100%;
     }
 
@@ -4130,7 +4117,7 @@ body{
          
     }
     .mobileMenu-logo img {
-        width: 105px; /* Adjust logo size */
+        width: 105px; 
         height: auto;
         object-fit: contain; 
         margin-left: 7px;
@@ -4145,7 +4132,7 @@ body{
      }
 
     .iconX {
-        width: 140px; /* Consistent size */
+        width: 140px; 
         height: 50px;
         object-fit: contain; 
     }
@@ -4160,18 +4147,18 @@ body{
     }
 
     .iconSearch {
-       border: none; /* Remove any border */
+       border: none; 
        padding: 6px;
        width: 25px;
        height: 25px;
        gap: 10px;
-       border-radius: 50%; /* Circular shape */
+       border-radius: 50%; 
        background: linear-gradient(90deg, #1a2f4b3d 50%, #1b334d49 75.03%, #1b364e6e 100%);
        transition: background 0.3s ease, transform 0.3s ease;
     }
 
     .header .header-topbar h1 {
-        order: 2; /* Move it below */
+        order: 2; 
         width: 100%;
         text-align: left;
         font-size: 1rem;
@@ -4261,7 +4248,7 @@ body{
      
     .text-cont1 { order: 0; }
     .news-update { order: 1; }
-    .text-cont { order: 2; } /* First in mobile */
+    .text-cont { order: 2; } 
     .live-match-demo { order: 3; } 
     .text-cont3 { order: 4; }
     .slider { order: 5; }
@@ -4270,15 +4257,15 @@ body{
     .text-cont4 { order: 8; } 
     .prediction-container { order: 9; } 
     .leagueTable-text-cont { order: 10; }
-    .league-table-demo { order: 11; } /* Third */
+    .league-table-demo { order: 11; } 
     .advert1 { order: 12; }
-    .news-podcast { order: 13; } /* Fifth (should be positioned after prediction container) */
+    .news-podcast { order: 13; } 
     
 
 
    .match-card > .match-col {
     margin: 0;
-    padding: 0 4px; /* Small side padding, optional */
+    padding: 0 4px; 
    }
 
 .Matchteam {
@@ -4287,7 +4274,7 @@ body{
   align-items: center;
   justify-content: flex-start;
   margin: 0;
-  padding: 0 4px; /* Keeps a small breathing space */
+  padding: 0 4px; 
   font-size: 0.75rem;
 }
 
@@ -4295,9 +4282,9 @@ body{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    white-space: nowrap; /* Prevent the text from wrapping to the next line */
-    overflow: hidden;  /* Hide any overflow if the name is too long */
-    text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
+    white-space: nowrap; 
+    overflow: hidden;  
+    text-overflow: ellipsis;  
     justify-content: flex-start;
   }
 
@@ -4309,7 +4296,7 @@ body{
     .match-status,
     .match-score {
         display: flex;
-        flex-direction: row; /* Stack score and match status vertically for highlight */
+        flex-direction: row; 
         align-items: center;
         font-size: 0.75rem;
         font-family: 'Lato';
@@ -4327,7 +4314,7 @@ body{
       font-size: 0.75rem;
       font-weight: bold;
       font-family: 'Lato';      
-      margin-right: 1px; /* Small gap only */
+      margin-right: 1px; 
     }
   
 
@@ -4386,7 +4373,7 @@ body{
 
        .field {
         height: 120vw;
-        width: 100vh; /* fixed width like height on desktop */
+        width: 100vh; 
         transform: rotate(90deg);
         transform-origin: center center;
         }
@@ -4420,29 +4407,32 @@ body{
 
  
     .news-podcast-wrapper {
-        overflow: hidden; /* Prevents scrolling */
+        overflow: hidden; 
         width: 100%;
         position: relative;
     }
 
     .news-podcast {
         display: flex;
-        width: 200%; /* Double width for sliding effect */
-        transition: transform 0.6s ease-in-out;
+        width: 200%; 
+         flex-direction: column;
     }
 
     .top-stories, .podcast-updates {
-        width: 100%; /* Each section takes full viewport width */
+        width: 100%; 
         flex-shrink: 0;
     }
 
 
+    .transferNews-header {
+        font-size: 0.70rem;
+    }
 
     /*......news .....*/
 
     body.news-page .middle-layer {
-        padding: 0; /* Removes padding */
-        margin: 0 auto; /* Centers content */
+        padding: 0; 
+        margin: 0 auto; 
     }
 
    
@@ -4467,7 +4457,7 @@ body{
       body.news-page .text-cont2,
       body.news-page .text-cont,
       body.news-page .header-line {
-          display: none; /* Hide everything except menu icon, logo, and h2 */
+          display: none; 
       }
       
 
@@ -4475,7 +4465,7 @@ body{
     body.news-page .header-top .mobileMenu-logo {
         display: flex;
         align-items: center;
-        justify-content: center; /* Centers the items */
+        justify-content: center; 
         width: 100%;
     }
 
@@ -4486,7 +4476,7 @@ body{
     }
 
     body.news-page .body-container .content > .layer:not(.middle-layer) {
-        display: none; /* Hide all layers except middle-layer */
+        display: none; 
     }
 
     body.news-page .newsAd-middle {
@@ -4504,27 +4494,32 @@ body{
 
     .news-infomat {
         display: flex;
-        align-items: stretch; /* Ensures both children take full height */
-        gap: 10px; /* Adds spacing between image and text */
+        flex-direction: row;
+        align-items: stretch; 
+        gap: 10px; 
         margin-bottom: 10px;
     }
     
+    .title-desc {
+        display: flex;
+        flex-direction: column;
+    }
     .feature-img {
         display: flex;
         align-items: center;
         justify-content: center;
-        max-height: 100%; /* Ensures it takes full height */
+        max-height: 100%; 
     }
 
     .feature-img img {
         width: 100px;
-        height: 100%; /* Makes the image take the full height */
-        object-fit: cover; /* Ensures the image fills the container properly */
+        height: 100%; 
+        object-fit: cover; 
     }
     .news-messages {
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* Ensures content is spread evenly */
+        justify-content: space-between; 
     }
 
     .news-meta {
@@ -4542,8 +4537,7 @@ body{
     }
 
     .news-full-view {
-      padding: 20px;
-      font-size: 0.80rem;
+      font-size: 0.75rem;
       width: 100%;
       box-sizing: border-box;
       color: #fff;
@@ -4555,8 +4549,8 @@ body{
 
 
      body.matches-page .middle-layer {
-        padding: 0; /* Removes padding */
-        margin: 0 auto; /* Centers content */
+        padding: 0; 
+        margin: 0 auto; 
     }
 
 
@@ -4582,7 +4576,7 @@ body{
     body.matches-page .header-top .mobileMenu-logo {
         display: flex;
         align-items: center;
-        justify-content: center; /* Centers the items */
+        justify-content: center; 
         width: 100%;
     }
 
@@ -4612,14 +4606,12 @@ body{
         flex-direction: row;
         font-size: 0.70rem;
         font-family: 'Lato';
-        white-space: nowrap; /* Prevent the text from wrapping to the next line */
-        overflow: hidden;  /* Hide any overflow if the name is too long */
-        text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
         justify-content: flex-start;
        
     }
-
-
 
 
        .match-category-btn {
@@ -4629,21 +4621,45 @@ body{
        }
 
     .tab-btn {
-    color: #fff;
-    border-radius: 20px;
-    padding: 4px 10px;
-    background-color: #1f3750;
-    cursor: pointer;
-    text-align: center;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.60rem;
-    font-family: 'Lato';
-    font-weight: 500;
-    gap: 5px;
-    border: none;
+      color: #fff;
+      border-radius: 20px;
+      padding: 4px 10px;
+      background-color: #1f3750;
+      cursor: pointer;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.60rem;
+      font-family: 'Lato';
+      font-weight: 500;
+      gap: 5px;
+      border: none;
+    }
 
+  .lineUpsteams-container {
+    flex-direction: column; 
+    align-items: center;
+  }
+
+  .lineUpsteam-info {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lineup-players-names {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lineUp-cont {
+    flex-direction: column; 
+    align-items: center;
+  }
+
+  .lineup-home-players, .lineup-away-players {
+    width: 100%;
+    margin-bottom: 20px;
   }
 
 
@@ -4654,8 +4670,8 @@ body{
       }
       
       body.league-table-page .middle-layer {
-        padding: 0; /* Removes padding */
-        margin: 0 auto; /* Centers content */
+        padding: 0; 
+        margin: 0 auto; 
     }
 
     body.league-table-page .header-top .mobileMenu-logo img,
@@ -4677,7 +4693,7 @@ body{
     body.league-table-page .header-top .mobileMenu-logo {
         display: flex;
         align-items: center;
-        justify-content: center; /* Centers the items */
+        justify-content: center; 
         width: 100%;
     }
 
@@ -4703,7 +4719,7 @@ body{
      }
      
     .team-infos img {
-       width: 12px; /* Adjust logo size */
+       width: 12px; 
        height: 12px;
        object-fit: cover;
      }
@@ -4784,8 +4800,8 @@ body{
     /*......prediction page .....*/
 
      body.matches-page .middle-layer {
-        padding: 0; /* Removes padding */
-        margin: 0 auto; /* Centers content */
+        padding: 0; 
+        margin: 0 auto; 
     }
 
 
@@ -4802,7 +4818,7 @@ body{
     body.prediction-page .header-top .mobileMenu-logo {
         display: flex;
         align-items: center;
-        justify-content: center; /* Centers the items */
+        justify-content: center; 
         width: 100%;
     }
 

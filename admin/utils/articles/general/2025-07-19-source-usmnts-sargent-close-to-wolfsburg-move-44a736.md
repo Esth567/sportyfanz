@@ -1,0 +1,19 @@
+---
+title: "Source: USMNT's Sargent close to Wolfsburg move"
+date: "2025-07-19T22:04:59.000Z"
+slug: "source:-usmnt's-sargent-close-to-wolfsburg-move"
+source: "www.espn.com - TOP"
+original_link: "https://www.espn.com/soccer/story/_/id/45775420/usmnt-josh-sargent-close-wolfsburg-transfer-source"
+description: "USMNT forward Josh Sargent is on the verge of joining Bundesliga side Wolfsburg for a deal worth in excess of €21 million, a source has told ESPN."
+mode: "summarize"
+image: "https://a1.espncdn.com/combiner/i?img=%2Fphoto%2F2024%2F1108%2Fr1412145_1296x729_16%2D9.jpg"
+category: "general"
+tags: ["general"]
+domain: "espn.com"
+---
+<div id="readability-page-1" class="page"><div><div><ul><li><p><img src="https://a.espncdn.com/combiner/i?img=/photo/2019/0605/r552405_3_1296x1296_1-1.jpg&amp;h=80&amp;w=80&amp;scale=crop" alt="" width="40" height="40"></p><p>Tom Hamilton<span>Jul 19, 2025, 09:02 AM ET</span></p><div><p><a href="#">Close</a></p><ul>•&nbsp;Joined ESPN in 2011<br>
+•&nbsp;Covered two Olympics, a pair of Rugby World Cups and two British &amp; Irish Lions tours<br>
+•&nbsp;Previously rugby editor, and became senior writer in 2018</ul></div></li></ul></div><p><a data-clubhouse-guid="e6b65d49-258c-b730-b7db-df75c6b1f714" href="https://www.espn.com/soccer/team?id=660">United States</a> men's national team forward <a data-player-guid="209fdfb5-6eb2-3ccf-89b2-6173294ab71a" href="http://espn.com/soccer/player/_/id/256613/josh-sargent">Josh Sargent</a> is on the verge of joining <a data-league-guid="30244926-00c4-3f69-8946-f8421c97ff71" href="https://www.espn.com/soccer/league/_/name/GER.1">Bundesliga</a> side Wolfsburg for a deal worth in excess of €21 million ($24.4m), a source has told ESPN.</p><p>Sargent, 25, has excelled at Norwich City but is set for a return to Germany. He joined Norwich from <a data-clubhouse-guid="a3a831e5-335d-8b0d-f0c6-791c7cc37c1a" href="https://www.espn.com/soccer/team?id=137">Werder Bremen</a> in 2021 and has since scored 46 goals in 124 league matches for the Championship side.</p><p>He was there in Norwich's 2021-22 season in the <a data-league-guid="6949f3af-300c-35f1-beab-b95669eedd38" href="https://www.espn.com/soccer/league/_/name/ENG.1">Premier League</a> and has spent the past three campaigns in England's second tier, where he was top scorer for Norwich in both the 2022-23 and 2023-24 seasons.</p><p><strong>- O'Hanlon: <a href="https://www.espn.com/football/story/_/id/45765098/the-usmnt-do-list-2026-world-cup-ranked-urgency" target="_blank">The USMNT's to-do list before the 2026 World Cup</a></strong><br>
+<strong>- O'Hanlon: <a href="https://www.espn.com/football/story/_/id/45620363/can-usmnt-player-transfers-boost-usa-2026-world-cup-hopes" target="_blank">Can USMNT player transfers boost USA's 2026 World Cup hopes?</a></strong><br>
+<strong>- Connelly: <a href="https://www.espn.com/football/story/_/id/45748379/ideal-transfer-fits-usmnt-stars-2026-world-cup-reyna-busio-luna-agyemang" target="_blank">Ideal transfer fits for USMNT stars ahead of 2026 World Cup</a></strong></p><p>Sargent has five goals in 28 appearances for the USMNT and will hope to play a prominent role at the 2026 World Cup.</p><p>Wolfsburg have already brought in Sheffield United defensive midfielder Vini Souza this summer while Norwich have seen Jonathan Rowe join <a data-clubhouse-guid="0946f01d-a5f4-2c8e-c61d-bc162eac3f3a" href="https://www.espn.com/soccer/team?id=176">Marseille</a> and <a data-player-guid="aee887ed-a315-8a61-0d2a-90eaefa1556c" href="http://espn.com/soccer/player/_/id/292268/borja-sainz">Borja Sainz</a> head to <a data-clubhouse-guid="838e86e2-6645-c1b8-9fd2-46b6c1392876" href="https://www.espn.com/soccer/team?id=437">Porto</a>.</p>
+</div></div>

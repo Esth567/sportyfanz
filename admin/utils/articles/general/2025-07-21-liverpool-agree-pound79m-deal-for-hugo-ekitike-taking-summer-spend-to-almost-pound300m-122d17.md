@@ -1,0 +1,14 @@
+---
+title: "Liverpool agree £79m deal for Hugo Ekitike, taking summer spend to almost £300m"
+date: "2025-07-21T10:54:24.000Z"
+slug: "liverpool-agree-pound79m-deal-for-hugo-ekitike-taking-summer-spend-to-almost-pound300m"
+source: "Sport | The Guardian"
+original_link: "https://www.theguardian.com/football/2025/jul/21/liverpool-agree-hugo-ekitike-deal-79m-eintracht-frankfurt"
+description: "Eintracht Frankfurt to get guaranteed £69m for striker  He will join squad in Hong Kong subject to medical  Liverpool are to take their summer spending to almost £300m after agreeing to pay £69m plus £10m in add-ons for the Eintracht Frankfurt striker Hugo Ekitike. Ekitike emerged as the Premier League champions’ favoured No 9 after they received no encouragement regarding their interest in Newcastle’s Alexander Isak.  Continue reading..."
+mode: "summarize"
+image: "https://i.guim.co.uk/img/media/5b58802b5b4182d077b1cafe7f9c0b95108f71a5/344_0_1899_1519/master/1899.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&precrop=40:21,offset-x50,offset-y0&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=bc0e1174971acc397ed2bb5b8a4753e3"
+category: "general"
+tags: ["general"]
+domain: "theguardian.com"
+---
+<p>Liverpool are to take their summer spending to almost £300m after agreeing to pay £69m plus £10m in add-ons for the Eintracht Frankfurt striker Hugo Ekitike.Ekitike emerged as the Premier League champions’ favoured No 9 after they received no encouragement regarding their interest in Newcastle’s Alexander Isak.Liverpool accelerated talks with Eintracht late last week, having been granted permission to discuss personal terms with the player. The £10m in add-ons for the France under-21 international relate to individual and club achievements. The deal amounts to €91m, €9m less than the €100m release clause in the forward’s contract.Ekitike is set to become the champions’ seventh signing of an ambitious summer transfer window, after Florian Wirtz, Jeremie Frimpong, Milos Kerkez, Giorgi Mamardashvili, Armin Pecsi and Freddie Woodman.The 23-year-old has agreed a six-year contract in principle and is expected to join Arne Slot’s squad later this week on their 10-day pre-season tour of Hong Kong and Japan. Liverpool arrived in Hong Kong on Monday in advance of their friendly against Milan on Saturday.Ekitike is scheduled to undergo a medical in the UK on Tuesday before finalising his contract and flying to Hong Kong. Liverpool’s sporting director, Richard Hughes, and members of their medical staff remained in the UK to complete the transfer.Ekitike scored 22 goals and made 12 assists in all competitions last season, his first in the Bundesliga, as Eintracht qualified for the Champions League. He emerged as a leading transfer target this summer for Newcastle, who had a £70m bid rejected last week, but made it clear his preference was to join Slot’s side.</p>

@@ -78,22 +78,33 @@ exports.extractEntities = text => {
  };
 
 
-   exports.chunkSummary = (text, numChunks = 5) => {
-      const doc = compromise(text);
-      const sentences = doc.sentences().out('array');
+  exports.chunkSummary = (text, minWordsPerChunk = 40) => {
+  const doc = compromise(text);
+  const sentences = doc.sentences().out('array');
 
-      const chunkSize = Math.ceil(sentences.length / numChunks);
-      const chunks = [];
- 
-    for (let i = 0; i < sentences.length; i += chunkSize) {
-      const chunk = sentences.slice(i, i + chunkSize).join(' ');
-     if (chunk.trim().length > 0) {
-       chunks.push(chunk);
-      }
+  const chunks = [];
+  let currentChunk = '';
+
+  for (const sentence of sentences) {
+    const currentWords = currentChunk.split(/\s+/).filter(Boolean).length;
+    const sentenceWords = sentence.split(/\s+/).filter(Boolean).length;
+
+    // Add sentence to chunk
+    currentChunk += (currentChunk ? ' ' : '') + sentence;
+
+    if (currentWords + sentenceWords >= minWordsPerChunk) {
+      chunks.push(currentChunk.trim());
+      currentChunk = '';
     }
+  }
 
-    return chunks;
-  };
+  // Add any remaining text
+  if (currentChunk.trim().split(/\s+/).length >= minWordsPerChunk / 2) {
+    chunks.push(currentChunk.trim());
+  }
+
+  return chunks;
+};
 
 
 

@@ -1,0 +1,14 @@
+---
+title: "Rangers to face Viktoria Plzen or Servette if they beat Panathinaikos"
+date: "2025-07-21T10:20:19.000Z"
+slug: "rangers-to-face-viktoria-plzen-or-servette-if-they-beat-panathinaikos"
+source: "BBC Sport"
+original_link: "https://www.bbc.com/sport/football/articles/c4g81e3ew5ro"
+description: "Rangers will face Viktoria Plzen of the Czech Republic or Servette of Switzerland in the Champions League third qualifying round should they defeat Panathinaikos."
+mode: "summarize"
+image: "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/b3df/live/318e88e0-6610-11f0-af20-030418be2ca5.png"
+category: "general"
+tags: ["general"]
+domain: "bbc.com"
+---
+<p>Image source, SNSImage caption, Rangers' Russell Martin, Hibernian's David Gray and Dundee United's Jim Goodwin lead their sides into EuropeUpdated 52 minutes agoRangers will face Viktoria Plzen of the Czech Republic or Servette of Switzerland in the Champions League third qualifying round should they defeat Panathinaikos.The draws for the third qualifying round of all three Uefa competitions are being made on Monday before Rangers, Hibs and Dundee United play the first legs of their second qualifying round ties this week.After learning their potential next Champions League opponents, Rangers also feature in the Europa League draw, which follows at 12:00, when they will know who they will face should they lose to the Greeks, who visit Ibrox on Tuesday.The Glasgow side will be unseeded in the Europa League draw and could face the winners of Beşiktas (Turkey) against Shakhtar Donetsk (Ukraine), Anderlecht (Belgium) against Häcken (Sweden), or Sheriff Tiraspol (Moldova) against Utrecht (Netherlands).Hibs, who will be seeded, have four possible Europa League opponents should they defeat Midtjylland.They could face Wolfsberger (Austria), Fredrikstad (Norway), or the winners of Lugano (Switzerland) against Cluj (Romania) or Celje (Slovenia) against Larnaca (Cyprus).Should Hibs lose to the Danes, they will face seven possible Europa League qualifying losers in the Conference League qualifying draw at 13:00...Beşiktaş or Shakhtar Donetsk, Oleksandriya (Ukraine) or Partizan Beograd (Serbia), Novi Pazar (Serbia) or Jagiellonia Białystok (Poland), Arda Kardzhali 1924 (Bulgaria) or HJK Helsinki (Finland), Hammarby (Sweden) or Charleroi (Belgium) and Baník Ostrava (Czech Republic) or Legia Warsaw (Poland).Meanwhile, assuming United defeat Luxembourg minnows UNA Strassen, they have five potential opponents in the Conference League's third qualifying round...Dečić (Montenegro) or Rapid Vienna (Austria), Cherno More (Bulgaria) or İstanbul Başakşehir (Turkey), Sheriff Tiraspol (Moldova) or Utrecht (Netherlands), Radnički 1923 (Serbia) or KÍ Klaksvík (Faroe Islands), and Pyunik (Armenia) or Győr (Hungary).</p>

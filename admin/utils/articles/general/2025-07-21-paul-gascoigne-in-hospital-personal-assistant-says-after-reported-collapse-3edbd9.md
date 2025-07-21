@@ -1,0 +1,14 @@
+---
+title: "Paul Gascoigne in hospital, personal assistant says, after reported collapse"
+date: "2025-07-21T07:30:18.000Z"
+slug: "paul-gascoigne-in-hospital-personal-assistant-says-after-reported-collapse"
+source: "Sport | The Guardian"
+original_link: "https://www.theguardian.com/football/2025/jul/21/paul-gascoigne-hospital-reported-collapse"
+description: "Hospital is ‘best possible place for him’, Steve Foster says  Former footballer reported to be in stable condition  Paul Gascoigne is in hospital, his personal assistant has said, after the former England midfielder was reportedly found semi-conscious in his bedroom. Gascoigne was said by the Sun to have been admitted to an intensive care ward on Friday before being moved to an acute medical unit, where his condition was described as stable. Steve Foster, Gascoigne’s friend, driver and personal assistant, was reported to have found the 58-year-old at home in Poole, Dorset. “Paul is in hospital, which is the best possible place for him to be right now,” Foster was quoted by the Sun.  Continue reading..."
+mode: "summarize"
+image: "https://i.guim.co.uk/img/media/a73c87b486d5cd97569305bd1c01cea91cf49ad4/553_125_3724_2980/master/3724.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&precrop=40:21,offset-x50,offset-y0&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=9f97c3061a63a2200d0368a7e8b69187"
+category: "general"
+tags: ["general"]
+domain: "theguardian.com"
+---
+<p>Paul Gascoigne is in hospital, his personal assistant has said, after the former England midfielder was reportedly found semi-conscious in his bedroom. Gascoigne was said by the Sun to have been admitted to an intensive care ward on Friday before being moved to an acute medical unit, where his condition was described as stable.Steve Foster, Gascoigne’s friend, driver and personal assistant, was reported to have found the 58-year-old at home in Poole, Dorset. “Paul is in hospital, which is the best possible place for him to be right now,” Foster was quoted by the Sun.Foster also said that Gascoigne would “like to thank everyone for the support he’s received so far from so many old friends who wish him well and want to see him back to his best”.Quick GuideHow do I sign up for sport breaking news alerts?ShowDownload the Guardian app from the iOS App Store on iPhone or the Google Play store on Android by searching for 'The Guardian'.If you already have the Guardian app, make sure you’re on the most recent version.In the Guardian app, tap the Menu button at the bottom right, then go to Settings (the gear icon), then Notifications.Turn on sport notifications.Gascoigne, nicknamed Gazza, is widely recognised as one of English football’s most exciting talents of the past 40 years. His clubs included Newcastle, Tottenham, Lazio and Rangers and he played 57 times for England.</p>

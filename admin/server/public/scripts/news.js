@@ -78,7 +78,7 @@ function updateRelativeTime() {
 const MAX_VISIBLE_NEWS = 5;
 
 // ========== LOAD NEWS ==========
-async function loadNews() {
+async function loadNews(retry = true) {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
 
@@ -95,21 +95,7 @@ async function loadNews() {
       throw new Error("Empty response from server");
     }
 
-    let data;
-    try {
-      data = JSON.parse(text);
-      console.log("Received news:", data);
-      console.log("Trending:", data.trending.length, data.trending[0]);
-      console.log("Updates:", data.updates.length, data.updates[0]);
-
-    } catch {
-      throw new Error("Invalid JSON received from server");
-    }
-
-    if (!Array.isArray(data.trending) || !Array.isArray(data.updates)) {
-      throw new Error("Invalid or incomplete news structure from API");
-    }
-
+    const data = JSON.parse(text);
     window.trendingNews = data.trending;
     window.updatesNews = data.updates;
 
@@ -118,8 +104,15 @@ async function loadNews() {
     updateRelativeTime();
 
   } catch (error) {
-    console.error('Failed to load news:', error);
-    alert("⚠️ Could not load news: " + error.message);
+    console.error('⚠️ loadNews error:', error);
+
+    // Retry logic
+    if (retry) {
+      console.log('🔁 Retrying in 2 seconds...');
+      setTimeout(() => loadNews(false), 2000); // one retry
+    } else {
+      alert("⚠️ Could not load news. Please try again later.");
+    }
   } finally {
     if (loader) loader.style.display = 'none';
   }
@@ -201,12 +194,20 @@ function showFullNews(clickedItem) {
     const newsItem = newsList[parseInt(index)];
 
     // Format description into paragraphs
-    const formattedDesc = typeof newsItem.fullSummary === 'string'
-      ? newsItem.fullSummary
-          .split('\n\n')
-          .map(p => `<p>${p.trim()}</p>`)
-          .join('')
-      : '<p>No content available.</p>';
+    const formattedDesc = Array.isArray(newsItem.paragraphs)
+  ? newsItem.paragraphs.map(p => `
+      <div class="paragraph-block">
+        <p>${p.trim()}</p>
+        <div class="inline-ad">🔸 Advert - Your Ad Here 🔸</div>
+      </div>
+    `).join('')
+  : `
+    <div class="paragraph-block">
+      <p>${(newsItem.fullSummary || 'No content available.').trim()}</p>
+      <div class="inline-ad">🔸 Advert - Your Ad Here 🔸</div>
+    </div>
+  `;
+
 
     // Create and display the full view container
     const fullView = document.createElement('div');
@@ -317,3 +318,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+// layout-fix
+let resizeTimer;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+
+  resizeTimer = setTimeout(() => {
+    document.body.classList.add("resizing-refresh");
+
+    // refresh ads
+    if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+      try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.warn("Ad refresh failed", e);
+      }
+    }
+
+    setTimeout(() => {
+      document.body.classList.remove("resizing-refresh");
+    }, 50);
+  }, 200);
+});

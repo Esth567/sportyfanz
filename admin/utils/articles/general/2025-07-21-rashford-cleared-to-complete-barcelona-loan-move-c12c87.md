@@ -1,0 +1,14 @@
+---
+title: "Rashford cleared to complete Barcelona loan move"
+date: "2025-07-21T08:41:59.000Z"
+slug: "rashford-cleared-to-complete-barcelona-loan-move"
+source: "BBC Sport"
+original_link: "https://www.bbc.com/sport/football/articles/cp3kgyx919go"
+description: "Manchester United give permission for Marcus Rashford to complete a loan move to Spanish giants Barcelona."
+mode: "summarize"
+image: "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/3ab0/live/1b315230-65f7-11f0-8d65-a926817d043b.jpg"
+category: "general"
+tags: ["general"]
+domain: "bbc.com"
+---
+<p>Image source, Getty ImagesImage caption, Marcus Rashford has scored 138 goals in 426 appearances for Manchester UnitedChief football news reporterUpdated 2 hours agoManchester United forward Marcus Rashford is in Spain to complete a season-long loan move to Barcelona.The 27-year-old arrived in Catalonia on Sunday night after getting permission from United to complete the formalities of a move to Barcelona. Images of Rashford arriving in Barcelona on a private jet quickly circulated on social media. Talks between the Spanish giants and United have progressed swiftly in the last week, with a deal being agreed in principle over the weekend. United have now given permission for Rashford to seal the move, which is an initial 12-month loan with an option to buy. Joining Barcelona has been Rashford's preferred option since he declared in December that he was ready for a new challenge after being dropped by United head coach Ruben Amorim. The move will be Rashford's second consecutive loan spell after a six-month stint with Aston Villa in the second half of last season.The forward is expected to complete a medical with the La Liga club early this week, with the aim of being able to join Barcelona's pre-season tour of Japan and South Korea on Thursday. Should Rashford join the tour, he could come up against former United team-mate Jesse Lingard.Lingard, 32, is in his second season with K League side FC Seoul, who face Barcelona on 31 July. Another of Rashford's former team-mates, Monaco midfielder Paul Pogba, told YouTuber IShowSpeed: "I'm happy for him because they (United) took his number."Manchester United are losing a great player. Unlucky for them. It's great for Barcelona.'It's not really his (Amorim's) fault. If he doesn't believe in someone... He needs to win. If he doesn't win they're going to sack him."Image source, Mundo Deportivo/SPORTImage caption, Mundo Deportivo and SPORT, two of Spain's leading sports publications, led with images of Rashford arriving in Barcelona on Sunday. SPORT's headline says 'Rashford is already here'. More on this story</p>

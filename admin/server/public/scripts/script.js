@@ -219,28 +219,26 @@ async function loadNews(sectionId, endpoint) {
       throw new Error("Empty response from server");
     }
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      throw new Error("Invalid JSON received from server");
-    }
-
+     const data = JSON.parse(text);
+    
     const newsData = sectionId === 'trending-stories' ? data.trending : data.updates;
     const newsKey = sectionId === 'trending-stories' ? 'trendingNews' : 'updatesNews';
-
-    if (!Array.isArray(newsData)) {
-      throw new Error("Invalid news structure from API");
-    }
 
     window[newsKey] = newsData;
 
     populateNewsSection(sectionId, newsData);
     updateRelativeTime();
 
-  } catch (error) {
-    console.error('Failed to load news:', error);
-    alert("⚠️ Could not load news: " + error.message);
+   } catch (error) {
+    console.error('⚠️ loadNews error:', error);
+
+    // Retry logic
+    if (retry) {
+      console.log('🔁 Retrying in 2 seconds...');
+      setTimeout(() => loadNews(false), 2000); // one retry
+    } else {
+      alert("⚠️ Could not load news. Please try again later.");
+    }
   } finally {
     if (loader) loader.style.display = 'none';
   }
@@ -309,9 +307,8 @@ function populateNewsSection(sectionId, newsList) {
               ${imageHtml}
             </div>
             <div class="news-info">
-              <h2 class=transferNews-header"><a href="/news/${item.seoTitle}" class="news-link">${item.title}</a></h2>
+              <h2 class=transferNews-header"><a href="/news/${item.seoTitle}" class="transferNews-link">${item.title}</a></h2>
               <p class="transferNews-description">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
-              <span class="news-time" data-posted="${item.date}"></span>
             </div>
           </div>
         </div>
@@ -402,13 +399,54 @@ function showFullNews(clickedItem) {
         return;
       }
 
-      // Format description into paragraphs
-      const formattedDesc = typeof newsItem.fullSummary === 'string'
-        ? newsItem.fullSummary
-          .split('\n\n')
-          .map(p => `<p>${p.trim()}</p>`)
-          .join('')
-      : '<p>No content available.</p>';
+    // Format description into paragraphs
+    function injectAdParagraphs(paragraphs, adEvery = 2) {
+  const googleAdCode = `
+    <div class="ad-container">
+      <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXX"   <!-- ✅ Replace with your AdSense ID -->
+           data-ad-slot="YYYYYYYYYYYYY"></ins>
+      <script>
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          console.warn('AdSense error:', e.message);
+        }
+      </script>
+    </div>
+  `;
+
+  const placeholderAdCode = `
+    <div class="ad-container">
+      <div style="width:100%;height:100px;background:#1A2F4B;color:#999;text-align:center;line-height:100px;">
+      </div>
+    </div>
+  `;
+
+  const adCode = typeof window !== "undefined" && window.adsbygoogle
+    ? googleAdCode
+    : placeholderAdCode;
+
+  const htmlParts = [];
+
+  for (let i = 0; i < paragraphs.length; i++) {
+    htmlParts.push(`<p>${paragraphs[i].trim()}</p>`);
+    if ((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) {
+      htmlParts.push(adCode);
+    }
+  }
+
+  return htmlParts.join('');
+}
+
+
+const formattedDesc = Array.isArray(newsItem.paragraphs)
+  ? injectAdParagraphs(newsItem.paragraphs, 2)  // ⬅️ Inject ads every 2 paragraphs
+  : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
+
 
     // Create and display the full view container
     const fullView = document.createElement('div');
@@ -2013,6 +2051,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+// layout-fix
+let resizeTimer;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+
+  resizeTimer = setTimeout(() => {
+    document.body.classList.add("resizing-refresh");
+
+    // refresh ads
+    if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+      try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.warn("Ad refresh failed", e);
+      }
+    }
+
+    setTimeout(() => {
+      document.body.classList.remove("resizing-refresh");
+    }, 50);
+  }, 200);
+});
 
 
 

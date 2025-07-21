@@ -1,0 +1,14 @@
+---
+title: "Knueppel-led Hornets win 1st summer league title"
+date: "2025-07-21T05:41:28.000Z"
+slug: "knueppel-led-hornets-win-1st-summer-league-title"
+source: "www.espn.com - TOP"
+original_link: "https://www.espn.com/nba/story/_/id/45784931/kon-knueppel-scores-21-points-hornets-hold-kings-win-first-nba-summer-league-title"
+description: "Kon Knueppel, the fourth pick in this year's NBA draft, scored 21 points, and Charlotte held off a Sacramento rally to beat the Kings 83-78 on Sunday for the Hornets' first summer league title."
+mode: "summarize"
+image: "https://a.espncdn.com/combiner/i?img=%2Fphoto%2F2025%2F0721%2Fr1521561_1296x729_16%2D9.jpg"
+category: "general"
+tags: ["general"]
+domain: "espn.com"
+---
+<p>playHornets take down Kings for franchise's first summer league title (1:12)Kon Knueppel is named MVP as the Hornets defeat the Kings to win the Las Vegas Summer League championship. (1:12)Associated PressJul 21, 2025, 12:35 AM ETLAS VEGAS -- Kon Knueppel, the fourth pick in this year's NBA draft, scored 21 points, and Charlotte held off a Sacramento rally to beat the Kings 83-78 on Sunday for the Hornets' first summer league title.Ryan Kalkbrenner added 15 points, and three other players each scored 11 for the Hornets, who ended their summer league run with a 6-0 record.Isaac Jones registered 24 points and 11 rebounds for Sacramento (5-1), and Devin Carter put up 13 points. Nique Clifford, drafted 24th, finished with 10 points and eight rebounds. He entered the game averaging 16.2 points and 6.2 rebounds.The Kings lost for the first time in three trips to the final. They won summer league titles in 2014 and 2021.Knueppel continued his hot play after scoring five points in his opener. He averaged 18.3 points over his final four games and was named the championship game MVP. His 3-pointer with 31.1 seconds left in the final gave the Hornets a four-point lead."Like I said before, if you're going to come here, you should win," Knueppel said. "So, that's what we did."The Hornets dominated early, leading by 36-18 in the second quarter. The Kings came back, and Jones twice cut the deficit to a point late, on a follow with 1:17 left and a 3-pointer with 20.3 seconds remaining.But the Hornets closed out the game at the free throw line, with three players making 5 of 6 foul shots."It's a championship game," said Chris Jent, Charlotte's summer league coach. "That's what everybody wants to see anyway, so it works out well. In order to win a championship, you've got to play through adversity."Hornets center James Banks III was ejected with 3:47 left in the third quarter after picking up a flagrant foul 2 for an elbow to Sacramento center Dylan Cardwell's face. Cardwell went down hard and remained on the floor during most of the video review.</p>

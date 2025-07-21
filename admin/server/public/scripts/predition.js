@@ -315,3 +315,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
  
   
+
+// layout-fix
+let resizeTimer;
+
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+
+  resizeTimer = setTimeout(() => {
+    document.body.classList.add("resizing-refresh");
+
+    //refresh ads
+    if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+      try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.warn("Ad refresh failed", e);
+      }
+    }
+
+    setTimeout(() => {
+      document.body.classList.remove("resizing-refresh");
+    }, 50);
+  }, 200);
+});

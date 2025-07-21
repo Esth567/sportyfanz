@@ -378,6 +378,7 @@ body{
     gap: 10px;
     margin-top: 70px;
     height: calc(100vh - 150px);
+    overflow: auto;
     background: #0A131F;
     padding-bottom: 60px;
 }
@@ -719,9 +720,13 @@ body{
   display: flex;
   flex-direction: column;
   justify-content: center; /* ✅ vertical centering */
-  margin-top: -8px;
+  margin-bottom: 5px;
 }
 
+.news-info .news-time {
+    font-size: 0.6rem;
+    margin-top: 3px;
+}
 
 /* Headline */
 .news-headline {
@@ -808,7 +813,7 @@ body{
 
 /* Heading styling */
 .slider-title {
-    color: #fff; 
+    color: #ffffffd0; 
     font-weight: bold;
     text-align: center;
 }
@@ -876,10 +881,8 @@ body{
 .transferNews {
     display: flex; /* Align items in a row */
     gap: 2px; /* Adjust spacing between news items */
-    padding: 8px;
     border-radius: 10px;
-    background: linear-gradient(#1a2f4b6c 50%, #1b364e8e 25%);
-   
+   background: #1A2F4B;
 }
 
 .news-short-message {
@@ -902,30 +905,31 @@ body{
 }
 
 /* Headline */
-.transferNews-header {
+.transferNews-link {
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-family: 'Lato';
     font-weight: 500;
     line-height: 1.5;
     word-spacing: 1px;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+     -webkit-box-orient: vertical;
+  -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-top: 8px;
+    margin-top: 5px;
     text-align: left;
 }
 
 /* Description */
 .transferNews-description {
     color: #ffffffd0;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-family: 'Lato';
     font-weight: 400;
     line-height: 1.3;
     word-spacing: 1px;
+    text-decoration: none;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -938,9 +942,9 @@ body{
 /* Image */
 .transferNews-image {
   width: 100%;
-  height: 120px; /* or whatever fixed height fits your design */
+  height: 120px;
   border-radius: 5px;
-  overflow: hidden; /* Ensures image doesn't overflow */
+  overflow: hidden; 
 }
 
 .transferNews-image img {
@@ -953,7 +957,7 @@ body{
 
 
 .podcast-updates {
-    background: linear-gradient( #1a2f4b6c 50%, #1b364e8e 25%);
+    background: #1A2F4B;
     border-radius: 10px;
     padding: 10px;
     flex: 1;
@@ -1704,7 +1708,6 @@ body{
     transform: scale(1.05); /* Slightly enlarges on hover */
 }
 
-
 .news-headers {
     font-size: 0.80rem;
     font-weight: bold;
@@ -1750,7 +1753,7 @@ body{
     justify-content: flex-start; /* Aligns items to the start of the container */
     align-items: flex-start; /* Ensures top alignment of wrapped rows */
     gap: 10px; /* Space between items */
-    padding: 5px;
+    padding: 1.1rem;
     border-radius: 10px;
     color: #fff;
     font-weight: 'Lato';
@@ -1783,7 +1786,7 @@ body{
     flex-direction: row;
 }
 
-.news-desc {
+.news-meta .news-desc {
     flex: 4;
     font-size: 0.75rem;
     line-height: 1.5;
@@ -1851,6 +1854,10 @@ body{
   white-space: pre-wrap;
 }
 
+.blog-content p {
+  margin-bottom: 1em;
+  line-height: 1.6;
+}
 
 .back-button:hover {
   color: #0A131F;
@@ -1962,10 +1969,10 @@ body{
 
 }
 
-.newsAd-container {
-    border-radius: 10px;
-    flex: 1;
-
+.ad-container {
+  margin: 24px 0;
+  padding: 10px 0;
+  text-align: center;
 }
 
 .vs-scores {
@@ -4866,6 +4873,11 @@ body{
   display: flex;
   flex-direction: column;
 }
+}
+
+/* Force reflow after viewport resize */
+body.resizing-refresh .content {
+  transform: scale(1.0001); /* Subtle nudge triggers layout repaint */
 }
 
 

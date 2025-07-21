@@ -1,0 +1,14 @@
+---
+title: "'Can't be far away' - MacIntyre confident of Ryder Cup spot"
+date: "2025-07-21T09:39:30.000Z"
+slug: "'can't-be-far-away'-macintyre-confident-of-ryder-cup-spot"
+source: "BBC Sport"
+original_link: "https://www.bbc.com/sport/golf/articles/clyz7ygl2nmo"
+description: "Bob MacIntyre is confident of an automatic spot on the European Ryder Cup team in September after a strong showing at this year's Open Championship took him up to second in the standings."
+mode: "in_depth"
+image: "https://ichef.bbci.co.uk/ace/branded_sport/1200/cpsprodpb/81ad/live/8d0d94f0-6597-11f0-80d2-87e860018e3d.jpg"
+category: "general"
+tags: ["general"]
+domain: "bbc.com"
+---
+<p>Image source, Getty ImagesImage caption, Bob MacIntyre finished in a tie for seventh at the OpenBrian McLauchlinBBC Sport Scotland Senior ReporterBob MacIntyre is confident of an automatic spot on the European Ryder Cup team in September after a strong showing at this year's Open Championship took him up one place to second in the standings.The 28-year-old Scot finished in a tie for seventh at Royal Portrush after rounds of 71, 66, 70 and 67 left him 10-under par.MacIntyre believes that, following on from his second-place finish at last month's US Open, he has gone a long way to making Luke Donald's team."My job is to qualify automatically so that Luke Donald can do what he wants with the picks," he said. "I feel like the last two majors I've put a massive dent in that."Again, for me, it's just keep going, play golf, do what you do. Good golf takes care of the Ryder Cup. I can't be far away now."The top six ranked players following the British Masters on 24 August will qualify for Team Europe. "For me, there's going to be another three or four tournaments I'm going to play from now until the finish," MacIntyre said. "If I do my job well, I should be in that team."The Oban-born golfer had to remain patient during his final round before finishing with four birdies in his last seven holes.Despite that strong end to his round, the Scot was still seven shots back from the imperious Scottie Scheffler, who won his fourth major title by four shots from fellow American Harris English."It was difficult, it was like yesterday," MacIntyre said. "Playing well, making a rash mistake, not holing any putts, feeling as though I'm hitting lots of lovely putts and nothing's going in. And then getting angry on myself, but I just had to wait my turn, wait my run."And then I hold a couple of nice ones coming in, obviously a nice chip in on 14, a hole that's had my number all week. "It's always good to finish strongly, especially with the par on 18, such a strong finishing hole."</p>

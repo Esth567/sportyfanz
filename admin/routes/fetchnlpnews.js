@@ -14,116 +14,146 @@ const feedUrls = require('../utils/rssFeeds');
 const { extractImageFromURL } = require('../utils/extractImageFromURL');
 const redisClient = require('../utils/redisClient');
 
-const fallbackImage = process.env.DEFAULT_NEWS_IMAGE || 'https://example.com/default-news.jpg';
-
 const parser = new RSSParser();
-const CACHE_KEY = 'sports-news-cache';
+const CACHE_KEY = 'news:sports-summaries';
 const TTL = 60 * 30; // 30 minutes
 
-function extractCategories(categoryList) {
-  if (!Array.isArray(categoryList)) return [];
-  return categoryList.map(cat => {
-    if (typeof cat === 'string') return cat;
-    if (typeof cat === 'object' && '_' in cat) return cat._;
-    return '';
-  }).filter(Boolean);
+
+async function refreshNewsInBackground() {
+  try {
+    const data = await generateFreshNews(); // Move the fetching logic into a function
+    await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(data));
+    console.log('🔄 Refreshed sports data in background');
+  } catch (err) {
+    console.error('🚨 Background refresh failed:', err.message);
+  }
 }
 
 
 function isTopNewsArticle(article) {
-  const safeTitle = typeof article.title === 'string' ? article.title : '';
-  const safeSummary = typeof article.fullSummary === 'string' ? article.fullSummary : '';
-  const content = `${safeTitle} ${safeSummary}`.toLowerCase();
-
   const topNewsKeywords = [
-    'transfer', 'signing', 'departure', 'rumor', 
-    'match preview', 'match result', 'score', 'analysis','signing', 'record',
-    'injury', 'suspension', 'tactics', 'strategy', 'form',"title",
-    'performance', 'milestone', 'award', 'manager', 'coach',
-    'appointed', 'sacked', 'tournament', 'world cup', 'win', 'victory',
-    'champions league', 'euros', 'controversy', 'scandal', 'championship', 'final',
-    'investigation', 'allegation', 'ballon d\'or', 'golden boot', 
-    'speculation', "defeat",
+    'transfer', 'signing', 'departure', 'rumor',
+    'match preview', 'match result', 'score', 'analysis',
+    'injury', 'suspension',
+    'tactics', 'strategy', 'form',
+    'performance', 'milestone', 'award',
+    'manager', 'coach', 'appointed', 'sacked',
+    'tournament', 'world cup', 'champions league', 'euros',
+    'controversy', 'scandal', 'investigation', 'allegation',
+    'ballon d\'or', 'golden boot',
+    'speculation'
   ];
 
+  const content = `${article.title || ''} ${article.fullSummary || ''}`.toLowerCase();
   return topNewsKeywords.some(keyword => content.includes(keyword));
 }
 
-const fetchArticleHtmlWithMercury = async (url) => {
+function isFootballArticle(item) {
+  const title = item.title?.toLowerCase() || '';
+  const categories = item.categories?.join(' ').toLowerCase() || '';
+  const link = item.link?.toLowerCase() || '';
+
+  return (
+    title.includes('football') ||
+    title.includes('soccer') ||
+    categories.includes('football') ||
+    link.includes('/football') ||
+    link.includes('/soccer')
+  );
+}
+
+
+async function fetchArticleHtmlWithMercury(url) {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
-
-    const result = await Mercury.parse(url, { signal: controller.signal });
-    clearTimeout(timeout);
-
-    if (!result || !result.content) return null;
+    const result = await Mercury.parse(url);
     return typeof result.content === 'string' ? result.content : null;
   } catch (err) {
-    console.error(`Error fetching article HTML from ${url}:`, err.message);
+    console.warn('Mercury failed:', url, err.message);
     return null;
   }
-};
+}
 
-router.get('/sports-summaries', async (req, res) => {
-  const allSummaries = [];
+async function generateFreshNews() {
+  const topNews = [];
+  const updates = [];
 
-  try {
-    for (const feedUrl of feedUrls) {
-      try {
-        const feed = await parser.parseURL(feedUrl);
+  for (const feedUrl of feedUrls) {
+    try {
+      const feed = await parser.parseURL(feedUrl);
 
-        for (const item of feed.items) {
-          try {
-            const articleUrl = item.link;
-            if (!articleUrl || !/^https?:\/\//.test(articleUrl)) continue;
+      for (const item of feed.items) {
+        const articleUrl = item.link;
+        if (!articleUrl || !/^https?:\/\//.test(articleUrl) || articleUrl.includes('/live/')) continue;
 
-            const articleHtml = await fetchArticleHtmlWithMercury(articleUrl);
-            if (!articleHtml) continue;
+        const articleHtml = await fetchArticleHtmlWithMercury(articleUrl);
+        if (!articleHtml) continue;
 
-            const articleText = extractTextFromHtml(articleHtml);
-            if (!articleText || articleText.length < 300) continue;
+        const articleText = extractTextFromHtml(articleHtml);
+        if (!articleText || articleText.length < 300) continue;
 
-            // ✅ Get image URL or fallback
-            let imageUrl = item.enclosure?.url || item.image || '';
-            if (!imageUrl?.trim()) {
-              imageUrl = 'https://example.com/default-news.jpg'; // Replace with a real fallback image URL
-            }
+        let imageUrl = await extractImageFromURL(articleUrl);
+        if (!imageUrl?.trim()) {
+          imageUrl = 'https://example.com/default-news.jpg';
+        }
 
-            const title = cleanUnicode(item.title);
-            const chunks = chunkSummary(articleText, 5);
-            const fullSummary = chunks.join(' ');
-            if (!fullSummary || typeof fullSummary !== 'string') continue;
+        const chunks = chunkSummary(articleText, 5);
+        const fullSummary = chunks.join('\n\n');
+        const entities = extractEntities(articleText);
+        const sentiment = analyzeSentiment(fullSummary);
+        const seoTitle = slugify(item.title, { lower: true, strict: true });
 
-            const description = cleanUnicode(chunks[0] || '');
-            const entities = extractEntities(articleText);
-            const sentiment = analyzeSentiment(articleText);
-            const seoTitle = slugify(title, { lower: true, strict: true });
+        const articleData = {
+          title: cleanUnicode(item.title),
+          seoTitle,
+          link: item.link,
+          image: imageUrl,
+          paragraphs: chunks.map(cleanUnicode),
+          fullSummary: cleanUnicode(fullSummary),
+          description: cleanUnicode(chunks[0]),
+          date: item.isoDate || item.pubDate || new Date().toISOString(),
+          entities,
+          sentiment,
+        };
 
-            allSummaries.push({
-              title,
-              seoTitle,
-              link: articleUrl,
-              image: imageUrl,
-              paragraphs: chunks.map(cleanUnicode),
-              fullSummary: cleanUnicode(fullSummary),
-              description,
-              date: item.isoDate || item.pubDate || new Date().toISOString(),
-              entities,
-              sentiment,
-            });
-          } catch (err) {
-            console.warn(`⚠️ Failed to process item from ${feedUrl}:`, err.message);
-            continue;
+        if (isFootballArticle(item)) {
+          if (isTopNewsArticle(articleData)) {
+            topNews.push(articleData);
+          } else {
+            updates.push(articleData);
           }
         }
-      } catch (err) {
-        console.warn(`⚠️ Failed to parse feed ${feedUrl}:`, err.message);
-        continue;
       }
+    } catch (err) {
+      console.warn(`⚠️ Failed to process ${feedUrl}:`, err.message);
+    }
+  }
+
+  return {
+    trending: topNews.slice(0, 10),
+    updates: updates.slice(0, 20),
+    count: topNews.length + updates.length,
+  };
+}
+
+
+router.get('/sports-summaries', async (req, res) => {
+  try {
+    const staleData = await redisClient.get(CACHE_KEY);
+    if (staleData) {
+      console.log('⚡ Serving cached sports data (stale)');
+      res.status(200).json(JSON.parse(staleData));
+
+      // Trigger background refresh (non-blocking)
+      refreshNewsInBackground();
+      return;
     }
 
-    res.status(200).json({ count: allSummaries.length, results: allSummaries });
+    // No cache available, generate fresh data synchronously
+    const freshData = await generateFreshNews();
+    await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(freshData));
+    console.log('📝 Cached sports news in Redis');
+
+    res.status(200).json(freshData);
   } catch (err) {
     console.error('🛑 Error in /sports-summaries route:', err.message);
     res.status(500).json({ error: 'Internal server error' });
@@ -131,14 +161,5 @@ router.get('/sports-summaries', async (req, res) => {
 });
 
 
-router.delete('/clear-cache', async (req, res) => {
-  try {
-    await redisClient.del(CACHE_KEY);
-    res.status(200).json({ message: 'Cache cleared' });
-  } catch (err) {
-    console.error('❌ Failed to clear cache:', err.message);
-    res.status(500).json({ error: 'Cache clear failed' });
-  }
-});
-
 module.exports = router;
+

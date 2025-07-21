@@ -1,0 +1,14 @@
+---
+title: "Mikel Arteta ‘100%’ sure Arsenal followed right processes over Thomas Partey"
+date: "2025-07-21T07:57:56.000Z"
+slug: "mikel-arteta-'100percent'-sure-arsenal-followed-right-processes-over-thomas-partey"
+source: "Sport | The Guardian"
+original_link: "https://www.theguardian.com/football/2025/jul/21/mikel-arteta-100-sure-arsenal-followed-right-processes-over-thomas-partey"
+description: "Manager addresses situation regarding former midfielder  Partey has been charged with rape and sexual assault  Mikel Arteta has said he is “100%” confident Arsenal followed the correct processes in dealing with Thomas Partey, who was charged this month with five counts of rape and one count of sexual assault. Partey played for Arsenal while under police investigation and left when his contract expired at the end of June. The midfielder was charged on 4 July and is due to appear at Westminster magistrates court on 5 August.  Continue reading..."
+mode: "summarize"
+image: "https://i.guim.co.uk/img/media/4ce3c3feb3c79e91d360a47703f559c61baa252b/652_332_6465_5172/master/6465.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&precrop=40:21,offset-x50,offset-y0&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=325a62bcefcdae808f43964357dbb8f0"
+category: "general"
+tags: ["general"]
+domain: "theguardian.com"
+---
+<p>Mikel Arteta has said he is “100%” confident Arsenal followed the correct processes in dealing with Thomas Partey, who was charged this month with five counts of rape and one count of sexual assault.Partey played for Arsenal while under police investigation and left when his contract expired at the end of June. The midfielder was charged on 4 July and is due to appear at Westminster magistrates court on 5 August.Partey has denied the allegations, which relate to three women who reported incidents between 2021 and 2022. His lawyer, Jenny Wiltshire, has said Partey “welcomes the opportunity to finally clear his name”.Arteta was asked in Singapore, where Arsenal have travelled on a pre-season tour, about the the situation regarding Partey. Arsenal said in a statement on the day the charges were announced: “The player’s contract ended on June 30. Due to ongoing legal proceedings the club is unable to comment on the case.”Arsenal’s manager, speaking publicly about the matter for the first time, said on Monday: “I think the club was very clear in its statement. There are a lot of legal matters that are very complicated so I cannot comment on any of that.”It was then put to him: “A lot of fans have questions over the way in which the matter was handled by the club. Do you feel confident and comfortable that the club followed all the right processes in that?”Arteta answered: “100%, yes.”Last season Partey made 52 appearances for Arsenal. He joined the club in 2020 from Atlético Madrid.</p>

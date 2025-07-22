@@ -420,10 +420,7 @@ function showFullNews(clickedItem) {
   `;
 
   const placeholderAdCode = `
-    <div class="ad-container">
-      <div style="width:100%;height:100px;background:#1A2F4B;color:#999;text-align:center;line-height:100px;">
-      </div>
-    </div>
+    <div class="ad-container"></div>
   `;
 
   const adCode = typeof window !== "undefined" && window.adsbygoogle
@@ -496,7 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// List of top leagues (IDs can be replaced with actual IDs or names)
+// function to fetch top scorer
 
 let playerImageMap = {};
 
@@ -504,6 +501,8 @@ async function init() {
   try {
     const res = await fetch('/api/player-image-map');
     playerImageMap = await res.json();
+    console.log(playerImageMap);
+
     await fetchTopScorers(); // Now run after map is loaded
   } catch (err) {
     console.error("Failed to load player image map:", err);
@@ -518,6 +517,7 @@ async function fetchTopScorers() {
     try {
         const res = await fetch('/api/topscorers');
         const topScorers = await res.json();
+        
 
         const playersContainer = document.querySelector(".players-container");
         const dotsContainer = document.querySelector(".slider-dots");
@@ -541,7 +541,7 @@ async function fetchTopScorers() {
 
             let playerImage = topScorer.player_image;
 
-             if (!playerImage) {
+             if (!playerImage || playerImage.trim() === '') {
                 const localImage = playerImageMap[playerName];
               if (localImage) {
                  playerImage = `/assets/players/${localImage}`;
@@ -549,6 +549,13 @@ async function fetchTopScorers() {
                   playerImage = '/assets/images/default-player.png';
                }
               }
+
+              console.log({
+                playerName,
+                playerImageFromAPI: topScorer.player_image,
+                localMappedImage: playerImageMap[playerName],
+                finalImage: playerImage
+               });
 
             const playerItem = document.createElement("div");
             playerItem.classList.add("player-item");

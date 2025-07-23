@@ -400,9 +400,9 @@ function showFullNews(clickedItem) {
       }
 
     // Format description into paragraphs
-    function injectAdParagraphs(paragraphs, adEvery = 2) {
+    function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 2) + 2) {
   const googleAdCode = `
-    <div class="ad-container">
+    <div class="ad-container" style="margin: 1px 0;">
       <ins class="adsbygoogle"
            style="display:block; text-align:center;"
            data-ad-layout="in-article"
@@ -420,7 +420,19 @@ function showFullNews(clickedItem) {
   `;
 
   const placeholderAdCode = `
-    <div class="ad-container"></div>
+    <div class="ad-container" style="margin: 15px 0;">
+      <div style="
+        width: 100%;
+        height: 100px;
+        background: #1A2F4B;
+        color: #999;
+        text-align: center;
+        line-height: 100px;
+        font-size: 14px;
+        font-family: 'Lato', sans-serif;">
+        Advertisement
+      </div>
+    </div>
   `;
 
   const adCode = typeof window !== "undefined" && window.adsbygoogle

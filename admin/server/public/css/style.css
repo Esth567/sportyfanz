@@ -1970,11 +1970,16 @@ body{
 }
 
 .ad-container {
-  margin: 24px 0;
-  padding: 10px 0;
+  margin: 0;
+  padding: 0;
+  width:100%;
+  height:100px;
+  background:#1a2f4b9a;
+  color:#f0eeee;
   text-align: center;
 }
 
+ 
 .vs-scores {
     font-size: 0.70rem;
     font-weight: bold;

@@ -190,7 +190,7 @@ function updateRelativeTime() {
         const diff = Math.floor((now.getTime() - postedMs) / 1000);
         let text;
 
-        if (diff < 1) text = '0 second(s) ago';
+        if (diff < 1) text = '1 second(s) ago';
         else if (diff < 60) text = `${diff} second(s) ago`;
         else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
         else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
@@ -368,141 +368,139 @@ function populateNewsSection(sectionId, newsList) {
 // ========== SHOW FULL NEWS ========== //
 function showFullNews(clickedItem) {
   try {
-    const middleLayer = document.querySelector('.middle-layer');
+      const middleLayer = document.querySelector('.middle-layer');
 
-    // Hide all children inside middle-layer
-    const children = Array.from(middleLayer.children);
-    children.forEach(child => {
-      child.style.display = 'none';
-    });
+          // Hide all children inside middle-layer
+              const children = Array.from(middleLayer.children);
+                  children.forEach(child => {
+                        child.style.display = 'none';
+                            });
 
-    // Get data from clicked item
-    const index = clickedItem.dataset.index;
-    const section = clickedItem.dataset.section;
-    let newsList = [];
+                                // Get data from clicked item
+                                    const index = clickedItem.dataset.index;
+                                        const section = clickedItem.dataset.section;
+                                            let newsList = [];
 
-    if (section === 'trending-stories') {
-        newsList = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-     } else if (section === 'newsUpdate-stories') {
-        newsList = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-     } else if (section === 'sliderNews-stories') {
-       const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-       const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-       newsList = [...trending, ...updates];
-     }
-
-
-      const newsItem = newsList[parseInt(index)];
-
-      if (!newsItem) {
-        alert("News item not found.");
-        return;
-      }
-
-    // Format description into paragraphs
-    function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 2) + 2) {
-  const googleAdCode = `
-    <div class="ad-container" style="margin: 1px 0;">
-      <ins class="adsbygoogle"
-           style="display:block; text-align:center;"
-           data-ad-layout="in-article"
-           data-ad-format="fluid"
-           data-ad-client="ca-pub-XXXXXXXXXXXXXXX"   <!-- ✅ Replace with your AdSense ID -->
-           data-ad-slot="YYYYYYYYYYYYY"></ins>
-      <script>
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {
-          console.warn('AdSense error:', e.message);
-        }
-      </script>
-    </div>
-  `;
-
-  const placeholderAdCode = `
-    <div class="ad-container" style="margin: 15px 0;">
-      <div style="
-        width: 100%;
-        height: 100px;
-        background: #1A2F4B;
-        color: #999;
-        text-align: center;
-        line-height: 100px;
-        font-size: 14px;
-        font-family: 'Lato', sans-serif;">
-        Advertisement
-      </div>
-    </div>
-  `;
-
-  const adCode = typeof window !== "undefined" && window.adsbygoogle
-    ? googleAdCode
-    : placeholderAdCode;
-
-  const htmlParts = [];
-
-  for (let i = 0; i < paragraphs.length; i++) {
-    htmlParts.push(`<p>${paragraphs[i].trim()}</p>`);
-    if ((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) {
-      htmlParts.push(adCode);
-    }
-  }
-
-  return htmlParts.join('');
-}
+                                                if (section === 'trending-stories') {
+                                                        newsList = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+                                                             } else if (section === 'newsUpdate-stories') {
+                                                                     newsList = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+                                                                          } else if (section === 'sliderNews-stories') {
+                                                                                 const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+                                                                                        const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+                                                                                               newsList = [...trending, ...updates];
+                                                                                                    }
 
 
-const formattedDesc = Array.isArray(newsItem.paragraphs)
-  ? injectAdParagraphs(newsItem.paragraphs, 2)  // ⬅️ Inject ads every 2 paragraphs
-  : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
+                                                                                                          const newsItem = newsList[parseInt(index)];
+
+                                                                                                                if (!newsItem) {
+                                                                                                                        alert("News item not found.");
+                                                                                                                                return;
+                                                                                                                                      }
+
+                                                                                                                                          // Format description into paragraphs
+                                                                                                                                              function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 2) + 2) {
+                                                                                                                                                const googleAdCode = `
+                                                                                                                                                    <div class="ad-container" style="margin: 1px 0;">
+                                                                                                                                                          <ins class="adsbygoogle"
+                                                                                                                                                                     style="display:block; text-align:center;"
+                                                                                                                                                                                data-ad-layout="in-article"
+                                                                                                                                                                                           data-ad-format="fluid"
+                                                                                                                                                                                                      data-ad-client="ca-pub-XXXXXXXXXXXXXXX"   <!-- ✅ Replace with your AdSense ID -->
+                                                                                                                                                                                                                 data-ad-slot="YYYYYYYYYYYYY"></ins>
+                                                                                                                                                                                                                       <script>
+                                                                                                                                                                                                                               try {
+                                                                                                                                                                                                                                         (adsbygoogle = window.adsbygoogle || []).push({});
+                                                                                                                                                                                                                                                 } catch (e) {
+                                                                                                                                                                                                                                                           console.warn('AdSense error:', e.message);
+                                                                                                                                                                                                                                                                   }
+                                                                                                                                                                                                                                                                         </script>
+                                                                                                                                                                                                                                                                             </div>
+                                                                                                                                                                                                                                                                               `;
+
+                                                                                                                                                                                                                                                                                 const placeholderAdCode = `
+                                                                                                                                                                                                                                                                                     <div class="ad-container" style="margin: 15px 0;">
+                                                                                                                                                                                                                                                                                           <div style="
+                                                                                                                                                                                                                                                                                                   width: 100%;
+                                                                                                                                                                                                                                                                                                           height: 100px;
+                                                                                                                                                                                                                                                                                                                   background: #1A2F4B;
+                                                                                                                                                                                                                                                                                                                           color: #999;
+                                                                                                                                                                                                                                                                                                                                   text-align: center;
+                                                                                                                                                                                                                                                                                                                                           line-height: 100px;
+                                                                                                                                                                                                                                                                                                                                                   font-size: 14px;
+                                                                                                                                                                                                                                                                                                                                                           font-family: 'Lato', sans-serif;">
+                                                                                                                                                                                                                                                                                                                                                                   Advertisement
+                                                                                                                                                                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                                                                                                                                                                             </div>
+                                                                                                                                                                                                                                                                                                                                                                               `;
+
+                                                                                                                                                                                                                                                                                                                                                                                 const adCode = typeof window !== "undefined" && window.adsbygoogle
+                                                                                                                                                                                                                                                                                                                                                                                     ? googleAdCode
+                                                                                                                                                                                                                                                                                                                                                                                         : placeholderAdCode;
+
+                                                                                                                                                                                                                                                                                                                                                                                           const htmlParts = [];
+
+                                                                                                                                                                                                                                                                                                                                                                                             for (let i = 0; i < paragraphs.length; i++) {
+                                                                                                                                                                                                                                                                                                                                                                                                 htmlParts.push(`<p>${paragraphs[i].trim()}</p>`);
+                                                                                                                                                                                                                                                                                                                                                                                                     if ((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) {
+                                                                                                                                                                                                                                                                                                                                                                                                           htmlParts.push(adCode);
+                                                                                                                                                                                                                                                                                                                                                                                                               }
+                                                                                                                                                                                                                                                                                                                                                                                                                 }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                   return htmlParts.join('');
+                                                                                                                                                                                                                                                                                                                                                                                                                   }
 
 
-    // Create and display the full view container
-    const fullView = document.createElement('div');
-    fullView.className = 'news-full-view';
-    fullView.innerHTML = `
-      <article class="blog-post">
-        <h1 class="blog-title">${newsItem.title}</h1>
-        ${newsItem.image ? `
-          <div class="blog-image-wrapper">
-            <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-          </div>` : ''
-        }
-        <div class="blog-meta">
-          <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
-        </div>
-        <div class="blog-content">
-          ${formattedDesc}
-        </div>
-      </article>
-    `;
-
-    // Add back button
-    const backButton = document.createElement('button');
-    backButton.textContent = '← Back to news';
-    backButton.className = 'back-button';
-    backButton.onclick = () => {
-      fullView.remove();
-      children.forEach(child => child.style.display = '');
-      //updateRelativeTime();
-    };
-
-    fullView.prepend(backButton);
-    middleLayer.appendChild(fullView);
-
-  } catch (err) {
-    console.error("Failed to render full news view", err);
-    alert("Something went wrong displaying the full article.");
-  }
-}
+                                                                                                                                                                                                                                                                                                                                                                                                                   const formattedDesc = Array.isArray(newsItem.paragraphs)
+                                                                                                                                                                                                                                                                                                                                                                                                                     ? injectAdParagraphs(newsItem.paragraphs, 2)  // ⬅️ Inject ads every 2 paragraphs
+                                                                                                                                                                                                                                                                                                                                                                                                                       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadNews('trending-stories', '/api/sports-summaries'); 
-  loadNews('newsUpdate-stories', '/api/sports-summaries'); 
-  loadNews('sliderNews-stories', '/api/sports-summaries');
-});
+                                                                                                                                                                                                                                                                                                                                                                                                                           // Create and display the full view container
+                                                                                                                                                                                                                                                                                                                                                                                                                               const fullView = document.createElement('div');
+                                                                                                                                                                                                                                                                                                                                                                                                                                   fullView.className = 'news-full-view';
+                                                                                                                                                                                                                                                                                                                                                                                                                                       fullView.innerHTML = `
+                                                                                                                                                                                                                                                                                                                                                                                                                                             <article class="blog-post">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                     <h1 class="blog-title">${newsItem.title}</h1>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             ${newsItem.image ? `
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       <div class="blog-image-wrapper">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             </div>` : ''
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     <div class="blog-content">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ${formattedDesc}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             </article>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 `;
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     // Add back button
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         const backButton = document.createElement('button');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             backButton.textContent = '← Back to news';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 backButton.className = 'back-button';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     backButton.onclick = () => {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           fullView.remove();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 children.forEach(child => child.style.display = '');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       //updateRelativeTime();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           };
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               fullView.prepend(backButton);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   middleLayer.appendChild(fullView);
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     } catch (err) {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         console.error("Failed to render full news view", err);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             alert("Something went wrong displaying the full article.");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               document.addEventListener("DOMContentLoaded", () => {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 loadNews('trending-stories', '/api/sports-summaries'); 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   loadNews('newsUpdate-stories', '/api/sports-summaries'); 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     loadNews('sliderNews-stories', '/api/sports-summaries');
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     });
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
 
 // function to fetch top scorer

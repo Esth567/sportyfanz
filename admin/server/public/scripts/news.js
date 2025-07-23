@@ -62,7 +62,7 @@ function updateRelativeTime() {
         const diff = Math.floor((now.getTime() - postedMs) / 1000);
         let text;
 
-        if (diff < 1) text = '0 second(s) ago';
+        if (diff < 1) text = '1 second(s) ago';
         else if (diff < 60) text = `${diff} second(s) ago`;
         else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
         else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
@@ -130,13 +130,13 @@ function populateNewsSection(sectionId, newsList) {
   container.innerHTML = newsList.map((item, index) => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     const imageHtml = isValidImage
-       ? `<div class="news-image">
+       ? `<div class="feature-image">
         <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
               alt="Image for ${item.title}" 
               loading="lazy" 
               onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
         </div>`
-       : `<div class="news-image">
+       : `<div class="feature-image">
         <img src="https://via.placeholder.com/600x400?text=No+Image" 
               alt="Image not available for ${item.title}" 
               loading="lazy" />
@@ -253,9 +253,6 @@ function showFullNews(clickedItem) {
             <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
           </div>` : ''
         }
-        <div class="blog-meta">
-          <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
-        </div>
         <div class="blog-content">
           ${formattedDesc}
         </div>

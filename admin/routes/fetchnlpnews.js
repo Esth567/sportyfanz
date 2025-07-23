@@ -115,25 +115,28 @@ async function generateFreshNews() {
           sentiment,
         };
 
-        if (isFootballArticle(item)) {
-          if (isTopNewsArticle(articleData)) {
-            topNews.push(articleData);
+        if (isTopNewsArticle(articleData) && isFootballArticle(item)) {
+          topNews.push(articleData); // Only top FOOTBALL news goes to trending
           } else {
-            updates.push(articleData);
+           updates.push(articleData); // All other sports go to updates
           }
         }
-      }
-    } catch (err) {
+      } catch (err) {
       console.warn(`⚠️ Failed to process ${feedUrl}:`, err.message);
     }
   }
 
+  // Sort both arrays so the latest articles are first
+  topNews.sort((a, b) => new Date(b.date) - new Date(a.date));
+  updates.sort((a, b) => new Date(b.date) - new Date(a.date));
+
   return {
-    trending: topNews.slice(0, 10),
-    updates: updates.slice(0, 20),
+    trending: topNews.slice(0, 10),  // latest top 10
+    updates: updates.slice(0, 20),   // latest 20 updates
     count: topNews.length + updates.length,
   };
 }
+
 
 
 router.get('/sports-summaries', async (req, res) => {

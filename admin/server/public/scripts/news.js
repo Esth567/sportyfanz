@@ -152,7 +152,7 @@ function populateNewsSection(sectionId, newsList) {
           </h1>
         <div class="news-meta">
           <p class="news-desc">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
-          <span class="news-time" data-posted="${item.date}"></span>
+          <span class="newstime" data-posted="${item.date}"></span>
         </div>
         </div>
       </div>
@@ -194,19 +194,52 @@ function showFullNews(clickedItem) {
     const newsItem = newsList[parseInt(index)];
 
     // Format description into paragraphs
-    const formattedDesc = Array.isArray(newsItem.paragraphs)
-  ? newsItem.paragraphs.map(p => `
-      <div class="paragraph-block">
-        <p>${p.trim()}</p>
-        <div class="inline-ad">🔸 Advert - Your Ad Here 🔸</div>
-      </div>
-    `).join('')
-  : `
-    <div class="paragraph-block">
-      <p>${(newsItem.fullSummary || 'No content available.').trim()}</p>
-      <div class="inline-ad">🔸 Advert - Your Ad Here 🔸</div>
+    function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 2) + 2) {
+    const googleAdCode = `
+     <div class="ad-container">
+       <ins class="adsbygoogle"
+           style="display:block; text-align:center;"
+           data-ad-layout="in-article"
+           data-ad-format="fluid"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXX"   <!-- ✅ Replace with your AdSense ID -->
+           data-ad-slot="YYYYYYYYYYYYY"></ins>
+      <script>
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          console.warn('AdSense error:', e.message);
+        }
+      </script>
     </div>
   `;
+
+  const placeholderAdCode = `
+    <div class="ad-container">
+    <div style="width:100%;height:100px;background:#1A2F4B;color:#999;text-align:center;line-height:100px;">
+        Advertisement
+      </div>
+    </div>
+  `;
+
+  const adCode = typeof window !== "undefined" && window.adsbygoogle
+    ? googleAdCode
+    : placeholderAdCode;
+
+  const htmlParts = [];
+
+  for (let i = 0; i < paragraphs.length; i++) {
+    htmlParts.push(`<p>${paragraphs[i].trim()}</p>`);
+    if ((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) {
+      htmlParts.push(adCode);
+    }
+  }
+
+  return htmlParts.join('');
+}
+
+    const formattedDesc = Array.isArray(newsItem.paragraphs)
+  ? injectAdParagraphs(newsItem.paragraphs, 2)  // ⬅️ Inject ads every 2 paragraphs
+  : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
 
     // Create and display the full view container

@@ -167,6 +167,7 @@ function populateNewsSection(sectionId, newsList) {
 
 
   container.querySelectorAll('.news-infomat').forEach((el) => {
+    updateRelativeTime();
     el.addEventListener('click', () => {
       showFullNews(el);
     });
@@ -196,7 +197,7 @@ function showFullNews(clickedItem) {
     // Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 2) + 2) {
     const googleAdCode = `
-     <div class="ad-container">
+     <div class="ad-container" style="margin: 15px 0;">
        <ins class="adsbygoogle"
            style="display:block; text-align:center;"
            data-ad-layout="in-article"
@@ -246,18 +247,31 @@ function showFullNews(clickedItem) {
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
-      <article class="blog-post">
-        <h1 class="blog-title">${newsItem.title}</h1>
-        ${newsItem.image ? `
-          <div class="blog-image-wrapper">
-            <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-          </div>` : ''
-        }
-        <div class="blog-content">
-          ${formattedDesc}
+  <article class="blog-post">
+    <h1 class="blog-title">${newsItem.title}</h1>
+
+    <div class="blog-meta">
+      <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
+      <span class="news-time" data-posted="${newsItem.date}"></span>
+    </div>
+
+    ${newsItem.image ? `
+      <div class="blog-image-wrapper">
+        <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
+      </div>` : ''
+    }
+
+    <div class="social-icons">
+          <a href="#" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
         </div>
-      </article>
-    `;
+        
+    <div class="blog-content">
+      ${formattedDesc}
+    </div>
+  </article>
+`;
 
     // Add back button
     const backButton = document.createElement('button');

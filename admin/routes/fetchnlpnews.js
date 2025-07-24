@@ -13,6 +13,7 @@ const {
 const feedUrls = require('../utils/rssFeeds');
 const { extractImageFromURL } = require('../utils/extractImageFromURL');
 const redisClient = require('../utils/redisClient');
+const { detectEntityFromText } = require('../utils/entityDetect');
 
 const parser = new RSSParser();
 const CACHE_KEY = 'news:sports-summaries';
@@ -73,7 +74,13 @@ async function fetchArticleHtmlWithMercury(url) {
   }
 }
 
+
+
 async function generateFreshNews() {
+
+  const rawEntityDB = await redisClient.get('entity:database');
+  const entityDb = rawEntityDB ? JSON.parse(rawEntityDB) : {};
+
   const topNews = [];
   const updates = [];
 
@@ -96,11 +103,15 @@ async function generateFreshNews() {
           imageUrl = 'https://example.com/default-news.jpg';
         }
 
+        
         const chunks = chunkSummary(articleText, 5);
         const fullSummary = chunks.join('\n\n');
         const entities = extractEntities(articleText);
         const sentiment = analyzeSentiment(fullSummary);
         const seoTitle = slugify(item.title, { lower: true, strict: true });
+       
+        // 👇 Detect main entity (team, player, country) using pre-built database
+        const matchedEntity = detectEntityFromText(item.title, entityDb);
 
         const articleData = {
           title: cleanUnicode(item.title),
@@ -113,6 +124,7 @@ async function generateFreshNews() {
           date: item.isoDate || item.pubDate || new Date().toISOString(),
           entities,
           sentiment,
+          entity: matchedEntity || null
         };
 
         if (isTopNewsArticle(articleData) && isFootballArticle(item)) {
@@ -162,6 +174,8 @@ router.get('/sports-summaries', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
 
 
 module.exports = router;

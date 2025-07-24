@@ -12,6 +12,7 @@ const leagueRoutes = require('../routes/leagueRoutes');
 const videoRoutes = require('../routes/videoRoutes');
 const playerImageRoutes = require('../routes/playerImageRoutes');
 const fetchnlpnews = require('../routes/fetchnlpnews'); 
+const entitydadabase = require('../routes/entitydatabase');
 
 
 
@@ -62,6 +63,8 @@ app.use('/api',leagueRoutes);
 app.use('/api', videoRoutes);
 app.use('/api', playerImageRoutes);
 app.use('/api', fetchnlpnews);
+app.use('/api', entitydadabase);
+
 
 app.get("/", (req, res) => res.send("✅ API is live."));
 

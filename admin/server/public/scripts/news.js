@@ -195,7 +195,7 @@ function showFullNews(clickedItem) {
     const newsItem = newsList[parseInt(index)];
 
     // Format description into paragraphs
-    function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 2) + 2) {
+    function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
     const googleAdCode = `
      <div class="ad-container" style="margin: 15px 0;">
        <ins class="adsbygoogle"
@@ -210,17 +210,13 @@ function showFullNews(clickedItem) {
         } catch (e) {
           console.warn('AdSense error:', e.message);
         }
-      </script>
-    </div>
-  `;
-
-  const placeholderAdCode = `
-    <div class="ad-container">
-    <div style="width:100%;height:100px;background:#1A2F4B;color:#999;text-align:center;line-height:100px;">
-        Advertisement
+       </script>
       </div>
-    </div>
-  `;
+    `;
+
+      const placeholderAdCode = `
+        <div class="ad-container placeholder-ad">Advertisement</div>
+       `;
 
   const adCode = typeof window !== "undefined" && window.adsbygoogle
     ? googleAdCode
@@ -363,8 +359,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // layout-fix
-let resizeTimer;
-
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
 

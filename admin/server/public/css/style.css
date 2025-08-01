@@ -1670,7 +1670,7 @@ body{
   }
 
 
-  .close-ad {
+.close-ad {
   position: absolute;
   top: 8px;
   right: 12px;
@@ -1687,6 +1687,8 @@ body{
   /* Prevent overlap with footer */
   .main-footer {
     padding-bottom: 60px;
+    background-color: #111B2A;
+    color: #D1D5DB;
   }
 
 
@@ -1838,7 +1840,7 @@ body{
 }
 
 .blog-title {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-family: 'Lato';
   font-weight: bold;
   margin-bottom: 1rem;
@@ -1872,10 +1874,6 @@ body{
   margin: 8px 0 4px;
 }
 
-.news-time::before {
-  content: '•';
-  margin: 0 5px;
-}
 
 .blog-content {
   font-size: 0.80rem;
@@ -1910,23 +1908,35 @@ body{
   }
 }
 
+/* social icon*/
 .social-icons {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 15px;
   margin-top: 8px;
+  margin-left: 10px;
 }
 
 .social-icons a {
-  color: #fff;
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-decoration: none;
   transition: transform 0.2s ease;
 }
 
+.social-icons a .fa-twitter {
+  color: #1DA1F2;
+}
+
+.social-icons a .fa-facebook-f {
+  color: #1877F2;
+}
+
+.social-icons a .fa-whatsapp {
+  color: #25D366;
+}
+
 .social-icons a:hover {
-  transform: scale(1.2);
-  color: #1DA1F2; /* Example for Twitter */
+  transform: scale(1.1);
 }
 
 .news-image {
@@ -2047,12 +2057,28 @@ body{
 
 }
 
+/* google advert container */
 .ad-container {
   margin: 0;
   padding: 0;
-  color:#f0eeee;
   text-align: center;
+  width: 100%;
+  margin-bottom: -20px;
+  padding-top: -20px;
+  
 }
+
+.ad-container.placeholder-ad {
+  background-color: #111B2A;
+  color: #9CA3AF;
+  height: 100px;
+  display: flex;
+  align-items: flex-start;  /* Push content toward the top */
+  justify-content: center;
+  font-size: 0.75rem;
+  padding-top: 5px;
+}
+
 
  
 .vs-scores {
@@ -4631,6 +4657,11 @@ body{
       animation: fadeIn 0.3s ease-in-out;
      }
 
+     .ad-container.placeholder-ad {
+      height: 70px;           
+      font-size: 0.65rem;    
+      padding-top: 6px;      
+  }
 
      /*......matches page .....*/
 

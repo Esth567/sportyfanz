@@ -257,7 +257,7 @@ async function loadNews(sectionId, endpoint) {
 
 async function loadEntityDatabase() {
   try {
-    const res = await fetch('/api/entity-database'); // or full URL
+    const res = await fetch('/api/entity-database');
     if (!res.ok) throw new Error("Failed to fetch entity DB");
     window.entityDatabase = await res.json();
     console.log("✅ Entity DB loaded", Object.keys(window.entityDatabase).length);
@@ -349,7 +349,7 @@ function populateNewsSection(sectionId, newsList) {
   const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
   const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
   
-  const combinedNews = [...trending, ...updates].slice(0, 20); // Limit to 10 combined items
+  const combinedNews = [...trending, ...updates].slice(0, 20); 
 
 
   // Remove old dynamically generated news slides (optional cleanup)
@@ -377,7 +377,10 @@ function populateNewsSection(sectionId, newsList) {
       </div>
     `;
 
-    slide.addEventListener('click', () => showFullNews(item));
+    slide.dataset.index = index;
+    slide.dataset.section = 'sliderNews-stories';
+    slide.addEventListener('click', () => showFullNews(slide));
+
     container.appendChild(slide);
   });
 
@@ -389,40 +392,53 @@ function populateNewsSection(sectionId, newsList) {
 
 
 // ========== SHOW FULL NEWS ========== //
-function showFullNews(clickedItem) {
+function showFullNews(input) {
   try {
     const middleLayer = document.querySelector('.middle-layer');
 
     // Hide all children inside middle-layer
-    const children = Array.from(middleLayer.children);
-    children.forEach(child => {
+    Array.from(middleLayer.children).forEach(child => {
       child.style.display = 'none';
     });
 
-    // Get data from clicked item
-    const index = clickedItem.dataset.index;
-    const section = clickedItem.dataset.section;
-    let newsList = [];
+    // Determine if input is a DOM element or news object
+    let newsItem;
+    if (input instanceof HTMLElement) {
+      const index = parseInt(input.dataset.index, 10);
+      const section = input.dataset.section;
+      let newsList = [];
 
-    if (section === 'trending-stories') {
-      newsList = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-    } else if (section === 'newsUpdate-stories') {
-      newsList = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-    } else if (section === 'sliderNews-stories') {
-      const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-      const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-      newsList = [...trending, ...updates];
-    }
+      if (section === 'trending-stories') {
+        newsList = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+      } else if (section === 'newsUpdate-stories') {
+        newsList = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+      } else if (section === 'sliderNews-stories') {
+        const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+        const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+        newsList = [...trending, ...updates];
+      }
 
-    const newsItem = newsList[parseInt(index)];
+      newsItem = newsList[index];
 
-    if (!newsItem) {
-      alert("News item not found.");
+      if (!newsItem) {
+        alert("News item not found.");
+        return;
+      }
+
+      // Optional: push state for back button
+      history.pushState({ index, section }, '', `/news/${newsItem.seoTitle}`);
+    } else if (typeof input === 'object' && input.title) {
+      newsItem = input;
+
+      // Optional: still push state with minimal info
+      history.pushState({}, '', `/news/${newsItem.seoTitle}`);
+    } else {
+      alert("Invalid news input");
       return;
     }
 
     // Format description into paragraphs
-    function injectAdParagraphs(paragraphs, adEvery = 2) {
+    function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
       const googleAdCode = `
         <div class="ad-container" style="margin: 15px 0;">
           <ins class="adsbygoogle"
@@ -441,32 +457,25 @@ function showFullNews(clickedItem) {
         </div>
       `;
 
-      const placeholderAdCode = `<div class="ad-container"></div>`;
-      const adCode = typeof window !== "undefined" && window.adsbygoogle
-        ? googleAdCode
-        : placeholderAdCode;
+      const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
+      const adCode = typeof window !== "undefined" && window.adsbygoogle ? googleAdCode : placeholderAdCode;
 
-      const htmlParts = [];
-
-      for (let i = 0; i < paragraphs.length; i++) {
-        htmlParts.push(`<p>${paragraphs[i].trim()}</p>`);
-        if ((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) {
-          htmlParts.push(adCode);
-        }
-      }
-
-      return htmlParts.join('');
+      return paragraphs.map((p, i) => 
+        `<p>${p.trim()}</p>${((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) ? adCode : ''}`
+      ).join('');
     }
 
     const formattedDesc = Array.isArray(newsItem.paragraphs)
       ? injectAdParagraphs(newsItem.paragraphs, 2)
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
-    // Build the full view HTML
+    const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
+
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
       <article class="blog-post">
+        <button class="back-button">← Back to news</button>
         <h1 class="blog-title">${newsItem.title}</h1>
 
         <div class="blog-meta">
@@ -481,37 +490,36 @@ function showFullNews(clickedItem) {
               <h2 class="entity-name">${newsItem.entity.name}</h2>
               <div class="entity-category">${newsItem.entity.category}</div>
             </div>
-          </div>
-        ` : ''}
+          </div>` : ''}
 
         ${newsItem.image ? `
           <div class="blog-image-wrapper">
             <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-          </div>
-        ` : ''}
+          </div>` : ''}
 
         <div class="social-icons">
-          <a href="#" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://wa.me/?text=${encodeURIComponent(newsItem.title + ' ' + articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-whatsapp"></i>
+          </a>
         </div>
 
-        <div class="blog-content">
-          ${formattedDesc}
-        </div>
+        <div class="blog-content">${formattedDesc}</div>
       </article>
     `;
 
-    // Add back button
-    const backButton = document.createElement('button');
-    backButton.textContent = '← Back to news';
-    backButton.className = 'back-button';
-    backButton.onclick = () => {
+    // Back button handler
+    fullView.querySelector('.back-button').onclick = () => {
       fullView.remove();
-      children.forEach(child => child.style.display = '');
+      Array.from(middleLayer.children).forEach(child => child.style.display = '');
+      history.back();
     };
 
-    fullView.prepend(backButton);
     middleLayer.appendChild(fullView);
     updateRelativeTime();
 
@@ -529,8 +537,23 @@ document.addEventListener("DOMContentLoaded", () => {
   loadNews('sliderNews-stories', '/api/sports-summaries');
 });                                                                                                                                                                                                                                                                                                                                                                                                  
 
-
-                                                                                                                                                                                                                                                                                                                                                                                  
+ window.onpopstate = function (event) {
+  if (event.state && typeof event.state.index !== 'undefined') {
+    const dummy = document.createElement('div');
+    dummy.dataset.index = event.state.index;
+    dummy.dataset.section = event.state.section;
+    showFullNews(dummy);
+  } else {
+    // Return to news list view
+    const middleLayer = document.querySelector('.middle-layer');
+    const fullView = document.querySelector('.news-full-view');
+    if (fullView) fullView.remove();
+    Array.from(middleLayer.children).forEach(child => {
+      child.style.display = '';
+    });
+  }
+};
+                                                                                                                                                                                                                                                                                                                                                                                 
                                                                                                                                                                                                                                                                                                
 // function to fetch top scorer
 
@@ -808,7 +831,7 @@ function initSlider() {
 
 //function to display matches for the middle layers in home page
 
-// Function to get today's date or a date offset by days (formatted as YYYY-MM-DD)
+// Function to get today's date
 function getTodayDate(offset = 0) {
     const date = new Date();
     date.setDate(date.getDate() + offset);
@@ -821,17 +844,17 @@ function getTodayDate(offset = 0) {
  function getMinutesSince(matchDate, matchTime) {
     const { DateTime } = luxon;
 
-    const matchDateTime = DateTime.fromFormat(
+    const matchDateTimeBerlin = DateTime.fromFormat(
         `${matchDate} ${matchTime}`,
         "yyyy-MM-dd HH:mm",
-        { zone: "utc" } // match time is assumed to be UTC
+        { zone: "Europe/Berlin" } 
     );
 
-    const now = DateTime.utc(); // Compare in UTC
-
-    const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
-    return diffInMinutes > 0 ? diffInMinutes : 0;
+        const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+        const diffInMinutes = Math.floor(now.diff(matchBerlin, "minutes").minutes);
+        return diffInMinutes > 0 ? diffInMinutes : 0;
 }
+
 
 
 function formatToUserLocalTime(dateStr, timeStr) {

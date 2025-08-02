@@ -4,16 +4,15 @@ services:
     env: node
     plan: starter  # or whatever plan fits you
     buildCommand: npm install
-    startCommand: node index.js
+    startCommand: node server/index.js
     envVars:
-      - key: GROQ_API_KEY
-        fromSecret: groq_api_key  # store your secrets securely in Render dashboard
+      - key: FOOTBALL_API_KEY
+        fromSecret: football_api_key 
       - key: REDIS_URL
         fromSecret: redis_url
-      - key: FOOTBALL_API_KEY
-        fromSecret: football_api_key
 
 databases:
   - name: redis-database
     type: redis
     plan: starter
+

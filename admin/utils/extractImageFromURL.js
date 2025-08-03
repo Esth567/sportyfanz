@@ -3,13 +3,17 @@ const cheerio = require('cheerio');
 const { URL } = require('url');
 
 async function extractImageFromURL(url) {
+  const cacheKey = `image:${url}`;
+  const cachedImage = await redisClient.get(cacheKey);
+  if (cachedImage) return cachedImage;
+
   try {
     const response = await axios.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (NewsFetcherBot)',
         Accept: 'text/html,application/xhtml+xml',
       },
-      timeout: 10000,
+      timeout: 20000,
       responseType: 'text',
       maxRedirects: 5,
     });
@@ -79,6 +83,11 @@ async function extractImageFromURL(url) {
          image = null;
         }
     if (image) return image.startsWith('http') ? image : toAbsolute(image);
+
+    if (image) {
+      await redisClient.setEx(cacheKey, 60 * 60 * 2, image); // cache for 2 hours
+      return image;
+    }
 
     // 8. Fallback
     console.warn(`⚠️ No usable image found at ${url}`);

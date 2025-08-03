@@ -3,7 +3,7 @@ const router = express.Router();
 const RSSParser = require('rss-parser');
 const slugify = require('slugify');
 const axios = require('axios');
-const axiosRetry = require('axios-retry');
+const axiosRetry = require('axios-retry').default || require('axios-retry');
 const cheerio = require('cheerio');
 const pLimit = require('p-limit');
 const { cleanUnicode } = require('../utils/cleanText');
@@ -26,10 +26,8 @@ const TTL = 60 * 30; // 30 minutes
 axiosRetry(axios, {
   retries: 3,
   retryDelay: axiosRetry.exponentialDelay,
-  retryCondition: (error) => {
-    return error.code === 'ECONNABORTED' || error.message.includes('socket hang up');
-  },
 });
+
 
 function isTopNewsArticle(article) {
   const topNewsKeywords = [

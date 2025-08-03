@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const RSSParser = require('rss-parser');
-const Mercury = require('@postlight/mercury-parser');
 const slugify = require('slugify');
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
 const cheerio = require('cheerio');
+const pLimit = require('p-limit');
 const { cleanUnicode } = require('../utils/cleanText');
 const {
   extractTextFromHtml,
@@ -21,34 +22,26 @@ const parser = new RSSParser();
 const CACHE_KEY = 'news:sports-summaries';
 const TTL = 60 * 30; // 30 minutes
 
-
-async function refreshNewsInBackground() {
-  try {
-    const redisClient = await getRedisClient();
-    const data = await generateFreshNews();
-    await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(data));
-    console.log('🔄 Refreshed sports data in background');
-  } catch (err) {
-    console.error('🚨 Background refresh failed:', err.message);
-  }
-}
-
-
+// Retry strategy for axios
+axiosRetry(axios, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error) => {
+    return error.code === 'ECONNABORTED' || error.message.includes('socket hang up');
+  },
+});
 
 function isTopNewsArticle(article) {
   const topNewsKeywords = [
     'transfer', 'signing', 'departure', 'rumor',
     'match preview', 'match result', 'score', 'analysis',
-    'injury', 'suspension',
-    'tactics', 'strategy', 'form',
-    'performance', 'milestone', 'award',
-    'manager', 'coach', 'appointed', 'sacked',
-    'tournament', 'world cup', 'champions league', 'euros',
-    'controversy', 'scandal', 'investigation', 'allegation',
-    'ballon d\'or', 'golden boot',
-    'speculation'
+    'injury', 'suspension', 'tactics', 'strategy', 'form',
+    'performance', 'milestone', 'award', 'manager', 'coach',
+    'appointed', 'sacked', 'tournament', 'world cup',
+    'champions league', 'euros', 'controversy', 'scandal',
+    'investigation', 'allegation', 'ballon d\'or',
+    'golden boot', 'speculation'
   ];
-
   const content = `${article.title || ''} ${article.fullSummary || ''}`.toLowerCase();
   return topNewsKeywords.some(keyword => content.includes(keyword));
 }
@@ -57,7 +50,6 @@ function isFootballArticle(item) {
   const title = item.title?.toLowerCase() || '';
   const categories = item.categories?.join(' ').toLowerCase() || '';
   const link = item.link?.toLowerCase() || '';
-
   return (
     title.includes('football') ||
     title.includes('soccer') ||
@@ -67,20 +59,17 @@ function isFootballArticle(item) {
   );
 }
 
-
 const fetchArticleHtmlWithAxios = async (url) => {
   try {
     const { data: html } = await axios.get(url, {
-      timeout: 15000,
+      timeout: 20000,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'User-Agent': 'Mozilla/5.0',
         'Accept-Language': 'en-US,en;q=0.9',
       },
     });
 
     const $ = cheerio.load(html);
-
-    // Try to extract main content from typical article containers
     const selectors = [
       'article',
       '.article-content',
@@ -96,20 +85,22 @@ const fetchArticleHtmlWithAxios = async (url) => {
       if (content.length > 300) return content;
     }
 
-    // fallback: return entire page text if we can't extract main section
     const fallback = $('body').text().trim();
     return fallback.length > 300 ? fallback : null;
 
   } catch (err) {
     console.warn(`❌ Axios fetch failed for ${url}: ${err.message}`);
-    return null;
+    try {
+      const fallbackRes = await axios.get(url);
+      return fallbackRes.data;
+    } catch (fallbackErr) {
+      console.warn(`⚠️ Fallback fetch also failed for ${url}`);
+      return null;
+    }
   }
 };
 
-
-
 async function generateFreshNews() {
-
   const redisClient = await getRedisClient();
   const rawEntityDB = await redisClient.get('entity:database');
   const entityDb = rawEntityDB ? JSON.parse(rawEntityDB) : {};
@@ -117,92 +108,98 @@ async function generateFreshNews() {
   const topNews = [];
   const updates = [];
 
-  for (const feedUrl of feedUrls) {
-    try {
-      const feed = await parser.parseURL(feedUrl);
+  const limit = pLimit(5);
 
-      for (const item of feed.items) {
-        const articleUrl = item.link;
-        if (!articleUrl || !/^https?:\/\//.test(articleUrl) || articleUrl.includes('/live/')) continue;
+  await Promise.allSettled(feedUrls.map(feedUrl =>
+    limit(async () => {
+      try {
+        const feed = await parser.parseURL(feedUrl);
+        for (const item of feed.items) {
+          const articleUrl = item.link;
+          if (!articleUrl || !/^https?:\/\//.test(articleUrl) || articleUrl.includes('/live/')) return;
 
-        const articleHtml = await fetchArticleHtmlWithAxios(articleUrl);
-        if (!articleHtml) continue;
+          const articleHtml = await fetchArticleHtmlWithAxios(articleUrl);
+          if (!articleHtml || articleHtml.length < 300) return;
 
-        const articleText = extractTextFromHtml(articleHtml);
-        if (!articleText || articleText.length < 300) continue;
+          const articleText = extractTextFromHtml(articleHtml);
+          if (!articleText || articleText.length < 300) return;
 
-        let imageUrl = await extractImageFromURL(articleUrl);
-        if (!imageUrl?.trim()) {
-          console.warn(`⚠️ No image found for: ${item.link}`);
-          imageUrl = 'https://sportyfanz.com/assets/images/default-payer.png';
-        }
+          let imageUrl = await extractImageFromURL(articleUrl);
+          if (!imageUrl?.trim()) {
+            console.warn(`⚠️ No image found for: ${item.link}`);
+            imageUrl = 'https://sportyfanz.com/assets/images/default-player.png';
+          }
 
-        
-        const chunks = chunkSummary(articleText, 5);
-        const fullSummary = chunks.join('\n\n');
-        const entities = extractEntities(articleText);
-        const sentiment = analyzeSentiment(fullSummary);
-        const seoTitle = slugify(item.title, { lower: true, strict: true });
-       
-        // 👇 Detect main entity (team, player, country) using pre-built database
-        const matchedEntity = detectEntityFromText(item.title, entityDb);
+          const chunks = chunkSummary(articleText, 5);
+          const fullSummary = chunks.join('\n\n');
+          const entities = extractEntities(articleText);
+          const sentiment = analyzeSentiment(fullSummary);
+          const seoTitle = slugify(item.title, { lower: true, strict: true });
+          const matchedEntity = detectEntityFromText(item.title, entityDb);
 
-        const articleData = {
-          title: cleanUnicode(item.title),
-          seoTitle,
-          link: item.link,
-          image: imageUrl,
-          paragraphs: chunks.map(cleanUnicode),
-          fullSummary: cleanUnicode(fullSummary),
-          description: cleanUnicode(chunks[0]),
-          date: item.isoDate || item.pubDate || new Date().toISOString(),
-          entities,
-          sentiment,
-          entity: matchedEntity || null
-        };
+          const articleData = {
+            title: cleanUnicode(item.title),
+            seoTitle,
+            link: articleUrl,
+            image: imageUrl,
+            paragraphs: chunks.map(cleanUnicode),
+            fullSummary: cleanUnicode(fullSummary),
+            description: cleanUnicode(chunks[0]),
+            date: item.isoDate || item.pubDate || new Date().toISOString(),
+            entities,
+            sentiment,
+            entity: matchedEntity || null,
+          };
 
-        if (isTopNewsArticle(articleData) && isFootballArticle(item)) {
-          topNews.push(articleData); // Only top FOOTBALL news goes to trending
+          if (isTopNewsArticle(articleData) && isFootballArticle(item)) {
+            topNews.push(articleData);
           } else {
-           updates.push(articleData); // All other sports go to updates
+            updates.push(articleData);
           }
         }
       } catch (err) {
-      console.warn(`⚠️ Failed to process ${feedUrl}:\n`, err);  // Full stack trace
-    }
-  }
+        console.warn(`⚠️ Failed to process ${feedUrl}:\n`, err);
+      }
+    })
+  ));
 
-  // Sort both arrays so the latest articles are first
   topNews.sort((a, b) => new Date(b.date) - new Date(a.date));
   updates.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return {
-    trending: topNews.slice(0, 10),  // latest top 10
-    updates: updates.slice(0, 20),   // latest 20 updates
+    trending: topNews.slice(0, 10),
+    updates: updates.slice(0, 20),
     count: topNews.length + updates.length,
   };
 }
 
-
+async function refreshNewsInBackground() {
+  try {
+    const redisClient = await getRedisClient();
+    const data = await generateFreshNews();
+    await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(data));
+    console.log('🔄 Refreshed sports data in background');
+  } catch (err) {
+    console.error('🚨 Background refresh failed:', err.message);
+  }
+}
 
 router.get('/sports-summaries', async (req, res) => {
   try {
     const redisClient = await getRedisClient();
-    const staleData = await redisClient.get(CACHE_KEY);
-    if (staleData) {
-      console.log('⚡ Serving cached sports data (stale)');
-      res.status(200).json(JSON.parse(staleData));
+    const cached = await redisClient.get(CACHE_KEY);
+    res.setHeader('Cache-Control', 'public, max-age=60');
 
-      // Trigger background refresh (non-blocking)
-      refreshNewsInBackground();
+    if (cached) {
+      console.log('⚡ Serving cached sports data');
+      res.status(200).json(JSON.parse(cached));
+      refreshNewsInBackground(); // Trigger non-blocking refresh
       return;
     }
 
-    // No cache available, generate fresh data synchronously
     const freshData = await generateFreshNews();
     await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(freshData));
-    console.log('📝 Cached sports news in Redis');
-
+    console.log('📝 Cached fresh sports news');
     res.status(200).json(freshData);
   } catch (err) {
     console.error('🛑 Error in /sports-summaries route:', err.message);
@@ -210,8 +207,4 @@ router.get('/sports-summaries', async (req, res) => {
   }
 });
 
-
-
-
 module.exports = router;
-

@@ -1,5 +1,5 @@
 // cache/redisCache.js
-const getRedisClient  = require('../redisClient');
+const getRedisClient  = require('../../utils/redisClient');
 
 
 // Gracefully handle Redis get

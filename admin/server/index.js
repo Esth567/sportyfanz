@@ -27,7 +27,8 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 const allowedOrigins = [
-  'https://fantastic-couscous-q7xqw64rvx9vc4pqj-5501.app.github.dev'
+   'https://sportyfanz.com',
+  'https://www.sportyfanz.com'
 ];
 
 

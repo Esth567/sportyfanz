@@ -2,7 +2,10 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const { URL } = require('url');
 
+const getRedisClient = require('./redisClient');
+
 async function extractImageFromURL(url) {
+  const redisClient = await getRedisClient();
   const cacheKey = `image:${url}`;
   const cachedImage = await redisClient.get(cacheKey);
   if (cachedImage) return cachedImage;

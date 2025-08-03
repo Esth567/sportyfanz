@@ -16,7 +16,6 @@ const {
 } = require('../controllers/dashboardController');
 
 
-
 router.get('/matches', getMatches);
 router.get('/topscorers', getTopScorers);
 router.get('/leagues', getLeagues);

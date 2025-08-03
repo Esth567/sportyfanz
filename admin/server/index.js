@@ -18,7 +18,7 @@ const entitydadabase = require('../routes/entitydatabase');
 
 const app = express();
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
 
 app.use(compression());
 app.use(express.json());

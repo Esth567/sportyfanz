@@ -7,7 +7,7 @@ const playerImageMap = require('../utils/playerImageMap');
 
 const APIkey = process.env.FOOTBALL_API_KEY;
 
-// matches cache (5 min)
+// Display matches for live-match-demo
 const getMatchesCache = new NodeCache({ stdTTL: 300 });
 
 exports.getMatches = async (req, res) => {
@@ -79,8 +79,7 @@ exports.getMatches = async (req, res) => {
 
 
 
-
-// matches cache (5 min)
+// function to fetch top scorer
 const topScorersCache = new NodeCache({ stdTTL: 300 });
 
 exports.getTopScorers = async (req, res) => {
@@ -155,7 +154,7 @@ exports.getTopScorers = async (req, res) => {
 };
 
 
-//get all leagues functin
+// Get the active league ID
 
 // cache for 10 minutes
 const leaguesCache = new NodeCache({ stdTTL: 500 }); 
@@ -194,7 +193,7 @@ exports.getLeagues = async (req, res) => {
 
 
 
-// Controller 3: Get Standings (with cache)
+//league table for 5 team top beased on ranking
 
 const standingCache = new NodeCache({ stdTTL: 500 }); // cache for 10 minutes
 

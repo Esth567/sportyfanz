@@ -608,13 +608,19 @@ async function fetchTopScorers() {
             let playerImage = topScorer.player_image;
 
              if (!playerImage || playerImage.trim() === '') {
-                const localImage = playerImageMap[playerName];
-              if (localImage) {
-                 playerImage = `/assets/players/${localImage}`;
-               } else {
+                const normalizedName = playerName
+                    .replace(/\.(?=\s|[A-Z])/g, '')     // remove dot before space/caps
+                    .replace(/[^\w\s]/gi, '')           // remove special characters
+                    .replace(/\s+/g, ' ')               // collapse spaces
+                    .trim();
+
+             const localImage = playerImageMap[normalizedName]; 
+               if (localImage) {
+                  playerImage = `/assets/players/${localImage}`;
+                } else {
                   playerImage = `/assets/images/default-player.png`;
+                }
                }
-              }
 
               console.log({
                 playerName,
@@ -702,8 +708,6 @@ function setActiveSlide(index) {
 
 // Fetch top scorers on page load
 document.addEventListener("DOMContentLoaded", fetchTopScorers);
-
-
 
 
 
@@ -842,41 +846,44 @@ function getTodayDate(offset = 0) {
     return date.toISOString().split("T")[0];
 }
 
+const { DateTime } = luxon;
 
-
-// === LUXON Time Functions ===
- function getMinutesSince(matchDate, matchTime) {
-    const { DateTime } = luxon;
-
-    const matchDateTimeBerlin = DateTime.fromFormat(
-        `${matchDate} ${matchTime}`,
+// Convert a match date/time string to a Luxon DateTime in Berlin time
+function getBerlinTime(dateStr, timeStr) {
+    return DateTime.fromFormat(
+        `${dateStr} ${timeStr}`,
         "yyyy-MM-dd HH:mm",
-        { zone: "Europe/Berlin" } 
+        { zone: "Europe/Berlin" }
     );
-
-        const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-        const diffInMinutes = Math.floor(now.diff(matchBerlin, "minutes").minutes);
-        return diffInMinutes > 0 ? diffInMinutes : 0;
 }
 
+// Convert Berlin time to the user's local timezone
+function convertToUserLocalTime(berlinTime) {
+    return berlinTime.setZone(DateTime.local().zoneName);
+}
 
-
+// Format match time for display in local time
 function formatToUserLocalTime(dateStr, timeStr) {
     try {
-        const { DateTime } = luxon;
-
-        const berlinTime = DateTime.fromFormat(
-            `${dateStr} ${timeStr}`,
-            "yyyy-MM-dd HH:mm",
-            { zone: "Europe/Berlin" }
-        );
-
-        return berlinTime
-            .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-            .toFormat("h:mm");
+        const berlinTime = getBerlinTime(dateStr, timeStr);
+        return convertToUserLocalTime(berlinTime).toFormat("h:mm");
     } catch (e) {
         console.error("Time conversion error:", e);
         return "TBD";
+    }
+}
+
+// Calculate minutes since match start
+function getMinutesSince(dateStr, timeStr) {
+    try {
+        const now = DateTime.local();
+        const matchBerlin = getBerlinTime(dateStr, timeStr);
+        const matchLocal = convertToUserLocalTime(matchBerlin);
+        const diff = now.diff(matchLocal, "minutes").minutes;
+        return diff > 0 ? Math.floor(diff) : 0;
+    } catch (e) {
+        console.error("Minutes-since calculation failed:", e);
+        return 0;
     }
 }
 
@@ -914,35 +921,25 @@ function updateTheMatches(matches) {
         allHighlights: []
     };
 
-    
-    const now = luxon.DateTime.utc();  // Get the current time in UTC
+    const now = luxon.DateTime.utc();
     const oneWeekAgo = now.minus({ days: 7 });
 
     matches.forEach(match => {
         const status = (match.match_status || "").trim().toLowerCase();
-
-        // Convert match time from UTC to local timezone (Ensure that match times are in UTC and are converted correctly)
-        const matchBerlin = luxon.DateTime.fromFormat(
-        `${match.match_date} ${match.match_time}`,
-        "yyyy-MM-dd HH:mm",
-        { zone: "Europe/Berlin" }
-       );
-      const matchDateTimeLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-
+        const matchBerlin = getBerlinTime(match.match_date, match.match_time);
+        const matchLocal = convertToUserLocalTime(matchBerlin);
 
         const isFinished = status === "ft" || status === "finished" || status.includes("pen") || status.includes("after") || parseInt(status) >= 90;
-        const isUpcoming = matchDateTimeLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
+        const isUpcoming = matchLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
         const isLive = parseInt(status) > 0 && parseInt(status) < 90;
 
         if (isLive) matchesData.live.push(match);
-        if (isFinished && matchDateTimeLocal >= oneWeekAgo) matchesData.highlight.push(match);
+        if (isFinished && matchLocal >= oneWeekAgo) matchesData.highlight.push(match);
         if (isFinished) matchesData.allHighlights.push(match);
         if (isUpcoming) matchesData.upcoming.push(match);
 
-        // Format the match time to the user's local time
-        const formattedMatchTime = matchDateTimeLocal.toFormat("h:mm");  
-        
-        console.log(`Match: ${match.match_hometeam_name} vs ${match.match_awayteam_name} - Time: ${formattedMatchTime}`);
+        const formattedMatchTime = matchLocal.toFormat("h:mm");
+        console.log(`[${category.toUpperCase()}] ${match.match_hometeam_name} vs ${match.match_awayteam_name} at ${formattedTime}`);
     });
 
     showMatches(matchesData, "live");
@@ -1010,12 +1007,8 @@ function showMatches(matchesData, category) {
      for (const match of selectedMatches.sort((a, b) => getPriority(a) - getPriority(b))) { 
         if (displayedMatchCount >= MAX_MATCHES) break;
 
-        const matchBerlin = luxon.DateTime.fromFormat(
-            `${match.match_date} ${match.match_time}`,
-            "yyyy-MM-dd HH:mm",
-            { zone: "Europe/Berlin" }
-        );
-        const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+        const matchBerlin = getBerlinTime(match.match_date, match.match_time);
+        const matchLocal = convertToUserLocalTime(matchBerlin);
 
         const matchDay = matchLocal.toFormat("MMM d");
         const matchTime = match.match_time || "Time TBA";
@@ -1028,24 +1021,25 @@ function showMatches(matchesData, category) {
         let scoreDisplay = "";
         let matchStatusDisplay = "";
         let formattedTime = "";
-  if (category === "live") {
-        const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
-        matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
-        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-        formattedTime = `
-            <div class="live-indicator">
-                <span class="red-dot"></span>
-                <span class="live-text">Live</span> - ${matchMinute}
-            </div>
-        `;
-    } else if (category === "highlight") {
-        matchStatusDisplay = `<h5>FT</h5>`;
-        scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-        formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
-    } else if (category === "upcoming") {
-        matchStatusDisplay = `<h5>vs</h5>`;
-        formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
-    }
+
+        if (category === "live") {
+           const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
+           matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
+           scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+           formattedTime = `
+              <div class="live-indicator">
+                 <span class="red-dot"></span>
+                 <span class="live-text">Live</span> - ${matchMinute}
+             </div>
+            `;
+        } else if (category === "highlight") {
+           matchStatusDisplay = `<h5>FT</h5>`;
+           scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+           formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
+        } else if (category === "upcoming") {
+           matchStatusDisplay = `<h5>vs</h5>`;
+           formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
+        }
 
 
 
@@ -1091,16 +1085,16 @@ function showMatches(matchesData, category) {
     html += `</div>`;
     matchesContainer.innerHTML = html;
     // Add event listeners to all "View Details" buttons
-document.querySelectorAll('.view-details-btn').forEach(btn => {
-    btn.addEventListener('click', function (event) {
+    document.querySelectorAll('.view-details-btn').forEach(btn => {
+     btn.addEventListener('click', function (event) {
         event.stopPropagation(); // Prevent parent .match-details click
         const matchId = this.getAttribute('data-match-id');
         const category = this.getAttribute('data-category');
         displayLiveMatch(matchId, category);
+      });
     });
-});
 
-}
+  }
     
 
 

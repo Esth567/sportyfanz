@@ -27,24 +27,36 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 const allowedOrigins = [
-  'https://reimagined-space-robot-pj6rx9wv7g462jx6-3000.app.github.dev/',
-   'https://sportyfanz.com',
-  'https://www.sportyfanz.com'
+  'https://sportyfanz.com',
+  'https://www.sportyfanz.com',
+  'https://reimagined-space-robot-pj6rx9wv7g462jx6-5500.app.github.dev', // ✅ Your Codespace dev URL
+  'http://localhost:5500', // ✅ If you ever test from local
 ];
+
 
 
 app.use(cors({
   origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://sportyfanz.com',
+      'https://www.sportyfanz.com',
+    ];
+
+    // In development, allow Codespace and localhost
+    if (process.env.NODE_ENV !== 'production') {
+      allowedOrigins.push('http://localhost:3000');
+      allowedOrigins.push('http://localhost:5500');
+      allowedOrigins.push('https://reimagined-space-robot-pj6rx9wv7g462jx6-5500.app.github.dev');
+    }
+
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error(`Not allowed by CORS: ${origin}`));
     }
-  },
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-  credentials: false
+  }
 }));
+
 
 
 app.set('trust proxy', 1);

@@ -1,3 +1,6 @@
+const API_BASE = location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://backend.sportyfanz.com';
 
 
 // Format for date + time

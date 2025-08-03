@@ -3,6 +3,8 @@ const router = express.Router();
 const RSSParser = require('rss-parser');
 const Mercury = require('@postlight/mercury-parser');
 const slugify = require('slugify');
+const axios = require('axios');
+const cheerio = require('cheerio');
 const { cleanUnicode } = require('../utils/cleanText');
 const {
   extractTextFromHtml,
@@ -66,16 +68,43 @@ function isFootballArticle(item) {
 }
 
 
-const fetchArticleHtmlWithMercury = async (url) => {
+const fetchArticleHtmlWithAxios = async (url) => {
   try {
-    const result = await Mercury.parse(url, { timeout: 20000 });
-    return typeof result.content === 'string' ? result.content : null;
+    const { data: html } = await axios.get(url, {
+      timeout: 15000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+    });
+
+    const $ = cheerio.load(html);
+
+    // Try to extract main content from typical article containers
+    const selectors = [
+      'article',
+      '.article-content',
+      '.entry-content',
+      '#article-body',
+      '[itemprop="articleBody"]',
+      '.story-body',
+      '.main-content',
+    ];
+
+    for (const selector of selectors) {
+      const content = $(selector).text().trim();
+      if (content.length > 300) return content;
+    }
+
+    // fallback: return entire page text if we can't extract main section
+    const fallback = $('body').text().trim();
+    return fallback.length > 300 ? fallback : null;
+
   } catch (err) {
-    console.warn('Mercury failed:', url, err.message);
+    console.warn(`❌ Axios fetch failed for ${url}: ${err.message}`);
     return null;
   }
 };
-
 
 
 
@@ -96,7 +125,7 @@ async function generateFreshNews() {
         const articleUrl = item.link;
         if (!articleUrl || !/^https?:\/\//.test(articleUrl) || articleUrl.includes('/live/')) continue;
 
-        const articleHtml = await fetchArticleHtmlWithMercury(articleUrl);
+        const articleHtml = await fetchArticleHtmlWithAxios(articleUrl);
         if (!articleHtml) continue;
 
         const articleText = extractTextFromHtml(articleHtml);

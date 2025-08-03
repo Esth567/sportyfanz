@@ -60,7 +60,7 @@ function isFootballArticle(item) {
 const fetchArticleHtmlWithAxios = async (url) => {
   try {
     const { data: html } = await axios.get(url, {
-      timeout: 20000,
+      timeout: 30000,
       headers: {
         'User-Agent': 'Mozilla/5.0',
         'Accept-Language': 'en-US,en;q=0.9',

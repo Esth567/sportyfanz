@@ -1,4 +1,4 @@
-// cache/rediscache.js
+// cache/redisCache.js
 const getRedisClient  = require('../redisClient');
 
 
@@ -16,6 +16,7 @@ exports.get = async (key) => {
 // Gracefully handle Redis set
 exports.set = async (key, value, ttlSeconds = 1800) => {
   try {
+    const redisClient = await getRedisClient(); // ✅ added
     await redisClient.set(key, value, { EX: ttlSeconds });
   } catch (err) {
     console.warn(`⚠️ Redis SET failed for ${key}:`, err.message);
@@ -24,9 +25,10 @@ exports.set = async (key, value, ttlSeconds = 1800) => {
 
 // Optional: Clear key with fallback
 exports.del = async (key) => {
-    try {
-        await redisClient.del(key);
-    } catch (err) {
-        console.warn(`Redis DEL failed for ${key}:`, err.message);
-    }
+  try {
+    const redisClient = await getRedisClient(); // ✅ added
+    await redisClient.del(key);
+  } catch (err) {
+    console.warn(`Redis DEL failed for ${key}:`, err.message);
+  }
 };

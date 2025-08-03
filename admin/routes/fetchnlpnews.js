@@ -64,15 +64,16 @@ function isFootballArticle(item) {
 }
 
 
-async function fetchArticleHtmlWithMercury(url) {
+const fetchArticleHtmlWithMercury = async (url) => {
   try {
-    const result = await Mercury.parse(url);
+    const result = await Mercury.parse(url, { timeout: 20000 });
     return typeof result.content === 'string' ? result.content : null;
   } catch (err) {
     console.warn('Mercury failed:', url, err.message);
     return null;
   }
-}
+};
+
 
 
 
@@ -100,7 +101,8 @@ async function generateFreshNews() {
 
         let imageUrl = await extractImageFromURL(articleUrl);
         if (!imageUrl?.trim()) {
-          imageUrl = 'https://example.com/default-news.jpg';
+          console.warn(`⚠️ No image found for: ${item.link}`);
+          imageUrl = 'https://sportyfanz.com/assets/images/default-payer.png';
         }
 
         

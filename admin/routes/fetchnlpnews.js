@@ -12,7 +12,7 @@ const {
 } = require('../utils/nlpfetchnews');
 const feedUrls = require('../utils/rssFeeds');
 const { extractImageFromURL } = require('../utils/extractImageFromURL');
-const redisClient = require('../utils/redisClient');
+const getRedisClient = require('../utils/redisClient');
 const { detectEntityFromText } = require('../utils/entityDetect');
 
 const parser = new RSSParser();
@@ -167,7 +167,7 @@ router.get('/sports-summaries', async (req, res) => {
 
     // No cache available, generate fresh data synchronously
     const freshData = await generateFreshNews();
-    await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(freshData));
+    await getRedisClient.setEx(CACHE_KEY, TTL, JSON.stringify(freshData));
     console.log('📝 Cached sports news in Redis');
 
     res.status(200).json(freshData);

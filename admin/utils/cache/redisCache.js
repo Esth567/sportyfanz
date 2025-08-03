@@ -1,15 +1,16 @@
 // cache/rediscache.js
-const redisClient = require('../utils/redisClient');
+const getRedisClient  = require('../redisClient');
 
 
 // Gracefully handle Redis get
 exports.get = async (key) => {
-    try {
-        return await redisClient.get(key);
-    } catch (err) {
-        console.warn(`Redis GET failed for ${key}:`, err.message);
-        return null;
-    }
+  try {
+    const redisClient = await getRedisClient();
+    return await redisClient.get(key);
+  } catch (err) {
+    console.warn(`Redis GET failed for ${key}:`, err.message);
+    return null;
+  }
 };
 
 // Gracefully handle Redis set

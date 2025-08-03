@@ -607,20 +607,14 @@ async function fetchTopScorers() {
 
             let playerImage = topScorer.player_image;
 
-             if (!playerImage || playerImage.trim() === '') {
-                const normalizedName = playerName
-                    .replace(/\.(?=\s|[A-Z])/g, '')     // remove dot before space/caps
-                    .replace(/[^\w\s]/gi, '')           // remove special characters
-                    .replace(/\s+/g, ' ')               // collapse spaces
-                    .trim();
-
-             const localImage = playerImageMap[normalizedName]; 
+               if (!playerImage || playerImage.trim() === '') {
+                 const localImage = playerImageMap[playerName];
                if (localImage) {
-                  playerImage = `/assets/players/${localImage}`;
-                } else {
-                  playerImage = `/assets/images/default-player.png`;
-                }
+                playerImage = `/assets/players/${localImage}`;
+               } else {
+                 playerImage = `/assets/images/default-player.png`;
                }
+              }
 
               console.log({
                 playerName,

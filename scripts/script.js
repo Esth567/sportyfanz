@@ -1,3 +1,7 @@
+const API_BASE = location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://backend.sportyfanz.com';
+
 
 //sidebar toggle for web view
 function toggleSidebar() {
@@ -124,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
             limit: 100
         });
 
-        const res = await fetch(`/api/matches?${params}`);
+        const res = await fetch(`${API_BASE}/api/matches?${params}`);
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -257,7 +261,7 @@ async function loadNews(sectionId, endpoint) {
 
 async function loadEntityDatabase() {
   try {
-    const res = await fetch('/api/entity-database');
+    const res = await fetch(`${API_BASE}/api/entity-database`);
     if (!res.ok) throw new Error("Failed to fetch entity DB");
     window.entityDatabase = await res.json();
     console.log("✅ Entity DB loaded", Object.keys(window.entityDatabase).length);
@@ -277,7 +281,7 @@ function populateNewsSection(sectionId, newsList) {
     container.innerHTML = newsList.map((item, index) => {
       const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
       const imageHtml = isValidImage
-        ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+        ? `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
                   alt="Image for ${item.title}" 
                   loading="lazy" 
                   onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
@@ -312,7 +316,7 @@ function populateNewsSection(sectionId, newsList) {
       const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
       const imageHtml = isValidImage
           ? `<div class="transferNews-image">
-              <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+              <img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
                alt="Image for ${item.title}" 
                loading="lazy" 
                onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
@@ -330,7 +334,7 @@ function populateNewsSection(sectionId, newsList) {
               ${imageHtml}
             </div>
             <div class="news-info">
-              <h2 class=transferNews-header"><a href="/news/${item.seoTitle}" class="transferNews-link">${item.title}</a></h2>
+              <h2 class=transferNews-header"><a href="${API_BASE}/news/${item.seoTitle}" class="transferNews-link">${item.title}</a></h2>
               <p class="transferNews-description">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
             </div>
           </div>
@@ -358,7 +362,7 @@ function populateNewsSection(sectionId, newsList) {
   combinedNews.forEach((item, index) => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     const imageHtml = isValidImage
-      ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+      ? `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
             alt="Image for ${item.title}" 
             loading="lazy" 
             onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
@@ -426,12 +430,12 @@ function showFullNews(input) {
       }
 
       // Optional: push state for back button
-      history.pushState({ index, section }, '', `/news/${newsItem.seoTitle}`);
+      history.pushState({ index, section }, '', `${API_BASE}/news/${newsItem.seoTitle}`);
     } else if (typeof input === 'object' && input.title) {
       newsItem = input;
 
       // Optional: still push state with minimal info
-      history.pushState({}, '', `/news/${newsItem.seoTitle}`);
+      history.pushState({}, '', `${API_BASE}/news/${newsItem.seoTitle}`);
     } else {
       alert("Invalid news input");
       return;
@@ -532,9 +536,9 @@ function showFullNews(input) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadNews('trending-stories', '/api/sports-summaries'); 
-  loadNews('newsUpdate-stories', '/api/sports-summaries'); 
-  loadNews('sliderNews-stories', '/api/sports-summaries');
+  loadNews('trending-stories', `${API_BASE}/api/sports-summaries`); 
+  loadNews('newsUpdate-stories', `${API_BASE}/api/sports-summaries`); 
+  loadNews('sliderNews-stories', `${API_BASE}/api/sports-summaries`);
 });                                                                                                                                                                                                                                                                                                                                                                                                  
 
  window.onpopstate = function (event) {
@@ -561,7 +565,7 @@ let playerImageMap = {};
 
 async function init() {
   try {
-    const res = await fetch('/api/player-image-map');
+    const res = await fetch(`${API_BASE}/api/player-image-map`);
     playerImageMap = await res.json();
     console.log(playerImageMap);
 
@@ -577,7 +581,7 @@ init();
 
 async function fetchTopScorers() {
     try {
-        const res = await fetch('/api/topscorers');
+        const res = await fetch(`${API_BASE}/api/topscorers`);
         const topScorers = await res.json();
         
 
@@ -608,7 +612,7 @@ async function fetchTopScorers() {
               if (localImage) {
                  playerImage = `/assets/players/${localImage}`;
                } else {
-                  playerImage = '/assets/images/default-player.png';
+                  playerImage = `/assets/images/default-player.png`;
                }
               }
 
@@ -711,7 +715,7 @@ const BACKUP_LEAGUE_IDS = [168, 169]; // Example: Euro, Copa America (update as 
 // Get the active league ID based on date
 async function getActiveLeagueId() {
   try {
-    const leagues = await fetch("/api/leagues").then(r => r.json());
+    const leagues = await fetch(`${API_BASE}/api/leagues`).then(r => r.json());
     const now = new Date();
 
     // 1. Check for Club World Cup in existing league data
@@ -745,7 +749,7 @@ async function getActiveLeagueId() {
 // Render the top 5 standings for a league
 async function fetchTopFourStandings(leagueId) {
   try {
-    const response = await fetch(`/api/topstandings/${leagueId}`);
+    const response = await fetch(`${API_BASE}/api/topstandings/${leagueId}`);
     const data = await response.json();
 
     const leagueTableDemo = document.querySelector(".league-table-demo");
@@ -881,7 +885,7 @@ function formatToUserLocalTime(dateStr, timeStr) {
 //function to fetch matches
 async function fetchMatchesData() {
   try {
-    const response = await fetch('/api/all_matches');
+    const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
     console.log("Live Matches: ", data.live);
@@ -1124,7 +1128,7 @@ function filterByDate(category) {
   const selectedDate = document.getElementById("match-date").value;
   if (!selectedDate) return;
 
-  fetch(`/api/matches/by-date?date=${selectedDate}`)
+  fetch(`${API_BASE}/api/matches/by-date?date=${selectedDate}`)
     .then(res => res.json())
     .then(data => {
       let filteredData = data;
@@ -1159,7 +1163,7 @@ function toggleCalendar() {
 // Function to fetch match video 
 async function fetchMatchVideo(matchId) {
     try {
-        const response = await fetch(`/api/match-video/${matchId}`);
+        const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
         const data = await response.json();
 
         console.log("🎥 Video Data:", data);
@@ -1205,7 +1209,7 @@ async function displayLiveMatch(matchId, category) {
 
     const teamHTML = `
         <div class="live-match-team">
-            <img src="${match.team_home_badge || '/assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
+            <img src="${match.team_home_badge || `/assets/images/default-team.png`}" alt="${match.match_hometeam_name} Logo">
             <span>${match.match_hometeam_name}</span>
         </div>
         <div class="match-time-scores">
@@ -1439,7 +1443,7 @@ async function displayLiveMatch(matchId, category) {
 //function to load statistic
 async function loadMatchStatistics(match_id, match) {
     try {
-        const response = await fetch(`/api/match/statistics?matchId=${match_id}`);
+        const response = await fetch(`${API_BASE}/api/match/statistics?matchId=${match_id}`);
         const data = await response.json();
         const stats = data.statistics || [];
 
@@ -1610,7 +1614,7 @@ function loadH2HData(homeTeam, awayTeam) {
         try {
             spinner.style.display = "block";
     
-            const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
+            const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
             const { standings } = await response.json();
 
             if (!Array.isArray(standings)) {
@@ -1669,7 +1673,7 @@ function loadH2HData(homeTeam, awayTeam) {
   
     // ✅ Fetch lineup and dynamically infer formation
      function fetchAndRenderLineups(match_id, match) {
-       fetch(`/api/lineups?matchId=${match_id}`)
+       fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
         .then(res => res.json())
         .then(({ lineup }) => {
                 const container = document.getElementById("football-field");
@@ -1884,7 +1888,7 @@ function updateLiveTimers() {
 async function fetchTodayPredictions(predictionContainer) {
   const today = getDateString(0);
   try {
-    const response = await fetch('/api/predictions');
+    const response = await fetch(`${API_BASE}/api/predictions`);
     const data = await response.json();
 
 

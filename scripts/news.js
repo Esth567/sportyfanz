@@ -1,3 +1,7 @@
+const API_BASE = location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  :
+
 document.addEventListener("DOMContentLoaded", async function () {
     await loadNews(); // Make sure news loads first
     showInitialNews("trending-news");
@@ -83,7 +87,7 @@ async function loadNews(retry = true) {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/sports-summaries');
+    const response = await fetch(`${API_BASE}/api/sports-summaries`);
 
     if (!response.ok) {
       const text = await response.text();
@@ -131,7 +135,7 @@ function populateNewsSection(sectionId, newsList) {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     const imageHtml = isValidImage
        ? `<div class="feature-image">
-        <img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+        <img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
               alt="Image for ${item.title}" 
               loading="lazy" 
               onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
@@ -148,7 +152,7 @@ function populateNewsSection(sectionId, newsList) {
         ${imageHtml}
         <div class="title-desc"> 
         <h1 class="news-title">
-          <a href="/news/${item.seoTitle}" class="news-link">${item.title}</a>
+          <a href="${API_BASE}/news/${item.seoTitle}" class="news-link">${item.title}</a>
           </h1>
         <div class="news-meta">
           <p class="news-desc">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>

@@ -1,3 +1,8 @@
+const API_BASE = location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://backend.sportyfanz.com';
+
+
 // List of leagues to display
 const leaguesSelected = {
     "Premier League": { country: "England" },
@@ -43,7 +48,7 @@ function displayMatchesByLeagueId(leagueId, leagueName, category) {
 
 
 
-fetch(`/api/leagues`)
+fetch(`${API_BASE}/api/leagues`)
     .then(res => res.json())
     .then(leagues => {
         const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
@@ -125,7 +130,7 @@ fetch(`/api/leagues`)
     //function to fetch matches
 async function fetchAndRenderMatches() {
   try {
-    const response = await fetch('/api/all_matches');
+    const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
     console.log("Live Matches: ", data.live);
@@ -408,7 +413,7 @@ function toggleCalendar() {
 // Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
     try {
-        const response = await fetch(`/api/video/${matchId}`);
+        const response = await fetch(`${API_BASE}/api/video/${matchId}`);
         const data = await response.json();
 
         console.log("🎥 Video Data:", data);
@@ -670,7 +675,7 @@ async function displayLiveMatch(matchId, category) {
 //function to load statistic
 async function loadMatchStatistics(match_id, match) {
     try {
-        const response = await fetch(`/api/match/statistics?matchId=${match_id}`);
+        const response = await fetch(`${API_BASE}/api/match/statistics?matchId=${match_id}`);
         const data = await response.json();
         const stats = data.statistics || [];
 
@@ -716,7 +721,7 @@ function loadH2HData(homeTeam, awayTeam) {
 
     spinner.style.display = "block";
 
-    fetch(`/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
+    fetch(`${API_BASE}/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
         .then(res => res.json())
         .then(data => {
             spinner.style.display = "none";
@@ -842,7 +847,7 @@ function loadH2HData(homeTeam, awayTeam) {
         try {
             spinner.style.display = "block";
     
-             const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
+             const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
              const { standings } = await response.json();
     
             const tableHTML = `
@@ -899,7 +904,7 @@ function loadH2HData(homeTeam, awayTeam) {
      function fetchAndRenderLineups(match_id, match) {
   const containerWrapper = document.getElementById("football-field-wrapper");
 
-  fetch(`/api/lineups?matchId=${match_id}`)
+  fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
     .then(res => res.json())
     .then(({ lineup }) => {
       containerWrapper.innerHTML = ""; // Clear previous content

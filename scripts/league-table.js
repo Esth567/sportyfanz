@@ -1,3 +1,7 @@
+const API_BASE = location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://backend.sportyfanz.com';
+
 // List of leagues to display 
 const selectedLeagues = {
     "Premier League": { league_id: 152, country: "England" }, 
@@ -21,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetch the league names
     async function fetchLeagues() {
         try {
-            const response = await fetch(`/api/leagues`);
+            const response = await fetch(`${API_BASE}/api/leagues`);
             const leagues = await response.json();
             leaguesContainer.innerHTML = ""; // Clear existing content
     
@@ -89,7 +93,7 @@ const leagueLogos = {
 async function updateLeagueTable(leagueName, leagueId) {
     try {
         const [standingsResponse, formMap] = await Promise.all([
-            fetch(`/api/standings/${leagueId}`).then(res => res.json()),
+            fetch(`${API_BASE}/api/standings/${leagueId}`).then(res => res.json()),
             getRecentForms(leagueId)
         ]);
 
@@ -278,7 +282,7 @@ async function getRecentForms(leagueId) {
 
 
 function updateTeamForm(teamId) {
-    fetch(`/api/team-form/${teamId}`)
+    fetch(`${API_BASE}/api/team-form/${teamId}`)
         .then(response => response.json())
         .then(data => {
             if (data && Array.isArray(data) && data.length > 0) {
@@ -364,7 +368,7 @@ function attachTeamClickListeners() {
 // Placeholder function to fetch team details by team key
 async function getTeamDetailsByKey(teamKey) {
   try {
-    const res = await fetch(`/api/team/${teamKey}`);
+    const res = await fetch(`${API_BASE}/api/team/${teamKey}`);
     const data = await res.json();
     return data;
   } catch (error) {

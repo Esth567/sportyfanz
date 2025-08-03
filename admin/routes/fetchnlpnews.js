@@ -22,13 +22,15 @@ const TTL = 60 * 30; // 30 minutes
 
 async function refreshNewsInBackground() {
   try {
-    const data = await generateFreshNews(); // Move the fetching logic into a function
+    const redisClient = await getRedisClient();
+    const data = await generateFreshNews();
     await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(data));
     console.log('🔄 Refreshed sports data in background');
   } catch (err) {
     console.error('🚨 Background refresh failed:', err.message);
   }
 }
+
 
 
 function isTopNewsArticle(article) {
@@ -79,6 +81,7 @@ const fetchArticleHtmlWithMercury = async (url) => {
 
 async function generateFreshNews() {
 
+  const redisClient = await getRedisClient();
   const rawEntityDB = await redisClient.get('entity:database');
   const entityDb = rawEntityDB ? JSON.parse(rawEntityDB) : {};
 
@@ -155,6 +158,7 @@ async function generateFreshNews() {
 
 router.get('/sports-summaries', async (req, res) => {
   try {
+    const redisClient = await getRedisClient();
     const staleData = await redisClient.get(CACHE_KEY);
     if (staleData) {
       console.log('⚡ Serving cached sports data (stale)');
@@ -167,7 +171,7 @@ router.get('/sports-summaries', async (req, res) => {
 
     // No cache available, generate fresh data synchronously
     const freshData = await generateFreshNews();
-    await getRedisClient.setEx(CACHE_KEY, TTL, JSON.stringify(freshData));
+    await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(freshData));
     console.log('📝 Cached sports news in Redis');
 
     res.status(200).json(freshData);

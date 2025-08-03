@@ -27,6 +27,7 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 const allowedOrigins = [
+  'https://reimagined-space-robot-pj6rx9wv7g462jx6-3000.app.github.dev/',
    'https://sportyfanz.com',
   'https://www.sportyfanz.com'
 ];

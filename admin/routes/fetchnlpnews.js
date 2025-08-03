@@ -5,7 +5,7 @@ const slugify = require('slugify');
 const axios = require('axios');
 const axiosRetry = require('axios-retry').default || require('axios-retry');
 const cheerio = require('cheerio');
-const pLimit = require('p-limit');
+const pLimit = require('p-limit').default;
 const { cleanUnicode } = require('../utils/cleanText');
 const {
   extractTextFromHtml,

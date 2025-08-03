@@ -2,24 +2,26 @@
 const redis = require('redis');
 require('dotenv').config();
 
-const client = redis.createClient({
-  url: process.env.REDIS_URL,
-  socket: {
-    tls: true, // ✅ Important for Upstash
-    connectTimeout: 10000,
-  },
-});
+let client;
 
-client.on('error', (err) => console.error('❌ Redis error:', err));
-client.on('connect', () => console.log('🔌 Redis connecting...'));
-client.on('ready', () => console.log('✅ Redis connected'));
+async function getRedisClient() {
+  if (!client) {
+    client = redis.createClient({
+      url: process.env.REDIS_URL,
+      socket: {
+        tls: true,
+        connectTimeout: 10000,
+      },
+    });
 
-(async () => {
-  try {
+    client.on('error', (err) => console.error('❌ Redis error:', err));
+    client.on('connect', () => console.log('🔌 Redis connecting...'));
+    client.on('ready', () => console.log('✅ Redis connected'));
+
     await client.connect();
-  } catch (err) {
-    console.error('Redis connection error:', err);
   }
-})();
 
-module.exports = client;
+  return client;
+}
+
+module.exports = getRedisClient;

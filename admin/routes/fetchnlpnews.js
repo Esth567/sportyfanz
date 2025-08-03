@@ -139,7 +139,7 @@ async function generateFreshNews() {
           }
         }
       } catch (err) {
-      console.warn(`⚠️ Failed to process ${feedUrl}:`, err.message);
+      console.warn(`⚠️ Failed to process ${feedUrl}:\n`, err);  // Full stack trace
     }
   }
 

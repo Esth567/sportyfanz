@@ -1,5 +1,5 @@
 const API_BASE = location.hostname === 'localhost'
-  ? 'http://localhost:5000'
+  ? 'http://localhost:3000'
   : 'https://backend.sportyfanz.com';
 
 

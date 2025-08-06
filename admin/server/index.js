@@ -80,6 +80,12 @@ app.use('/api', entitydadabase);
 // ✅ Health check route
 app.get("/", (req, res) => res.send("✅ API is live."));
 
+// Serve frontend for any route not handled by API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+
 // 404 handler
 app.use((req, res, next) => {
   res.status(404).json({ error: 'Route not found' });

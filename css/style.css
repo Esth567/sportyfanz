@@ -805,12 +805,12 @@ body{
 
 /* Banner 1 background image */
 .banner1 {
-    background-image: url('../assets/images/podcastImage.png'); /* Use ../ to go up one level */
+    background-image: url('../assets/images/podcastImage.png'); 
 }
 
 /* Banner 2 background image */
 .banner2 {
-    background-image: url('../assets/images/podImage.png');
+    background-image: url('../assets/images/podcasterImg.png');
 }
 
 /* Overlay text box */

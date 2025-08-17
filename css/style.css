@@ -752,11 +752,6 @@ body{
   white-space: normal;
 }
 
-.news-container:hover {
-    transform: scale(1.05); /* Slightly enlarges on hover */
-    padding: 5px;
-   
-}
 
 .button{
     color: #234737;
@@ -773,7 +768,7 @@ body{
 .header-slider {
     position: relative;
     width: 100%;
-    height: 250px; /* Adjust height as needed */
+    height: 250px; 
     overflow: hidden;
     margin-bottom: 20px;
 }
@@ -785,7 +780,7 @@ body{
     position: absolute;
     top: 0;
     left: 0;
-    display: flex; /* hidden by default */
+    display: flex; 
     justify-content: center;
     align-items: center;
     background-size: cover;
@@ -794,12 +789,34 @@ body{
     opacity: 0;
     pointer-events: none;
     transition: opacity 1s ease-in-out;
+    /* fallback background if no image */
+    background-color: #1a1a1a; 
+    color: #fff; 
 }
 
 /* Show active slide */
 .slider-content.active {
     opacity: 1;
     pointer-events: all;
+    z-index: 1;
+}
+
+/* Dark overlay for readability */
+.slider-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4); 
+    border-radius: 20px;
+    z-index: 0;
+}
+
+/* ✅ Ensure text/content is above the overlay */
+.slider-content > * {
+    position: relative;
     z-index: 1;
 }
 
@@ -815,9 +832,10 @@ body{
 
 /* Overlay text box */
 .banne2item-contnt {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     padding: 20px 30px;
-    border-radius: 10px;
+    border-radius: 8px;
+    color: #fff;
 }
 
 /* Heading styling */

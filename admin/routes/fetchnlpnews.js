@@ -60,6 +60,15 @@ function isFootballArticle(item) {
 }
 
 
+function cleanArticleText(text) {
+  return text
+    .replace(/\s{2,}/g, ' ')                       // collapse extra spaces
+    .replace(/document\.currentScript[\s\S]*?};/g, '') // strip inline JS blobs
+    .replace(/window\.sdc[\s\S]*?};/g, '')         // strip window config objects
+    .replace(/©\s*\d{4}\s*Sky UK.*/g, '')          // strip Sky UK footer notices
+    .trim();
+}
+
 const fetchArticleHtmlWithAxios = async (url) => {
   try {
     const { data: html } = await axios.get(url, {
@@ -72,6 +81,7 @@ const fetchArticleHtmlWithAxios = async (url) => {
 
     const $ = cheerio.load(html);
 
+    // Common article containers
     const selectors = [
       'article',
       '.article-content',
@@ -95,6 +105,7 @@ const fetchArticleHtmlWithAxios = async (url) => {
       }
     }
 
+    // fallback: take whole body text (but still clean it)
     const fallback = $('body').text().trim();
     return fallback.length > 300 ? cleanUnicode(fallback) : null;
 
@@ -109,6 +120,7 @@ const fetchArticleHtmlWithAxios = async (url) => {
     }
   }
 };
+
 
 async function generateFreshNews() {
   const redisClient = await getRedisClient();

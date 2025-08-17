@@ -47,9 +47,18 @@ function isTopNewsArticle(article) {
 
 function isFootballArticle(item) { 
   const title = item.title?.toString().toLowerCase() || '';
+
   const categories = Array.isArray(item.categories)
-    ? item.categories.map(c => c?.toString().toLowerCase()).join(' ')
+    ? item.categories
+        .map(c => {
+          if (!c) return '';
+          if (typeof c === 'string') return c.toLowerCase();
+          if (typeof c === 'object' && c._) return String(c._).toLowerCase();
+          return String(c).toLowerCase();
+        })
+        .join(' ')
     : '';
+
   const link = item.link?.toString().toLowerCase() || '';
 
   return keywords.some(keyword =>

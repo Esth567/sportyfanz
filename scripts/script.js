@@ -955,7 +955,7 @@ function updateTheMatches(matches) {
     };
 
     const now = luxon.DateTime.utc();
-    const oneWeekAgo = now.minus({ days: 7 });
+    const oneWeekAgo = now.minus({ days: 7 }); 
 
     matches.forEach(match => {
         const status = (match.match_status || "").trim().toLowerCase();

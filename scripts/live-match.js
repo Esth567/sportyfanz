@@ -196,11 +196,12 @@ function renderMatches(matchesData, category) {
     const matchesContainer = document.querySelector(".matches");
     if (!matchesContainer) return;
 
-    const selectedMatches = matchesData[category] || [];
+    let selectedMatches = matchesData[category] || [];
 
-    if (selectedMatches.length === 0) {
-        matchesContainer.innerHTML = `<p>No ${category} matches found.</p>`;
-        return;
+    // ✅ If no live matches and category is "live", switch to "upcoming"
+    if (category === "live" && selectedMatches.length === 0) {
+        category = "upcoming";
+        selectedMatches = matchesData.upcoming || [];
     }
 
     // Group matches by league_id
@@ -218,7 +219,6 @@ function renderMatches(matchesData, category) {
         return acc;
     }, {});
 
-    // Sort leagues by priority
     const preferredLeagues = [
         { name: "Premier League", country: "England" },
         { name: "La Liga", country: "Spain" },
@@ -239,11 +239,31 @@ function renderMatches(matchesData, category) {
 
     let html = "";
 
-    leagueArray.forEach((league, index) => {
+    // ✅ Always render header
+    html += `
+    <div class="matches-header">
+        <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesByCategory('live')">Live</div>
+        <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesByCategory('highlight')">Highlight</div>
+        <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesByCategory('upcoming')">Upcoming</div>
+        <div class="calendar-wrapper" style="position: relative;">
+            <div class="match-category-btn calendar" onclick="toggleCalendar()">
+                <ion-icon name="calendar-outline"></ion-icon>
+            </div>
+            <input type="date" id="match-date" onchange="filterByDate('${category}')" style="display: none;">
+        </div>
+    </div>`;
+
+    if (leagueArray.length === 0) {
+        html += `<p>No ${category} matches found.</p>`;
+        matchesContainer.innerHTML = html;
+        return;
+    }
+
+    // ✅ Render leagues + matches
+    leagueArray.forEach(league => {
         if (league.matches.length === 0) return;
 
         const leagueId = league.matches[0].league_id;
-        const isCurrentLeagueSelected = selectedLeagueId && selectedLeagueId === leagueId;
 
         html += `
         <div class="league-header">
@@ -259,31 +279,15 @@ function renderMatches(matchesData, category) {
         </div>
         <div class="league-container">`;
 
-        // Add category buttons only for the first league
-        if (index === 0 && !selectedLeagueId) {
-            html += `
-            <div class="matches-header">
-                <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesByCategory('live')">Live</div>
-                <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesByCategory('highlight')">Highlight</div>
-                <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesByCategory('upcoming')">Upcoming</div>
-                <div class="calendar-wrapper" style="position: relative;">
-                    <div class="match-category-btn calendar" onclick="toggleCalendar()">
-                        <ion-icon name="calendar-outline"></ion-icon>
-                    </div>
-                    <input type="date" id="match-date" onchange="filterByDate('${category}')" style="display: none;">
-                </div>
-            </div>`;
-        }
-
         html += `<div class="match-category-content">`;
 
         league.matches.forEach(match => {
             const matchBerlin = luxon.DateTime.fromFormat(
-           `${match.match_date} ${match.match_time}`,
-           "yyyy-MM-dd HH:mm",
-           { zone: "Europe/Berlin" }
-           );
-          const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+                `${match.match_date} ${match.match_time}`,
+                "yyyy-MM-dd HH:mm",
+                { zone: "Europe/Berlin" }
+            );
+            const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
 
             const matchDay = matchLocal.toFormat("MMM d");
 
@@ -292,9 +296,11 @@ function renderMatches(matchesData, category) {
             if (category === "highlight") {
                 matchMinute = "FT";
             } else if (category === "live") {
-                matchMinute = parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90 ? `${match.match_status}'` : matchLocal.toFormat("h:mm");
+                matchMinute = parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90 
+                    ? `${match.match_status}'` 
+                    : matchLocal.toFormat("h:mm");
             } else if (category === "upcoming") {
-                matchMinute = matchLocal.toFormat("h:mm a");  // Display time for upcoming matches
+                matchMinute = matchLocal.toFormat("h:mm a");
             }
 
             html += `

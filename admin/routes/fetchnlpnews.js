@@ -126,10 +126,11 @@ async function generateFreshNews() {
           if (!articleText || articleText.length < 300) return;
 
           let imageUrl = await extractImageFromURL(articleUrl);
-          if (!imageUrl?.trim()) {
-            console.warn(`⚠️ No image found for: ${item.link}`);
-            imageUrl = 'https://sportyfanz.com/assets/images/default-player.png';
+           if (!imageUrl || !/^https?:\/\//.test(imageUrl)) {
+            console.warn(`⚠️ Invalid image found for: ${item.link}, using fallback.`);
+           imageUrl = 'https://sportyfanz.com/assets/images/default-player.png';
           }
+
 
           const chunks = chunkSummary(articleText, 5);
           const fullSummary = chunks.join('\n\n');

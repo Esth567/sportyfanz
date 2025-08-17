@@ -72,7 +72,6 @@ const fetchArticleHtmlWithAxios = async (url) => {
 
     const $ = cheerio.load(html);
 
-    // Common article containers
     const selectors = [
       'article',
       '.article-content',
@@ -92,26 +91,24 @@ const fetchArticleHtmlWithAxios = async (url) => {
 
       const content = paragraphs.join('\n\n');
       if (content.length > 300) {
-        return cleanUnicode(content);
+        return cleanText(content);
       }
     }
 
-    // fallback: take whole body text (but still clean it)
     const fallback = $('body').text().trim();
-    return fallback.length > 300 ? cleanUnicode(fallback) : null;
+    return fallback.length > 300 ? cleanText(fallback) : null;
 
   } catch (err) {
     console.warn(`❌ Axios fetch failed for ${url}: ${err.message}`);
     try {
       const fallbackRes = await axios.get(url);
-      return cleanUnicode(fallbackRes.data);
+      return cleanText(fallbackRes.data);
     } catch (fallbackErr) {
       console.warn(`⚠️ Fallback fetch also failed for ${url}`);
       return null;
     }
   }
 };
-
 
 async function generateFreshNews() {
   const redisClient = await getRedisClient();

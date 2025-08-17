@@ -1,5 +1,5 @@
 // utils/cleanText.js
-function cleanUnicode(str) {
+function cleanText(str) {
   if (typeof str !== 'string') return '';
 
   return str
@@ -15,6 +15,4 @@ function cleanUnicode(str) {
     .trim();
 }
 
-
-
-module.exports = { cleanUnicode };
+module.exports = { cleanText };

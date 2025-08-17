@@ -124,10 +124,7 @@ exports.getTopScorers = async (req, res) => {
           .filter(p => parseInt(p.goals) >= 10)
           .slice(0, limitPerLeague)
           .map(p => ({
-            player_name: p.player_name,
-            player_image: p.player_image || (playerImageMap[p.player_name]
-              ? `/assets/players/${playerImageMap[p.player_name]}`
-              : ''),
+            player_image: p.player_image || "",
             team_name: p.team_name,
             league_name: leagueName,
             goals: parseInt(p.goals)

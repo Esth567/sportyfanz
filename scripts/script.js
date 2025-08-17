@@ -578,93 +578,110 @@ async function init() {
 
 init();
 
+// ✅ Utility: Normalize player names into safe filenames
+function normalizePlayerName(playerName) {
+  if (!playerName) return "default-player";
+
+  return playerName
+    .normalize("NFD")                     // split accents
+    .replace(/[\u0300-\u036f]/g, "")      // remove accents
+    .replace(/[^a-zA-Z0-9]/g, "")         // remove non-letters/digits
+    .trim();
+}
+
 
 async function fetchTopScorers() {
-    try {
-        const res = await fetch(`${API_BASE}/api/topscorers`);
-        const topScorers = await res.json();
-        
+  try {
+    const res = await fetch(`${API_BASE}/api/topscorers`);
+    const topScorers = await res.json();
 
-        const playersContainer = document.querySelector(".players-container");
-        const dotsContainer = document.querySelector(".slider-dots");
+    const playersContainer = document.querySelector(".players-container");
+    const dotsContainer = document.querySelector(".slider-dots");
 
-        if (!playersContainer || !dotsContainer) {
-            console.error("Slider container elements not found.");
-            return;
-        }
-
-        playersContainer.innerHTML = "";
-        dotsContainer.innerHTML = "";
-
-        let playerElements = [];
-        let playerIndex = 0;
-
-        for (const topScorer of topScorers) {
-            const goals = topScorer.goals || 0;
-            const playerName = topScorer.player_name || "Unknown Player";
-            const teamName = topScorer.team_name || "Unknown Team";
-            const leagueName = topScorer.league_name || "Unknown League";
-
-            let playerImage = topScorer.player_image;
-
-               if (!playerImage || playerImage.trim() === '') {
-                 const localImage = playerImageMap[playerName];
-               if (localImage) {
-                playerImage = `/assets/players/${localImage}`;
-               } else {
-                 playerImage = `/assets/images/default-player.png`;
-               }
-              }
-
-              console.log({
-                playerName,
-                playerImageFromAPI: topScorer.player_image,
-                localMappedImage: playerImageMap[playerName],
-                finalImage: playerImage
-               });
-
-            const playerItem = document.createElement("div");
-            playerItem.classList.add("player-item");
-            if (playerIndex === 0) playerItem.classList.add("active");
-
-            playerItem.innerHTML = `
-                <div class="player-image">
-                    <img src="${playerImage}" alt="${playerName}">
-                </div>
-                <div class="players-data">
-                    <div class="player-name">${playerName}</div>
-                    <div class="goals">${goals} Goals</div>
-                    <div class="team-name">${teamName}</div>
-                    <div class="leagues">${leagueName}</div>
-                </div>
-            `;
-
-            playersContainer.appendChild(playerItem);
-            playerElements.push(playerItem);
-
-            const dot = document.createElement("span");
-            dot.classList.add("dot");
-            if (playerIndex === 0) dot.classList.add("active-dot");
-
-            dot.addEventListener("click", () => setActiveSlide(playerIndex));
-            dotsContainer.appendChild(dot);
-
-            playerIndex++;
-        }
-
-        if (playerElements.length > 10) {
-            dotsContainer.style.display = "none";
-        }
-
-        if (playerElements.length > 0) {
-            startSlider(playerElements);
-        } else {
-            console.warn("No players were added to the UI.");
-        }
-
-    } catch (error) {
-        console.error("Error fetching top scorers:", error);
+    if (!playersContainer || !dotsContainer) {
+      console.error("Slider container elements not found.");
+      return;
     }
+
+    playersContainer.innerHTML = "";
+    dotsContainer.innerHTML = "";
+
+    let playerElements = [];
+    let playerIndex = 0;
+
+    for (const topScorer of topScorers) {
+      const goals = topScorer.goals || 0;
+      const playerName = topScorer.player_name || "Unknown Player";
+      const teamName = topScorer.team_name || "Unknown Team";
+      const leagueName = topScorer.league_name || "Unknown League";
+
+      let playerImage = "";
+
+      // ✅ Prefer API-provided image
+      if (topScorer.player_image && topScorer.player_image.trim() !== "") {
+        playerImage = topScorer.player_image;
+      } else {
+        // ✅ Try local asset (PNG first, JPG fallback via onerror)
+        const safeName = normalizePlayerName(playerName);
+        playerImage = `/assets/players/${safeName}.png`;
+      }
+
+      console.log({
+        playerName,
+        apiImage: topScorer.player_image,
+        resolvedImage: playerImage,
+      });
+
+      const playerItem = document.createElement("div");
+      playerItem.classList.add("player-item");
+      if (playerIndex === 0) playerItem.classList.add("active");
+
+      playerItem.innerHTML = `
+        <div class="player-image">
+          <img 
+            src="${playerImage}" 
+            alt="${playerName}"
+            onerror="this.onerror=null;
+                     if(this.src.includes('.png')){
+                       this.src=this.src.replace('.png','.jpg');
+                     } else {
+                       this.src='/assets/images/default-player.png';
+                     }">
+        </div>
+        <div class="players-data">
+          <div class="player-name">${playerName}</div>
+          <div class="goals">${goals} Goals</div>
+          <div class="team-name">${teamName}</div>
+          <div class="leagues">${leagueName}</div>
+        </div>
+      `;
+
+      playersContainer.appendChild(playerItem);
+      playerElements.push(playerItem);
+
+      const dot = document.createElement("span");
+      dot.classList.add("dot");
+      if (playerIndex === 0) dot.classList.add("active-dot");
+
+      dot.addEventListener("click", () => setActiveSlide(playerIndex));
+      dotsContainer.appendChild(dot);
+
+      playerIndex++;
+    }
+
+    if (playerElements.length > 10) {
+      dotsContainer.style.display = "none";
+    }
+
+    if (playerElements.length > 0) {
+      startSlider(playerElements);
+    } else {
+      console.warn("No players were added to the UI.");
+    }
+
+  } catch (error) {
+    console.error("Error fetching top scorers:", error);
+  }
 }
 
 
@@ -898,28 +915,28 @@ async function fetchMatchesData() {
 
     selectedLeagueId = null;
     selectedLeagueName = null;
-    
+
+    // ✅ Smart auto-switch logic
     if (matchesData.live && matchesData.live.length > 0) {
       currentCategory = "live";
     } else if (matchesData.upcoming && matchesData.upcoming.length > 0) {
-      currentCategory = "upcoming";
+      currentCategory = "upcoming";   // auto-switch
     } else if (matchesData.highlight && matchesData.highlight.length > 0) {
       currentCategory = "highlight";
     } else {
-      currentCategory = null;
+      currentCategory = "live"; // default fallback
     }
 
-    if (currentCategory) {
-      showMatches(matchesData, currentCategory);
-    } else {
-      document.querySelector(".matches-container").innerHTML =
-        `<p>No matches found.</p>`;
-    }
+    // ✅ Render matches (this also applies "active" to the correct tab)
+    showMatches(matchesData, currentCategory);
+
   } catch (error) {
     console.error("Error fetching match data:", error);
     document.querySelector(".matches-container").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
   }
 }
+
+
 
 
 // Modify the updateMatches function to use correct timezone conversion
@@ -963,11 +980,7 @@ function showMatches(matchesData, category) {
 
     const selectedMatches = matchesData[category] || [];
 
-    if (selectedMatches.length === 0) {
-        matchesContainer.innerHTML = `<p>No ${category} matches found.</p>`;
-        return;
-    }
-
+    
     const preferredLeagues = [
         { name: "Premier League", country: "England" },
         { name: "La Liga", country: "Spain" },
@@ -1007,6 +1020,14 @@ function showMatches(matchesData, category) {
                 <input type="date" id="match-date" onchange="filterByDate('${category}')" style="display: none;">
             </div>
         </div>`;
+
+        if (selectedMatches.length === 0) {
+        html += `<p class="no-matches-msg">No ${category} matches found.</p>`;
+        html += `</div>`;
+        matchesContainer.innerHTML = html;
+        return;
+       }
+
 
         const getPriority = (m) => {
         const index = preferredLeagues.findIndex(

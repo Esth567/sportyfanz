@@ -1512,9 +1512,7 @@ body{
 }
 
 .advert {
-  width: 250px;
-  max-width: 300px;   /* container width */
-  margin: 0 auto 20px;
+ 
   text-align: center;
   font-family: 'Lato', sans-serif;
   font-weight: 400;
@@ -1527,7 +1525,7 @@ body{
 
 /* iframe fills the advert container */
 .advert iframe {
-  width: 100%;
+  width: 1080px;
   height: 270px;  /* fixed height */
   border-radius: 8px;
   border: 0;

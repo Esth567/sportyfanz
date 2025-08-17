@@ -788,9 +788,6 @@ body{
     opacity: 0;
     pointer-events: none;
     transition: opacity 1s ease-in-out;
-    /* fallback background if no image */
-    background-color: #1a1a1a; 
-    color: #fff; 
 }
 
 /* Show active slide */
@@ -833,7 +830,7 @@ body{
 .banne2item-contnt {
     background: rgba(0, 0, 0, 0.6);
     padding: 20px 30px;
-    border-radius: 8px;
+    border-radius: 10px;
     color: #fff;
 }
 

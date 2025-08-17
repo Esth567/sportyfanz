@@ -362,13 +362,13 @@ function populateNewsSection(sectionId, newsList) {
   combinedNews.forEach((item, index) => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     const imageHtml = isValidImage
-     ? `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
-        alt="Image for ${item.title}" 
-        loading="lazy" 
-        onerror="this.onerror=null; this.src='https://sportyfanz.com/assets/images/default-player.png';" />`
-    : `<img src="https://sportyfanz.com/assets/images/default-player.png" 
-        alt="Image not available for ${item.title}" 
-        loading="lazy" />`;
+        ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+                  alt="Image for ${item.title}" 
+                  loading="lazy" 
+                  onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
+        : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
+                  alt="Image not available for ${item.title}" 
+                  loading="lazy" />`;
 
     const slide = document.createElement('div');
     slide.className = 'slider-content sliderNews-dynamic'; // Add class for cleanup
@@ -401,45 +401,34 @@ function showFullNews(input) {
     const middleLayer = document.querySelector('.middle-layer');
 
     // Hide all children inside middle-layer
-    Array.from(middleLayer.children).forEach(child => {
+    const children = Array.from(middleLayer.children);
+    children.forEach(child => {
       child.style.display = 'none';
     });
 
-    // Determine if input is a DOM element or news object
-    let newsItem;
-    if (input instanceof HTMLElement) {
-      const index = parseInt(input.dataset.index, 10);
-      const section = input.dataset.section;
-      let newsList = [];
+    // Get data from clicked item
+    const index = clickedItem.dataset.index;
+    const section = clickedItem.dataset.section;
+    let newsList = [];
 
-      if (section === 'trending-stories') {
+    if (section === 'trending-stories') {
         newsList = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-      } else if (section === 'newsUpdate-stories') {
+     } else if (section === 'newsUpdate-stories') {
         newsList = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-      } else if (section === 'sliderNews-stories') {
-        const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-        const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-        newsList = [...trending, ...updates];
-      }
+     } else if (section === 'sliderNews-stories') {
+       const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+       const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+       newsList = [...trending, ...updates];
+     }
 
-      newsItem = newsList[index];
+
+      const newsItem = newsList[parseInt(index)];
 
       if (!newsItem) {
         alert("News item not found.");
         return;
       }
 
-      // Optional: push state for back button
-      history.pushState({ index, section }, '', `${API_BASE}/news/${newsItem.seoTitle}`);
-    } else if (typeof input === 'object' && input.title) {
-      newsItem = input;
-
-      // Optional: still push state with minimal info
-      history.pushState({}, '', `${API_BASE}/news/${newsItem.seoTitle}`);
-    } else {
-      alert("Invalid news input");
-      return;
-    }
 
     // Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
@@ -1993,8 +1982,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function reorderElements() {
       if (window.innerWidth <= 1024) {
           const parent = document.querySelector(".content");
-
           
+
           const headerSlider = document.querySelector(".header-slider");
           const textCont1 = document.querySelector(".text-cont1");
           const newsUpdate = document.querySelector(".news-update");

@@ -832,6 +832,7 @@ function initSlider() {
 
 
 //function to display matches for the middle layers in home page
+let currentCategory = "live";
 
 // Function to get today's date
 function getTodayDate(offset = 0) {
@@ -897,8 +898,23 @@ async function fetchMatchesData() {
 
     selectedLeagueId = null;
     selectedLeagueName = null;
+    
+    if (matchesData.live && matchesData.live.length > 0) {
+      currentCategory = "live";
+    } else if (matchesData.upcoming && matchesData.upcoming.length > 0) {
+      currentCategory = "upcoming";
+    } else if (matchesData.highlight && matchesData.highlight.length > 0) {
+      currentCategory = "highlight";
+    } else {
+      currentCategory = null;
+    }
 
-    showMatches(matchesData, "live");
+    if (currentCategory) {
+      showMatches(matchesData, currentCategory);
+    } else {
+      document.querySelector(".matches-container").innerHTML =
+        `<p>No matches found.</p>`;
+    }
   } catch (error) {
     console.error("Error fetching match data:", error);
     document.querySelector(".matches-container").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
@@ -933,7 +949,6 @@ function updateTheMatches(matches) {
         if (isUpcoming) matchesData.upcoming.push(match);
 
         const formattedMatchTime = matchLocal.toFormat("h:mm");
-        console.log(`[${category.toUpperCase()}] ${match.match_hometeam_name} vs ${match.match_awayteam_name} at ${formattedTime}`);
     });
 
     showMatches(matchesData, "live");
@@ -942,6 +957,7 @@ function updateTheMatches(matches) {
 
 //funtion to render matches
 function showMatches(matchesData, category) {
+  currentCategory = category;
     const matchesContainer = document.querySelector(".matches-container");
     if (!matchesContainer) return;
 
@@ -1112,29 +1128,16 @@ document.querySelectorAll(".match-category-btn").forEach(button => {
 
 
 // Function to filter matches by the selected date
-function filterByDate(category) {
-  const selectedDate = document.getElementById("match-date").value;
+function filterByDate(category = currentCategory) {
+  function filterByDate(category = currentCategory) {
+  const dateInput = document.getElementById("match-date");
+  if (!dateInput) return;
+
+  const selectedDate = dateInput.value;
   if (!selectedDate) return;
 
-  fetch(`${API_BASE}/api/matches/by-date?date=${selectedDate}`)
-    .then(res => res.json())
-    .then(data => {
-      let filteredData = data;
-
-      if (selectedLeagueId) {
-        filteredData = Object.fromEntries(
-          Object.entries(data).map(([key, matches]) => [
-            key,
-            matches.filter(m => m.league_id === selectedLeagueId)
-          ])
-        );
-      }
-
-      showMatches(filteredData, category);
-    })
-    .catch(err => {
-      console.error("Date filter fetch error:", err);
-    });
+  const filteredMatches = (matchesData[category] || []).filter(match => match.match_date === selectedDate);
+  showMatches({ ...matchesData, [category]: filteredMatches }, category);
 }
 
 

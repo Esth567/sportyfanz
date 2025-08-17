@@ -297,6 +297,10 @@ function showFullNews(clickedItem) {
     backButton.className = 'back-button';
     backButton.onclick = () => {
       fullView.remove();
+      // Show previously hidden children again
+     children.forEach(child => {
+      child.style.display = ''; // resets to original display
+     });
       updateRelativeTime();
     };
 

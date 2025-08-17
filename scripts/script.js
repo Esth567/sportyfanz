@@ -521,15 +521,21 @@ function showFullNews(clickedItem) {
       </article>
     `;
 
-    // Back button handler
-    fullView.querySelector('.back-button').onclick = () => {
+    // Add back button
+    const backButton = document.createElement('button');
+    backButton.textContent = '← Back to news';
+    backButton.className = 'back-button';
+    backButton.onclick = () => {
       fullView.remove();
-      Array.from(middleLayer.children).forEach(child => child.style.display = '');
-      history.back();
+      // Show previously hidden children again
+     children.forEach(child => {
+      child.style.display = ''; // resets to original display
+     });
+      updateRelativeTime();
     };
 
-    middleLayer.appendChild(fullView);
-    updateRelativeTime();
+    fullView.prepend(backButton);
+    middleLayer.insertBefore(fullView, middleLayer.firstChild);
 
   } catch (err) {
     console.error("Failed to render full news view", err);

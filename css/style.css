@@ -1518,7 +1518,7 @@ body{
   text-align: center;
   font-family: 'Lato', sans-serif;
   font-weight: 400;
-  font-size: 0.7rem;
+  font-size: 12px;
   color: #ffffff7a;
   border: 1px solid #c4c4c41c;
   border-radius: 8px;
@@ -1676,27 +1676,28 @@ body{
   .fixed-advert {
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: 50px;
   width: 50%;
   background: rgba(248, 248, 248, 0.9);
-  padding: 10px;
+  padding: 6px 8px;
   text-align: center;
   z-index: 9999;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  font-family: sans-serif;
+  font-size: 12px;
+  font-family: 'Lato';
+  border-radius: 8px 8px 0 0;
 }
 
 /* iframe fits container width automatically */
 .fixed-advert iframe {
-  width: 100%;
-  max-width: 1080px;  /* keeps it from overflowing on large screens */
-  height: 50px;      /* fixed banner height */
-  border: 0;
-  border-radius: 6px;
+   width: 100%;
+   height: 90px;                    /* standard banner height */
+   max-height: 120px;
+   border: 0;
+   border-radius: 6px;
 }
 
 

@@ -694,7 +694,11 @@ body{
 
 }
 
-
+.news-update:hover {
+  background: #1A2F4B;    /* keep same as default */
+  transform: none;        /* no scale/zoom */
+  box-shadow: none;       /* no shadow change */
+}
 /* News Container */
 .news-container {
   display: flex;

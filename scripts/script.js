@@ -1996,6 +1996,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           
           const headerSlider = document.querySelector(".header-slider");
+          const textCont1 = document.querySelector(".text-cont1");
           const newsUpdate = document.querySelector(".news-update");
           const textCont = document.querySelector(".text-cont");
           const liveMatchDemo = document.querySelector(".live-match-demo");
@@ -2012,6 +2013,7 @@ document.addEventListener("DOMContentLoaded", () => {
  
           // Append in the correct order
           if (headerSlider) parent.appendChild(headerSlider);
+          if (textCont1) parent.appendChild(textCont1);
           if (newsUpdate) parent.appendChild(newsUpdate);
           if (textCont) parent.appendChild(textCont);
           if (liveMatchDemo) parent.appendChild(liveMatchDemo);

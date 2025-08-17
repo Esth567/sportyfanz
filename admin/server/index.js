@@ -35,7 +35,7 @@ app.use(cors({
     const allowedOrigins = [
       'https://sportyfanz.com',
       'https://www.sportyfanz.com',
-      'http://localhost:3000',
+      //'http://localhost:3000',
       //'http://localhost:5500',
     ];
 

@@ -4362,6 +4362,10 @@ body{
     font-weight: bold;
 }
 
+.text-cont2 {
+  margin-bottom: 10px;
+}
+
 .leagueTable-text-cont h4 {
     font-size: 0.80rem;
     font-family: 'Lato';
@@ -4376,12 +4380,13 @@ body{
 
      
     .header-slider { order: 0; }
-    .news-update { order: 1; }
-    .text-cont { order: 2; } 
-    .live-match-demo { order: 3; } 
-    .text-cont3 { order: 4; }
-    .slider { order: 5; }
-    .advert { order: 6; }
+    .text-cont1 { order: 1; }
+    .news-update { order: 2; }
+    .text-cont { order: 3; } 
+    .live-match-demo { order: 4; } 
+    .text-cont3 { order: 5; }
+    .slider { order: 6; }
+    .advert { order: 7; }
     .text-cont4 { order: 8; } 
     .prediction-container { order: 9; } 
     .leagueTable-text-cont { order: 10; }

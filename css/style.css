@@ -1497,7 +1497,6 @@ body{
    
 
 /* Advert  */
-.advert1,
 .advert1 {
     width: 100%;
     height: 200px;
@@ -1513,17 +1512,25 @@ body{
 }
 
 .advert {
+  width: 100%;
+  max-width: 300px;   /* prevent it from stretching too much */
+  margin: 0 auto 20px;
   text-align: center;
-  margin: 20px auto;
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 0.7rem;
+  color: #ffffff7a;
+  border: 1px solid #c4c4c41c;
+  border-radius: 8px;
+  padding: 5px;
+  background: #000;   /* optional background to make text visible */
 }
 
-.advert-label {
-  font-size: 14px;
-  color: #666;
-  margin-top: 5px;
-  font-family: sans-serif;
+.advert iframe {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
 }
-
 
 .about-details{
     color: #fff;

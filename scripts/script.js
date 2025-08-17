@@ -576,97 +576,102 @@ async function init() {
   }
 }
 
-init();
+init(); 
 
 
 async function fetchTopScorers() {
-    try {
-        const res = await fetch(`${API_BASE}/api/topscorers`);
-        const topScorers = await res.json();
-        
+  try {
+    const res = await fetch(`${API_BASE}/api/topscorers`);
+    const topScorers = await res.json();
 
-        const playersContainer = document.querySelector(".players-container");
-        const dotsContainer = document.querySelector(".slider-dots");
+    const playersContainer = document.querySelector(".players-container");
+    const dotsContainer = document.querySelector(".slider-dots");
 
-        if (!playersContainer || !dotsContainer) {
-            console.error("Slider container elements not found.");
-            return;
-        }
-
-        playersContainer.innerHTML = "";
-        dotsContainer.innerHTML = "";
-
-        let playerElements = [];
-        let playerIndex = 0;
-
-        for (const topScorer of topScorers) {
-            const goals = topScorer.goals || 0;
-            const playerName = topScorer.player_name || "Unknown Player";
-            const teamName = topScorer.team_name || "Unknown Team";
-            const leagueName = topScorer.league_name || "Unknown League";
-
-            let playerImage = topScorer.player_image;
-
-               if (!playerImage || playerImage.trim() === '') {
-                 const localImage = playerImageMap[playerName];
-               if (localImage) {
-                playerImage = `/assets/players/${localImage}`;
-               } else {
-                 playerImage = `/assets/images/default-player.png`;
-               }
-              }
-
-              console.log({
-                playerName,
-                playerImageFromAPI: topScorer.player_image,
-                localMappedImage: playerImageMap[playerName],
-                finalImage: playerImage
-               });
-
-            const playerItem = document.createElement("div");
-            playerItem.classList.add("player-item");
-            if (playerIndex === 0) playerItem.classList.add("active");
-
-            playerItem.innerHTML = `
-                <div class="player-image">
-                    <img src="${playerImage}" alt="${playerName}">
-                </div>
-                <div class="players-data">
-                    <div class="player-name">${playerName}</div>
-                    <div class="goals">${goals} Goals</div>
-                    <div class="team-name">${teamName}</div>
-                    <div class="leagues">${leagueName}</div>
-                </div>
-            `;
-
-            playersContainer.appendChild(playerItem);
-            playerElements.push(playerItem);
-
-            const dot = document.createElement("span");
-            dot.classList.add("dot");
-            if (playerIndex === 0) dot.classList.add("active-dot");
-
-            dot.addEventListener("click", () => setActiveSlide(playerIndex));
-            dotsContainer.appendChild(dot);
-
-            playerIndex++;
-        }
-
-        if (playerElements.length > 10) {
-            dotsContainer.style.display = "none";
-        }
-
-        if (playerElements.length > 0) {
-            startSlider(playerElements);
-        } else {
-            console.warn("No players were added to the UI.");
-        }
-
-    } catch (error) {
-        console.error("Error fetching top scorers:", error);
+    if (!playersContainer || !dotsContainer) {
+      console.error("Slider container elements not found.");
+      return;
     }
-}
 
+    playersContainer.innerHTML = "";
+    dotsContainer.innerHTML = "";
+
+    let playerElements = [];
+    let playerIndex = 0;
+
+    for (const topScorer of topScorers) {
+      const goals = topScorer.goals || 0;
+      const playerName = topScorer.player_name || "Unknown Player";
+      const teamName = topScorer.team_name || "Unknown Team";
+      const leagueName = topScorer.league_name || "Unknown League";
+
+      let playerImage = "";
+
+      // ✅ Prefer API-provided image
+      if (topScorer.player_image && topScorer.player_image.trim() !== "") {
+        playerImage = topScorer.player_image;
+      } else {
+        // ✅ Try local asset (PNG first, JPG fallback via onerror)
+        const safeName = normalizePlayerName(playerName);
+        playerImage = `/assets/players/${safeName}.png`;
+      }
+
+      console.log({
+        playerName,
+        apiImage: topScorer.player_image,
+        resolvedImage: playerImage,
+      });
+
+      const playerItem = document.createElement("div");
+      playerItem.classList.add("player-item");
+      if (playerIndex === 0) playerItem.classList.add("active");
+
+      playerItem.innerHTML = `
+        <div class="player-image">
+          <img 
+            src="${playerImage}" 
+            alt="${playerName}"
+            onerror="this.onerror=null;
+                     if(this.src.includes('.png')){
+                       this.src=this.src.replace('.png','.jpg');
+                     } else {
+                       this.src='/assets/images/default-player.png';
+                     }">
+        </div>
+        <div class="players-data">
+          <div class="player-name">${playerName}</div>
+          <div class="goals">${goals} Goals</div>
+          <div class="team-name">${teamName}</div>
+          <div class="leagues">${leagueName}</div>
+        </div>
+      `;
+
+      playersContainer.appendChild(playerItem);
+      playerElements.push(playerItem);
+
+      const dot = document.createElement("span");
+      dot.classList.add("dot");
+      if (playerIndex === 0) dot.classList.add("active-dot");
+
+      dot.addEventListener("click", () => setActiveSlide(playerIndex));
+      dotsContainer.appendChild(dot);
+
+      playerIndex++;
+    }
+
+    if (playerElements.length > 10) {
+      dotsContainer.style.display = "none";
+    }
+
+    if (playerElements.length > 0) {
+      startSlider(playerElements);
+    } else {
+      console.warn("No players were added to the UI.");
+    }
+
+  } catch (error) {
+    console.error("Error fetching top scorers:", error);
+  }
+}
 
 // Slider functionality
 let currentPlayer = 0;

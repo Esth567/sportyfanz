@@ -61,13 +61,17 @@ function isFootballArticle(item) {
 
 
 function cleanArticleText(text) {
-  return text
-    .replace(/\s{2,}/g, ' ')                       // collapse extra spaces
-    .replace(/document\.currentScript[\s\S]*?};/g, '') // strip inline JS blobs
-    .replace(/window\.sdc[\s\S]*?};/g, '')         // strip window config objects
-    .replace(/©\s*\d{4}\s*Sky UK.*/g, '')          // strip Sky UK footer notices
+  if (!text) return '';
+  const stripped = text
+    .replace(/\s{2,}/g, ' ')
+    .replace(/document\.currentScript[\s\S]*?};/g, '')
+    .replace(/window\.sdc[\s\S]*?};/g, '')
+    .replace(/©\s*\d{4}\s*Sky UK.*/g, '')
     .trim();
+
+  return cleanUnicode(stripped);
 }
+
 
 const fetchArticleHtmlWithAxios = async (url) => {
   try {
@@ -101,19 +105,19 @@ const fetchArticleHtmlWithAxios = async (url) => {
 
       const content = paragraphs.join('\n\n');
       if (content.length > 300) {
-        return cleanUnicode(content);
+        return cleanArticleText(content);
       }
     }
 
     // fallback: take whole body text (but still clean it)
     const fallback = $('body').text().trim();
-    return fallback.length > 300 ? cleanUnicode(fallback) : null;
+    return fallback.length > 300 ? cleanArticleText(fallback) : null;
 
   } catch (err) {
     console.warn(`❌ Axios fetch failed for ${url}: ${err.message}`);
     try {
       const fallbackRes = await axios.get(url);
-      return cleanUnicode(fallbackRes.data);
+      return cleanArticleText(fallbackRes.data);
     } catch (fallbackErr) {
       console.warn(`⚠️ Fallback fetch also failed for ${url}`);
       return null;

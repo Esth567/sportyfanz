@@ -1644,7 +1644,7 @@ body{
     left: 0;
     width: 100%;
     background: rgba(248, 248, 248, 0.8); /* Light grey with 80% opacity */
-    padding: 10px 20px;
+    padding: 15px 20px;
     text-align: center;
     z-index: 9999;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
@@ -1664,7 +1664,7 @@ body{
   .fixed-advert .close-ad {
     background: transparent;
     border: none;
-    font-size: 1.2rem;
+    font-size: 0.80rem;
     cursor: pointer;
     color: #444;
   }
@@ -4360,14 +4360,13 @@ body{
     }
 
      
-    .text-cont1 { order: 0; }
+    .header-slider { order: 0; }
     .news-update { order: 1; }
     .text-cont { order: 2; } 
     .live-match-demo { order: 3; } 
     .text-cont3 { order: 4; }
     .slider { order: 5; }
     .advert { order: 6; }
-    .header-slider { order: 7; }
     .text-cont4 { order: 8; } 
     .prediction-container { order: 9; } 
     .leagueTable-text-cont { order: 10; }

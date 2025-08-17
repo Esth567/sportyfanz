@@ -259,10 +259,31 @@ function showFullNews(clickedItem) {
     }
 
     <div class="social-icons">
-          <a href="#" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
-        </div>
+         <!-- X (Twitter rebranded) -->
+         <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+         <i class="fab fa-x-twitter"></i> <!-- Font Awesome 6 has this -->
+        </a>
+
+        <!-- Facebook -->
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+         <i class="fab fa-facebook-f"></i>
+        </a>
+
+       <!-- WhatsApp -->
+       <a href="https://wa.me/?text=${encodeURIComponent(newsItem.title + ' ' + articleUrl)}" target="_blank" rel="noopener noreferrer">
+         <i class="fab fa-whatsapp"></i>
+       </a>
+
+      <!-- TikTok (links to your TikTok profile or a video) -->
+     <a href="https://www.tiktok.com/@yourusername" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-tiktok"></i>
+     </a>
+
+     <!-- Instagram (links to your IG profile or post) -->
+     <a href="https://www.instagram.com/yourusername/" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-instagram"></i>
+      </a>
+    </div>
         
     <div class="blog-content">
       ${formattedDesc}

@@ -17,6 +17,7 @@ const feedUrls = require('../utils/rssFeeds');
 const { extractImageFromURL } = require('../utils/extractImageFromURL');
 const getRedisClient = require('../utils/redisClient');
 const { detectEntityFromText } = require('../utils/entityDetect');
+const keywords = require('../config/footballKeywords.json');
 
 const parser = new RSSParser();
 const CACHE_KEY = 'news:sports-summaries';
@@ -44,18 +45,20 @@ function isTopNewsArticle(article) {
   return topNewsKeywords.some(keyword => content.includes(keyword));
 }
 
-function isFootballArticle(item) {
-  const title = item.title?.toLowerCase() || '';
-  const categories = item.categories?.join(' ').toLowerCase() || '';
-  const link = item.link?.toLowerCase() || '';
-  return (
-    title.includes('football') ||
-    title.includes('soccer') ||
-    categories.includes('football') ||
-    link.includes('/football') ||
-    link.includes('/soccer')
+function isFootballArticle(item) { 
+  const title = item.title?.toString().toLowerCase() || '';
+  const categories = Array.isArray(item.categories)
+    ? item.categories.map(c => c?.toString().toLowerCase()).join(' ')
+    : '';
+  const link = item.link?.toString().toLowerCase() || '';
+
+  return keywords.some(keyword =>
+    title.includes(keyword) ||
+    categories.includes(keyword) ||
+    link.includes(keyword.replace(/\s+/g, '-')) // e.g. champions-league
   );
 }
+
 
 const fetchArticleHtmlWithAxios = async (url) => {
   try {

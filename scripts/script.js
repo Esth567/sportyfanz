@@ -395,7 +395,7 @@ function populateNewsSection(sectionId, newsList) {
 
 
 // ========== SHOW FULL NEWS ========== //
-function showFullNews(input) {
+function showFullNews(clickedItem) {
   try {
     const middleLayer = document.querySelector('.middle-layer');
 

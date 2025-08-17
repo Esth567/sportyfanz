@@ -1911,7 +1911,7 @@ body{
 
 .blog-image {
   width: 100%;
-  max-height: 400px;
+  max-height: 350px;
   object-fit: cover;
   border-radius: 10px;
 }
@@ -1980,21 +1980,34 @@ body{
   transition: transform 0.2s ease;
 }
 
-.social-icons a .fa-twitter {
-  color: #1DA1F2;
-}
-
-.social-icons a .fa-facebook-f {
-  color: #1877F2;
-}
-
-.social-icons a .fa-whatsapp {
-  color: #25D366;
-}
-
 .social-icons a:hover {
   transform: scale(1.1);
 }
+
+* Brand colors */
+.x-icon i {
+  color: #000000; /* X is just black */
+}
+
+.facebook-icon i {
+  color: #1877F2; /* Facebook blue */
+}
+
+.whatsapp-icon i {
+  color: #25D366; /* WhatsApp green */
+}
+
+ .tiktok-icon i {
+  color: #000000; /* TikTok base */
+  text-shadow: 
+    1px 1px 0 #25F4EE,  /* TikTok cyan accent */
+    -1px -1px 0 #FE2C55; /* TikTok pink accent */
+ }
+
+.instagram-icon i {
+  color: #E1306C; /* Instagram pinkish red */
+}
+
 
 .news-image {
   margin: 10px 0;

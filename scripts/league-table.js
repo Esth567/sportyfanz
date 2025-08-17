@@ -502,9 +502,6 @@ function toggleFormColumn() {
 }
  
 
-// layout-fix
-let resizeTimer;
-
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
 

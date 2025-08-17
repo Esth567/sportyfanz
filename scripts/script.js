@@ -1844,8 +1844,6 @@ function createPlayerDiv(player, xPercent, yPercent) {
 
 //function for predition-container in middly layer
 
-c// FRONTEND: predictions.js
-
 const bigLeagues = [
   "Premier League", "LaLiga", "Serie A", "Bundesliga", 
   "UEFA Champions League", "Ligue 1", "Ligue 2", "Eredivisie",

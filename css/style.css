@@ -1697,7 +1697,13 @@ body{
 }
 
 /* iframe fits container width automatically */
-
+.fixed-advert iframe {
+   width: 70%;
+   height: 20px;                    /* standard banner height */
+   max-height: 120px;
+   border: 0;
+   border-radius: 6px;
+}
 
 
   .fixed-advert h5 {

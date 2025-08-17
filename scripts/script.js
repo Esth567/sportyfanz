@@ -297,7 +297,6 @@ function populateNewsSection(sectionId, newsList) {
             </div>
             <div class="news-info">
               <p class="news-headline">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
-              <span class="news-time" data-posted="${item.date}"></span>
             </div>
           </div>
         </div>

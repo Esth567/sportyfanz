@@ -1512,7 +1512,7 @@ body{
 }
 
 .advert {
-  width: 100%;
+  width: 270px;
   max-width: 300px;   /* container width */
   margin: 0 auto 20px;
   text-align: center;
@@ -1677,7 +1677,7 @@ body{
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%;
+  width: 50%;
   background: rgba(248, 248, 248, 0.9);
   padding: 10px;
   text-align: center;
@@ -1694,7 +1694,7 @@ body{
 .fixed-advert iframe {
   width: 100%;
   max-width: 1080px;  /* keeps it from overflowing on large screens */
-  height: 100px;      /* fixed banner height */
+  height: 50px;      /* fixed banner height */
   border: 0;
   border-radius: 6px;
 }

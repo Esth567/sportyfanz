@@ -1497,8 +1497,7 @@ body{
    
 
 /* Advert  */
-.advert1,
-.advert {
+.advert1 {
     width: 100%;
     height: 200px;
     text-align: center;
@@ -1510,6 +1509,28 @@ body{
     border-radius: 8px;
     margin-bottom: 20px;
     border: 1px solid #c4c4c41c;
+}
+
+.advert {
+  width: 100%;
+  max-width: 300px;   /* container width */
+  margin: 0 auto 20px;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  font-size: 0.7rem;
+  color: #ffffff7a;
+  border: 1px solid #c4c4c41c;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+/* iframe fills the advert container */
+.advert iframe {
+  width: 100%;
+  height: 270px;  /* fixed height */
+  border-radius: 8px;
+  border: 0;
 }
 
 
@@ -1654,20 +1675,31 @@ body{
 
  
   .fixed-advert {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(248, 248, 248, 0.8); /* Light grey with 80% opacity */
-    padding: 15px 20px;
-    text-align: center;
-    z-index: 9999;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: sans-serif;
-  }
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(248, 248, 248, 0.9);
+  padding: 10px;
+  text-align: center;
+  z-index: 9999;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-family: sans-serif;
+}
+
+/* iframe fits container width automatically */
+.fixed-advert iframe {
+  width: 100%;
+  max-width: 1080px;  /* keeps it from overflowing on large screens */
+  height: 100px;      /* fixed banner height */
+  border: 0;
+  border-radius: 6px;
+}
+
 
   .fixed-advert h5 {
     margin: 0;

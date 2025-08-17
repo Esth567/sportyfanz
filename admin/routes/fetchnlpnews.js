@@ -6,7 +6,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry').default || require('axios-retry');
 const cheerio = require('cheerio');
 const pLimit = require('p-limit').default;
-const { cleanText } = require('../utils/cleanText');
+const { cleanUnicode } = require('../utils/cleanText');
 const {
   extractTextFromHtml,
   extractEntities,
@@ -91,18 +91,18 @@ const fetchArticleHtmlWithAxios = async (url) => {
 
       const content = paragraphs.join('\n\n');
       if (content.length > 300) {
-        return cleanText(content);
+        return cleanUnicode(content);
       }
     }
 
     const fallback = $('body').text().trim();
-    return fallback.length > 300 ? cleanText(fallback) : null;
+    return fallback.length > 300 ? cleanUnicode(fallback) : null;
 
   } catch (err) {
     console.warn(`❌ Axios fetch failed for ${url}: ${err.message}`);
     try {
       const fallbackRes = await axios.get(url);
-      return cleanText(fallbackRes.data);
+      return cleanUnicode(fallbackRes.data);
     } catch (fallbackErr) {
       console.warn(`⚠️ Fallback fetch also failed for ${url}`);
       return null;

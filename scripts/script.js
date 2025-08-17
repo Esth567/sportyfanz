@@ -362,13 +362,13 @@ function populateNewsSection(sectionId, newsList) {
   combinedNews.forEach((item, index) => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     const imageHtml = isValidImage
-      ? `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
-            alt="Image for ${item.title}" 
-            loading="lazy" 
-            onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
-      : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
-            alt="Image not available for ${item.title}" 
-            loading="lazy" />`;
+     ? `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+        alt="Image for ${item.title}" 
+        loading="lazy" 
+        onerror="this.onerror=null; this.src='https://sportyfanz.com/assets/images/default-player.png';" />`
+    : `<img src="https://sportyfanz.com/assets/images/default-player.png" 
+        alt="Image not available for ${item.title}" 
+        loading="lazy" />`;
 
     const slide = document.createElement('div');
     slide.className = 'slider-content sliderNews-dynamic'; // Add class for cleanup

@@ -579,6 +579,18 @@ async function init() {
 init(); 
 
 
+// ✅ Utility: Normalize player names into safe filenames
+function normalizePlayerName(playerName) {
+  if (!playerName) return "default-player";
+
+  return playerName
+    .normalize("NFD")                     // split accents
+    .replace(/[\u0300-\u036f]/g, "")      // remove accents
+    .replace(/[^a-zA-Z0-9]/g, "")         // remove non-letters/digits
+    .trim();
+}
+
+// ✅ Main function
 async function fetchTopScorers() {
   try {
     const res = await fetch(`${API_BASE}/api/topscorers`);
@@ -606,20 +618,14 @@ async function fetchTopScorers() {
 
       let playerImage = "";
 
-      // ✅ Prefer API-provided image
       if (topScorer.player_image && topScorer.player_image.trim() !== "") {
         playerImage = topScorer.player_image;
+      } else if (playerImageMap[playerName]) {
+        playerImage = playerImageMap[playerName];
       } else {
-        // ✅ Try local asset (PNG first, JPG fallback via onerror)
         const safeName = normalizePlayerName(playerName);
         playerImage = `/assets/players/${safeName}.png`;
       }
-
-      console.log({
-        playerName,
-        apiImage: topScorer.player_image,
-        resolvedImage: playerImage,
-      });
 
       const playerItem = document.createElement("div");
       playerItem.classList.add("player-item");
@@ -672,6 +678,8 @@ async function fetchTopScorers() {
     console.error("Error fetching top scorers:", error);
   }
 }
+
+
 
 // Slider functionality
 let currentPlayer = 0;
@@ -1137,7 +1145,6 @@ document.querySelectorAll(".match-category-btn").forEach(button => {
 
 
 // Function to filter matches by the selected date
-function filterByDate(category = currentCategory) {
   function filterByDate(category = currentCategory) {
   const dateInput = document.getElementById("match-date");
   if (!dateInput) return;
@@ -1147,7 +1154,7 @@ function filterByDate(category = currentCategory) {
 
   const filteredMatches = (matchesData[category] || []).filter(match => match.match_date === selectedDate);
   showMatches({ ...matchesData, [category]: filteredMatches }, category);
-}
+ }
 
 
 // Function to toggle calendar visibility
@@ -1988,14 +1995,13 @@ document.addEventListener("DOMContentLoaded", () => {
           const parent = document.querySelector(".content");
 
           
-          const textCont1 = document.querySelector(".text-cont1");
+          const headerSlider = document.querySelector(".header-slider");
           const newsUpdate = document.querySelector(".news-update");
           const textCont = document.querySelector(".text-cont");
           const liveMatchDemo = document.querySelector(".live-match-demo");
           const textCont3 = document.querySelector(".text-cont3");
           const slider = document.querySelector(".slider");
           const advertPodcast = document.querySelector(".advert");
-          const headerSlider = document.querySelector(".header-slider");
           const textCont4 = document.querySelector(".text-cont4");
           const prediction = document.querySelector(".prediction-container");
           const leagueTabletextCont = document.querySelector(".leagueTable-text-cont");
@@ -2005,14 +2011,13 @@ document.addEventListener("DOMContentLoaded", () => {
            
  
           // Append in the correct order
-           if (textCont1) parent.appendChild(textCont1);
+          if (headerSlider) parent.appendChild(headerSlider);
           if (newsUpdate) parent.appendChild(newsUpdate);
           if (textCont) parent.appendChild(textCont);
           if (liveMatchDemo) parent.appendChild(liveMatchDemo);
           if (textCont3) parent.appendChild(textCont3);
           if (slider) parent.appendChild(slider);
           if (advertPodcast) parent.appendChild(advertPodcast);
-          if (headerSlider) parent.appendChild(headerSlider);
           if (textCont4) parent.appendChild(textCont4);
           if (prediction) parent.appendChild(prediction);
           if (leagueTabletextCont) parent.appendChild(leagueTabletextCont);

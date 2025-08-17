@@ -89,20 +89,14 @@ exports.getTopScorers = async (req, res) => {
   // ✅ Generate a specific cache key
   const cacheKey = `topScorers_${limitPerLeague}_${globalLimit}`;
   const cached = topScorersCache.get(cacheKey);
-  if (cached) {
-    return res.json(cached);
-  }
+ if (cached) return res.json(cached);
 
-  try {
+ try {
     const leaguesRes = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
-    if (!leaguesRes.ok) {
-      return res.status(502).json({ error: "Failed to fetch leagues" });
-    }
+    if (!leaguesRes.ok) return res.status(502).json({ error: "Failed to fetch leagues" });
 
     const leaguesData = await leaguesRes.json();
-    if (!Array.isArray(leaguesData)) {
-      return res.status(500).json({ error: "Invalid leagues structure" });
-    }
+    if (!Array.isArray(leaguesData)) return res.status(500).json({ error: "Invalid leagues structure" });
 
     let allScorers = [];
 
@@ -124,6 +118,7 @@ exports.getTopScorers = async (req, res) => {
           .filter(p => parseInt(p.goals) >= 10)
           .slice(0, limitPerLeague)
           .map(p => ({
+            player_name: p.player_name,
             player_image: p.player_image || "",
             team_name: p.team_name,
             league_name: leagueName,
@@ -131,17 +126,15 @@ exports.getTopScorers = async (req, res) => {
           }));
 
         allScorers.push(...filteredScorers);
-      } catch (innerErr) {
-        console.warn(`Error processing league ${leagueName}:`, innerErr.message);
+      } catch (err) {
+        console.warn(`Error processing league ${leagueName}:`, err.message);
       }
     }
 
     allScorers.sort((a, b) => b.goals - a.goals);
     const finalList = allScorers.slice(0, globalLimit);
 
-    // ✅ Store in cache
     topScorersCache.set(cacheKey, finalList);
-
     res.json(finalList);
 
   } catch (err) {

@@ -1497,8 +1497,7 @@ body{
    
 
 /* Advert  */
-.advert1,
-.advert {
+.advert1 {
     width: 100%;
     height: 200px;
     text-align: center;
@@ -1510,6 +1509,18 @@ body{
     border-radius: 8px;
     margin-bottom: 20px;
     border: 1px solid #c4c4c41c;
+}
+
+.advert {
+  text-align: center;
+  margin: 20px auto;
+}
+
+.advert-label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+  font-family: sans-serif;
 }
 
 
@@ -1664,16 +1675,15 @@ body{
     z-index: 9999;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    font-family: sans-serif;
   }
 
-  .fixed-advert h5 {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 500;
-    align-items: center;
+  .advert-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-family: Lato;
   }
 
   .fixed-advert .close-ad {
@@ -4378,21 +4388,27 @@ body{
         height: 220px;
     }
 
+
+    .sliderNews-image img {
+      object-fit: contain;   
+      object-position: top;  
+      background-color: #000; 
+     }
      
-    .header-slider { order: 0; }
-    .text-cont1 { order: 1; }
-    .news-update { order: 2; }
-    .text-cont { order: 3; } 
-    .live-match-demo { order: 4; } 
-    .text-cont3 { order: 5; }
-    .slider { order: 6; }
-    .advert { order: 7; }
-    .text-cont4 { order: 8; } 
-    .prediction-container { order: 9; } 
-    .leagueTable-text-cont { order: 10; }
-    .league-table-demo { order: 11; } 
-    .advert1 { order: 12; }
-    .news-podcast { order: 13; } 
+    .header-slider { order: 1; }
+    .text-cont1 { order: 2; }
+    .news-update { order: 3; }
+    .text-cont { order: 4; } 
+    .live-match-demo { order: 5; } 
+    .text-cont3 { order: 6; }
+    .slider { order: 7; }
+    .advert { order: 8; }
+    .text-cont4 { order: 9; } 
+    .prediction-container { order: 10; } 
+    .leagueTable-text-cont { order: 11; }
+    .league-table-demo { order: 12; } 
+    .advert1 { order: 13; }
+    .news-podcast { order: 14; } 
     
 
 

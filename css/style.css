@@ -1811,7 +1811,7 @@ body{
 
 .news-infomat {
     display: flex;
-    flex-direction: column; /* Keep the direction row-based */
+    flex-direction: row; /* Keep the direction row-based */
     justify-content: flex-start; /* Aligns items to the start of the container */
     align-items: flex-start; /* Ensures top alignment of wrapped rows */
     gap: 10px; /* Space between items */
@@ -1821,6 +1821,10 @@ body{
     font-weight: 'Lato';
 }
 
+.title-desc {
+  display: flex;
+  flex-direction: column;
+}
 .news-title {
     font-size: 1.5rem;
 }

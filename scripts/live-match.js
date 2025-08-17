@@ -1176,6 +1176,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+// layout-fix
+let resizeTimer;
+
 window.addEventListener('resize', () => {
     // Optionally clear and re-render field
     const container = document.getElementById("football-field");

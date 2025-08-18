@@ -275,4 +275,23 @@ router.get('/sports-summaries', async (req, res) => {
   }
 });
 
+// SSR HTML page route
+router.get('/', async (req, res) => {
+  try {
+    const redisClient = await getRedisClient();
+    const cached = await redisClient.get(CACHE_KEY);
+    const data = cached ? JSON.parse(cached) : { trending: [], updates: [] };
+
+    res.render('index', {
+      trending: data.trending || [],
+      updates: data.updates || [],
+      sliderNews: data.updates.slice(0, 5), // e.g. first 5 for slider
+    });
+  } catch (err) {
+    console.error('SSR render failed:', err);
+    res.render('index', { trending: [], updates: [], sliderNews: [] });
+  }
+});
+
+
 module.exports = router;

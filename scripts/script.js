@@ -15,7 +15,6 @@ document.querySelector('.icon img').addEventListener('click', toggleSidebar);
 
 
 
-
 // Display matches for live-match-demo
 document.addEventListener("DOMContentLoaded", function () {
     const liveMatchContainer = document.querySelector(".live-match-demo");
@@ -1990,12 +1989,19 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+/* Init bottom banner Swiper */
+new Swiper('.footer-banner', {
+  loop: true,
+  autoplay: {
+    delay: 4000,
+    disableOnInteraction: false,
+  },
+});
 
-//function for fixed advert
- function closeFixedAd() {
-    const ad = document.getElementById("fixedAd");
-    if (ad) ad.style.display = "none";
-  }
+/* Close footer Button banner*/
+function closeFixedAd() {
+  document.getElementById("fixedAd").style.display = "none";
+}
 
 
 // css code to restructure page layout for mobile and tablet view

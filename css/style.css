@@ -1516,28 +1516,20 @@ body{
 }
 
 .advert {
-  width: 250px;
-  max-width: 300px;   /* container width */
-  margin: 0 auto 20px;
-  text-align: center;
-  font-family: 'Lato', sans-serif;
-  font-weight: 400;
-  font-size: 12px;
-  color: #ffffff7a;
-  border: 1px solid #c4c4c41c;
-  border-radius: 8px;
-  padding: 5px;
-}
-
-/* iframe fills the advert container */
-.advert iframe {
   width: 100%;
-  height: 270px;  /* fixed height */
-  border-radius: 8px;
-  font-size: 12px;
-  border: 0;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
+.advert-img {
+  width: 100%;         /* responsive */
+  max-width: 300px;    /* keeps sidebar format */
+  height: auto;        /* preserves aspect ratio */
+  border: 2px solid #000; 
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;      /* center inside sidebar */
+}
 
 .about-details{
     color: #fff;
@@ -1678,42 +1670,32 @@ body{
   }
   
 
-  .fixed-advert {
+/* Footer Banner Container */
+.footer-banner {
   position: fixed;
   bottom: 0;
-  left: 100px;
-  width: 70%;
-  background: rgba(248, 248, 248, 0.9);
-  padding: 15px 20px;
-  text-align: center;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-height: 220px;
+  background: #0b1d39;
   z-index: 9999;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  font-family: 'Lato';
-
+  border-top: 3px solid #1a73e8;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
 }
 
-/* iframe fits container width automatically */
-.fixed-advert iframe {
-   width: 70%;
-   height: 20px;                    /* standard banner height */
-   max-height: 120px;
-   border: 0;
-   border-radius: 6px;
+.footer-banner .swiper-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  cursor: pointer;
 }
 
-
-  .fixed-advert h5 {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 500;
-    align-items: center;
-  }
-
-  .fixed-advert .close-ad {
+ 
+  .close-ad {
     background: transparent;
     border: none;
     font-size: 0.80rem;
@@ -1732,11 +1714,12 @@ body{
   cursor: pointer;
 }
 
-  .fixed-advert .close-ad:hover {
+  .close-ad:hover {
     color: #000;
   }
 
-  /* Prevent overlap with footer */
+
+  /*footer */
   .main-footer {
     padding-bottom: 60px;
     background-color: #111B2A;

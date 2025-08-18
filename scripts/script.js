@@ -399,35 +399,25 @@ function showFullNews(clickedItem) {
   try {
     const middleLayer = document.querySelector('.middle-layer');
 
-    // Hide all children inside middle-layer
+     // hide existing list
     const children = Array.from(middleLayer.children);
-    children.forEach(child => {
-      child.style.display = 'none';
-    });
+    children.forEach(child => child.style.display = 'none');
 
-    // Get data from clicked item
+    // get news list
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
     let newsList = [];
 
     if (section === 'trending-stories') {
-        newsList = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-     } else if (section === 'newsUpdate-stories') {
-        newsList = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-     } else if (section === 'sliderNews-stories') {
-       const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-       const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-       newsList = [...trending, ...updates];
-     }
+      newsList = window.trendingNews || [];
+    } else if (section === 'newsUpdate-stories') {
+      newsList = window.updatesNews || [];
+    } else if (section === 'sliderNews-stories') {
+      newsList = [...(window.trendingNews || []), ...(window.updatesNews || [])];
+    }
 
-
-      const newsItem = newsList[parseInt(index)];
-
-      if (!newsItem) {
-        alert("News item not found.");
-        return;
-      }
-
+    const newsItem = newsList[parseInt(index)];
+    if (!newsItem) return alert("News item not found.");
 
     // Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
@@ -461,12 +451,15 @@ function showFullNews(clickedItem) {
       ? injectAdParagraphs(newsItem.paragraphs, 2)
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
+    // ✅ pushState so browser back/forward works
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
+    history.pushState({ index, section }, '', articleUrl);
 
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
       <article class="blog-post">
+        <!-- ✅ keep only this back button -->
         <button class="back-button">← Back to news</button>
         <h1 class="blog-title">${newsItem.title}</h1>
 
@@ -490,60 +483,39 @@ function showFullNews(clickedItem) {
           </div>` : ''}
 
         <div class="social-icons">
-         <!-- X (Twitter rebranded) -->
-         <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
-         <i class="fab fa-x-twitter"></i> <!-- Font Awesome 6 has this -->
-        </a>
-
-        <!-- Facebook -->
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
-         <i class="fab fa-facebook-f"></i>
-        </a>
-
-       <!-- WhatsApp -->
-       <a href="https://wa.me/?text=${encodeURIComponent(newsItem.title + ' ' + articleUrl)}" target="_blank" rel="noopener noreferrer">
-         <i class="fab fa-whatsapp"></i>
-       </a>
-
-      <!-- TikTok (links to your TikTok profile or a video) -->
-     <a href="https://www.tiktok.com/@yourusername" target="_blank" rel="noopener noreferrer">
-      <i class="fab fa-tiktok"></i>
-     </a>
-
-     <!-- Instagram (links to your IG profile or post) -->
-     <a href="https://www.instagram.com/yourusername/" target="_blank" rel="noopener noreferrer">
-      <i class="fab fa-instagram"></i>
-      </a>
-    </div>
-
+          <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-x-twitter"></i>
+          </a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://wa.me/?text=${encodeURIComponent(newsItem.title + ' ' + articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="https://www.tiktok.com/@yourusername" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-tiktok"></i>
+          </a>
+          <a href="https://www.instagram.com/yourusername/" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-instagram"></i>
+          </a>
+        </div>
 
         <div class="blog-content">${formattedDesc}</div>
       </article>
     `;
 
-    // Add back button
-    const backButton = document.createElement('button');
-    backButton.textContent = '← Back to news';
-    backButton.className = 'back-button';
+     // hook up back button
+    const backButton = fullView.querySelector('.back-button');
     backButton.onclick = () => {
-      fullView.remove();
-      // Show previously hidden children again
-     children.forEach(child => {
-      child.style.display = ''; // resets to original display
-     });
-      updateRelativeTime();
+      history.back(); // 👈 let popstate handle cleanup
     };
 
-    fullView.prepend(backButton);
     middleLayer.insertBefore(fullView, middleLayer.firstChild);
 
   } catch (err) {
     console.error("Failed to render full news view", err);
-    alert("Something went wrong displaying the full article.");
   }
 }
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   loadNews('trending-stories', `${API_BASE}/api/sports-summaries`); 
@@ -551,14 +523,15 @@ document.addEventListener("DOMContentLoaded", () => {
   loadNews('sliderNews-stories', `${API_BASE}/api/sports-summaries`);
 });                                                                                                                                                                                                                                                                                                                                                                                                  
 
- window.onpopstate = function (event) {
+window.onpopstate = function (event) {
   if (event.state && typeof event.state.index !== 'undefined') {
+    // reopen correct article
     const dummy = document.createElement('div');
     dummy.dataset.index = event.state.index;
     dummy.dataset.section = event.state.section;
     showFullNews(dummy);
   } else {
-    // Return to news list view
+    // return to list
     const middleLayer = document.querySelector('.middle-layer');
     const fullView = document.querySelector('.news-full-view');
     if (fullView) fullView.remove();
@@ -567,7 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 };
-                                                                                                                                                                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                                                                                                                                       
                                                                                                                                                                                                                                                                                                
 // function to fetch top scorer
 

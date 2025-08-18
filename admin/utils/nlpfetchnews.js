@@ -11,11 +11,20 @@ exports.extractTextFromHtml = html => {
   const article = root.querySelector('article') || root;
 
   return article.text
-    .replace(/(\.)([A-Z])/g, '$1 $2') 
+    // 🚫 remove timestamps at the START of a line/paragraph
+    .replace(/^(?:\s*[\(\[]?\d{1,2}:\d{2}[\)\]]?\s*)+/gm, '')
+    // 🚫 remove inline timestamps inside text e.g. "scored (01:32) to make it 2-0"
+    .replace(/[\(\[]\d{1,2}:\d{2}[\)\]]/g, '')
+    // ✅ keep legitimate times like "At 19:45" since they aren't in () or []
+    // add space after periods if missing
+    .replace(/(\.)([A-Z])/g, '$1 $2')
+    // collapse extra whitespace
     .replace(/\s+/g, ' ')
+    // strip Sky Sports footers / boilerplate
     .replace(/(Datawrapper|Sky Sports[^.]*\.)/gi, '') 
     .trim();
 };
+
 
    function cleanEntities(arr) {
       return [...new Set(

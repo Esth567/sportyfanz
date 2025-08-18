@@ -135,6 +135,31 @@ const fetchArticleHtmlWithAxios = async (url) => {
 };
 
 
+// 👇 Add this helper function above generateFreshNews
+function isExcludedArticle(articleUrl, title = '') {
+  const excludedPatterns = [
+    '/watch/',         // Sky Sports shows/videos
+    '/transfer-talk',  // Transfer Talk show
+    '/live-blog',      // Live blogs
+    '/video/',         // Pure video content
+    '/shows/',         // Talk shows
+  ];
+
+  const excludedKeywords = [
+    'transfer talk live',
+    'free stream',
+    'watch live',
+    'live show',
+  ];
+
+  const lowerUrl = articleUrl.toLowerCase();
+  const lowerTitle = title.toLowerCase();
+
+  return excludedPatterns.some(p => lowerUrl.includes(p)) ||
+         excludedKeywords.some(k => lowerTitle.includes(k));
+}
+
+
 async function generateFreshNews() {
   const redisClient = await getRedisClient();
   const rawEntityDB = await redisClient.get('entity:database');
@@ -150,8 +175,15 @@ async function generateFreshNews() {
       try {
         const feed = await parser.parseURL(feedUrl);
         for (const item of feed.items) {
-          const articleUrl = item.link;
-          if (!articleUrl || !/^https?:\/\//.test(articleUrl) || articleUrl.includes('/live/')) return;
+         const articleUrl = item.link;
+         if (
+          !articleUrl || 
+          !/^https?:\/\//.test(articleUrl) || 
+          isExcludedArticle(articleUrl, item.title)
+          ) {
+          return;
+          }
+
 
           const articleHtml = await fetchArticleHtmlWithAxios(articleUrl);
           if (!articleHtml || articleHtml.length < 300) return;

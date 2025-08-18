@@ -216,25 +216,24 @@ function updateRelativeTime() {
 
 
 // ========== LOAD NEWS DETAILS ==========
-async function loadNews(sectionId, endpoint) {
+async function loadNews(sectionId, endpoint, retries = 2) {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch(endpoint);
+    const response = await fetch(endpoint, { cache: "no-cache" });
 
     if (!response.ok) {
-      const text = await response.text(); 
+      const text = await response.text();
       throw new Error(`Failed to fetch news: ${response.status}\n${text}`);
     }
 
-    const text = await response.text();
-    if (!text || text.trim() === '') {
-      throw new Error("Empty response from server");
+    const data = await response.json();
+    if (!data || Object.keys(data).length === 0) {
+    throw new Error("Empty response from server");
     }
 
-     const data = JSON.parse(text);
-    
+
     const newsData = sectionId === 'trending-stories' ? data.trending : data.updates;
     const newsKey = sectionId === 'trending-stories' ? 'trendingNews' : 'updatesNews';
 
@@ -243,13 +242,12 @@ async function loadNews(sectionId, endpoint) {
     populateNewsSection(sectionId, newsData);
     updateRelativeTime();
 
-   } catch (error) {
+  } catch (error) {
     console.error('⚠️ loadNews error:', error);
 
-    // Retry logic
-    if (retry) {
-      console.log('🔁 Retrying in 2 seconds...');
-      setTimeout(() => loadNews(false), 2000); // one retry
+    if (retries > 0) {
+      console.log(`🔁 Retrying ${sectionId} in 2s... (${retries} left)`);
+      setTimeout(() => loadNews(sectionId, endpoint, retries - 1), 2000);
     } else {
       alert("⚠️ Could not load news. Please try again later.");
     }
@@ -257,6 +255,7 @@ async function loadNews(sectionId, endpoint) {
     if (loader) loader.style.display = 'none';
   }
 }
+
 
 
 async function loadEntityDatabase() {
@@ -273,124 +272,96 @@ async function loadEntityDatabase() {
 
 // ========== POPULATE NEWS ==========
 function populateNewsSection(sectionId, newsList) {
-  const container = document.getElementById(sectionId);
+  const container = document.getElementById(sectionId) || 
+   (sectionId === 'sliderNews-stories' ? document.querySelector('.header-slider') : null);
   if (!container || !Array.isArray(newsList)) return;
   console.log("Populating:", sectionId, "with", newsList.length, "items");
 
-  if (sectionId === 'trending-stories') {
-    container.innerHTML = newsList.map((item, index) => {
-      const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
-      const imageHtml = isValidImage
-        ? `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+  // Helper: image block with proxy + fallback
+  const getImageHtml = (item, size = "600x400") => {
+    const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
+    if (isValidImage) {
+      return `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
                   alt="Image for ${item.title}" 
                   loading="lazy" 
-                  onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
-        : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
-                  alt="Image not available for ${item.title}" 
-                  loading="lazy" />`;
+                  onerror="this.src='https://via.placeholder.com/${size}?text=No+Image'" />`;
+    }
+    return `<img src="https://via.placeholder.com/${size}?text=No+Image" 
+                alt="Image not available for ${item.title}" 
+                loading="lazy" />`;
+  };
 
-      return `
-        <div class="news-update" data-index="${index}" data-section="${sectionId}">   
-          <div class="news-container">
-            <div class="news-image">
-              ${imageHtml}
-            </div>
-            <div class="news-info">
-              <p class="news-headline">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
-            </div>
+  // ========== TRENDING ==========
+  if (sectionId === 'trending-stories') {
+    container.innerHTML = newsList.map((item, index) => `
+      <div class="news-update" data-index="${index}" data-section="${sectionId}">
+        <div class="news-container">
+          <div class="news-image">${getImageHtml(item)}</div>
+          <div class="news-info">
+            <p class="news-headline">${item.fullSummary?.slice(0,150) || 'No description'}...</p>
           </div>
         </div>
-      `;
-    }).join('');
+      </div>
+    `).join('');
 
     container.querySelectorAll('.news-update').forEach((el) => {
       updateRelativeTime();
-      el.addEventListener('click', () => {
-        showFullNews(el);
-      });
+      el.addEventListener('click', () => showFullNews(el));
     });
-  } else if (sectionId === 'newsUpdate-stories') {
-    const limitedNews = newsList.slice(0, 2); //LIMIT TO 2 ITEMS
-    container.innerHTML = limitedNews.map((item, index) => {
-      const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
-      const imageHtml = isValidImage
-          ? `<div class="transferNews-image">
-              <img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
-               alt="Image for ${item.title}" 
-               loading="lazy" 
-               onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />
-            </div>`
-          : `<div class="transferNews-image">
-            <img src="https://via.placeholder.com/600x400?text=No+Image" 
-             alt="Image not available for ${item.title}" 
-             loading="lazy" />
-        </div>`;
 
-      return `
-        <div class="transferNews" data-index="${index}" data-section="${sectionId}">   
-          <div class="news-short-message">
-            <div class="transferNews-image">
-              ${imageHtml}
-            </div>
-            <div class="news-info">
-              <h2 class=transferNews-header"><a href="${API_BASE}/news/${item.seoTitle}" class="transferNews-link">${item.title}</a></h2>
-              <p class="transferNews-description">${item.fullSummary?.slice(0, 150) || 'No description'}...</p>
-            </div>
+  // ========== NEWS UPDATE ==========
+  } else if (sectionId === 'newsUpdate-stories') {
+    const limitedNews = newsList.slice(0, 2); // Only 2
+    container.innerHTML = limitedNews.map((item, index) => `
+      <div class="transferNews" data-index="${index}" data-section="${sectionId}">
+        <div class="news-short-message">
+          <div class="transferNews-image">${getImageHtml(item)}</div>
+          <div class="news-info">
+            <h2 class="transferNews-header">
+              <a href="${API_BASE}/news/${item.seoTitle}" class="transferNews-link">${item.title}</a>
+            </h2>
+            <p class="transferNews-description">${item.fullSummary?.slice(0,150) || 'No description'}...</p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.transferNews').forEach((el) => {
+      el.addEventListener('click', () => showFullNews(el));
+    });
+
+  // ========== SLIDER ==========
+  } else if (sectionId === 'sliderNews-stories') {
+    const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
+    const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
+    const combinedNews = [...trending, ...updates].slice(0, 20);
+
+    // Clean old slides
+    container.querySelectorAll('.sliderNews-dynamic').forEach(el => el.remove());
+
+    combinedNews.forEach((item, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'slider-content sliderNews-dynamic';
+      slide.innerHTML = `
+        <div class="sliderNews-image">
+          ${getImageHtml(item)}
+          <div class="sliderNews-info">
+            <h2 class="sliderNews-header">
+              <a href="/news/${item.seoTitle}" class="news-link">${item.title}</a>
+            </h2>
           </div>
         </div>
       `;
-    }).join('');
-
-    container.querySelectorAll('.transferNews').forEach((el) => {
-      el.addEventListener('click', () => {
-        showFullNews(el);
-      });
+      slide.dataset.index = index;
+      slide.dataset.section = 'sliderNews-stories';
+      slide.addEventListener('click', () => showFullNews(slide));
+      container.appendChild(slide);
     });
-  } else if (sectionId === 'sliderNews-stories') {
-  const container = document.querySelector('.header-slider');
 
-  const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
-  const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
-  
-  const combinedNews = [...trending, ...updates].slice(0, 20); 
-
-
-  // Remove old dynamically generated news slides (optional cleanup)
-  container.querySelectorAll('.sliderNews-dynamic').forEach(el => el.remove());
-
-  combinedNews.forEach((item, index) => {
-    const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
-    const imageHtml = isValidImage
-        ? `<img src="${location.origin}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
-                  alt="Image for ${item.title}" 
-                  loading="lazy" 
-                  onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />`
-        : `<img src="https://via.placeholder.com/600x400?text=No+Image" 
-                  alt="Image not available for ${item.title}" 
-                  loading="lazy" />`;
-
-    const slide = document.createElement('div');
-    slide.className = 'slider-content sliderNews-dynamic'; // Add class for cleanup
-    slide.innerHTML = `
-      <div class="sliderNews-image">
-        ${imageHtml}
-        <div class="sliderNews-info">
-          <h2 class="sliderNews-header"><a href="/news/${item.seoTitle}" class="news-link">${item.title}</a></h2>
-        </div>
-      </div>
-    `;
-
-    slide.dataset.index = index;
-    slide.dataset.section = 'sliderNews-stories';
-    slide.addEventListener('click', () => showFullNews(slide));
-
-    container.appendChild(slide);
-  });
-
-   // Re-initialize slider after inserting slides
-   initSlider();
- }
+    initSlider();
+  }
 }
+
 
 
 
@@ -402,23 +373,24 @@ function showFullNews(clickedItem) {
     const thirdLayer = document.querySelector('.third-layer');
 
      // hide existing list
-    const children = Array.from(middleLayer.children);
-    children.forEach(child => child.style.display = 'none');
+    //const children = Array.from(middleLayer.children);
+    //children.forEach(child => child.style.display = 'none');
 
-    const isMobileOrTablet = window.innerWidth <= 1024; // breakpoint
+    const isMobileOrTablet = window.innerWidth <= 1024; 
 
     if (isMobileOrTablet) {
-      // Hide first-layer children EXCEPT trending news
+      // Mobile/tablet → hide other sections
       Array.from(firstLayer.children).forEach(child => {
         if (!child.matches('#trending-stories, .text-cont1')) {
           child.style.display = 'none';
         }
       });
-
-      // Hide middle + third layer
       middleLayer.style.display = 'none';
       thirdLayer.style.display = 'none';
-    }
+     } else {
+       // Desktop → don't hide everything, just clear middle-layer news list
+       Array.from(middleLayer.children).forEach(child => child.style.display = 'none');
+     }
 
     // get news list
     const index = clickedItem.dataset.index;
@@ -552,12 +524,14 @@ function restoreLayout() {
   const isMobileOrTablet = window.innerWidth <= 1024;
 
   if (isMobileOrTablet) {
+    // Mobile/tablet → show everything back
     Array.from(firstLayer.children).forEach(child => child.style.display = '');
     middleLayer.style.display = '';
     thirdLayer.style.display = '';
+  } else {
+    // Desktop → restore all children of middle-layer
+    Array.from(middleLayer.children).forEach(child => child.style.display = '');
   }
-
-  // ✅ Reset URL back to the news list view (without adding a new history entry)
   const newsListUrl = `${window.location.origin}/news/`;
   history.replaceState({}, '', newsListUrl);
 }
@@ -578,10 +552,11 @@ window.onpopstate = function (event) {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadNews('trending-stories', `${API_BASE}/api/sports-summaries`); 
-  loadNews('newsUpdate-stories', `${API_BASE}/api/sports-summaries`); 
-  loadNews('sliderNews-stories', `${API_BASE}/api/sports-summaries`);
-});                                                                                                                                                                                                                                                                                                                                                                                                  
+  ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
+    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
+  });
+});
+                                                                                                                                                                                                                                                                                                                                                                                               
 
                                                                                                                                                                                                                                                                                                                                                                        
                                                                                                                                                                                                                                                                                                

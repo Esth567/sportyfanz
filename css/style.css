@@ -1228,6 +1228,23 @@ body{
         display: none !important;
     }
 
+    .time-date-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center under clock icon */
+  gap: 2px;
+}
+
+.time-date-col .time {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.time-date-col .date {
+  font-size: 12px;
+  color: #888;
+}
+
 
     .match-status,
     .match-score {
@@ -1253,7 +1270,6 @@ body{
       min-width: 40px;
       margin-right: 3px; /* Small gap only */
     }
-
 
     .match-time,
     .match-country {
@@ -1967,7 +1983,7 @@ body{
   transform: scale(1.1);
 }
 
-* Brand colors */
+/* Brand colors */
 .x-icon i {
   color: #000000; /* X is just black */
 }
@@ -2124,6 +2140,7 @@ body{
 .ad-container.placeholder-ad {
   background-color: #111B2A;
   color: #9CA3AF;
+  border: 1px solid #c4c4c41c;
   height: 100px;
   display: flex;
   align-items: flex-start;  /* Push content toward the top */
@@ -2647,7 +2664,7 @@ body{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.60rem;
+    font-size: 0.65rem;
     font-family: 'Lato';
     font-weight: 400;
     gap: 5px;
@@ -4108,17 +4125,6 @@ body{
 
 
 
-/* No animation for desktop */
-@media screen and (min-width: 1025px) {
-    .news-podcast {
-        display: flex !important; /* Ensures row layout */
-        transform: none !important;
-        flex-direction: row; 
-    }
-}
-
-
-
  /* Tablet and small desktops */
 @media screen and (max-width: 1024px) {
 /* Sidebar Container */
@@ -4394,7 +4400,7 @@ body{
 .text-cont2 h4,
 .text-cont1 h4,
 .text-cont h4 {
-    font-size: 0.77rem;
+    font-size: 0.80rem;
     font-family: 'Lato';
     font-weight: bold;
     margin-bottom: 8px;
@@ -4449,7 +4455,8 @@ body{
   justify-content: flex-start;
   margin: 0;
   padding: 0 4px; 
-  font-size: 0.75rem;
+  font-size: 12px;
+  font-weight: 400;
 }
 
   .match-details {
@@ -4580,26 +4587,15 @@ body{
     }
 
  
-    .news-podcast-wrapper {
-        overflow: hidden; 
-        width: 100%;
-        position: relative;
-    }
-
-    .news-podcast {
-        display: flex;
-        width: 200%; 
-         flex-direction: column;
-    }
-
-    .top-stories, .podcast-updates {
-        width: 100%; 
-        flex-shrink: 0;
-    }
-
+    .top-stories {
+    display: block; /* show */
+  }
+  .podcast-updates {
+    display: none; /* hide */
+  }
 
     .transferNews-header {
-        font-size: 0.70rem;
+        font-size: 0.75rem;
     }
 
     /*......news .....*/
@@ -4726,17 +4722,23 @@ body{
     }
 
     .news-full-view {
-      font-size: 0.75rem;
+      font-size: 0.77rem;
+      font-weight: 400;
       width: 100%;
       box-sizing: border-box;
       color: #fff;
       animation: fadeIn 0.3s ease-in-out;
+      margin: 0;
      }
 
+     .blog-title {
+       font-size: 0.80rem;
+     }
      .ad-container.placeholder-ad {
-      height: 70px;           
+      height: 100px;           
       font-size: 0.65rem;    
-      padding-top: 6px;      
+      padding-top: 10px;
+      margin-bottom: 10px;
   }
 
      /*......matches page .....*/
@@ -4762,6 +4764,7 @@ body{
     body.matches-page .advert,
     body.matches-page .prediction-container,
     body.matches-page .text-cont
+    body.matches-page .text-cont1
     {
         display: none !important;
     }

@@ -369,14 +369,34 @@ function populateNewsSection(sectionId, newsList) {
 function showFullNews(clickedItem) {
   try {
     const middleLayer = document.querySelector('.middle-layer');
+    const thirdLayer = document.querySelector('.third-layer');
+    const firstLayer = document.querySelector('.first-layer');
 
-    // Hide all children inside middle-layer
-    const children = Array.from(middleLayer.children);
-    children.forEach(child => {
-      child.style.display = 'none';
-    });
+    // --------- Hide based on device type ---------
+    if (isMobileOrTablet()) {
+      // hide third + middle completely
+      if (thirdLayer) thirdLayer.style.display = 'none';
+      if (middleLayer) middleLayer.style.display = 'none';
 
-    // Get data from clicked item
+      // in first-layer keep only trending news section
+      Array.from(firstLayer.children).forEach(child => {
+        if (
+          !child.classList.contains('text-cont1') &&
+          !(child.classList.contains('news-update') && child.id === 'trending-stories')
+        ) {
+          child.style.display = 'none';
+        } else {
+          child.style.display = '';
+        }
+      });
+    } else {
+      // Desktop: only hide news lists inside middle-layer
+      const newsLists = middleLayer.querySelectorAll('.news-update');
+      newsLists.forEach(list => list.style.display = 'none');
+    }
+
+
+    // Get news data on clicked 
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
     let newsList = [];
@@ -427,7 +447,7 @@ function showFullNews(clickedItem) {
     }
 
     const formattedDesc = Array.isArray(newsItem.paragraphs)
-      ? injectAdParagraphs(newsItem.paragraphs, 2)
+      ? injectAdParagraphs(newsItem.paragraphs, Math.floor(Math.random() * 2) + 3)
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
@@ -482,13 +502,11 @@ function showFullNews(clickedItem) {
       </article>
     `;
 
-    // hook up back button
-    const backButton = fullView.querySelector('.back-button');
-    backButton.onclick = () => {
-      history.back(); // 👈 let popstate handle cleanup
-    };
+    // back button → restore state
+    fullView.querySelector('.back-button').onclick = () => history.back();
 
-    middleLayer.insertBefore(fullView, middleLayer.firstChild);
+    // insert at top of middle layer
+    if (middleLayer) middleLayer.insertBefore(fullView, middleLayer.firstChild);
 
   } catch (err) {
     console.error("Failed to render full news view", err);
@@ -498,25 +516,37 @@ function showFullNews(clickedItem) {
 
 
 
-// Handle browser back/forward
+// --------- Handle back/forward ---------
 window.onpopstate = function (event) {
+  const middleLayer = document.querySelector('.middle-layer');
+  const thirdLayer = document.querySelector('.third-layer');
+  const firstLayer = document.querySelector('.first-layer');
+  const fullView = document.querySelector('.news-full-view');
+
   if (event.state && typeof event.state.index !== 'undefined') {
-    // reopen correct article
+    // reopen article
     const dummy = document.createElement('div');
     dummy.dataset.index = event.state.index;
     dummy.dataset.section = event.state.section;
     showFullNews(dummy);
   } else {
     // return to list
-    const middleLayer = document.querySelector('.middle-layer');
-    const fullView = document.querySelector('.news-full-view');
     if (fullView) fullView.remove();
-    Array.from(middleLayer.children).forEach(child => {
-      child.style.display = '';
-    });
+
+    if (isMobileOrTablet()) {
+      // restore third + middle
+      if (thirdLayer) thirdLayer.style.display = '';
+      if (middleLayer) middleLayer.style.display = '';
+
+      // restore all children in first-layer
+      Array.from(firstLayer.children).forEach(child => child.style.display = '');
+    } else {
+      // desktop: restore news lists in middle-layer
+      const newsLists = middleLayer.querySelectorAll('.news-update');
+      newsLists.forEach(list => list.style.display = '');
+    }
   }
 };
-
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
@@ -525,8 +555,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
                                                                                                                                                                                                                                                                                                                                                                                                
 
-                                                                                                                                                                                                                                                                                                                                                                       
-                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 // function to fetch top scorer
 
 let playerImageMap = {};
@@ -1030,11 +1059,21 @@ function showMatches(matchesData, category) {
         } else if (category === "highlight") {
            matchStatusDisplay = `<h5>FT</h5>`;
            scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-           formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
+           formattedTime = `
+             <div class="time-date-col">
+             <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
+             <span class="date">${matchDay}</span>
+             </div>
+          `;
         } else if (category === "upcoming") {
            matchStatusDisplay = `<h5>vs</h5>`;
-           formattedTime = formatToUserLocalTime(match.match_date, match.match_time);
-        }
+           formattedTime = `
+             <div class="time-date-col">
+             <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
+             <span class="date">${matchDay}</span>
+             </div>
+            `;
+         }
 
 
 

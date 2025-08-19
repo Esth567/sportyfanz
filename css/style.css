@@ -417,7 +417,7 @@ body{
 .text-cont2 h4,
 .text-cont1 h4,
 .text-cont h4 {
-    font-size: 0.75rem;
+    font-size: 14px;
     font-family: 'Lato';
     font-weight: bold;
 }
@@ -484,7 +484,6 @@ body{
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: px;
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
@@ -694,17 +693,13 @@ body{
 
 }
 
-.news-update:hover {
-  background: #1A2F4B;    /* keep same as default */
-  transform: none;        /* no scale/zoom */
-  box-shadow: none;       /* no shadow change */
-}
+
 /* News Container */
 .news-container {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 3px;
   padding: 8px;
 }
 
@@ -735,16 +730,12 @@ body{
   justify-content: center; /* ✅ vertical centering */
 }
 
-.news-info .news-time {
-    font-size: 0.7rem;
-    margin-top: 5px;
-}
 
 /* Headline */
 .news-headline {
-  font-size: 0.7rem;
+  font-size: 14px;
   font-family: 'Lato';
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.4;
   color: white;
   overflow: hidden;
@@ -1016,6 +1007,7 @@ body{
     font-weight: bold;
 }
 
+/*middle layer mathes styling*/
 .latest-match {
     padding-top: 30px;
     width: 100%;
@@ -1033,66 +1025,6 @@ body{
     border-radius: 10px;
 }
 
-.match-header {
-    display: flex;
-    background-color: #007bff;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 10px; 
-    border-radius: 8px;
-    align-items: center;
-}
-
-.match-header .category-btn {
-    cursor: pointer;
-    padding: 4px 12px;
-    background-color: #14273f;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    color: #ffffffbe;
-    border-radius: 20px;
-    text-align: center;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.70rem;
-    font-family: 'Lato';
-    font-weight: 400;
-    gap: 3px;
-    margin-bottom: -15px;
-    transition: background-color 0.3s ease;
-}
-
-.match-header .category-btn.calendar {
-    margin-left: auto; /* Pushes the calendar button to the far right */
-    background-color: transparent;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.match-calendar {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 5px;
-  }
-  .calendar-scroll {
-    display: flex;
-    gap: 8px;
-  }
-  .calendar-date {
-    display: inline-block;
-    padding: 6px;
-    background-color: #1A2F4B;
-    border-radius: 8px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 11px;
-  }
-  .calendar-date.selected {
-    background-color: #141e30;
-    color: white;
-  }
-  
 
 #match-date::-webkit-calendar-picker-indicator {
     color: #244537;
@@ -1151,7 +1083,7 @@ body{
         padding: 10px;
     }
 
-    .match-card {
+  .match-card {
     display: flex;
     flex-direction: row; /* change from row to column */
     align-items: center;
@@ -1176,7 +1108,7 @@ body{
     background-color: #1a2f4bad;
     color: white;
     border-radius: 10px;
-    padding: 8px;
+    padding: 10px;
     margin-top: 10px;
     width: 100%;
     gap: 10px; /* space between sections */
@@ -1187,13 +1119,14 @@ body{
         display: flex;
         align-items: center;
         flex-direction: row;
-        font-size: 0.70rem;
+        font-size: 14px;
+        font-weight: 400;
         font-family: 'Lato';
         white-space: nowrap; /* Prevent the text from wrapping to the next line */
         overflow: hidden;  /* Hide any overflow if the name is too long */
         text-overflow: ellipsis;  /* Add ellipsis (...) if the text overflows */
         justify-content: flex-start;
-        gap: 5px;
+        gap: 10px;
     }
 
 
@@ -1203,7 +1136,7 @@ body{
         background: #fff;
         color: #1A2F4B;
         border-radius: 15px;
-        font-size: 0.60rem;
+        font-size: 14px;
         font-family: 'Lato';
         font-weight: bold;
         border: none;
@@ -1236,12 +1169,12 @@ body{
 }
 
 .time-date-col .time {
-  font-weight: bold;
+  font-weight: 400;
   font-size: 14px;
 }
 
 .time-date-col .date {
-  font-size: 12px;
+  font-size: 14px;
   color: #888;
 }
 
@@ -1251,7 +1184,7 @@ body{
         display: flex;
         flex-direction: row; /* Stack score and match status vertically for highlight */
         align-items: center;
-        font-size: 0.75rem;
+        font-size: 14px;
         font-family: 'Lato';
         font-weight: bold;
         gap: 5px;
@@ -2664,9 +2597,9 @@ body{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.65rem;
+    font-size: 14px;
     font-family: 'Lato';
-    font-weight: 400;
+    font-weight: 500;
     gap: 5px;
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 } 
@@ -4595,7 +4528,7 @@ body{
   }
 
     .transferNews-header {
-        font-size: 0.75rem;
+       font-size: 0.75rem;
     }
 
     /*......news .....*/

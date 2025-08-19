@@ -395,7 +395,6 @@ function showFullNews(clickedItem) {
       newsLists.forEach(list => list.style.display = 'none');
     }
 
-
     // Get news data on clicked 
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
@@ -514,8 +513,6 @@ function showFullNews(clickedItem) {
   }
 }
 
-
-
 // --------- Handle back/forward ---------
 window.onpopstate = function (event) {
   const middleLayer = document.querySelector('.middle-layer');
@@ -547,6 +544,7 @@ window.onpopstate = function (event) {
     }
   }
 };
+
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {

@@ -331,6 +331,8 @@ function populateNewsSection(sectionId, newsList) {
 
   // ========== SLIDER ==========
   } else if (sectionId === 'sliderNews-stories') {
+    const container = document.querySelector('.header-slider');
+    
     const trending = Array.isArray(window.trendingNews) ? window.trendingNews : [];
     const updates = Array.isArray(window.updatesNews) ? window.updatesNews : [];
     const combinedNews = [...trending, ...updates].slice(0, 20);
@@ -364,34 +366,17 @@ function populateNewsSection(sectionId, newsList) {
 
 
 
-// ========== SHOW FULL NEWS ========== //
 function showFullNews(clickedItem) {
   try {
-    const firstLayer = document.querySelector('.first-layer');
     const middleLayer = document.querySelector('.middle-layer');
-    const thirdLayer = document.querySelector('.third-layer');
 
-     // hide existing list
-    //const children = Array.from(middleLayer.children);
-    //children.forEach(child => child.style.display = 'none');
+    // Hide all children inside middle-layer
+    const children = Array.from(middleLayer.children);
+    children.forEach(child => {
+      child.style.display = 'none';
+    });
 
-    const isMobileOrTablet = window.innerWidth <= 1024; 
-
-    if (isMobileOrTablet) {
-      // Mobile/tablet → hide other sections
-      Array.from(firstLayer.children).forEach(child => {
-        if (!child.matches('#trending-stories, .text-cont1')) {
-          child.style.display = 'none';
-        }
-      });
-      middleLayer.style.display = 'none';
-      thirdLayer.style.display = 'none';
-     } else {
-       // Desktop → don't hide everything, just clear middle-layer news list
-       Array.from(middleLayer.children).forEach(child => child.style.display = 'none');
-     }
-
-    // get news list
+    // Get data from clicked item
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
     let newsList = [];
@@ -407,7 +392,11 @@ function showFullNews(clickedItem) {
     }
 
     const newsItem = newsList[parseInt(index)];
-    if (!newsItem) return alert("News item not found.");
+
+    if (!newsItem) {
+      alert("News item not found.");
+      return;
+    }
 
     // Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
@@ -441,7 +430,6 @@ function showFullNews(clickedItem) {
       ? injectAdParagraphs(newsItem.paragraphs, 2)
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
-    // ✅ pushState so browser back/forward works
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
     history.pushState({ index, section }, '', articleUrl);
 
@@ -494,61 +482,41 @@ function showFullNews(clickedItem) {
       </article>
     `;
 
-     // Back button restores layout
+    // hook up back button
     const backButton = fullView.querySelector('.back-button');
     backButton.onclick = () => {
-      restoreLayout();
+      history.back(); // 👈 let popstate handle cleanup
     };
 
-    // Insert article in correct place
-    if (isMobileOrTablet) {
-      firstLayer.insertBefore(fullView, document.querySelector('#trending-stories'));
-    } else {
-      middleLayer.insertBefore(fullView, middleLayer.firstChild);
-    }
+    middleLayer.insertBefore(fullView, middleLayer.firstChild);
+
   } catch (err) {
     console.error("Failed to render full news view", err);
+    alert("Something went wrong displaying the full article.");
   }
 }
 
-
-function restoreLayout() {
-  const fullView = document.querySelector('.news-full-view');
-  if (fullView) fullView.remove();
-
-  const firstLayer = document.querySelector('.first-layer');
-  const middleLayer = document.querySelector('.middle-layer');
-  const thirdLayer = document.querySelector('.third-layer');
-
-  const isMobileOrTablet = window.innerWidth <= 1024;
-
-  if (isMobileOrTablet) {
-    // Mobile/tablet → show everything back
-    Array.from(firstLayer.children).forEach(child => child.style.display = '');
-    middleLayer.style.display = '';
-    thirdLayer.style.display = '';
-  } else {
-    // Desktop → restore all children of middle-layer
-    Array.from(middleLayer.children).forEach(child => child.style.display = '');
-  }
-  const newsListUrl = `${window.location.origin}/news/`;
-  history.replaceState({}, '', newsListUrl);
-}
 
 
 // Handle browser back/forward
 window.onpopstate = function (event) {
   if (event.state && typeof event.state.index !== 'undefined') {
-    // Reopen article
+    // reopen correct article
     const dummy = document.createElement('div');
     dummy.dataset.index = event.state.index;
     dummy.dataset.section = event.state.section;
     showFullNews(dummy);
   } else {
-    // Restore news list view
-    restoreLayout();
+    // return to list
+    const middleLayer = document.querySelector('.middle-layer');
+    const fullView = document.querySelector('.news-full-view');
+    if (fullView) fullView.remove();
+    Array.from(middleLayer.children).forEach(child => {
+      child.style.display = '';
+    });
   }
 };
+
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {

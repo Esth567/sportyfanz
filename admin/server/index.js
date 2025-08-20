@@ -22,8 +22,7 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
-// ✅ Serve static files from /public
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ✅ Middleware
 app.use(compression());
@@ -57,6 +56,7 @@ app.use(cors({
     }
   }
 }));
+
 
 // ✅ Rate Limiting for API routes
 const limiter = rateLimit({

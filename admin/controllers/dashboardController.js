@@ -86,26 +86,42 @@ exports.getTopScorers = async (req, res) => {
   const limitPerLeague = parseInt(req.query.limitPerLeague) || 3;
   const globalLimit = parseInt(req.query.limit) || 100;
 
-  // ✅ Generate a specific cache key
-  const cacheKey = `topScorers_${limitPerLeague}_${globalLimit}`;
-  const cached = topScorersCache.get(cacheKey);
- if (cached) return res.json(cached);
-
- try {
+  try {
+    // Fetch leagues (to get current season IDs)
     const leaguesRes = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
     if (!leaguesRes.ok) return res.status(502).json({ error: "Failed to fetch leagues" });
 
     const leaguesData = await leaguesRes.json();
     if (!Array.isArray(leaguesData)) return res.status(500).json({ error: "Invalid leagues structure" });
 
+    // Active season signature for cache
+    const activeSeasons = leaguesData.map(l => `${l.league_id}_${l.league_season}`).join("-");
+    const cacheKey = `topScorers_${activeSeasons}_${limitPerLeague}_${globalLimit}`;
+
+    // 🧹 Cleanup: drop any cache entries not matching active season(s)
+    const validSeasonFragments = leaguesData.map(l => `${l.league_id}_${l.league_season}`);
+    topScorersCache.keys().forEach(key => {
+      if (!validSeasonFragments.some(season => key.includes(season))) {
+        console.log(`🧹 Dropping old season cache: ${key}`);
+        topScorersCache.del(key);
+      }
+    });
+
+    // ✅ Return cached result if valid
+    const cached = topScorersCache.get(cacheKey);
+    if (cached) return res.json(cached);
+
     let allScorers = [];
 
     for (const league of leaguesData) {
       const leagueId = league.league_id;
       const leagueName = league.league_name;
+      const leagueSeason = league.league_season;
 
       try {
-        const scorerRes = await fetch(`https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&APIkey=${APIkey}`);
+        const scorerRes = await fetch(
+          `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&APIkey=${APIkey}`
+        );
         if (!scorerRes.ok) {
           console.warn(`Failed to fetch scorers for league ${leagueName}: ${scorerRes.status}`);
           continue;
@@ -115,13 +131,14 @@ exports.getTopScorers = async (req, res) => {
         if (!Array.isArray(scorers) || scorers.length === 0) continue;
 
         const filteredScorers = scorers
-          .filter(p => parseInt(p.goals) >= 10)
+          .filter(p => parseInt(p.goals) > 0)  // ✅ reset each season, include fresh scorers
           .slice(0, limitPerLeague)
           .map(p => ({
             player_name: p.player_name,
             player_image: p.player_image || "",
             team_name: p.team_name,
             league_name: leagueName,
+            league_season: leagueSeason,   // ✅ included for clarity
             goals: parseInt(p.goals)
           }));
 
@@ -134,6 +151,7 @@ exports.getTopScorers = async (req, res) => {
     allScorers.sort((a, b) => b.goals - a.goals);
     const finalList = allScorers.slice(0, globalLimit);
 
+    // ✅ Save with season-aware cache key
     topScorersCache.set(cacheKey, finalList);
     res.json(finalList);
 
@@ -426,9 +444,9 @@ exports.getH2HData = async (req, res) => {
 
 
 //function to load standings
-
 const standingsCache = new NodeCache({ stdTTL: 300 }); // 5 minutes TTL
 
+// controller
 exports.getStandings = async (req, res) => {
   const { leagueId } = req.query;
 
@@ -440,7 +458,7 @@ exports.getStandings = async (req, res) => {
   const cached = standingsCache.get(cacheKey);
 
   if (cached) {
-    return res.json({ standings: cached });
+    return res.json({ leagueId, standings: cached }); // ✅ include leagueId
   }
 
   try {
@@ -449,26 +467,30 @@ exports.getStandings = async (req, res) => {
 
     if (!response.ok) {
       const text = await response.text();
-      return res.status(502).json({ error: "Failed to fetch standings", details: text });
+      return res.status(502).json({
+        leagueId,
+        error: "Failed to fetch standings",
+        details: text
+      });
     }
 
     const data = await response.json();
 
     if (!Array.isArray(data)) {
-       console.warn("⚠️ Invalid API response structure:", data);
-       standingsCache.set(cacheKey, []); // still cache empty to avoid repeated bad calls
-      return res.json({ standings: [] }); // ensure consistent response
-     }
+      console.warn("⚠️ Invalid API response structure:", data);
+      standingsCache.set(cacheKey, []); 
+      return res.json({ leagueId, standings: [] }); // ✅ include leagueId
+    }
 
-     // ✅ Save to cache
-      standingsCache.set(cacheKey, data);
+    // ✅ Save to cache
+    standingsCache.set(cacheKey, data);
 
-      // ✅ Always return consistent shape
-    res.json({ standings: Array.isArray(data) ? data : [] });
+    // ✅ Always return consistent shape
+    res.json({ leagueId, standings: data });
 
   } catch (error) {
     console.error("❌ Standings fetch error (backend):", error);
-    res.status(500).json({ error: "Server error fetching standings" });
+    res.status(500).json({ leagueId, error: "Server error fetching standings" });
   }
 };
 

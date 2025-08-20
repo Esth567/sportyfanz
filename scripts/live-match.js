@@ -842,68 +842,75 @@ function loadH2HData(homeTeam, awayTeam) {
 
     //function to load standings
     async function loadStandings(match) {
-        const tableContainer = document.getElementById("standing-table");
-        const spinner = document.getElementById("standing-spinner");
-    
-        if (!tableContainer) {
-            console.error("❌ #standing-table element not found in DOM.");
+    const tableContainer = document.getElementById("standing-table");
+    const spinner = document.getElementById("standing-spinner");
+
+    if (!tableContainer) {
+        console.error("❌ #standing-table element not found in DOM.");
+        return;
+    }
+
+    try {
+        spinner.style.display = "block";
+
+        const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
+        const { standings } = await response.json();
+
+        if (!Array.isArray(standings) || standings.length === 0) {
+            tableContainer.innerHTML = "<p>No standings available for this league.</p>";
             return;
         }
-    
-        try {
-            spinner.style.display = "block";
-    
-             const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
-             const { standings } = await response.json();
-    
-            const tableHTML = `
-                <table class="standing-table">
-                    <thead>
-                        <tr>
-                            <th>Pos</th><th>Team</th><th>Pl</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${standings.map(team => {
-                            const isHome = team.team_name === match.match_hometeam_name;
-                            const isAway = team.team_name === match.match_awayteam_name;
-                            const highlightTeam = isHome || isAway ? 'highlight-team' : '';
-    
-                            // Determine class for position coloring only
-                            const pos = parseInt(team.overall_league_position);
-                            let posClass = '';
-                            if (pos >= 1 && pos <= 4) posClass = 'ucl';
-                            else if (pos >= 5 && pos <= 6) posClass = 'uel';
-                            else if (pos >= data.length - 2) posClass = 'relegated';
-    
-                            return `
-                                <tr class="${highlightTeam}">
-                                    <td class="pos-cell ${posClass}">${team.overall_league_position}</td>
-                                    <td>${team.team_name}</td>
-                                    <td>${team.overall_league_payed}</td>
-                                    <td>${team.overall_league_W}</td> 
-                                    <td>${team.overall_league_D}</td>
-                                    <td>${team.overall_league_L}</td>
-                                    <td>${team.overall_league_GF}</td>
-                                    <td>${team.overall_league_GA}</td>
-                                    <td>${team.overall_league_GF - team.overall_league_GA}</td>
-                                    <td>${team.overall_league_PTS}</td>
-                                </tr>
-                            `;
-                        }).join("")}
-                    </tbody>
-                </table>
-            `;
-    
-            tableContainer.innerHTML = tableHTML;
-    
-        } catch (err) {
-            tableContainer.innerHTML = "<p>Error loading standings</p>";
-            console.error("Standings fetch error:", err);
-        } finally {
-            spinner.style.display = "none";
-        }
+
+        const tableHTML = `
+            <table class="standing-table">
+                <thead>
+                    <tr>
+                        <th>Pos</th><th>Team</th><th>Pl</th><th>W</th><th>D</th><th>L</th>
+                        <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${standings.map(team => {
+                        const isHome = team.team_name === match.match_hometeam_name;
+                        const isAway = team.team_name === match.match_awayteam_name;
+                        const highlightTeam = isHome || isAway ? 'highlight-team' : '';
+
+                        // Determine class for position coloring only
+                        const pos = parseInt(team.overall_league_position);
+                        let posClass = '';
+                        if (pos >= 1 && pos <= 4) posClass = 'ucl';
+                        else if (pos >= 5 && pos <= 6) posClass = 'uel';
+                        else if (pos >= standings.length - 2) posClass = 'relegated';
+
+                        return `
+                            <tr class="${highlightTeam}">
+                                <td class="pos-cell ${posClass}">${team.overall_league_position}</td>
+                                <td>${team.team_name}</td>
+                                <td>${team.overall_league_payed}</td>
+                                <td>${team.overall_league_W}</td> 
+                                <td>${team.overall_league_D}</td>
+                                <td>${team.overall_league_L}</td>
+                                <td>${team.overall_league_GF}</td>
+                                <td>${team.overall_league_GA}</td>
+                                <td>${team.overall_league_GF - team.overall_league_GA}</td>
+                                <td>${team.overall_league_PTS}</td>
+                            </tr>
+                        `;
+                    }).join("")}
+                </tbody>
+            </table>
+        `;
+
+        tableContainer.innerHTML = tableHTML;
+
+    } catch (err) {
+        tableContainer.innerHTML = "<p>Error loading standings</p>";
+        console.error("Standings fetch error:", err);
+    } finally {
+        spinner.style.display = "none";
     }
+}
+
      
   
   // ✅ Fetch lineup and dynamically infer formation
@@ -1177,7 +1184,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // layout-fix
-let resizeTimer;
 
 window.addEventListener('resize', () => {
     // Optionally clear and re-render field

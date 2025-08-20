@@ -269,6 +269,7 @@ async function loadEntityDatabase() {
 }
 
 
+
 // ========== POPULATE NEWS ==========
 function populateNewsSection(sectionId, newsList) {
   const container = document.getElementById(sectionId) || 
@@ -305,7 +306,10 @@ function populateNewsSection(sectionId, newsList) {
 
     container.querySelectorAll('.news-update').forEach((el) => {
       updateRelativeTime();
-      el.addEventListener('click', () => showFullNews(el));
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        showFullNews(el);
+      });
     });
 
   // ========== NEWS UPDATE ==========
@@ -317,7 +321,7 @@ function populateNewsSection(sectionId, newsList) {
           <div class="transferNews-image">${getImageHtml(item)}</div>
           <div class="news-info">
             <h2 class="transferNews-header">
-              <a href="${API_BASE}/news/${item.seoTitle}" class="transferNews-link">${item.title}</a>
+              <a href="/news/${item.seoTitle}" class="transferNews-link">${item.title}</a>
             </h2>
             <p class="transferNews-description">${item.fullSummary?.slice(0,150) || 'No description'}...</p>
           </div>
@@ -326,7 +330,10 @@ function populateNewsSection(sectionId, newsList) {
     `).join('');
 
     container.querySelectorAll('.transferNews').forEach((el) => {
-      el.addEventListener('click', () => showFullNews(el));
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        showFullNews(el);
+      });
     });
 
   // ========== SLIDER ==========
@@ -355,7 +362,12 @@ function populateNewsSection(sectionId, newsList) {
       `;
       slide.dataset.index = index;
       slide.dataset.section = 'sliderNews-stories';
-      slide.addEventListener('click', () => showFullNews(slide));
+
+      slide.addEventListener('click', (e) => {
+        e.preventDefault();
+        showFullNews(slide);
+      });
+
       container.appendChild(slide);
     });
 
@@ -364,35 +376,25 @@ function populateNewsSection(sectionId, newsList) {
 }
 
 
-
-
+// ========== SHOW FULL NEMWS ==========
 function showFullNews(clickedItem) {
   try {
     const middleLayer = document.querySelector('.middle-layer');
+    const firstLayer = document.querySelector('.first-layer'); 
     const thirdLayer = document.querySelector('.third-layer');
-    const firstLayer = document.querySelector('.first-layer');
 
-    // --------- Hide based on device type ---------
-    if (isMobileOrTablet()) {
-      // hide third + middle completely
-      if (thirdLayer) thirdLayer.style.display = 'none';
-      if (middleLayer) middleLayer.style.display = 'none';
+    // detect if mobile/tablet (adjust breakpoint to match your CSS media queries)
+     const isMobileOrTablet = window.innerWidth <= 1024;
+    
+    // Hide all children inside middle-layer
+    const children = Array.from(middleLayer.children);
+    children.forEach(child => {
+      child.style.display = 'none';
+    });
 
-      // in first-layer keep only trending news section
-      Array.from(firstLayer.children).forEach(child => {
-        if (
-          !child.classList.contains('text-cont1') &&
-          !(child.classList.contains('news-update') && child.id === 'trending-stories')
-        ) {
-          child.style.display = 'none';
-        } else {
-          child.style.display = '';
-        }
-      });
-    } else {
-      // Desktop: only hide news lists inside middle-layer
-      const newsLists = middleLayer.querySelectorAll('.news-update');
-      newsLists.forEach(list => list.style.display = 'none');
+    // ✅ hide first & third layer only for mobile/tablet
+    if (isMobileOrTablet) {
+      document.body.classList.add("full-view-active");
     }
 
     // Get news data on clicked 
@@ -450,8 +452,7 @@ function showFullNews(clickedItem) {
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
-    history.pushState({ index, section }, '', articleUrl);
-
+        
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
@@ -502,10 +503,22 @@ function showFullNews(clickedItem) {
     `;
 
     // back button → restore state
-    fullView.querySelector('.back-button').onclick = () => history.back();
+    const backButton = fullView.querySelector('.back-button');
+    backButton.onclick = () => {
+      fullView.remove();
+      children.forEach(child => {
+        child.style.display = ''; // restores previous display
+      });
 
-    // insert at top of middle layer
-    if (middleLayer) middleLayer.insertBefore(fullView, middleLayer.firstChild);
+      // ✅ restore first & third layers only if mobile/tablet
+      if (isMobileOrTablet) {
+        document.body.classList.remove("full-view-active");
+      }
+
+      updateRelativeTime();
+    };
+
+    middleLayer.insertBefore(fullView, middleLayer.firstChild);
 
   } catch (err) {
     console.error("Failed to render full news view", err);
@@ -516,34 +529,33 @@ function showFullNews(clickedItem) {
 // --------- Handle back/forward ---------
 window.onpopstate = function (event) {
   const middleLayer = document.querySelector('.middle-layer');
-  const thirdLayer = document.querySelector('.third-layer');
-  const firstLayer = document.querySelector('.first-layer');
-  const fullView = document.querySelector('.news-full-view');
+  const isMobileOrTablet = window.innerWidth <= 1024;
 
   if (event.state && typeof event.state.index !== 'undefined') {
-    // reopen article
     const dummy = document.createElement('div');
     dummy.dataset.index = event.state.index;
     dummy.dataset.section = event.state.section;
     showFullNews(dummy);
+
+    if (isMobileOrTablet) {
+      document.body.classList.add("full-view-active");
+    }
   } else {
-    // return to list
+    const fullView = document.querySelector('.news-full-view');
     if (fullView) fullView.remove();
 
-    if (isMobileOrTablet()) {
-      // restore third + middle
-      if (thirdLayer) thirdLayer.style.display = '';
-      if (middleLayer) middleLayer.style.display = '';
+    Array.from(middleLayer.children).forEach(child => {
+      child.style.display = '';
+    });
 
-      // restore all children in first-layer
-      Array.from(firstLayer.children).forEach(child => child.style.display = '');
-    } else {
-      // desktop: restore news lists in middle-layer
-      const newsLists = middleLayer.querySelectorAll('.news-update');
-      newsLists.forEach(list => list.style.display = '');
+    if (isMobileOrTablet) {
+      document.body.classList.remove("full-view-active");
     }
   }
 };
+
+
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1501,7 +1513,7 @@ function loadH2HData(homeTeam, awayTeam) {
 
     spinner.style.display = "block";
 
-    fetch(`/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
+    fetch(`${API_BASE}/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
         .then(res => res.json())
         .then(data => {
             spinner.style.display = "none";
@@ -1995,13 +2007,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 /* Init bottom banner Swiper */
-new Swiper('.footer-banner', {
-  loop: true,
-  autoplay: {
-    delay: 4000,
-    disableOnInteraction: false,
-  },
-});
+document.addEventListener("DOMContentLoaded", function () {
+    new Swiper(".footer-banner", {
+      loop: true,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      slidesPerView: 1,
+    });
+  });
 
 /* Close footer Button banner*/
 function closeFixedAd() {
@@ -2125,28 +2140,6 @@ document.addEventListener("DOMContentLoaded", function () {
           searchBar.style.display = searchBar.style.display === "none" ? "block" : "none";
       }
   });
-});
-
-
-//news-podcast animation slider
-document.addEventListener("DOMContentLoaded", function () {
-  let currentIndex = 0;
-  const slider = document.querySelector(".news-podcast");
-
-  function slideNewsPodcast() {
-      if (window.innerWidth <= 1024) { // Mobile & Tablet Only
-          currentIndex = (currentIndex + 1) % 2; // Toggle between 0 and 1
-          slider.style.transform = `translateX(-${currentIndex * 100}%)`; // Slide left/right
-      } else {
-          // Reset position for desktop view
-          slider.style.transform = `translateX(0)`;
-      }
-  }
-
-  // Auto-slide every 5 seconds only on mobile & tablet
-  if (window.innerWidth <= 1024) {
-      setInterval(slideNewsPodcast, 5000);
-  }
 });
 
 

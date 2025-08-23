@@ -399,10 +399,10 @@ exports.getMatchStatistics = async (req, res) => {
 };
 
 
-
 //functkion to det h2h
 const h2hCache = new NodeCache({ stdTTL: 600 }); // Cache duration: 10 minutes
 
+//function to det h2h
 exports.getH2HData = async (req, res) => {
   const { homeTeam, awayTeam } = req.query;
 
@@ -413,7 +413,7 @@ exports.getH2HData = async (req, res) => {
   const cacheKey = `h2h_${homeTeam}_${awayTeam}`;
   const cached = h2hCache.get(cacheKey);
   if (cached) {
-    return res.json({ matches: cached });
+    return res.json(cached);
   }
 
   try {
@@ -426,21 +426,23 @@ exports.getH2HData = async (req, res) => {
     }
 
     const data = await response.json();
-    const h2hArray = data.firstTeam_VS_secondTeam;
 
-    if (!Array.isArray(h2hArray)) {
-      return res.status(404).json({ error: 'No H2H data found' });
-    }
+    const result = {
+      h2h: data.firstTeam_VS_secondTeam || [],
+      homeLast: data.firstTeam_lastResults || [],
+      awayLast: data.secondTeam_lastResults || []
+    };
 
-    // ✅ Store result in cache
-    h2hCache.set(cacheKey, h2hArray);
+    // ✅ Cache
+    h2hCache.set(cacheKey, result);
 
-    res.json({ matches: h2hArray });
+    res.json(result);
   } catch (error) {
     console.error("H2H Fetch Error:", error);
     res.status(500).json({ error: 'Internal server error while fetching H2H data' });
   }
 };
+
 
 
 //function to load standings

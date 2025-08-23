@@ -7,6 +7,7 @@ const axiosRetry = require('axios-retry').default || require('axios-retry');
 const cheerio = require('cheerio');
 const pLimit = require('p-limit').default;
 const { cleanUnicode } = require('../utils/cleanText');
+const boilerplateFilters = require('../config/boilerplateFilters.json');
 const {
   extractTextFromHtml,
   extractEntities,
@@ -45,8 +46,20 @@ function isTopNewsArticle(article) {
   return topNewsKeywords.some(keyword => content.includes(keyword));
 }
 
-function isFootballArticle(item) { 
+function isFootballArticle(item) {
+  const footballKeywords = [
+    'football', 'soccer', 'futbol',
+    'premier league', 'la liga', 'serie a', 'bundesliga', 'ligue 1',
+    'champions league', 'europa league', 'conference league',
+    'world cup', 'afcon', 'africa cup of nations',
+    'caf champions league', 'caf confederation cup',
+    'super eagles', 'nigeria', 'ghana', 'cameroon', 'senegal',
+    'fifa', 'uefa', 'caf'
+  ];
+
   const title = item.title?.toString().toLowerCase() || '';
+  const summary = item.fullSummary?.toString().toLowerCase() || '';
+  const link = item.link?.toString().toLowerCase() || '';
 
   const categories = Array.isArray(item.categories)
     ? item.categories
@@ -59,26 +72,32 @@ function isFootballArticle(item) {
         .join(' ')
     : '';
 
-  const link = item.link?.toString().toLowerCase() || '';
-
-  return keywords.some(keyword =>
+  return footballKeywords.some(keyword =>
     title.includes(keyword) ||
+    summary.includes(keyword) ||
     categories.includes(keyword) ||
-    link.includes(keyword.replace(/\s+/g, '-')) // e.g. champions-league
+    link.includes(keyword.replace(/\s+/g, '-'))
   );
 }
 
 
 function cleanArticleText(text) {
   if (!text) return '';
-  const stripped = text
+
+  let stripped = text
     .replace(/\s{2,}/g, ' ')
     .replace(/document\.currentScript[\s\S]*?};/g, '')
     .replace(/window\.sdc[\s\S]*?};/g, '')
     .replace(/©\s*\d{4}\s*Sky UK.*/g, '')
     .trim();
 
-  return cleanUnicode(stripped);
+  // Apply boilerplate filters from JSON
+  boilerplateFilters.patterns.forEach(phrase => {
+    const regex = new RegExp(phrase, 'i'); // case-insensitive
+    stripped = stripped.replace(regex, '');
+  });
+
+  return cleanUnicode(stripped).trim();
 }
 
 

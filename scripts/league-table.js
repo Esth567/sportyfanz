@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Fetch the league names
     async function fetchLeagues() {
         try {
-            const response = await fetch(`/api/leagues`);
+            const response = await fetch(`${API_BASE}/api/leagues`);
             const leagues = await response.json();
             leaguesContainer.innerHTML = ""; // Clear existing content
     
@@ -90,7 +90,7 @@ const leagueLogos = {
 async function updateLeagueTable(leagueName, leagueId) {
     try {
         const [standingsResponse, formMap] = await Promise.all([
-            fetch(`/api/standings/${leagueId}`).then(res => res.json()),
+            fetch(`${API_BASE}/api/standings/${leagueId}`).then(res => res.json()),
             getRecentForms(leagueId)
         ]);
 
@@ -271,7 +271,7 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
 
 // Fetch recent match results and build form per team
 async function getRecentForms(leagueId) {
-    const response = await fetch(`/api/recent_form/${leagueId}`);
+    const response = await fetch(`${API_BASE}/api/recent_form/${leagueId}`);
     const data = await response.json();
     return data;
 }
@@ -279,7 +279,7 @@ async function getRecentForms(leagueId) {
 
 
 function updateTeamForm(teamId) {
-    fetch(`/api/team-form/${teamId}`)
+    fetch(`${API_BASE}/api/team-form/${teamId}`)
         .then(response => response.json())
         .then(data => {
             if (data && Array.isArray(data) && data.length > 0) {

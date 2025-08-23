@@ -44,7 +44,7 @@ function displayMatchesByLeagueId(leagueId, leagueName, category) {
 
 
 
-fetch(`${API_BASE}/api/leagues`)
+fetch(`/api/leagues`)
     .then(res => res.json())
     .then(leagues => {
         const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
@@ -126,7 +126,7 @@ fetch(`${API_BASE}/api/leagues`)
     //function to fetch matches
 async function fetchAndRenderMatches() {
   try {
-    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const response = await fetch(`/api/all_matches`);
     const data = await response.json();
 
     console.log("Live Matches: ", data.live);
@@ -221,16 +221,19 @@ function renderMatches(matchesData, category) {
 
     // Preferred leagues
     const preferredLeagues = [
-        { name: "Premier League", country: "England" },
-        { name: "La Liga", country: "Spain" },
-        { name: "Bundesliga", country: "Germany" },
-        { name: "UEFA Champions League", country: "eurocups" },
-        { name: "Serie A", country: "Italy" },
-        { name: "Ligue 1", country: "France" },
-        { name: "Eredivisie", country: "Netherlands" },
-        { name: "MLS", country: "USA" },
-        { name: "NPFL", country: "Nigeria" },
-        { name: "CAF Champions League", country: "Africa" }
+      { name: "Premier League", country: "England" },
+      { name: "La Liga", country: "Spain" },
+      { name: "Bundesliga", country: "Germany" },
+      { name: "UEFA Champions League", country: "eurocups" },
+      { name: "UEFA Europa League", country: "eurocups" },
+      { name: "UEFA Europa Conference League", country: "eurocups" },
+      { name: "Serie A", country: "Italy" },
+      { name: "NPFL", country: "Nigeria" },
+      { name: "FIFA World Cup", country: "World" },
+      { name: "UEFA Euro", country: "eurocups" },
+      { name: "AFCON", country: "Africa" },
+      { name: "Gold Cup", country: "North America" },
+      { name: "Asian Cup", country: "Asia" }
     ];
 
     const leagueArray = Object.values(grouped).sort((a, b) => {
@@ -251,10 +254,13 @@ function renderMatches(matchesData, category) {
             <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesByCategory('highlight')">Highlight</div>
             <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesByCategory('upcoming')">Upcoming</div>
             <div class="calendar-wrapper" style="position: relative;">
-                <div class="match-category-btn calendar" onclick="toggleCalendar()">
-                    <ion-icon name="calendar-outline"></ion-icon>
-                </div>
-                <input type="date" id="match-date" onchange="filterByDate('${category}')" style="display: none;">
+                <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
+                    <div class="calendar-icon">
+                      <div class="calendar-header"></div>
+                      <div id="calendar-day" class="calendar-day"></div>
+                    </div>
+                 </div>
+                <input type="date" id="match-date" onchange="filterByDate(currentCategory)" style="display: none;">
             </div>
         </div>
     `;
@@ -339,20 +345,23 @@ function renderMatches(matchesData, category) {
 
 
 
-// Filter the matches based on category (live, highlight, upcoming)
-function filterMatchesByCategory(category) {
-    selectedLeagueId = null; // Reset selected league
-    selectedLeagueName = null; // Reset selected league name
-    renderMatches(matchesData, category);
+function filterMatchesCategory(category) {
+  currentCategory = category;
+
+  // Reset active state
+  document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
+
+  // Highlight the clicked button
+  document.querySelectorAll(".match-category-btn").forEach(btn => {
+    if (btn.textContent.toLowerCase() === category) {
+      btn.classList.add("active");
+    }
+  });
+
+  // Show matches for the category
+  showMatches(matchesData, category);
 }
 
-// Event listener for category button click
-document.querySelectorAll(".match-category-btn").forEach(button => {
-    button.addEventListener("click", () => {
-        const category = button.textContent.toLowerCase();
-        filterMatchesByCategory(category);
-    });
-});
 
 
 // Function to filter matches by the selected date
@@ -419,7 +428,7 @@ function toggleCalendar() {
 // Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
     try {
-        const response = await fetch(`${API_BASE}/api/video/${matchId}`);
+        const response = await fetch(`/api/video/${matchId}`);
         const data = await response.json();
 
         console.log("🎥 Video Data:", data);
@@ -502,7 +511,7 @@ async function displayLiveMatch(matchId, category) {
 
     matchesContainer.innerHTML = `
         <div class="live-match">
-            ${videoUrl ? `<iframe width="100%" height="313" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>` 
+            ${videoUrl ? `<iframe width="100%" height="455px" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>` 
             : `<div class="no-video-message">No video available for the match.</div>`}
             <div class="live-match-teams">${teamHTML}</div>
             ${contentHTML}
@@ -591,6 +600,7 @@ async function displayLiveMatch(matchId, category) {
                                 <h4>${match.match_hometeam_system || "No Formation"}</h4>
                             </div>
                         </div>
+                         <div>${matchMinute}</div>
                         <div class="lineUpsteam-info">
                             <div class="team-formation">
                                 <h3>${match.match_awayteam_name}</h3>
@@ -681,7 +691,7 @@ async function displayLiveMatch(matchId, category) {
 //function to load statistic
 async function loadMatchStatistics(match_id, match) {
     try {
-        const response = await fetch(`${API_BASE}/api/match/statistics?matchId=${match_id}`);
+        const response = await fetch(`/api/match/statistics?matchId=${match_id}`);
         const data = await response.json();
         const stats = data.statistics || [];
 
@@ -727,7 +737,7 @@ function loadH2HData(homeTeam, awayTeam) {
 
     spinner.style.display = "block";
 
-    fetch(`${API_BASE}/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
+    fetch(`/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
         .then(res => res.json())
         .then(data => {
             spinner.style.display = "none";
@@ -853,7 +863,7 @@ function loadH2HData(homeTeam, awayTeam) {
     try {
         spinner.style.display = "block";
 
-        const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
+        const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
         const { standings } = await response.json();
 
         if (!Array.isArray(standings) || standings.length === 0) {
@@ -917,7 +927,7 @@ function loadH2HData(homeTeam, awayTeam) {
      function fetchAndRenderLineups(match_id, match) {
   const containerWrapper = document.getElementById("football-field-wrapper");
 
-  fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
+  fetch(`/api/lineups?matchId=${match_id}`)
     .then(res => res.json())
     .then(({ lineup }) => {
       containerWrapper.innerHTML = ""; // Clear previous content

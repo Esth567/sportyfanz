@@ -24,21 +24,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let matchesList = [];
     let currentMatchIndex = 0;
+    
 
     // === LUXON Time Functions ===
-    function getMinutesSince(matchDate, matchTime) {
-        const { DateTime } = luxon;
-
-        const matchDateTime = DateTime.fromFormat(
-            `${matchDate} ${matchTime}`,
-            "yyyy-MM-dd H:mm",
-            { zone: "Europe/Berlin" }
-        );
-
-        const now = DateTime.now().setZone("Europe/Berlin");
-        const diffInMinutes = Math.floor(now.diff(matchDateTime, "minutes").minutes);
-        return diffInMinutes > 0 ? diffInMinutes : 0;
-    }
+    function getMinutesSince(dateStr, timeStr) {
+  try {
+    const now = DateTime.local().setZone("Europe/Berlin");
+    const matchBerlin = getBerlinTime(dateStr, timeStr);
+    return Math.max(0, Math.floor(now.diff(matchBerlin, "minutes").minutes));
+  } catch {
+    return 0;
+  }
+}
 
     function formatToUserLocalTime(dateStr, timeStr) {
         try {
@@ -127,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             limit: 100
         });
 
-        const res = await fetch(`/api/matches?${params}`);
+        const res = await fetch(`${API_BASE}/api/matches?${params}`);
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -259,7 +256,7 @@ async function loadNews(sectionId, endpoint, retries = 2) {
 
 async function loadEntityDatabase() {
   try {
-    const res = await fetch(`/api/entity-database`);
+    const res = await fetch(`${API_BASE}/api/entity-database`);
     if (!res.ok) throw new Error("Failed to fetch entity DB");
     window.entityDatabase = await res.json();
     console.log("✅ Entity DB loaded", Object.keys(window.entityDatabase).length);
@@ -335,6 +332,7 @@ function populateNewsSection(sectionId, newsList) {
         showFullNews(el);
       });
     });
+
 
   // ========== SLIDER ==========
   } else if (sectionId === 'sliderNews-stories') {
@@ -558,7 +556,7 @@ window.onpopstate = function (event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
-    loadNews(sectionId, `/api/sports-summaries`);
+    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
   });
 });
                                                                                                                                                                                                                                                                                                                                                                                                
@@ -570,7 +568,7 @@ let playerImageMap = {};
 
 async function init() {
   try {
-    const res = await fetch(`/api/player-image-map`);
+    const res = await fetch(`${API_BASE}/api/player-image-map`);
     playerImageMap = await res.json();
     console.log(playerImageMap);
 
@@ -598,7 +596,7 @@ function normalizePlayerName(playerName) {
 // ✅ Main function
 async function fetchTopScorers() {
   try {
-    const res = await fetch(`/api/topscorers`);
+    const res = await fetch(`${API_BASE}/api/topscorers`);
     const topScorers = await res.json();
 
     const playersContainer = document.querySelector(".players-container");
@@ -731,7 +729,7 @@ const BACKUP_LEAGUE_IDS = [168, 169]; // Example: Euro, Copa America (update as 
 // Get the active league ID based on date
 async function getActiveLeagueId() {
   try {
-    const leagues = await fetch(`/api/leagues`).then(r => r.json());
+    const leagues = await fetch(`${API_BASE}/api/leagues`).then(r => r.json());
     const now = new Date();
 
     // 1. Check for Club World Cup in existing league data
@@ -765,7 +763,7 @@ async function getActiveLeagueId() {
 // Render the top 5 standings for a league
 async function fetchTopFourStandings(leagueId) {
   try {
-    const response = await fetch(`/api/topstandings/${leagueId}`);
+    const response = await fetch(`${API_BASE}/api/topstandings/${leagueId}`);
     const data = await response.json();
 
     const leagueTableDemo = document.querySelector(".league-table-demo");
@@ -907,7 +905,7 @@ function getMinutesSince(dateStr, timeStr) {
 //function to fetch matches
 async function fetchMatchesData() {
   try {
-    const response = await fetch(`/api/all_matches`);
+    const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
     matchesData = data;
@@ -922,6 +920,37 @@ async function fetchMatchesData() {
   } catch (error) {
     console.error("Error fetching match data:", error);
     document.querySelector(".matches-container").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+  }
+}
+
+// Calculate live match minute display
+function formatLiveMinute(dateStr, timeStr, matchStatus = "") {
+  try {
+    const minutesElapsed = getMinutesSince(dateStr, timeStr);
+
+    // Handle halftime directly
+    if (matchStatus?.toLowerCase() === "halftime") return "HT";
+
+    if (minutesElapsed <= 45) {
+      return `${minutesElapsed}'`;
+    } else if (minutesElapsed > 45 && minutesElapsed < 60) {
+      // First-half injury time (e.g., 45+3)
+      return `45+${minutesElapsed - 45}'`;
+    } else if (minutesElapsed <= 90) {
+      return `${minutesElapsed}'`;
+    } else if (minutesElapsed > 90 && minutesElapsed <= 105) {
+      // Second-half injury time (e.g., 90+4)
+      return `90+${minutesElapsed - 90}'`;
+    } else if (minutesElapsed > 105 && minutesElapsed <= 120) {
+      // Extra time (show as ET)
+      return `ET ${minutesElapsed}'`;
+    } else if (minutesElapsed > 120) {
+      return "PEN"; // Penalties
+    } else {
+      return `${minutesElapsed}'`;
+    }
+  } catch {
+    return "";
   }
 }
 
@@ -1012,7 +1041,8 @@ function showMatches(matchesData, category) {
 
     if (category === "live") {
       const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
-      const matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
+      const matchMinute = formatLiveMinute(match.match_date, match.match_time, match.match_status);
+
       scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
       formattedTime = `
         <div class="live-indicator">
@@ -1099,22 +1129,33 @@ function initCalendarPicker() {
   const calendarWrapper = document.querySelector(".calendar-wrapper");
   const matchDateInput = document.getElementById("match-date");
 
+  if (!matchDateInput || !calendarWrapper) return;
+
   // ✅ Prevent re-initialization
   if (matchDateInput._flatpickr) {
-    // Just update enabled dates dynamically
     matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
-    return;
+  } else {
+    flatpickr(matchDateInput, {
+      dateFormat: "Y-m-d",
+      defaultDate: new Date(),
+      enable: getAvailableMatchDates(),
+      appendTo: calendarWrapper,
+      position: "below left",
+      onChange: (dates, dateStr) => {
+        filterByDate("upcoming", dateStr);
+      }
+    });
   }
 
-  flatpickr(matchDateInput, {
-  dateFormat: "Y-m-d",
-  defaultDate: new Date(),
-  enable: getAvailableMatchDates(),
-  appendTo: calendarWrapper,   // ✅ forces dropdown under wrapper
-  onChange: (dates, dateStr) => {
-    filterByDate("upcoming", dateStr);
+  // ✅ Safe bind after element exists
+  const calendarBtn = document.querySelector(".calendar");
+  if (calendarBtn) {
+    calendarBtn.addEventListener("click", () => {
+      matchDateInput._flatpickr.open();
+    });
   }
-});
+}
+
 
 
 
@@ -1166,8 +1207,6 @@ function filterMatchesCategory(category) {
   showMatches(matchesData, category);
 }
 
-
-
 // Init on load
 document.addEventListener("DOMContentLoaded", () => {
   fetchMatchesData();
@@ -1178,7 +1217,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Function to fetch match video 
 async function fetchMatchVideo(matchId) {
     try {
-        const response = await fetch(`/api/match-video/${matchId}`);
+        const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
         const data = await response.json();
 
         console.log("🎥 Video Data:", data);
@@ -1458,7 +1497,7 @@ async function displayLiveMatch(matchId, category) {
 //function to load statistic
 async function loadMatchStatistics(match_id, match) {
     try {
-        const response = await fetch(`/api/match/statistics?matchId=${match_id}`);
+        const response = await fetch(`${API_BASE}/api/match/statistics?matchId=${match_id}`);
         const data = await response.json();
         const stats = data.statistics || [];
 
@@ -1492,127 +1531,108 @@ async function loadMatchStatistics(match_id, match) {
 }
 
 
-//functkion to det h2h
+//function to get h2h
+
+function renderMatchesByLeague(matches) {
+  if (!matches.length) return "<p>No matches available.</p>";
+
+  // group matches by league_name
+  const grouped = matches.reduce((acc, match) => {
+    const league = match.league_name || "Other Competitions";
+    if (!acc[league]) acc[league] = [];
+    acc[league].push(match);
+    return acc;
+  }, {});
+
+  let html = "";
+
+  Object.keys(grouped).forEach(league => {
+    html += `<h3 class="h2h-league">${league}</h3>`;
+    grouped[league].forEach(match => {
+      html += `
+        <div class="h2h-match">
+          <div class="h2hmatch-row">
+            <div class="h2hteams-column">
+              <div class="h2h-match-meta">
+                <p class="h2h-match-date">${match.match_date}</p>
+                <p class="h2h-match-time">${
+                  (!isNaN(parseInt(match.match_hometeam_score)) &&
+                   !isNaN(parseInt(match.match_awayteam_score)))
+                    ? "FT"
+                    : match.match_time
+                }</p>
+              </div>
+              <div class="h2hteam">
+                <img src="${match.team_home_badge || '/assets/default.png'}" alt="${match.match_hometeam_name}">
+                <span>${match.match_hometeam_name}</span>
+              </div>
+              <div class="h2hteam">
+                <img src="${match.team_away_badge || '/assets/default.png'}" alt="${match.match_awayteam_name}">
+                <span>${match.match_awayteam_name}</span>
+              </div>
+            </div>
+            <div class="h2hscores-column">
+              <span>${match.match_hometeam_score}</span>
+              <span>${match.match_awayteam_score}</span>
+            </div>
+          </div>
+        </div>`;
+    });
+  });
+
+  return html;
+}
+
 function loadH2HData(homeTeam, awayTeam) {
-    const spinner = document.querySelector("#h2h-spinner");
-    const h2hMatchesContainer = document.querySelector("#h2h-matches");
+  const spinner = document.querySelector("#h2h-spinner");
+  const h2hMatchesContainer = document.querySelector("#h2h-matches");
 
-    if (!spinner || !h2hMatchesContainer) {
-        console.error('Missing DOM elements for H2H.');
-        return;
-    }
+  if (!spinner || !h2hMatchesContainer) {
+    console.error('Missing DOM elements for H2H.');
+    return;
+  }
 
-    spinner.style.display = "block";
+  spinner.style.display = "block";
 
-    fetch(`/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
-        .then(res => res.json())
-        .then(data => {
-            spinner.style.display = "none";
+  fetch(`${API_BASE}/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
+    .then(res => res.json())
+    .then(data => {
+      spinner.style.display = "none";
 
-            const h2hArray = data.matches;
+      const h2hArray = data.h2h || [];
+      const homeLast = data.homeLast || [];
+      const awayLast = data.awayLast || [];
 
-            if (!Array.isArray(h2hArray) || !h2hArray.length) {
-                h2hMatchesContainer.innerHTML = "<p>No H2H data available.</p>";
-                return;
-            }
+      let content = "";
 
-            const fiveYearsAgo = new Date();
-            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+      // Direct H2H
+      if (h2hArray.length) {
+        content += `<h2>Head-to-Head</h2>`;
+        content += renderMatchesByLeague(h2hArray.slice(0, 5));
+      } else {
+        content += `<p>No direct H2H data available.</p>`;
+      }
 
-            const filtered = h2hArray.filter(match => {
-                const matchDate = new Date(match.match_date);
-                return !isNaN(matchDate) && matchDate >= fiveYearsAgo;
-            });
+      // Home team last 5
+      if (homeLast.length) {
+        content += `<h2>Last 5 Matches - ${homeTeam}</h2>`;
+        content += renderMatchesByLeague(homeLast.slice(0, 5));
+      }
 
-            if (!filtered.length) {
-                h2hMatchesContainer.innerHTML = "<p>No H2H matches in the last 5 years.</p>";
-                return;
-            }
+      // Away team last 5
+      if (awayLast.length) {
+        content += `<h2>Last 5 Matches - ${awayTeam}</h2>`;
+        content += renderMatchesByLeague(awayLast.slice(0, 5));
+      }
 
-            const grouped = {};
-            filtered.forEach(match => {
-                const league = match.match_league_name || "Unknown Competition";
-                if (!grouped[league]) grouped[league] = [];
-                grouped[league].push(match);
-            });
-
-            const h2hContent = Object.entries(grouped).map(([leagueName, matches]) => {
-                const sortedMatches = matches.sort((a, b) => new Date(b.match_date) - new Date(a.match_date));
-
-                // Aggregate stats
-                let homeWins = 0, awayWins = 0, draws = 0, homeGoals = 0, awayGoals = 0;
-
-                sortedMatches.forEach(match => {
-                    const homeScore = parseInt(match.match_hometeam_score);
-                    const awayScore = parseInt(match.match_awayteam_score);
-
-                    if (!isNaN(homeScore) && !isNaN(awayScore)) {
-                        homeGoals += homeScore;
-                        awayGoals += awayScore;
-
-                        if (homeScore > awayScore) homeWins++;
-                        else if (awayScore > homeScore) awayWins++;
-                        else draws++;
-                    }
-                });
-
-                const statsHTML = `
-                    <div class="h2h-stats">
-                        <p><strong>Total Matches:</strong> ${sortedMatches.length}</p>
-                        <p><strong>${homeTeam} Wins:</strong> ${homeWins}</p>
-                        <p><strong>${awayTeam} Wins:</strong> ${awayWins}</p>
-                        <p><strong>Draws:</strong> ${draws}</p>
-                        <p><strong>${homeTeam} Goals:</strong> ${homeGoals}</p>
-                        <p><strong>${awayTeam} Goals:</strong> ${awayGoals}</p>
-                    </div>
-                `;
-
-                const matchHTML = sortedMatches.map(match => `
-                    <div class="h2h-match">
-                        
-                        <div class="h2h-teams-info">
-                        <div class="h2h-match-meta">
-                            <p class="h2h-match-date">${match.match_date}</p>
-                            <p class="h2h-match-time">${
-                               (!isNaN(parseInt(match.match_hometeam_score)) && !isNaN(parseInt(match.match_awayteam_score)))
-                              ? "FT"
-                              : match.match_time
-                            }</p>
-
-                        </div>
-                            <div class="h2h-team">
-                                <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="h2h-badge">
-                                <p>${match.match_hometeam_name}</p>
-                            </div>
-                            <div class="h2h-score-column">
-                                <p class="score">${match.match_hometeam_score}</p>
-                                <p class="score">${match.match_awayteam_score}</p>
-                            </div>
-                            <div class="h2h-team">
-                                <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="h2h-badge">
-                                <p>${match.match_awayteam_name}</p>
-                            </div>
-                        </div>
-                    </div>
-                `).join("");
-
-                return `
-                    <div class="h2h-league-group">
-                        <h3 class="h2h-league-name">${leagueName}</h3>
-                        ${statsHTML}
-                        ${matchHTML}
-                    </div>
-                `;
-            }).join("");
-
-            h2hMatchesContainer.innerHTML = h2hContent;
-        })
-        .catch(err => {
-            console.error("Error fetching H2H data:", err);
-            spinner.style.display = "none";
-            h2hMatchesContainer.innerHTML = "<p>Error loading H2H data.</p>";
-        });
-     }
+      h2hMatchesContainer.innerHTML = content;
+    })
+    .catch(err => {
+      console.error("Error fetching H2H data:", err);
+      spinner.style.display = "none";
+      h2hMatchesContainer.innerHTML = "<p>Error loading H2H data.</p>";
+    });
+}
 
 
 
@@ -1629,7 +1649,7 @@ function loadH2HData(homeTeam, awayTeam) {
         try {
             spinner.style.display = "block";
     
-            const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
+            const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
             const { standings } = await response.json();
 
             if (!Array.isArray(standings)) {
@@ -1688,7 +1708,7 @@ function loadH2HData(homeTeam, awayTeam) {
   
     // ✅ Fetch lineup and dynamically infer formation
      function fetchAndRenderLineups(match_id, match) {
-       fetch(`/api/lineups?matchId=${match_id}`)
+       fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
         .then(res => res.json())
         .then(({ lineup }) => {
                 const container = document.getElementById("football-field");
@@ -1902,7 +1922,7 @@ function updateLiveTimers() {
 // Fetch and display predictions
 async function fetchTodayPredictions(predictionContainer) {
   try {
-    const response = await fetch(`/api/predictions`);
+    const response = await fetch(`${API_BASE}/api/predictions`);
 
     if (!response.ok) {
       predictionContainer.innerHTML = "<p>Prediction loding...</p>";

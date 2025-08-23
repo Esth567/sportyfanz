@@ -12,6 +12,8 @@ const leaguesSelected = {
     "Africa Cup of Nations Qualification": { country: "intl" }
 };
 
+let currentCategory = "live";
+let selectedDate = null;
 let selectedLeagueId = null;
 let selectedLeagueName = null;
 let matchesData = {
@@ -20,6 +22,7 @@ let matchesData = {
     upcoming: [],
     allHighlights: []
 };
+
 
 function getTodayDate(offset = 0) {
     const date = new Date();
@@ -89,105 +92,67 @@ fetch(`/api/leagues`)
 
 
    // === LUXON Time Functions ===
-    function getMinutesSince(matchDate, matchTime) {
-        const { DateTime } = luxon;
-    
-        const matchBerlin = luxon.DateTime.fromFormat(
-           `${match.match_date} ${match.match_time}`,
-             "yyyy-MM-dd HH:mm",
-            { zone: "Europe/Berlin" }
-         );
-     
-    
-        const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-        const diffInMinutes = Math.floor(now.diff(matchBerlin, "minutes").minutes);
-        return diffInMinutes > 0 ? diffInMinutes : 0;
-    }
-    
-    function formatToUserLocalTime(dateStr, timeStr) {
-        try {
-            const { DateTime } = luxon;
-    
-            const berlinTime = DateTime.fromFormat(
-                `${dateStr} ${timeStr}`,
-                "yyyy-MM-dd HH:mm",
-                { zone: "Europe/Berlin" }
-            );
-    
-            return berlinTime
-                .setZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
-                .toFormat("hh:mm");
-        } catch (e) {
-            console.error("Time conversion error:", e);
-            return "TBD";
-        }
-    }
 
-    //function to fetch matches
-async function fetchAndRenderMatches() {
+// Function to get today's date
+function getTodayDate(offset = 0) {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date.toISOString().split("T")[0];
+}
+
+const { DateTime } = luxon;
+
+// Convert a match date/time string to a Luxon DateTime in Berlin time
+function getBerlinTime(dateStr, timeStr) {
+  return DateTime.fromFormat(`${dateStr} ${timeStr}`, "yyyy-MM-dd HH:mm", { zone: "Europe/Berlin" });
+}
+
+// Convert Berlin time to the user's local timezone
+function convertToUserLocalTime(berlinTime) {
+  return berlinTime.setZone(DateTime.local().zoneName);
+}
+
+// Format match time for display in local time
+function formatToUserLocalTime(dateStr, timeStr) {
   try {
-    const response = await fetch(`/api/all_matches`);
-    const data = await response.json();
+    return convertToUserLocalTime(getBerlinTime(dateStr, timeStr)).toFormat("h:mm");
+  } catch {
+    return "TBD";
+  }
+}
 
-    console.log("Live Matches: ", data.live);
-    console.log("Highlight Matches: ", data.highlight);
-    console.log("Upcoming Matches: ", data.upcoming);
-
-    matchesData = data;
-
-    selectedLeagueId = null;
-    selectedLeagueName = null;
-
-    renderMatches(matchesData, "live");
-  } catch (error) {
-    console.error("Error fetching match data:", error);
-    document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+// Calculate minutes since match start
+function getMinutesSince(dateStr, timeStr) {
+  try {
+    const now = DateTime.local();
+    const matchLocal = convertToUserLocalTime(getBerlinTime(dateStr, timeStr));
+    return Math.max(0, Math.floor(now.diff(matchLocal, "minutes").minutes));
+  } catch {
+    return 0;
   }
 }
 
 
 
-// Modify the updateMatches function to use correct timezone conversion
-function updateMatches(matches) {
-    matchesData = {
-        live: [],
-        highlight: [],
-        upcoming: [],
-        allHighlights: []
-    };
+//function to fetch matches
+async function fetchAndRenderMatches() {
+  try {
+    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const data = await response.json();
 
-    
-    const now = luxon.DateTime.utc();  // Get the current time in UTC
-    const oneWeekAgo = now.minus({ days: 7 });
+    matchesData = data;
+    matchesData = data;
+      if (data.live?.length > 0) currentCategory = "live";
+      else if (data.upcoming?.length > 0) currentCategory = "upcoming";
+      else if (data.highlight?.length > 0) currentCategory = "highlight";
 
-    matches.forEach(match => {
-        const status = (match.match_status || "").trim().toLowerCase();
+    // ✅ Render matches (this also applies "active" to the correct tab)
+    renderMatches(matchesData, currentCategory);
 
-        // Convert match time from UTC to local timezone (Ensure that match times are in UTC and are converted correctly)
-        const matchBerlin = luxon.DateTime.fromFormat(
-        `${match.match_date} ${match.match_time}`,
-        "yyyy-MM-dd HH:mm",
-        { zone: "Europe/Berlin" }
-       );
-      const matchDateTimeLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-
-
-        const isFinished = status === "ft" || status === "finished" || status.includes("pen") || status.includes("after") || parseInt(status) >= 90;
-        const isUpcoming = matchDateTimeLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
-        const isLive = parseInt(status) > 0 && parseInt(status) < 90;
-
-        if (isLive) matchesData.live.push(match);
-        if (isFinished && matchDateTimeLocal >= oneWeekAgo) matchesData.highlight.push(match);
-        if (isFinished) matchesData.allHighlights.push(match);
-        if (isUpcoming) matchesData.upcoming.push(match);
-
-        // Format the match time to the user's local time
-        const formattedMatchTime = matchDateTimeLocal.toFormat("h:mm a");  // Format the time in a readable local format
-
-        console.log(`Match: ${match.match_hometeam_name} vs ${match.match_awayteam_name} - Time: ${formattedMatchTime}`);
-    });
-
-    renderMatches(matchesData, "live");
+  } catch (error) {
+    console.error("Error fetching match data:", error);
+    document.querySelector(".matches-container").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+  }
 }
 
 
@@ -254,16 +219,16 @@ function renderMatches(matchesData, category) {
             <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesByCategory('highlight')">Highlight</div>
             <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesByCategory('upcoming')">Upcoming</div>
             <div class="calendar-wrapper" style="position: relative;">
-                <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
-                    <div class="calendar-icon">
-                      <div class="calendar-header"></div>
-                      <div id="calendar-day" class="calendar-day"></div>
-                    </div>
-                 </div>
-                <input type="date" id="match-date" onchange="filterByDate(currentCategory)" style="display: none;">
+             <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
+               <div class="calendar-icon">
+               <div class="calendar-header"></div>
+              <div id="calendar-day" class="calendar-day"></div>
             </div>
+          </div>
+         <input type="text" id="match-date" style="display:none;">
         </div>
-    `;
+      </div>
+      `;
 
     if (selectedMatches.length === 0) {
         html += `<p>No ${category} matches found.</p>`;
@@ -341,6 +306,83 @@ function renderMatches(matchesData, category) {
     });
 
     matchesContainer.innerHTML = html;
+
+    setTodayInCalendar();
+   initCalendarPicker(category);
+}
+
+ // Calendar Functions
+function getAvailableMatchDates() {
+  return [
+    ...matchesData.live.map(m => m.match_date),
+    ...matchesData.highlight.map(m => m.match_date),
+    ...matchesData.upcoming.map(m => m.match_date)
+  ];
+}
+
+// Initialize Flatpickr
+function initCalendarPicker() {
+  const calendarWrapper = document.querySelector(".calendar-wrapper");
+  const matchDateInput = document.getElementById("match-date");
+
+  if (!matchDateInput || !calendarWrapper) return;
+
+  // ✅ Prevent re-initialization
+  if (matchDateInput._flatpickr) {
+    matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
+  } else {
+    flatpickr(matchDateInput, {
+      dateFormat: "Y-m-d",
+      defaultDate: new Date(),
+      enable: getAvailableMatchDates(),
+      appendTo: calendarWrapper,
+      position: "below left",
+      onChange: (dates, dateStr) => {
+        filterByDate("upcoming", dateStr);
+      }
+    });
+  }
+
+  // ✅ Safe bind after element exists
+  const calendarBtn = document.querySelector(".calendar");
+  if (calendarBtn) {
+    calendarBtn.addEventListener("click", () => {
+      matchDateInput._flatpickr.open();
+    });
+  }
+}
+
+
+
+
+// Update filterByDate to accept selected date
+function filterByDate(category, selectedDate) {
+  const filteredData = {
+    live: matchesData.live.filter(m => m.match_date === selectedDate),
+    highlight: matchesData.highlight.filter(m => m.match_date === selectedDate),
+    upcoming: matchesData.upcoming.filter(m => m.match_date === selectedDate),
+  };
+  showMatches(filteredData, category);
+}
+
+
+  //calender function
+  function setTodayInCalendar() {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+
+  const dayEl = document.getElementById("calendar-day");
+  const inputEl = document.getElementById("match-date");
+
+  if (dayEl) dayEl.textContent = dd;
+  if (inputEl) inputEl.value = today.toISOString().split("T")[0];
+
+  // Auto-rollover at midnight
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setHours(24, 0, 0, 0);
+  if (window.calendarRolloverTimer) clearTimeout(window.calendarRolloverTimer);
+  window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
 }
 
 
@@ -362,73 +404,16 @@ function filterMatchesCategory(category) {
   showMatches(matchesData, category);
 }
 
-
-
-// Function to filter matches by the selected date
-function filterByDate(category) {
-    const selectedDate = document.getElementById("match-date").value;
-    if (!selectedDate) return;
-
-    const from = selectedDate;
-    const to = selectedDate;
-
-    fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`)
-        .then(res => res.json())
-        .then(data => {
-            const filtered = {
-                live: [],
-                highlight: [],
-                upcoming: []
-            };
-
-            data.forEach(match => {
-                const status = match.match_status.toLowerCase();
-
-                if (status.includes("ht") || parseInt(status) > 0) {
-                    filtered.live.push(match);
-                } else if (status === "ft") {
-                    filtered.highlight.push(match);
-                } else {
-                    filtered.upcoming.push(match);
-                }
-            });
-
-            // Save new filtered dataset
-            matchesData = filtered;
-
-            // Filter by current league if one is selected
-            let filteredData = filtered;
-            if (selectedLeagueId) {
-                filteredData = Object.fromEntries(
-                    Object.entries(filtered).map(([key, matches]) => [
-                        key,
-                        matches.filter(m => m.league_id === selectedLeagueId)
-                    ])
-                );
-            }
-
-            renderMatches(filteredData, category);
-        })
-        .catch(err => {
-            console.error("Date filter fetch error:", err);
-        });
-}
-
-
-// Function to toggle calendar visibility
-function toggleCalendar() {
-    const dateInput = document.getElementById("match-date");
-    // Toggle visibility of the calendar input field
-    dateInput.style.display = (dateInput.style.display === "none" || !dateInput.style.display) ? "block" : "none";
-}
-
-
+// Init on load
+document.addEventListener("DOMContentLoaded", () => {
+  fetchAndRenderMatches();
+});
 
 
 // Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
     try {
-        const response = await fetch(`/api/video/${matchId}`);
+        const response = await fetch(`${API_BASE}/api/video/${matchId}`);
         const data = await response.json();
 
         console.log("🎥 Video Data:", data);
@@ -691,7 +676,7 @@ async function displayLiveMatch(matchId, category) {
 //function to load statistic
 async function loadMatchStatistics(match_id, match) {
     try {
-        const response = await fetch(`/api/match/statistics?matchId=${match_id}`);
+        const response = await fetch(`${API_BASE}/api/match/statistics?matchId=${match_id}`);
         const data = await response.json();
         const stats = data.statistics || [];
 
@@ -726,127 +711,110 @@ async function loadMatchStatistics(match_id, match) {
     }
 }
 
+//function to get h2h
+
+function renderMatchesByLeague(matches) {
+  if (!matches.length) return "<p>No matches available.</p>";
+
+  // group matches by league_name
+  const grouped = matches.reduce((acc, match) => {
+    const league = match.league_name || "Other Competitions";
+    if (!acc[league]) acc[league] = [];
+    acc[league].push(match);
+    return acc;
+  }, {});
+
+  let html = "";
+
+  Object.keys(grouped).forEach(league => {
+    html += `<h3 class="h2h-league">${league}</h3>`;
+    grouped[league].forEach(match => {
+      html += `
+        <div class="h2h-match">
+          <div class="h2hmatch-row">
+            <div class="h2hteams-column">
+              <div class="h2h-match-meta">
+                <p class="h2h-match-date">${match.match_date}</p>
+                <p class="h2h-match-time">${
+                  (!isNaN(parseInt(match.match_hometeam_score)) &&
+                   !isNaN(parseInt(match.match_awayteam_score)))
+                    ? "FT"
+                    : match.match_time
+                }</p>
+              </div>
+              <div class="h2hteam">
+                <img src="${match.team_home_badge || '/assets/default.png'}" alt="${match.match_hometeam_name}">
+                <span>${match.match_hometeam_name}</span>
+              </div>
+              <div class="h2hteam">
+                <img src="${match.team_away_badge || '/assets/default.png'}" alt="${match.match_awayteam_name}">
+                <span>${match.match_awayteam_name}</span>
+              </div>
+            </div>
+            <div class="h2hscores-column">
+              <span>${match.match_hometeam_score}</span>
+              <span>${match.match_awayteam_score}</span>
+            </div>
+          </div>
+        </div>`;
+    });
+  });
+
+  return html;
+}
+
 function loadH2HData(homeTeam, awayTeam) {
-    const spinner = document.querySelector("#h2h-spinner");
-    const h2hMatchesContainer = document.querySelector("#h2h-matches");
+  const spinner = document.querySelector("#h2h-spinner");
+  const h2hMatchesContainer = document.querySelector("#h2h-matches");
 
-    if (!spinner || !h2hMatchesContainer) {
-        console.error('Missing DOM elements for H2H.');
-        return;
-    }
+  if (!spinner || !h2hMatchesContainer) {
+    console.error('Missing DOM elements for H2H.');
+    return;
+  }
 
-    spinner.style.display = "block";
+  spinner.style.display = "block";
 
-    fetch(`/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
-        .then(res => res.json())
-        .then(data => {
-            spinner.style.display = "none";
+  fetch(`${API_BASE}/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
+    .then(res => res.json())
+    .then(data => {
+      spinner.style.display = "none";
 
-            const h2hArray = data.matches;
+      const h2hArray = data.h2h || [];
+      const homeLast = data.homeLast || [];
+      const awayLast = data.awayLast || [];
 
-            if (!Array.isArray(h2hArray) || !h2hArray.length) {
-                h2hMatchesContainer.innerHTML = "<p>No H2H data available.</p>";
-                return;
-            }
+      let content = "";
 
-            const fiveYearsAgo = new Date();
-            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+      // Direct H2H
+      if (h2hArray.length) {
+        content += `<h2>Head-to-Head</h2>`;
+        content += renderMatchesByLeague(h2hArray.slice(0, 5));
+      } else {
+        content += `<p>No direct H2H data available.</p>`;
+      }
 
-            const filtered = h2hArray.filter(match => {
-                const matchDate = new Date(match.match_date);
-                return !isNaN(matchDate) && matchDate >= fiveYearsAgo;
-            });
+      // Home team last 5
+      if (homeLast.length) {
+        content += `<h2>Last 5 Matches - ${homeTeam}</h2>`;
+        content += renderMatchesByLeague(homeLast.slice(0, 5));
+      }
 
-            if (!filtered.length) {
-                h2hMatchesContainer.innerHTML = "<p>No H2H matches in the last 5 years.</p>";
-                return;
-            }
+      // Away team last 5
+      if (awayLast.length) {
+        content += `<h2>Last 5 Matches - ${awayTeam}</h2>`;
+        content += renderMatchesByLeague(awayLast.slice(0, 5));
+      }
 
-            const grouped = {};
-            filtered.forEach(match => {
-                const league = match.match_league_name || "Unknown Competition";
-                if (!grouped[league]) grouped[league] = [];
-                grouped[league].push(match);
-            });
+      h2hMatchesContainer.innerHTML = content;
+    })
+    .catch(err => {
+      console.error("Error fetching H2H data:", err);
+      spinner.style.display = "none";
+      h2hMatchesContainer.innerHTML = "<p>Error loading H2H data.</p>";
+    });
+}
 
-            const h2hContent = Object.entries(grouped).map(([leagueName, matches]) => {
-                const sortedMatches = matches.sort((a, b) => new Date(b.match_date) - new Date(a.match_date));
 
-                // Aggregate stats
-                let homeWins = 0, awayWins = 0, draws = 0, homeGoals = 0, awayGoals = 0;
-
-                sortedMatches.forEach(match => {
-                    const homeScore = parseInt(match.match_hometeam_score);
-                    const awayScore = parseInt(match.match_awayteam_score);
-
-                    if (!isNaN(homeScore) && !isNaN(awayScore)) {
-                        homeGoals += homeScore;
-                        awayGoals += awayScore;
-
-                        if (homeScore > awayScore) homeWins++;
-                        else if (awayScore > homeScore) awayWins++;
-                        else draws++;
-                    }
-                });
-
-                const statsHTML = `
-                    <div class="h2h-stats">
-                        <p><strong>Total Matches:</strong> ${sortedMatches.length}</p>
-                        <p><strong>${homeTeam} Wins:</strong> ${homeWins}</p>
-                        <p><strong>${awayTeam} Wins:</strong> ${awayWins}</p>
-                        <p><strong>Draws:</strong> ${draws}</p>
-                        <p><strong>${homeTeam} Goals:</strong> ${homeGoals}</p>
-                        <p><strong>${awayTeam} Goals:</strong> ${awayGoals}</p>
-                    </div>
-                `;
-
-               const matchHTML = sortedMatches.map(match => `
-                   <div class="h2h-match">
-                    <div class="h2h-teams-info">
-                     <div class="h2h-match-meta">
-                         <p class="h2h-match-date">${match.match_date}</p>
-                         <p class="h2h-match-time">${
-                         (!isNaN(parseInt(match.match_hometeam_score)) && !isNaN(parseInt(match.match_awayteam_score)))
-                         ? "FT"
-                         : match.match_time
-                        }</p>
-                     </div>
-                   <div class="h2h-teams-column">
-                      <div class="h2h-team">
-                        <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="h2h-badge">
-                        <p>${match.match_hometeam_name}</p>
-                   </div>
-                  <div class="h2h-team">
-                      <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="h2h-badge">
-                      <p>${match.match_awayteam_name}</p>
-                  </div>
-                 </div>
-                 <div class="h2h-score-column">
-                     <p class="score">${match.match_hometeam_score}</p>
-                     <p class="score">${match.match_awayteam_score}</p>
-                  </div>
-                </div>
-               </div>
-               `).join("");
- 
-
-                return `
-                    <div class="h2h-league-group">
-                        <h3 class="h2h-league-name">${leagueName}</h3>
-                        ${statsHTML}
-                        ${matchHTML}
-                    </div>
-                `;
-            }).join("");
-
-            h2hMatchesContainer.innerHTML = h2hContent;
-        })
-        .catch(err => {
-            console.error("Error fetching H2H data:", err);
-            spinner.style.display = "none";
-            h2hMatchesContainer.innerHTML = "<p>Error loading H2H data.</p>";
-        });
-     }
 
 
 
@@ -863,7 +831,7 @@ function loadH2HData(homeTeam, awayTeam) {
     try {
         spinner.style.display = "block";
 
-        const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
+        const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
         const { standings } = await response.json();
 
         if (!Array.isArray(standings) || standings.length === 0) {
@@ -927,7 +895,7 @@ function loadH2HData(homeTeam, awayTeam) {
      function fetchAndRenderLineups(match_id, match) {
   const containerWrapper = document.getElementById("football-field-wrapper");
 
-  fetch(`/api/lineups?matchId=${match_id}`)
+  fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
     .then(res => res.json())
     .then(({ lineup }) => {
       containerWrapper.innerHTML = ""; // Clear previous content

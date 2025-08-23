@@ -30,23 +30,34 @@ function showInitialNews(sectionId) {
   
   // ========== TOGGLE SEE MORE ========== //
 function toggleNews(section) {
-    const newsSection = document.getElementById(`${section}-news`);
-    const seeMoreText = document.getElementById(`${section}-text`);
-    const icon = document.querySelector(`#${section} .see-more ion-icon`);
+  const newsSection = document.getElementById(`${section}-news`);
+  const header = newsSection?.previousElementSibling; // .news-text-cont
+  const seeMoreText = header?.querySelector('.see-more p');
+  const seeMoreImg = header?.querySelector('.see-more img');
 
-    if (!newsSection || !seeMoreText || !icon) return;
+  if (!newsSection || !seeMoreText) {
+    console.warn(`toggleNews: missing elements for ${section}`);
+    return;
+  }
 
-    const items = newsSection.querySelectorAll('.news-infomat');
-    const expanded = seeMoreText.innerText === 'See less';
+  const items = newsSection.querySelectorAll('.news-infomat');
+  const expanded = seeMoreText.innerText.toLowerCase() === 'see less';
 
-    items.forEach((item, index) => {
-        item.style.display = expanded ? (index < MAX_VISIBLE_NEWS ? 'flex' : 'none') : 'flex';
-    });
+  items.forEach((item, index) => {
+    item.style.display = expanded ? (index < MAX_VISIBLE_NEWS ? 'flex' : 'none') : 'flex';
+  });
 
-    seeMoreText.innerText = expanded ? 'See more' : 'See less';
-    icon.name = expanded ? 'caret-down-outline' : 'caret-up-outline';
+  seeMoreText.innerText = expanded ? 'See more' : 'See less';
+
+  // Optional: swap arrow image
+  if (seeMoreImg) {
+    seeMoreImg.src = expanded 
+      ? "/assets/icons/ankle-vector.png"     // collapsed
+      : "/assets/icons/ankle-vector-up.png"; // expanded
+  }
 }
-  
+
+
   
   // ========== RELATIVE TIME ========== //
 function updateRelativeTime() {
@@ -54,7 +65,7 @@ function updateRelativeTime() {
     const now = new Date();
 
     timeElements.forEach(el => {
-        const postedMs = Date.parse(el.dataset.posted); // 👈 parses ISO string
+        const postedMs = Date.parse(el.dataset.posted);
         if (isNaN(postedMs)) {
             el.textContent = 'Invalid time';
             return;
@@ -63,16 +74,24 @@ function updateRelativeTime() {
         const diff = Math.floor((now.getTime() - postedMs) / 1000);
         let text;
 
-        if (diff < 1) text = '1 second(s) ago';
-        else if (diff < 60) text = `${diff} second(s) ago`;
-        else if (diff < 3600) text = `${Math.floor(diff / 60)} minute(s) ago`;
-        else if (diff < 86400) text = `${Math.floor(diff / 3600)} hour(s) ago`;
-        else text = `${Math.floor(diff / 86400)} day(s) ago`;
+        if (diff < 1) text = '1 second ago';
+        else if (diff < 60) {
+            const seconds = diff;
+            text = `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
+        } else if (diff < 3600) {
+            const minutes = Math.floor(diff / 60);
+            text = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        } else if (diff < 86400) {
+            const hours = Math.floor(diff / 3600);
+            text = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+        } else {
+            const days = Math.floor(diff / 86400);
+            text = `${days} day${days !== 1 ? 's' : ''} ago`;
+        }
 
         el.textContent = text;
     });
 }
-
 
 
 
@@ -84,7 +103,7 @@ async function loadNews(retry = true) {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch(`/api/sports-summaries`);
+    const response = await fetch(`${API_BASE}/api/sports-summaries`);
 
     if (!response.ok) {
       const text = await response.text();
@@ -147,7 +166,7 @@ function populateNewsSection(sectionId, newsList) {
     return `
       <div class="news-infomat" data-index="${index}" data-section="${sectionId}">
         ${imageHtml}
-        <div class="title-desc"> 
+        <div class="title-desc">  
         <h1 class="news-title">
           <a href="/news/${item.seoTitle}" class="news-link">${item.title}</a>
           </h1>
@@ -183,128 +202,140 @@ function showFullNews(clickedItem) {
   try {
     const middleLayer = document.querySelector('.middle-layer');
 
+
+    // detect if mobile/tablet (adjust breakpoint to match your CSS media queries)
+     const isMobileOrTablet = window.innerWidth <= 1024;
+    
     // Hide all children inside middle-layer
     const children = Array.from(middleLayer.children);
     children.forEach(child => {
       child.style.display = 'none';
     });
 
-    // Get data from clicked item
+    // ✅ hide first & third layer only for mobile/tablet
+    if (isMobileOrTablet) {
+      document.body.classList.add("full-view-active");
+    }
+
+    // ✅ On news page only → show hidden elements
+    if (document.body.classList.contains("news-page")) {
+      document.querySelectorAll('.text-cont1, .news-update').forEach(el => {
+        el.style.display = ''; // restore
+      });
+    }
+    // Get news data on clicked 
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
-    const newsList = section === 'trending-news' ? window.trendingNews : window.updatesNews;
+
+     const newsList = section === 'trending-news' ? window.trendingNews : window.updatesNews
+
     const newsItem = newsList[parseInt(index)];
+
+    if (!newsItem) {
+      alert("News item not found.");
+      return;
+    }
 
     // Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
-    const googleAdCode = `
-     <div class="ad-container" style="margin: 15px 0;">
-       <ins class="adsbygoogle"
-           style="display:block; text-align:center;"
-           data-ad-layout="in-article"
-           data-ad-format="fluid"
-           data-ad-client="ca-pub-XXXXXXXXXXXXXXX"   <!-- ✅ Replace with your AdSense ID -->
-           data-ad-slot="YYYYYYYYYYYYY"></ins>
-      <script>
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {
-          console.warn('AdSense error:', e.message);
-        }
-       </script>
-      </div>
-    `;
+      const googleAdCode = `
+        <div class="ad-container" style="margin: 15px 0;">
+          <ins class="adsbygoogle"
+               style="display:block; text-align:center;"
+               data-ad-layout="in-article"
+               data-ad-format="fluid"
+               data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+               data-ad-slot="YYYYYYYYYYYYY"></ins>
+          <script>
+            try {
+              (adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (e) {
+              console.warn('AdSense error:', e.message);
+            }
+          </script>
+        </div>
+      `;
 
-      const placeholderAdCode = `
-        <div class="ad-container placeholder-ad">Advertisement</div>
-       `;
+      const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
+      const adCode = typeof window !== "undefined" && window.adsbygoogle ? googleAdCode : placeholderAdCode;
 
-  const adCode = typeof window !== "undefined" && window.adsbygoogle
-    ? googleAdCode
-    : placeholderAdCode;
-
-  const htmlParts = [];
-
-  for (let i = 0; i < paragraphs.length; i++) {
-    htmlParts.push(`<p>${paragraphs[i].trim()}</p>`);
-    if ((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) {
-      htmlParts.push(adCode);
+      return paragraphs.map((p, i) => 
+        `<p>${p.trim()}</p>${((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) ? adCode : ''}`
+      ).join('');
     }
-  }
-
-  return htmlParts.join('');
-}
 
     const formattedDesc = Array.isArray(newsItem.paragraphs)
-  ? injectAdParagraphs(newsItem.paragraphs, 2)  // ⬅️ Inject ads every 2 paragraphs
-  : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
+      ? injectAdParagraphs(newsItem.paragraphs, Math.floor(Math.random() * 2) + 3)
+      : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
-
-    // Create and display the full view container
+    const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
+        
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
-  <article class="blog-post">
-    <h1 class="blog-title">${newsItem.title}</h1>
+      <article class="blog-post">
+        <!-- ✅ keep only this back button -->
+        <button class="back-button">← Back to news</button>
+        <h1 class="blog-title">${newsItem.title}</h1>
 
-    <div class="blog-meta">
-      <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
-      <span class="news-time" data-posted="${newsItem.date}"></span>
-    </div>
+        <div class="blog-meta">
+          <span class="blog-date">${new Date(newsItem.date).toLocaleDateString()}</span>
+          <span class="news-time" data-posted="${newsItem.date}"></span>
+        </div>
 
-    ${newsItem.image ? `
-      <div class="blog-image-wrapper">
-        <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-      </div>` : ''
-    }
+        ${newsItem.entity ? `
+          <div class="entity-display">
+            <img src="${newsItem.entity.logo}" alt="${newsItem.entity.name}" class="entity-logo" />
+            <div class="entity-meta">
+              <h2 class="entity-name">${newsItem.entity.name}</h2>
+              <div class="entity-category">${newsItem.entity.category}</div>
+            </div>
+          </div>` : ''}
 
-    <div class="social-icons">
-         <!-- X (Twitter rebranded) -->
-         <a href="https://x.com/sporty_fanz/intent/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
-         <i class="fab fa-x-twitter"></i> <!-- Font Awesome 6 has this -->
-        </a>
+        ${newsItem.image ? `
+          <div class="blog-image-wrapper">
+            <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
+          </div>` : ''}
 
-        <!-- Facebook -->
-        <a href="https://www.facebook.com/sportfolder/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
-         <i class="fab fa-facebook-f"></i>
-        </a>
+        <div class="social-icons">
+          <a href="https://x.com/sporty_fanz/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-x-twitter"></i>
+          </a>
+          <a href="https://www.facebook.com/sportfolder/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://wa.me/?text=${encodeURIComponent(newsItem.title + ' ' + articleUrl)}" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="https://www.tiktok.com/@sportyfanz" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-tiktok"></i>
+          </a>
+          <a href="https://www.instagram.com/sportyfanz_official?igsh=djJlbWl6Z3Uwcnl0/" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-instagram"></i>
+          </a>
+        </div>
 
-       <!-- WhatsApp -->
-       <a href="https://wa.me/?text=${encodeURIComponent(newsItem.title + ' ' + articleUrl)}" target="_blank" rel="noopener noreferrer">
-         <i class="fab fa-whatsapp"></i>
-       </a>
+        <div class="blog-content">${formattedDesc}</div>
+      </article>
+    `;
 
-      <!-- TikTok (links to your TikTok profile or a video) -->
-     <a href="https://www.tiktok.com/@sportyfanz" target="_blank" rel="noopener noreferrer">
-      <i class="fab fa-tiktok"></i>
-     </a>
-
-     <!-- Instagram (links to your IG profile or post) -->
-     <a href="https://www.instagram.com/sportyfanz_official?igsh=djJlbWl6Z3Uwcnl0/" target="_blank" rel="noopener noreferrer">
-      <i class="fab fa-instagram"></i>
-      </a>
-    </div>
-        
-    <div class="blog-content">
-      ${formattedDesc}
-    </div>
-  </article>
-`;
-
-    // Add back button
-    const backButton = document.createElement('button');
-    backButton.textContent = '← Back to news';
-    backButton.className = 'back-button';
+    // back button → restore state
+    const backButton = fullView.querySelector('.back-button');
     backButton.onclick = () => {
       fullView.remove();
-      // Show previously hidden children again
-     children.forEach(child => {
-      child.style.display = ''; // resets to original display
-     });
+      children.forEach(child => {
+        child.style.display = ''; // restores previous display
+      });
+       
+      if (document.body.classList.contains("news-page")) {
+        document.querySelectorAll('.text-cont1, .news-update').forEach(el => {
+        el.style.display = 'none';
+        });
+      }
+
       updateRelativeTime();
     };
 
-    fullView.prepend(backButton);
     middleLayer.insertBefore(fullView, middleLayer.firstChild);
 
   } catch (err) {
@@ -312,6 +343,35 @@ function showFullNews(clickedItem) {
     alert("Something went wrong displaying the full article.");
   }
 }
+
+
+// --------- Handle back/forward ---------
+window.onpopstate = function (event) {
+  const middleLayer = document.querySelector('.middle-layer');
+  const isMobileOrTablet = window.innerWidth <= 1024;
+
+  if (event.state && typeof event.state.index !== 'undefined') {
+    const dummy = document.createElement('div');
+    dummy.dataset.index = event.state.index;
+    dummy.dataset.section = event.state.section;
+    showFullNews(dummy);
+
+    if (isMobileOrTablet) {
+      document.body.classList.add("full-view-active");
+    }
+  } else {
+    const fullView = document.querySelector('.news-full-view');
+    if (fullView) fullView.remove();
+
+    Array.from(middleLayer.children).forEach(child => {
+      child.style.display = '';
+    });
+
+    if (isMobileOrTablet) {
+      document.body.classList.remove("full-view-active");
+    }
+  }
+};
 
 
 

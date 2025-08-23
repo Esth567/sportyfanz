@@ -394,6 +394,7 @@ body{
     flex-direction: column;
     padding: 0;
     margin: 0;
+    overflow: visible;
 }
 
 /* First Layer */
@@ -731,7 +732,7 @@ body{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-left: 5px; 
+  margin-left: 8px; 
 } 
 
 
@@ -762,8 +763,8 @@ body{
 .middle-layer {
   flex: 3;
   padding: 10px;
-  overflow-y: auto;
-  height: 100%;
+  overflow: visible;
+  height: auto;
 }
 
 .header-slider {
@@ -860,10 +861,12 @@ body{
 
 .sliderNews-image img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(70%); /* darkens image */
+  height: auto;            /* keep natural aspect ratio */
+  object-fit: contain;     /* no cropping */
+  background: #000;        /* black bars fill empty space */
   border-radius: 20px;
+  display: block;
+  margin: 0 auto;          /* keep centered */
 }
 
 .sliderNews-info {
@@ -1094,15 +1097,17 @@ body{
   }
 
   #match-date {
-  visibility: hidden;   /* instead of display:none */
-  position: absolute;
-  left: -9999px;        /* keep it off-screen */
-}
+    position: absolute;
+    opacity: 0;         /* invisible */
+    pointer-events: none; /* not clickable */
+    height: 0;
+    width: 0;
+  }
 
   .calendar-wrapper {
-  position: relative; /* makes dropdown position relative to wrapper */
-  display: inline-block;
-}
+    position: relative; /* makes dropdown position relative to wrapper */
+    display: inline-block;
+   }
   
 .calendar-icon {
   width: 30px;
@@ -1132,7 +1137,61 @@ body{
 }
 
 .flatpickr-calendar {
-  z-index: 9999; /* ensures it shows above other UI */
+  background: #1A2F4B !important;
+  z-index: 9999 !important; 
+  top: 100% !important;  /* dropdown directly below */
+  left: 0 !important;
+  margin-top: 5px;       /* small gap below icon */
+  border: 1px solid #0b1d39;        /* optional darker border */
+  border-radius: 8px;
+  width: 240px !important;
+  
+}
+/* Days inside */
+.flatpickr-day {
+  color: #fff !important;           /* text color */
+  background: transparent !important;
+}
+
+/* Today’s date */
+.flatpickr-day.today {
+  background: #0b1d39 !important;
+  border-radius: 4px;
+}
+
+/* Selected date */
+.flatpickr-day.selected {
+  background: #1a73e8 !important;   /* highlight color */
+  color: #fff !important;
+  border-radius: 4px;
+}
+
+/* Month & navigation arrows */
+.flatpickr-months,
+.flatpickr-current-month,
+.flatpickr-weekdays {
+  background: #0b1d39 !important;
+  color: #fff !important;
+  border-radius: 8px 8px 0 0;
+}
+
+/* Navigation arrows (prev & next month) */
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg {
+  fill: #fff !important;   /* make arrows white */
+  stroke: #fff !important;
+  width: 16px;
+  height: 16px;
+}
+
+/* Weekday names (Mon, Tue, etc.) */
+.flatpickr-weekdays {
+  background: #0b1d39 !important;
+}
+
+.flatpickr-weekday {
+  color: #fff !important;   /* make text white */
+  font-weight: 600;
 }
 
     .matches-container {
@@ -1146,14 +1205,13 @@ body{
      align-items: center;
      justify-content: space-between;
      flex-direction: row;
-     gap: 20px;
+     gap: 15px;
      background-color: #1a2f4bad;
      color: #fff;
      border-radius: 10px;
      padding: 12px 15px;
      margin-top: 10px;
-     width: 100%;   
-     flex-wrap: wrap;  
+     width: 100%;     
    }
 
    
@@ -1174,9 +1232,10 @@ body{
        font-size: 17px;
        font-weight: 500;
        font-family: 'Lato';
-       white-space: nowrap;     
-      overflow: hidden;         
-      text-overflow: ellipsis;
+       white-space: normal;  
+       overflow: visible;     
+       text-overflow: unset;   
+       word-break: break-word;  
     }
 
 
@@ -1257,11 +1316,10 @@ body{
     .match-time-country {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
       font-size: 15px;
       font-family: 'Lato';
-      flex: 1;
-      justify-content: flex-start;
+      flex-shrink: 0;
     }
 
    .match-time-country div {
@@ -1286,8 +1344,8 @@ body{
 
         
     .match-btn {
-     margin-left: auto;
-     }
+      flex-shrink: 0;   
+    }
 
      /*view button*/    
     .view-details-btn {
@@ -1302,13 +1360,14 @@ body{
         border: none;
         min-width: fit-content;
         width: 173px;
-        height: 45px;
-        gap: 12.5px;
+        height: 40px;
+        gap: 8px;
         margin-left: auto;
+        padding: 10px;
     }
     
     .view-details-btn img{
-        font-size: 22.5px;
+        font-size: 30px;
     }
 
     .advert-container {
@@ -1524,25 +1583,6 @@ body{
     border: 1px solid #c4c4c41c;
 }
 
-.advert {
-  width: 100%;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.advert-img {
-  width: 100%;         /* responsive */
-  max-width: 300px;    /* keeps sidebar format */
-  height: auto;        /* preserves aspect ratio */
-  border: 2px solid #000; 
-  border-radius: 8px;
-  display: block;
-  margin: 0 auto;      /* center inside sidebar */
-}
-
-.about-details{
-    color: #fff;
-}
 
 .about-details h4{
     color: #fff;
@@ -1687,11 +1727,8 @@ body{
 .footer-banner {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 728px;          /* leaderboard width */
-  height: 50px;          /* leaderboard height */
-  max-width: 95%;        /* responsive on smaller screens */
+  left: 65%;
+  transform: translateX(-70%);       
   background: #0b1d39;
   z-index: 9999;
   border-top: 3px solid #1a73e8;
@@ -1699,14 +1736,6 @@ body{
   border-radius: 8px 8px 0 0;
   overflow: hidden;
   text-align: center;
-}
-
-.footer-banner .footerBanner-slide img {
-  width: 100%;
-  height: 50%;
-  object-fit: cover;
-  display: block;
-  cursor: pointer;
 }
 
 /* Close Button */
@@ -1742,6 +1771,12 @@ body{
     display: none;
 }
 
+
+body.news-page .text-cont1,
+body.news-page .news-update {
+  display: none;
+}
+
 /*top stories */
 .top-story {
     flex: 1; 
@@ -1773,16 +1808,9 @@ body{
 }
 
 .news-headers {
-    font-size: 0.80rem;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: 700;
     color: #ffffff;
-    font-family: 'Lato';
-}
-
-
-.news-text-cont h4 {
-    font-size: 0.75rem;
-    font-weight: 400;
     font-family: 'Lato';
 }
 
@@ -1792,14 +1820,14 @@ body{
     align-items: center;
     gap: 5px;
     color: #fff;
-    font-size: 0.70rem;   
+    font-size: 16px;   
     font-family: 'Lato';
-    font-weight: 300;
+    font-weight: 500;
 }
 
 .see-more img {
-    width: 10px; /* Adjust size */
-    height: 10px; /* Maintain aspect ratio */
+    width: 20px; /* Adjust size */
+    height: 20px; /* Maintain aspect ratio */
     object-fit: contain;
 }
 
@@ -1809,8 +1837,8 @@ body{
     flex-direction: row; /* Keep the direction row-based */
     justify-content: flex-start; /* Aligns items to the start of the container */
     align-items: flex-start; /* Ensures top alignment of wrapped rows */
-    gap: 10px; /* Space between items */
-    padding: 1.1rem;
+    gap: 19px; /* Space between items */
+    padding: 10px;
     border-radius: 10px;
     color: #fff;
     font-weight: 'Lato';
@@ -1820,8 +1848,10 @@ body{
   display: flex;
   flex-direction: column;
 }
-.news-title {
-    font-size: 1rem;
+.title-desc .news-title {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Lato';
 }
 
 .news-link {
@@ -1831,9 +1861,9 @@ body{
 
 .feature-image {
   width: 120px;
-  height: auto;
+  height: 75px;
   aspect-ratio: 16 / 9; 
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
   object-fit: cover;
@@ -1856,24 +1886,23 @@ body{
     flex-direction: row;
 }
 
-.news-meta .news-desc {
+ .news-desc {
     flex: 4;
-    font-size: 0.75rem;
+    font-size: 14px;
     line-height: 1.5;
     font-weight: 500;
-    font-size: 0.70rem;
     margin: 0;
-    color: #cccccc;
+    color: #dce5e3;
     word-wrap: break-word;
-    
 }
 
 .news-meta .news-time {
     flex: 1;
     text-align: right;
-    font-size: 0.5rem;
+    font-size: 14px;
     font-family: 'Lato';
-    font-weight: 300;
+    color: #dce5e3;
+    font-weight: 500;
     margin-left: 10px;
     margin-top: 30px;
     white-space: nowrap;
@@ -1888,9 +1917,9 @@ body{
 }
 
 .blog-title {
-  font-size: 1.1rem;
+  font-size: 24px;
   font-family: 'Lato';
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 1rem;
   color: #fff;
 }
@@ -1902,9 +1931,9 @@ body{
 
 .blog-image {
   width: 100%;
-  max-height: 350px;
+  max-height: 480px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .blog-image:hover {
@@ -1917,15 +1946,27 @@ body{
   justify-content: flex-end;
   flex-direction: column;
   gap: 10px;
-  font-size: 0.8rem;
-  color: #ccc;
   margin: 8px 0 4px;
 }
 
+.blog-date {
+   font-size: 16px;
+   font-family: 'Lato';
+   font-weight: 600;
+   color: #dce5e3;
+}
 
+news-time {
+   font-size: 14px;
+   font-family: 'Lato';
+   font-weight: 500;
+   color: #b7bfbd;
+}
 .blog-content {
-  font-size: 0.80rem;
-  color: #333;
+  font-size: 16px;
+  color: #f4f6f6;
+  font-family: 'Lato';
+  font-weight: 500;
   white-space: pre-wrap;
 }
 
@@ -1957,80 +1998,42 @@ body{
 }
 
 /* social icon*/
-.social-icons {
-  display: flex;
-  justify-content: flex-start;
-  gap: 15px;
-  margin-top: 8px;
-  margin-left: 10px;
-}
-
 .social-icons a {
-  font-size: 1rem;
+  font-size: 1.5rem; /* a bit larger */
   text-decoration: none;
   transition: transform 0.2s ease;
+  color: inherit; /* prevent anchor from turning icons blue */
 }
 
 .social-icons a:hover {
   transform: scale(1.1);
 }
 
-/* Brand colors */
-.x-icon i {
-  color: #000000; /* X is just black */
+/* Brand colors with stronger specificity */
+.social-icons .x-icon i {
+  color: #000000 !important; /* X black */
 }
 
-.facebook-icon i {
-  color: #1877F2; /* Facebook blue */
+.social-icons .facebook-icon i {
+  color: #1877F2 !important; /* Facebook blue */
 }
 
-.whatsapp-icon i {
-  color: #25D366; /* WhatsApp green */
+.social-icons .whatsapp-icon i {
+  color: #25D366 !important; /* WhatsApp green */
 }
 
- .tiktok-icon i {
-  color: #000000; /* TikTok base */
+.social-icons .tiktok-icon i {
+  color: #000000 !important; /* TikTok base */
   text-shadow: 
-    1px 1px 0 #25F4EE,  /* TikTok cyan accent */
-    -1px -1px 0 #FE2C55; /* TikTok pink accent */
- }
+    1px 1px 0 #25F4EE,   /* cyan */
+    -1px -1px 0 #FE2C55; /* pink */
+}
 
-.instagram-icon i {
-  color: #E1306C; /* Instagram pinkish red */
+.social-icons .instagram-icon i {
+  color: #E1306C !important; /* Instagram pinkish red */
 }
 
 
-.news-image {
-  margin: 10px 0;
-  text-align: center;
-}
-
-.news-image img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-
-
-.newsDetails-content img {
-    max-width: 852px;
-    max-height: 480px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    padding-top: 10px;
-}
-
-.see-more img {
-    font-size: 0.8rem;
-    margin-top: 15px;
-}
-
-#back-button .search-icon {
-    margin-right: 7px; /* Space between arrow and text */
-}
 
 .entity-display {
   display: flex;
@@ -2097,14 +2100,6 @@ body{
   
 }
 
-.team-times {
-    display: flex;
-    padding: 20px;
-    width: 180px;
-    background: linear-gradient(to bottom, #1a2f4b 0%, #265a3f 50%, #70c172 100%);
-    border-radius: 15px;
-
-}
 
 /*-- newsAd-middle styling */
 
@@ -2124,20 +2119,19 @@ body{
   padding: 0;
   text-align: center;
   width: 100%;
-  margin-bottom: -5px;
-  padding-top: -5px;
-  
+  border-radius: 10px;
+  padding: 20px;
 }
 
 .ad-container.placeholder-ad {
   background-color: #111B2A;
   color: #9CA3AF;
   border: 1px solid #c4c4c41c;
-  height: 100px;
+  height: 300px;
   display: flex;
   align-items: flex-start;  /* Push content toward the top */
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 14px;
   padding-top: 5px;
 }
 
@@ -3390,12 +3384,16 @@ body{
     display: flex;
     flex-direction: row;
     gap: 20px;
-    font-size: 14px;
-    font-family: 'Lato';
     align-items: center;
-    font-weight: 500;
+    
 }
 
+.h2h-header h3,
+.h2h-header p {
+    font-size: 16px;
+    font-family: 'Lato';
+    font-weight: 500;
+}
 .h2h-header h3 {
     color: #28a745;
 }
@@ -3448,23 +3446,18 @@ body{
 }
 
 
-/* 🏅 H2H Match Container */
+
+/* H2H Match Container */
 .h2h-match {
-    background:#1a2f4b9a;
-    padding: 10px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 10px;
-    gap: 8px;
+  background: #1a2f4b9a;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  gap: 10px;
 }
 
-.h2h-left-column {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
   .h2h-match-meta {
     margin-bottom: 6px;
     display: flex;
@@ -3475,58 +3468,49 @@ body{
     gap: 8px;
   }
   
-  .h2h-teams-info {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-  }
 
-  .h2h-teams-column {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    justify-content: center;
+/* Row: teams on left, scores on right */
+.h2hmatch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
-  .h2h-team {
-     display: flex;
-     flex-direction: row;
-     gap: 15px;
-     align-items: center;
-  }
-  
-  .h2h-team p {
-   font-size: 16px;
-   font-weight: 600;
-   color: #b7bfbd;
-  }
+/* Teams stacked vertically */
+.h2hteams-column {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
 
-  .h2h-badge {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-  }
-  
-  .h2h-score-column {
-    font-size: 16px;
-    color: #fff;
-    font-family: 'Lato';
-    font-weight: 700;
-  }
+/* Single team row (logo + name) */
+.h2hteam {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #b7bfbd;
+  font-size: 16px;
+  font-weight: 600;
+}
 
-  .h2h-stats {
-    background: #f8f8f8;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 700;
-  }
+.h2hteam img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
 
-  .h2h-stats p {
-    margin: 4px 0;
-  }
-  
+/* Scores stacked on right */
+.h2hscores-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
 
 /* statistic Container */
 
@@ -4649,7 +4633,7 @@ body{
 
     body.news-page .middle-layer {
         padding: 0; 
-        margin: 0 auto; 
+        margin: 0; 
     }
 
    
@@ -4700,7 +4684,13 @@ body{
         display: none;
     }
 
-    .news-text-cont,
+    
+   .news-podcast {
+    display: flex;
+    flex-direction: column; 
+    }
+
+   .news-text-cont,
     .top-story {
       width: 100%;
       max-width: 100%;
@@ -4708,92 +4698,14 @@ body{
       box-sizing: border-box;
     }
 
-   .news-text-cont {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-   }
-
-   .top-story {
-     display: flex;
-     flex-direction: column;
-     gap: 1rem;
-   }
-
-   .news-podcast {
-    display: flex;
-    flex-direction: column; 
-    }
-
-    .news-text-cont .news-headers {
-        font-size: 0.80rem;
-    }
-
-    .news-text-cont .see-more {
-        font-size: 0.75rem;
-    }
-
-    .news-infomat {
-       flex-direction: column;
-       align-items: flex-start;
-    }
-    
-    .title-desc {
-        padding: 0.5rem 0;
-    }
-    .feature-img {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        max-height: 100%; 
-    }
-
-    .feature-img img {
-        width: 100px;
-        height: auto; 
-        object-fit: cover; 
-    }
-    .news-messages {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between; 
-    }
-
-    .news-meta {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start; 
-    }
-    
-    .news-time {
-        margin-top: 2px; 
-        text-align: left; 
-        font-size: 0.70rem;
-        margin-left: 1px;
-        
-    }
+ 
 
     body.full-view-active .first-layer,
     body.full-view-active .third-layer {
       display: none !important;
     }
 
-    .news-full-view {
-      font-size: 0.77rem;
-      font-weight: 400;
-      width: 100%;
-      box-sizing: border-box;
-      color: #fff;
-      animation: fadeIn 0.3s ease-in-out;
-      margin: 0;
-     }
-
-     .blog-post {
-      margin-bottom: 10px;
-     }
-     .blog-title {
-       font-size: 0.80rem;
-     }
+    
      .ad-container.placeholder-ad {
       height: 100px;           
       font-size: 0.65rem;    

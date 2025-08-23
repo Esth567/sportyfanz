@@ -260,12 +260,12 @@ function showFullNews(clickedItem) {
 
     <div class="social-icons">
          <!-- X (Twitter rebranded) -->
-         <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+         <a href="https://x.com/sporty_fanz/intent/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
          <i class="fab fa-x-twitter"></i> <!-- Font Awesome 6 has this -->
         </a>
 
         <!-- Facebook -->
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
+        <a href="https://www.facebook.com/sportfolder/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
          <i class="fab fa-facebook-f"></i>
         </a>
 
@@ -275,12 +275,12 @@ function showFullNews(clickedItem) {
        </a>
 
       <!-- TikTok (links to your TikTok profile or a video) -->
-     <a href="https://www.tiktok.com/@yourusername" target="_blank" rel="noopener noreferrer">
+     <a href="https://www.tiktok.com/@sportyfanz" target="_blank" rel="noopener noreferrer">
       <i class="fab fa-tiktok"></i>
      </a>
 
      <!-- Instagram (links to your IG profile or post) -->
-     <a href="https://www.instagram.com/yourusername/" target="_blank" rel="noopener noreferrer">
+     <a href="https://www.instagram.com/sportyfanz_official?igsh=djJlbWl6Z3Uwcnl0/" target="_blank" rel="noopener noreferrer">
       <i class="fab fa-instagram"></i>
       </a>
     </div>

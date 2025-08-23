@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
             limit: 100
         });
 
-        const res = await fetch(`${API_BASE}/api/matches?${params}`);
+        const res = await fetch(`/api/matches?${params}`);
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -259,7 +259,7 @@ async function loadNews(sectionId, endpoint, retries = 2) {
 
 async function loadEntityDatabase() {
   try {
-    const res = await fetch(`${API_BASE}/api/entity-database`);
+    const res = await fetch(`/api/entity-database`);
     if (!res.ok) throw new Error("Failed to fetch entity DB");
     window.entityDatabase = await res.json();
     console.log("✅ Entity DB loaded", Object.keys(window.entityDatabase).length);
@@ -281,7 +281,7 @@ function populateNewsSection(sectionId, newsList) {
   const getImageHtml = (item, size = "600x400") => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     if (isValidImage) {
-      return `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
+      return `<img src="/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
                   alt="Image for ${item.title}" 
                   loading="lazy" 
                   onerror="this.src='https://via.placeholder.com/${size}?text=No+Image'" />`;
@@ -298,7 +298,7 @@ function populateNewsSection(sectionId, newsList) {
         <div class="news-container">
           <div class="news-image">${getImageHtml(item)}</div>
           <div class="news-info">
-            <p class="news-headline">${item.fullSummary?.slice(0,150) || 'No description'}...</p>
+            <a href="/news/${item.seoTitle}" class="news-headline">${item.title}</a>
           </div>
         </div>
       </div>
@@ -370,8 +370,6 @@ function populateNewsSection(sectionId, newsList) {
 
       container.appendChild(slide);
     });
-
-    initSlider();
   }
 }
 
@@ -560,7 +558,7 @@ window.onpopstate = function (event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
-    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
+    loadNews(sectionId, `/api/sports-summaries`);
   });
 });
                                                                                                                                                                                                                                                                                                                                                                                                
@@ -572,7 +570,7 @@ let playerImageMap = {};
 
 async function init() {
   try {
-    const res = await fetch(`${API_BASE}/api/player-image-map`);
+    const res = await fetch(`/api/player-image-map`);
     playerImageMap = await res.json();
     console.log(playerImageMap);
 
@@ -600,7 +598,7 @@ function normalizePlayerName(playerName) {
 // ✅ Main function
 async function fetchTopScorers() {
   try {
-    const res = await fetch(`${API_BASE}/api/topscorers`);
+    const res = await fetch(`/api/topscorers`);
     const topScorers = await res.json();
 
     const playersContainer = document.querySelector(".players-container");
@@ -733,7 +731,7 @@ const BACKUP_LEAGUE_IDS = [168, 169]; // Example: Euro, Copa America (update as 
 // Get the active league ID based on date
 async function getActiveLeagueId() {
   try {
-    const leagues = await fetch(`${API_BASE}/api/leagues`).then(r => r.json());
+    const leagues = await fetch(`/api/leagues`).then(r => r.json());
     const now = new Date();
 
     // 1. Check for Club World Cup in existing league data
@@ -767,7 +765,7 @@ async function getActiveLeagueId() {
 // Render the top 5 standings for a league
 async function fetchTopFourStandings(leagueId) {
   try {
-    const response = await fetch(`${API_BASE}/api/topstandings/${leagueId}`);
+    const response = await fetch(`/api/topstandings/${leagueId}`);
     const data = await response.json();
 
     const leagueTableDemo = document.querySelector(".league-table-demo");
@@ -833,26 +831,37 @@ async function fetchTopFourStandings(leagueId) {
 // middle hero banner header slider
 function initSlider() {
   let currentIndex = 0;
-  const slides = document.querySelectorAll(".header-slider .slider-content");
 
   function showSlide(index) {
+    const slides = document.querySelectorAll(".header-slider .slider-content");
     slides.forEach((slide, i) => {
       slide.classList.toggle("active", i === index);
     });
   }
 
+  // Show first slide immediately
   showSlide(currentIndex);
 
+  // Rotate every 4s
   setInterval(() => {
+    const slides = document.querySelectorAll(".header-slider .slider-content");
     currentIndex = (currentIndex + 1) % slides.length;
     showSlide(currentIndex);
   }, 4000);
 }
 
+// Run this right after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  initSlider(); 
+});
+
+
 
 
 //function to display matches for the middle layers in home page
 let currentCategory = "live";
+let selectedDate = null;
+let matchesData = { live: [], highlight: [], upcoming: [], allHighlights: [] };
 
 // Function to get today's date
 function getTodayDate(offset = 0) {
@@ -865,41 +874,32 @@ const { DateTime } = luxon;
 
 // Convert a match date/time string to a Luxon DateTime in Berlin time
 function getBerlinTime(dateStr, timeStr) {
-    return DateTime.fromFormat(
-        `${dateStr} ${timeStr}`,
-        "yyyy-MM-dd HH:mm",
-        { zone: "Europe/Berlin" }
-    );
+  return DateTime.fromFormat(`${dateStr} ${timeStr}`, "yyyy-MM-dd HH:mm", { zone: "Europe/Berlin" });
 }
 
 // Convert Berlin time to the user's local timezone
 function convertToUserLocalTime(berlinTime) {
-    return berlinTime.setZone(DateTime.local().zoneName);
+  return berlinTime.setZone(DateTime.local().zoneName);
 }
 
 // Format match time for display in local time
 function formatToUserLocalTime(dateStr, timeStr) {
-    try {
-        const berlinTime = getBerlinTime(dateStr, timeStr);
-        return convertToUserLocalTime(berlinTime).toFormat("h:mm");
-    } catch (e) {
-        console.error("Time conversion error:", e);
-        return "TBD";
-    }
+  try {
+    return convertToUserLocalTime(getBerlinTime(dateStr, timeStr)).toFormat("h:mm");
+  } catch {
+    return "TBD";
+  }
 }
 
 // Calculate minutes since match start
 function getMinutesSince(dateStr, timeStr) {
-    try {
-        const now = DateTime.local();
-        const matchBerlin = getBerlinTime(dateStr, timeStr);
-        const matchLocal = convertToUserLocalTime(matchBerlin);
-        const diff = now.diff(matchLocal, "minutes").minutes;
-        return diff > 0 ? Math.floor(diff) : 0;
-    } catch (e) {
-        console.error("Minutes-since calculation failed:", e);
-        return 0;
-    }
+  try {
+    const now = DateTime.local();
+    const matchLocal = convertToUserLocalTime(getBerlinTime(dateStr, timeStr));
+    return Math.max(0, Math.floor(now.diff(matchLocal, "minutes").minutes));
+  } catch {
+    return 0;
+  }
 }
 
 
@@ -907,28 +907,14 @@ function getMinutesSince(dateStr, timeStr) {
 //function to fetch matches
 async function fetchMatchesData() {
   try {
-    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const response = await fetch(`/api/all_matches`);
     const data = await response.json();
 
-    console.log("Live Matches: ", data.live);
-    console.log("Highlight Matches: ", data.highlight);
-    console.log("Upcoming Matches: ", data.upcoming);
-
     matchesData = data;
-
-    selectedLeagueId = null;
-    selectedLeagueName = null;
-
-    // ✅ Smart auto-switch logic
-    if (matchesData.live && matchesData.live.length > 0) {
-      currentCategory = "live";
-    } else if (matchesData.upcoming && matchesData.upcoming.length > 0) {
-      currentCategory = "upcoming";   // auto-switch
-    } else if (matchesData.highlight && matchesData.highlight.length > 0) {
-      currentCategory = "highlight";
-    } else {
-      currentCategory = "live"; // default fallback
-    }
+    matchesData = data;
+      if (data.live?.length > 0) currentCategory = "live";
+      else if (data.upcoming?.length > 0) currentCategory = "upcoming";
+      else if (data.highlight?.length > 0) currentCategory = "highlight";
 
     // ✅ Render matches (this also applies "active" to the correct tab)
     showMatches(matchesData, currentCategory);
@@ -940,254 +926,259 @@ async function fetchMatchesData() {
 }
 
 
-
-
-// Modify the updateMatches function to use correct timezone conversion
-function updateTheMatches(matches) {
-    matchesData = {
-        live: [],
-        highlight: [],
-        upcoming: [],
-        allHighlights: []
-    };
-
-    const now = luxon.DateTime.utc();
-    const oneWeekAgo = now.minus({ days: 7 }); 
-
-    matches.forEach(match => {
-        const status = (match.match_status || "").trim().toLowerCase();
-        const matchBerlin = getBerlinTime(match.match_date, match.match_time);
-        const matchLocal = convertToUserLocalTime(matchBerlin);
-
-        const isFinished = status === "ft" || status === "finished" || status.includes("pen") || status.includes("after") || parseInt(status) >= 90;
-        const isUpcoming = matchLocal > now && (status === "ns" || status === "scheduled" || status === "" || status === "not started");
-        const isLive = parseInt(status) > 0 && parseInt(status) < 90;
-
-        if (isLive) matchesData.live.push(match);
-        if (isFinished && matchLocal >= oneWeekAgo) matchesData.highlight.push(match);
-        if (isFinished) matchesData.allHighlights.push(match);
-        if (isUpcoming) matchesData.upcoming.push(match);
-
-        const formattedMatchTime = matchLocal.toFormat("h:mm");
-    });
-
-    showMatches(matchesData, "live");
-}
-
-
 //funtion to render matches
 function showMatches(matchesData, category) {
   currentCategory = category;
-    const matchesContainer = document.querySelector(".matches-container");
-    if (!matchesContainer) return;
+  const matchesContainer = document.querySelector(".matches-container");
+  if (!matchesContainer) return;
 
-    const selectedMatches = matchesData[category] || [];
+  const selectedMatches = matchesData[category] || [];
 
-    
-    const preferredLeagues = [
-        { name: "Premier League", country: "England" },
-        { name: "La Liga", country: "Spain" },
-        { name: "Bundesliga", country: "Germany" },
-        { name: "UEFA Champions League", country: "eurocups" },
-        { name: "Serie A", country: "Italy" },
-        { name: "NPFL", country: "Nigeria" }
-    ];
-
-    // Sort matches so preferred leagues come first
-    const sortedMatches = selectedMatches.sort((a, b) => {
-        const indexA = preferredLeagues.findIndex(l => l.name === a.league_name && l.country === a.country_name);
-        const indexB = preferredLeagues.findIndex(l => l.name === b.league_name && l.country === b.country_name);
-        if (indexA === -1 && indexB === -1) return 0;
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
-        return indexA - indexB;
-    });
-
-    let html = "";
-    const MAX_MATCHES = 5;
-    let displayedMatchCount = 0;
+  // ✅ Preferred leagues to display first
+  const preferredLeagues = [
+  { name: "Premier League", country: "England" },
+  { name: "La Liga", country: "Spain" },
+  { name: "Bundesliga", country: "Germany" },
+  { name: "UEFA Champions League", country: "eurocups" },
+  { name: "UEFA Europa League", country: "eurocups" },
+  { name: "UEFA Europa Conference League", country: "eurocups" },
+  { name: "Serie A", country: "Italy" },
+  { name: "NPFL", country: "Nigeria" },
+  { name: "FIFA World Cup", country: "World" },
+  { name: "UEFA Euro", country: "eurocups" },
+  { name: "AFCON", country: "Africa" },
+  { name: "Gold Cup", country: "North America" },
+  { name: "Asian Cup", country: "Asia" }
+ ];
 
 
-    html += `<div class="match-category-content">`;
+  // ✅ Sorting helper
+  const getPriority = (m) => {
+    const index = preferredLeagues.findIndex(
+      l => l.name === m.league_name && l.country === m.country_name
+    );
+    return index === -1 ? Infinity : index;
+  };
 
-    // Category buttons at top
-    html += `
-        <div class="matches-header">
-            <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesCategory('live')">Live</div>
-            <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesCategory('highlight')">Highlight</div>
-            <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesCategory('upcoming')">Upcoming</div>
-            <div class="calendar-wrapper" style="position: relative;">
-                <div class="match-category-btn calendar" onclick="toggleCalendar()">
-                    <ion-icon name="calendar-outline"></ion-icon>
-                </div>
-                <input type="date" id="match-date" onchange="filterByDate('${category}')" style="display: none;">
-            </div>
-        </div>`;
+  // Sort matches (preferred leagues first)
+  const sortedMatches = selectedMatches.sort((a, b) => getPriority(a) - getPriority(b));
 
-        if (selectedMatches.length === 0) {
-        html += `<p class="no-matches-msg">No ${category} matches found.</p>`;
-        html += `</div>`;
-        matchesContainer.innerHTML = html;
-        return;
-       }
+  let html = "";
+  const MAX_MATCHES = 5;
+  let displayedMatchCount = 0;
 
+  html += `<div class="match-category-content">`;
 
-        const getPriority = (m) => {
-        const index = preferredLeagues.findIndex(
-             l => l.name === m.league_name && l.country === m.country_name
-           );
-             return index === -1 ? Infinity : index;
-          };
-     for (const match of selectedMatches.sort((a, b) => getPriority(a) - getPriority(b))) { 
-        if (displayedMatchCount >= MAX_MATCHES) break;
+  // Category buttons
+  html += `
+    <div class="matches-header">
+      <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesCategory('live')">Live</div>
+      <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesCategory('highlight')">Highlight</div>
+      <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesCategory('upcoming')">Upcoming</div>
+      <div class="calendar-wrapper" style="position: relative;">
+        <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
+          <div class="calendar-icon">
+            <div class="calendar-header"></div>
+            <div id="calendar-day" class="calendar-day"></div>
+          </div>
+        </div>
+        <input type="text" id="match-date" style="display:none;">
+      </div>
+    </div>`;
 
-        const matchBerlin = getBerlinTime(match.match_date, match.match_time);
-        const matchLocal = convertToUserLocalTime(matchBerlin);
-
-        const matchDay = matchLocal.toFormat("MMM d");
-        const matchTime = match.match_time || "Time TBA";
-        const country = match.country_name && match.country_name.trim() !== "" ? match.country_name : "Unknown Country";
-        const score1 = match.match_hometeam_score || "0";
-        const score2 = match.match_awayteam_score || "0";
-        const matchRound = match.league_round || "";
-
-        let matchMinute = match.match_status || matchTime;
-        let scoreDisplay = "";
-        let matchStatusDisplay = "";
-        let formattedTime = "";
-
-        if (category === "live") {
-           const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
-           matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
-           scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-           formattedTime = `
-              <div class="live-indicator">
-                 <span class="red-dot"></span>
-                 <span class="live-text">Live</span> - ${matchMinute}
-             </div>
-            `;
-        } else if (category === "highlight") {
-           matchStatusDisplay = `<h5>FT</h5>`;
-           scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
-           formattedTime = `
-             <div class="time-date-col">
-             <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
-             <span class="date">${matchDay}</span>
-             </div>
-          `;
-        } else if (category === "upcoming") {
-           matchStatusDisplay = `<h5>vs</h5>`;
-           formattedTime = `
-             <div class="time-date-col">
-             <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
-             <span class="date">${matchDay}</span>
-             </div>
-            `;
-         }
-
-
-
-        html += `
-        <div class="match-details" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-            <div class="match-card">
-                    <div class="match-col Matchteam">
-                        <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
-                        <span>${match.match_hometeam_name}</span>
-                    </div>
-                    <div class="match-col match-status-score">
-                      ${scoreDisplay}
-                      ${matchStatusDisplay}
-                    </div>
-                    <div class="match-col Matchteam">
-                        <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
-                        <span>${match.match_awayteam_name}</span>
-                    </div>
-                    </div>
-                    <div class="match-col match-time-country">
-                      <div class="match-time"><img src="/assets/icons/clock.png" alt="Clock">${formattedTime}</div>
-                     <div class="match-country"><img src="/assets/icons/map-pin.png" alt="Map">${country}</div>
-                   
-                      ${matchRound ? `
-                    <div class="match-col match-round">
-                        <img src="/assets/icons/trophy.png" alt="Round">
-                        ${matchRound}
-                    </div>` : ""}
-                    <div class="match-col match-btn">  
-                <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
-                    <img src="/assets/icons/arrow-up.png" alt="Round">
-                  View Details
-                  </button>
-                </div>
-                  </div>
-                
-             </div>`;
-
-        displayedMatchCount++;
-
-    }
-
+  if (sortedMatches.length === 0) {
+    html += `<p class="no-matches-msg">No ${category} matches found.</p>`;
     html += `</div>`;
     matchesContainer.innerHTML = html;
-    // Add event listeners to all "View Details" buttons
-    document.querySelectorAll('.view-details-btn').forEach(btn => {
-     btn.addEventListener('click', function (event) {
-        event.stopPropagation(); // Prevent parent .match-details click
-        const matchId = this.getAttribute('data-match-id');
-        const category = this.getAttribute('data-category');
-        displayLiveMatch(matchId, category);
-      });
-    });
-
+    return;
   }
-    
 
+  // ✅ Display matches (priority leagues first, max 5)
+  for (const match of sortedMatches) {
+    if (displayedMatchCount >= MAX_MATCHES) break;
 
-// Filter the matches based on category (live, highlight, upcoming)
-function filterMatchesCategory(category) {
-    selectedLeagueId = null; // Reset selected league
-    selectedLeagueName = null; // Reset selected league name
-    showMatches(matchesData, category);
+    const matchBerlin = getBerlinTime(match.match_date, match.match_time);
+    const matchLocal = convertToUserLocalTime(matchBerlin);
+
+    const matchDay = matchLocal.toFormat("MMM d");
+    const country = match.country_name?.trim() || "Unknown Country";
+    const score1 = match.match_hometeam_score || "0";
+    const score2 = match.match_awayteam_score || "0";
+    const matchRound = match.league_round || "";
+
+    let scoreDisplay = "";
+    let matchStatusDisplay = "";
+    let formattedTime = "";
+
+    if (category === "live") {
+      const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
+      const matchMinute = match.match_status?.toLowerCase() === "halftime" ? "HT" : `${minutesElapsed}'`;
+      scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+      formattedTime = `
+        <div class="live-indicator">
+          <span class="red-dot"></span>
+          <span class="live-text">Live</span> - ${matchMinute}
+        </div>`;
+    } else if (category === "highlight") {
+      matchStatusDisplay = `<h5>FT</h5>`;
+      scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+      formattedTime = `
+        <div class="time-date-col">
+          <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
+        </div>`;
+    } else if (category === "upcoming") {
+      matchStatusDisplay = `<h5>vs</h5>`;
+      formattedTime = `
+        <div class="time-date-col">
+          <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
+        </div>`;
+    }
+
+    html += `
+      <div class="match-details" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
+        <div class="match-card">
+          <div class="Matchteam">
+            <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
+            <span>${match.match_hometeam_name}</span>
+          </div>
+          <div class="match-status-score">
+            ${scoreDisplay}
+            ${matchStatusDisplay}
+          </div>
+          <div class="Matchteam">
+            <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
+            <span>${match.match_awayteam_name}</span>
+          </div>
+        </div>
+        <div class="match-time-country">
+          <div class="match-time"><img src="/assets/icons/clock.png"> ${formattedTime}</div>
+          <div class="match-country"><img src="/assets/icons/map-pin.png"> ${country}</div>
+          ${matchRound ? `<div class="match-round"><img src="/assets/icons/trophy.png"> ${matchRound}</div>` : ""}
+        </div>
+        <div class="match-btn">  
+          <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
+            <img src="/assets/icons/arrow-up.png" alt="Round">
+            View Details
+          </button>
+        </div>
+      </div>`;
+    displayedMatchCount++;
+  }
+
+  html += `</div>`;
+  matchesContainer.innerHTML = html;
+
+  // Add "View Details" button listeners
+  document.querySelectorAll('.view-details-btn').forEach(btn => {
+    btn.addEventListener('click', function (event) {
+      event.stopPropagation(); // Prevent parent .match-details click
+      const matchId = this.getAttribute('data-match-id');
+      const category = this.getAttribute('data-category');
+      displayLiveMatch(matchId, category);
+    });
+  });
+
+  setTodayInCalendar();
+  initCalendarPicker(category);
 }
 
-// Event listener for category button click
-document.querySelectorAll(".match-category-btn").forEach(button => {
-    button.addEventListener("click", () => {
-        const category = button.textContent.toLowerCase();
-        filterMatchesCategory(category);
-    });
+    
+  
+  
+ // Calendar Functions
+function getAvailableMatchDates() {
+  return [
+    ...matchesData.live.map(m => m.match_date),
+    ...matchesData.highlight.map(m => m.match_date),
+    ...matchesData.upcoming.map(m => m.match_date)
+  ];
+}
+
+// Initialize Flatpickr
+function initCalendarPicker() {
+  const calendarWrapper = document.querySelector(".calendar-wrapper");
+  const matchDateInput = document.getElementById("match-date");
+
+  // ✅ Prevent re-initialization
+  if (matchDateInput._flatpickr) {
+    // Just update enabled dates dynamically
+    matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
+    return;
+  }
+
+  flatpickr(matchDateInput, {
+  dateFormat: "Y-m-d",
+  defaultDate: new Date(),
+  enable: getAvailableMatchDates(),
+  appendTo: calendarWrapper,   // ✅ forces dropdown under wrapper
+  onChange: (dates, dateStr) => {
+    filterByDate("upcoming", dateStr);
+  }
 });
 
 
 
-
-
-// Function to filter matches by the selected date
-  function filterByDate(category = currentCategory) {
-  const dateInput = document.getElementById("match-date");
-  if (!dateInput) return;
-
-  const selectedDate = dateInput.value;
-  if (!selectedDate) return;
-
-  const filteredMatches = (matchesData[category] || []).filter(match => match.match_date === selectedDate);
-  showMatches({ ...matchesData, [category]: filteredMatches }, category);
- }
-
-
-// Function to toggle calendar visibility
-function toggleCalendar() {
-    const dateInput = document.getElementById("match-date");
-    // Toggle visibility of the calendar input field
-    dateInput.style.display = (dateInput.style.display === "none" || !dateInput.style.display) ? "block" : "none";
+// Update filterByDate to accept selected date
+function filterByDate(category, selectedDate) {
+  const filteredData = {
+    live: matchesData.live.filter(m => m.match_date === selectedDate),
+    highlight: matchesData.highlight.filter(m => m.match_date === selectedDate),
+    upcoming: matchesData.upcoming.filter(m => m.match_date === selectedDate),
+  };
+  showMatches(filteredData, category);
 }
 
+
+  //calender function
+  function setTodayInCalendar() {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+
+  const dayEl = document.getElementById("calendar-day");
+  const inputEl = document.getElementById("match-date");
+
+  if (dayEl) dayEl.textContent = dd;
+  if (inputEl) inputEl.value = today.toISOString().split("T")[0];
+
+  // Auto-rollover at midnight
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setHours(24, 0, 0, 0);
+  if (window.calendarRolloverTimer) clearTimeout(window.calendarRolloverTimer);
+  window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
+}
+
+
+function filterMatchesCategory(category) {
+  currentCategory = category;
+
+  // Reset active state
+  document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
+
+  // Highlight the clicked button
+  document.querySelectorAll(".match-category-btn").forEach(btn => {
+    if (btn.textContent.toLowerCase() === category) {
+      btn.classList.add("active");
+    }
+  });
+
+  // Show matches for the category
+  showMatches(matchesData, category);
+}
+
+
+
+// Init on load
+document.addEventListener("DOMContentLoaded", () => {
+  fetchMatchesData();
+});
 
 
 
 // Function to fetch match video 
 async function fetchMatchVideo(matchId) {
     try {
-        const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
+        const response = await fetch(`/api/match-video/${matchId}`);
         const data = await response.json();
 
         console.log("🎥 Video Data:", data);
@@ -1467,7 +1458,7 @@ async function displayLiveMatch(matchId, category) {
 //function to load statistic
 async function loadMatchStatistics(match_id, match) {
     try {
-        const response = await fetch(`${API_BASE}/api/match/statistics?matchId=${match_id}`);
+        const response = await fetch(`/api/match/statistics?matchId=${match_id}`);
         const data = await response.json();
         const stats = data.statistics || [];
 
@@ -1513,7 +1504,7 @@ function loadH2HData(homeTeam, awayTeam) {
 
     spinner.style.display = "block";
 
-    fetch(`${API_BASE}/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
+    fetch(`/api/h2h?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`)
         .then(res => res.json())
         .then(data => {
             spinner.style.display = "none";
@@ -1638,7 +1629,7 @@ function loadH2HData(homeTeam, awayTeam) {
         try {
             spinner.style.display = "block";
     
-            const response = await fetch(`${API_BASE}/api/standings?leagueId=${match.league_id}`);
+            const response = await fetch(`/api/standings?leagueId=${match.league_id}`);
             const { standings } = await response.json();
 
             if (!Array.isArray(standings)) {
@@ -1697,7 +1688,7 @@ function loadH2HData(homeTeam, awayTeam) {
   
     // ✅ Fetch lineup and dynamically infer formation
      function fetchAndRenderLineups(match_id, match) {
-       fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
+       fetch(`/api/lineups?matchId=${match_id}`)
         .then(res => res.json())
         .then(({ lineup }) => {
                 const container = document.getElementById("football-field");
@@ -1911,10 +1902,10 @@ function updateLiveTimers() {
 // Fetch and display predictions
 async function fetchTodayPredictions(predictionContainer) {
   try {
-    const response = await fetch(`${API_BASE}/api/predictions`);
+    const response = await fetch(`/api/predictions`);
 
     if (!response.ok) {
-      predictionContainer.innerHTML = "<p>⚠️ Unable to load prediction data.</p>";
+      predictionContainer.innerHTML = "<p>Prediction loding...</p>";
       return;
     }
 

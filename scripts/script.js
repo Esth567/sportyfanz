@@ -278,7 +278,7 @@ function populateNewsSection(sectionId, newsList) {
   const getImageHtml = (item, size = "600x400") => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     if (isValidImage) {
-      return `<img src="/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
+      return `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
                   alt="Image for ${item.title}" 
                   loading="lazy" 
                   onerror="this.src='https://via.placeholder.com/${size}?text=No+Image'" />`;
@@ -564,71 +564,56 @@ document.addEventListener("DOMContentLoaded", () => {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 // function to fetch top scorer
 
-let playerImageMap = {};
-
-async function init() {
-  try {
-    const res = await fetch(`${API_BASE}/api/player-image-map`);
-    playerImageMap = await res.json();
-    console.log(playerImageMap);
-
-    await fetchTopScorers(); // Now run after map is loaded
-  } catch (err) {
-    console.error("Failed to load player image map:", err);
-    await fetchTopScorers(); // fallback even if image map fails
-  }
-}
-
-init(); 
-
 
 // ✅ Utility: Normalize player names into safe filenames
-function normalizePlayerName(playerName) {
-  if (!playerName) return "default-player";
+function normalizeNameForAsset(name) {
+  if (!name) return "default-player";
 
-  return playerName
-    .normalize("NFD")                     // split accents
-    .replace(/[\u0300-\u036f]/g, "")      // remove accents
-    .replace(/[^a-zA-Z0-9]/g, "")         // remove non-letters/digits
+  return name
+    .normalize("NFD")                  // Decompose accents (Á -> A + ́)
+    .replace(/[\u0300-\u036f]/g, "")   // Remove diacritics
+    .replace(/[^a-zA-Z0-9]/g, "")      // Remove spaces & special chars
     .trim();
 }
+
 
 // ✅ Main function
 async function fetchTopScorers() {
   try {
-    const res = await fetch(`${API_BASE}/api/topscorers`);
-    const topScorers = await res.json();
+    const response = await fetch("${API_BASE}/api/topscorers");
+    const topScorers = await response.json();
+
+    // ✅ Check if backend returned an array
+    if (!Array.isArray(topScorers)) {
+      console.error("❌ Invalid data from backend:", topScorers);
+      return;
+    }
 
     const playersContainer = document.querySelector(".players-container");
     const dotsContainer = document.querySelector(".slider-dots");
 
     if (!playersContainer || !dotsContainer) {
-      console.error("Slider container elements not found.");
+      console.error("❌ Slider container elements not found.");
       return;
     }
 
     playersContainer.innerHTML = "";
     dotsContainer.innerHTML = "";
 
-    let playerElements = [];
     let playerIndex = 0;
+    let playerElements = [];
 
-    for (const topScorer of topScorers) {
-      const goals = topScorer.goals || 0;
-      const playerName = topScorer.player_name || "Unknown Player";
-      const teamName = topScorer.team_name || "Unknown Team";
-      const leagueName = topScorer.league_name || "Unknown League";
+    for (const scorer of topScorers) {
+      const playerName = scorer.player || "Unknown Player";
+      const goals = scorer.goals || 0;
+      const teamName = scorer.team || "Unknown Team";
+      const apiImage = scorer.image;
 
-      let playerImage = "";
-
-      if (topScorer.player_image && topScorer.player_image.trim() !== "") {
-        playerImage = topScorer.player_image;
-      } else if (playerImageMap[playerName]) {
-        playerImage = playerImageMap[playerName];
-      } else {
-        const safeName = normalizePlayerName(playerName);
-        playerImage = `/assets/players/${safeName}.png`;
-      }
+      // Normalize + fallback
+      const safeName = normalizeNameForAsset(playerName);
+      const imgSrc = apiImage && apiImage.trim() !== ""
+        ? apiImage
+        : `assets/players/${safeName}.png`;
 
       const playerItem = document.createElement("div");
       playerItem.classList.add("player-item");
@@ -636,27 +621,21 @@ async function fetchTopScorers() {
 
       playerItem.innerHTML = `
         <div class="player-image">
-          <img 
-            src="${playerImage}" 
-            alt="${playerName}"
-            onerror="this.onerror=null;
-                     if(this.src.includes('.png')){
-                       this.src=this.src.replace('.png','.jpg');
-                     } else {
-                       this.src='/assets/images/default-player.png';
-                     }">
+          <img src="${imgSrc}" alt="${playerName}"
+               onerror="this.onerror=null;this.src='assets/images/default-player.png';">
         </div>
         <div class="players-data">
           <div class="player-name">${playerName}</div>
           <div class="goals">${goals} Goals</div>
           <div class="team-name">${teamName}</div>
-          <div class="leagues">${leagueName}</div>
+          <div class="leagues">${scorer.league}</div>
         </div>
       `;
 
       playersContainer.appendChild(playerItem);
       playerElements.push(playerItem);
 
+      // Slider dots
       const dot = document.createElement("span");
       dot.classList.add("dot");
       if (playerIndex === 0) dot.classList.add("active-dot");
@@ -673,12 +652,9 @@ async function fetchTopScorers() {
 
     if (playerElements.length > 0) {
       startSlider(playerElements);
-    } else {
-      console.warn("No players were added to the UI.");
     }
-
-  } catch (error) {
-    console.error("Error fetching top scorers:", error);
+  } catch (err) {
+    console.error("❌ Error fetching top scorers:", err);
   }
 }
 
@@ -2042,7 +2018,6 @@ function closeFixedAd() {
           const parent = document.querySelector(".content");
           
 
-          const headerSlider = document.querySelector(".header-slider");
           const textCont1 = document.querySelector(".text-cont1");
           const newsUpdate = document.querySelector(".news-update");
           const textCont = document.querySelector(".text-cont");
@@ -2059,7 +2034,7 @@ function closeFixedAd() {
            
  
           // Append in the correct order
-          if (headerSlider) parent.appendChild(headerSlider);
+          
           if (textCont1) parent.appendChild(textCont1);
           if (newsUpdate) parent.appendChild(newsUpdate);
           if (textCont) parent.appendChild(textCont);

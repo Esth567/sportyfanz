@@ -151,7 +151,7 @@ function populateNewsSection(sectionId, newsList) {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     const imageHtml = isValidImage
        ? `<div class="feature-image">
-        <img src="/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
+        <img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400" 
               alt="Image for ${item.title}" 
               loading="lazy" 
               onerror="this.src='https://via.placeholder.com/600x400?text=No+Image'" />

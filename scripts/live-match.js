@@ -23,13 +23,6 @@ let matchesData = {
     allHighlights: []
 };
 
-
-function getTodayDate(offset = 0) {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    return date.toISOString().split("T")[0];
-}
-
 function displayMatchesByLeagueId(leagueId, leagueName, category) {
     selectedLeagueId = leagueId;
     selectedLeagueName = leagueName;
@@ -47,7 +40,7 @@ function displayMatchesByLeagueId(leagueId, leagueName, category) {
 
 
 
-fetch(`/api/leagues`)
+fetch(`${API_BASE}/api/leagues`)
     .then(res => res.json())
     .then(leagues => {
         const liveMatchesContainer = document.querySelector(".matches-live-ongoing");
@@ -93,26 +86,23 @@ fetch(`/api/leagues`)
 
    // === LUXON Time Functions ===
 
-// Function to get today's date
+// === Utility Functions ===
 function getTodayDate(offset = 0) {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    return date.toISOString().split("T")[0];
+  const date = new Date();
+  date.setDate(date.getDate() + offset);
+  return date.toISOString().split("T")[0];
 }
 
 const { DateTime } = luxon;
 
-// Convert a match date/time string to a Luxon DateTime in Berlin time
 function getBerlinTime(dateStr, timeStr) {
   return DateTime.fromFormat(`${dateStr} ${timeStr}`, "yyyy-MM-dd HH:mm", { zone: "Europe/Berlin" });
 }
 
-// Convert Berlin time to the user's local timezone
 function convertToUserLocalTime(berlinTime) {
   return berlinTime.setZone(DateTime.local().zoneName);
 }
 
-// Format match time for display in local time
 function formatToUserLocalTime(dateStr, timeStr) {
   try {
     return convertToUserLocalTime(getBerlinTime(dateStr, timeStr)).toFormat("h:mm");
@@ -121,7 +111,6 @@ function formatToUserLocalTime(dateStr, timeStr) {
   }
 }
 
-// Calculate minutes since match start
 function getMinutesSince(dateStr, timeStr) {
   try {
     const now = DateTime.local();
@@ -131,7 +120,6 @@ function getMinutesSince(dateStr, timeStr) {
     return 0;
   }
 }
-
 
 
 //function to fetch matches

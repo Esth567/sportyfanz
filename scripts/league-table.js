@@ -365,7 +365,7 @@ function attachTeamClickListeners() {
 // Placeholder function to fetch team details by team key
 async function getTeamDetailsByKey(teamKey) {
   try {
-    const res = await fetch(`/api/team/${teamKey}`);
+    const res = await fetch(`${API_BASE}/api/team/${teamKey}`);
     const data = await res.json();
     return data;
   } catch (error) {

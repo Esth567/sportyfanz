@@ -2674,7 +2674,6 @@ news-time {
     position: relative;
     margin-bottom: 10px;
     border: none;
-    padding-top: 10px;
   }
 
   .match-category-btn {
@@ -2721,6 +2720,7 @@ news-time {
 
 .matches {
     width: 100%;
+    margin-top: 15pz;
 
 }
 

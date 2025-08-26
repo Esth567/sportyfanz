@@ -2,7 +2,7 @@ const API_BASE = location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://backend.sportyfanz.com';
 
-
+  
 //sidebar toggle for web view
 function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");
@@ -580,7 +580,7 @@ function normalizeNameForAsset(name) {
 // ✅ Main function
 async function fetchTopScorers() {
   try {
-    const response = await fetch("${API_BASE}/api/topscorers");
+    const response = await fetch(`${API_BASE}/api/topscorers`);
     const topScorers = await response.json();
 
     // ✅ Check if backend returned an array

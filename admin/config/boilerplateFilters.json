@@ -1,13 +1,23 @@
 {
   "patterns": [
-    "read on for all the highlights",
-    "all the latest updates",
-    "stay tuned",
-    "follow the action",
-    "follow us",
-    "watch live",
-    "live coverage",
-    "as it happened",
-    "full commentary here"
+    "BBC Homepage",
+    "Skip to content",
+    "Accessibility Help",
+    "Your account",
+    "More menu",
+    "Close menu",
+    "Shareclose panel",
+    "Copy link",
+    "About sharing",
+    "Explore more",
+    "Published\\s*\\d+\\s*minutes? ago",
+    "LISTEN:.*",
+    "READ MORE:.*",
+    "Video,.*",
+    "Up Next",
+    "Subsection.*",
+    "Match of the Day",
+    "Sports Personality",
+    "Help & FAQs"
   ]
 }

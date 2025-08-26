@@ -80,6 +80,7 @@ exports.getMatches = async (req, res) => {
 
 
 // function to fetch top scorer
+// function to fetch top scorer
 const topScorersCache = new NodeCache({ stdTTL: 300 });
 
 exports.getTopScorers = async (req, res) => {
@@ -88,7 +89,7 @@ exports.getTopScorers = async (req, res) => {
     const globalLimit = parseInt(req.query.limit) || 100;
 
     const cacheKey = `topScorers_${limitPerLeague}_${globalLimit}`;
-    const cachedData = topScorersCache.get(cacheKey);  // ✅ FIXED
+    const cachedData = topScorersCache.get(cacheKey);  
     if (cachedData) {
       console.log("✅ Returning cached top scorers");
       return res.json(cachedData);
@@ -118,13 +119,40 @@ exports.getTopScorers = async (req, res) => {
       const topScorers = scorersData.slice(0, limitPerLeague);
 
       for (const scorer of topScorers) {
-        result.push({
-          league: league.league_name,
-          player: scorer.player_name,
-          goals: scorer.goals || 0,
-          team: scorer.team_name,
-          image: scorer.player_image,
-        });
+        const goals = scorer.goals ? parseInt(scorer.goals) : 0;
+
+        // ✅ Apply thresholds depending on competition
+        let passesThreshold = true;
+        const leagueName = league.league_name.toLowerCase();
+
+        if (leagueName.includes("champions league")) {
+          passesThreshold = goals >= 5;
+        } else if (
+          leagueName.includes("premier league") ||
+          leagueName.includes("la liga") ||
+          leagueName.includes("serie a") ||
+          leagueName.includes("bundesliga") ||
+          leagueName.includes("ligue 1")
+        ) {
+          passesThreshold = goals >= 15;
+        } else if (
+          leagueName.includes("world cup") ||
+          leagueName.includes("euro") ||
+          leagueName.includes("africa cup") ||
+          leagueName.includes("copa america")
+        ) {
+          passesThreshold = goals >= 2;
+        }
+
+        if (passesThreshold) {
+          result.push({
+            league: league.league_name,
+            player: scorer.player_name,
+            goals: goals,
+            team: scorer.team_name,
+            image: scorer.player_image,
+          });
+        }
       }
     }
 
@@ -132,13 +160,13 @@ exports.getTopScorers = async (req, res) => {
       result = result.slice(0, globalLimit);
     }
 
-    topScorersCache.set(cacheKey, result);  // ✅ FIXED
+    topScorersCache.set(cacheKey, result);
 
     res.json(result);  // always return array
-  }  catch (err) {
-     console.error("❌ Backend error:", err.message, err.stack);
-     res.status(500).json({ error: "Failed to fetch top scorers", details: err.message });
-   }
+  } catch (err) {
+    console.error("❌ Backend error:", err.message, err.stack);
+    res.status(500).json({ error: "Failed to fetch top scorers", details: err.message });
+  }
 };
 
 

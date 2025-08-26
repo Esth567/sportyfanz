@@ -710,11 +710,13 @@ body{
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
-  object-fit: cover;
 }
 
 .news-image img {
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* ensures it fills and crops instead of squashing */
+  object-position: center; /* center crop so heads aren't cut off */
   border-radius: 8px;
   display: block;
 }
@@ -1102,9 +1104,8 @@ body{
    }
   
 .calendar-icon {
-  width: 25px;
-  height: 25px;
-  border: 2px solid #000;
+  width: 20px;
+  height: 20px;
   border-radius: 4px;
   overflow: hidden;
   display: flex;
@@ -1123,8 +1124,8 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 500;
   color: #1a2f4b;
 }
 
@@ -1437,7 +1438,7 @@ body{
     top: 0;
     gap: 16px;
     width: 100%;
-    padding: 10px;
+    padding: 20px;
     border-radius: 10px;
     background: linear-gradient(to bottom, #244537 40%, #1b364e 80%);
     opacity: 0;
@@ -1455,6 +1456,7 @@ body{
     display: flex;
     flex-direction: column;
     gap: 5px; /* Spacing between player details */
+    padding-top: 10px;
  
 }
 
@@ -1613,7 +1615,7 @@ body{
     text-decoration: none;
     font-size: 16px;
     font-weight: 600;
-    font-famiy: 'Lato;'
+    font-family: 'Lato;'
 }
 .footer-social {
     margin-top: 1rem;
@@ -1775,7 +1777,12 @@ body{
   .main-footer {
     padding-bottom: 60px;
     background-color: #111B2A;
-    color: #D1D5DB;
+  }
+
+  .footer-links {
+    font-size: 14px;
+    font-family: 'Roboto';
+    color: #b7bfbd; 
   }
 
 
@@ -1849,10 +1856,10 @@ body.news-page .news-update {
 
 .news-infomat {
     display: flex;
-    flex-direction: row; /* Keep the direction row-based */
-    justify-content: flex-start; /* Aligns items to the start of the container */
-    align-items: flex-start; /* Ensures top alignment of wrapped rows */
-    gap: 19px; /* Space between items */
+    flex-direction: row; 
+    justify-content: flex-start; 
+    align-items: flex-start; 
+    gap: 19px; 
     padding: 10px;
     border-radius: 10px;
     color: #fff;
@@ -2026,26 +2033,26 @@ news-time {
 }
 
 /* Brand colors with stronger specificity */
-.social-icons .x-icon i {
+.social-icons .fa-x-twitter {
   color: #000000 !important; /* X black */
 }
 
-.social-icons .facebook-icon i {
+.social-icons .fa-facebook-f {
   color: #1877F2 !important; /* Facebook blue */
 }
 
-.social-icons .whatsapp-icon i {
+.social-icons .fa-whatsapp {
   color: #25D366 !important; /* WhatsApp green */
 }
 
-.social-icons .tiktok-icon i {
+.social-icons .fa-tiktok {
   color: #000000 !important; /* TikTok base */
   text-shadow: 
     1px 1px 0 #25F4EE,   /* cyan */
     -1px -1px 0 #FE2C55; /* pink */
 }
 
-.social-icons .instagram-icon i {
+.social-icons .fa-instagram {
   color: #E1306C !important; /* Instagram pinkish red */
 }
 
@@ -2667,6 +2674,7 @@ news-time {
     position: relative;
     margin-bottom: 10px;
     border: none;
+    padding-top: 10px;
   }
 
   .match-category-btn {
@@ -2690,10 +2698,6 @@ news-time {
     background-color: #fff; /* Highlight color */
     color: #000;
     font-weight: bold;
-}
-
-.calendar-wrapper {
-    margin-left: auto; 
 }
 
 .match-category-btn.calendar {   
@@ -2778,7 +2782,7 @@ news-time {
     border-radius: 50%; /* Optional: Make the logo circular */
   }
 
-  .league-header .league-title {
+  .league-title {
     font-size: 16px;
     margin-top: 10px;
     font-family: 'Lato';
@@ -2837,6 +2841,7 @@ news-time {
     color: #fff;
     border-radius: 12px;
     margin-bottom: 10px;
+    padding-top: 10px;
 }
   
   .matches-time {
@@ -3691,6 +3696,7 @@ news-time {
 .pos-cell {
     font-size: 16px;
     font-family: 'Lato';
+    font-weight: 500;
     width: 30px;
     text-align: center;
     color: #dce5e3;
@@ -4174,7 +4180,7 @@ news-time {
         position: fixed;
         top: 0;
         left: 0;
-        width: 280px;
+        width: 250px;
         height: 100vh;
         background: linear-gradient(to bottom, #1a2f4b 0%, #265a3f 50%, #70c172 100%);
         color: #fff;
@@ -4328,20 +4334,26 @@ news-time {
     }
 
     .mobileMenu-logo ion-icon {
-        font-size: 30px; 
+        font-size: 24px; 
         cursor: pointer;
         display: inline-block;
-    
      }
+
+     .mobileMenu-logo h2 {
+       font-size: 24px;
+       font-family: 'Lato';
+       font-weight: 700;
+       color: #fff;
+     }
+
 
     .icons {
         display: flex;
         align-items: center;
         gap: 10px;
-        
-       margin-top: -35px
-        
+       margin-top: -35px;
     }
+
 
 
     .iconSearch {
@@ -4524,11 +4536,11 @@ news-time {
 
   .transferNews {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .podcast-updates {
-    display: none; /* hide */
+    display: block; /* hide */
   }
 
     .transferNews-header {
@@ -4536,14 +4548,14 @@ news-time {
     }
     
     .footer-banner {
-    left: 0;
-    transform: none;
-    width: 100%;                     /* Full width */
-    border-radius: 0;                /* Flat edges like Livescore */
+      left: 0;
+      transform: none;
+       width: 50%;                     /* Full width */
+       border-radius: 0;                /* Flat edges like Livescore */
   }
 
   .footer-banner iframe {
-    width: 100% !important;          /* Stretch across screen */
+    width: 50% !important;          /* Stretch across screen */
     height: 60px;                    /* Slightly smaller */
   }
 
@@ -4624,6 +4636,7 @@ news-time {
       display: none !important;
     }
 
+   
     .feature-image {
       width: 120px;
       height: 147px;
@@ -4635,9 +4648,9 @@ news-time {
      }
 
      .ad-container.placeholder-ad {
-      height: 100px;           
+      height: 120px;           
       font-size: 0.65rem;    
-      padding-top: 10px;
+      padding-top: 20px;
    }
 
      /*......matches page .....*/
@@ -4682,7 +4695,9 @@ news-time {
         flex-grow: 1;
     }
 
-  
+    .matches-header {
+      top: 20px;
+    }
 
       /* Team Names */
     .Matchteam {

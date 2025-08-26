@@ -85,15 +85,32 @@ function cleanArticleText(text) {
   if (!text) return '';
 
   let stripped = text
+    // collapse excessive whitespace
     .replace(/\s{2,}/g, ' ')
-    .replace(/document\.currentScript[\s\S]*?};/g, '')
-    .replace(/window\.sdc[\s\S]*?};/g, '')
-    .replace(/©\s*\d{4}\s*Sky UK.*/g, '')
+    // remove embedded JSON-LD / schema.org objects
+    .replace(/{"@context":.*?"\}\}/gs, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    // remove navigation & accessibility boilerplate
+    .replace(/BBC Homepage.*?More menu/gi, '')
+    .replace(/Skip to content/gi, '')
+    .replace(/Accessibility Help/gi, '')
+    .replace(/Your account/gi, '')
+    .replace(/Share pageCopy linkAbout sharing/gi, '')
+    .replace(/Close menu/gi, '')
+    .replace(/Close panel/gi, '')
+    // remove video / player text
+    .replace(/This video can not be played/gi, '')
+    .replace(/To play this video you need to enable JavaScript.*/gi, '')
+    // remove leftover meta stuff
+    .replace(/Published\d+ minutes ago/gi, '')
+    .replace(/Explore more/gi, '')
+    .replace(/READ MORE:.*/gi, '')
+    .replace(/LISTEN:.*/gi, '')
     .trim();
 
-  // Apply boilerplate filters from JSON
+  // Apply boilerplate filters from JSON config
   boilerplateFilters.patterns.forEach(phrase => {
-    const regex = new RegExp(phrase, 'i'); // case-insensitive
+    const regex = new RegExp(phrase, 'gi'); // case-insensitive, global
     stripped = stripped.replace(regex, '');
   });
 

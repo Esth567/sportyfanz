@@ -210,6 +210,7 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
         </div>
     `;
 
+
     teams.forEach((team, index) => {
         const form = formMap[team.team_name] || "";
         const position = index + 1;
@@ -271,7 +272,7 @@ function generateTableHTML(teams, formMap = {}, leagueName = "Default League", a
 
 // Fetch recent match results and build form per team
 async function getRecentForms(leagueId) {
-    const response = await fetch(`${API_BASE}/api/recent_form/${leagueId}`);
+    const response = await fetch(`/api/recent_form/${leagueId}`);
     const data = await response.json();
     return data;
 }

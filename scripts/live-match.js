@@ -12,16 +12,10 @@ const leaguesSelected = {
     "Africa Cup of Nations Qualification": { country: "intl" }
 };
 
-let currentCategory = "live";
-let selectedDate = null;
+
 let selectedLeagueId = null;
 let selectedLeagueName = null;
-let matchesData = {
-    live: [],
-    highlight: [],
-    upcoming: [],
-    allHighlights: []
-};
+
 
 function displayMatchesByLeagueId(leagueId, leagueName, category) {
     selectedLeagueId = leagueId;
@@ -93,7 +87,6 @@ function getTodayDate(offset = 0) {
   return date.toISOString().split("T")[0];
 }
 
-const { DateTime } = luxon;
 
 function getBerlinTime(dateStr, timeStr) {
   return DateTime.fromFormat(`${dateStr} ${timeStr}`, "yyyy-MM-dd HH:mm", { zone: "Europe/Berlin" });
@@ -273,11 +266,11 @@ function renderMatches(matchesData, category) {
                         <div>${matchMinute}</div>
                     </div>
                     <div class="matches-datas">
-                        <div class="matches-team">
+                        <div class="Matchteam">
                             <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
                             <span>${match.match_hometeam_name}</span>
                         </div>
-                        <div class="matches-team">
+                        <div class="Matchteam">
                             <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
                             <span>${match.match_awayteam_name}</span>
                         </div>

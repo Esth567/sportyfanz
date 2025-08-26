@@ -4695,10 +4695,6 @@ news-time {
         flex-grow: 1;
     }
 
-    .matches-header {
-      top: 20px;
-    }
-
       /* Team Names */
     .Matchteam {
         display: flex;

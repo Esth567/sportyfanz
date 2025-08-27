@@ -376,10 +376,6 @@ function populateNewsSection(sectionId, newsList) {
 function showFullNews(clickedItem) {
   try {
     const middleLayer = document.querySelector('.middle-layer');
-    const firstLayer = document.querySelector('.first-layer'); 
-    const thirdLayer = document.querySelector('.third-layer');
-
-    // detect if mobile/tablet (adjust breakpoint to match your CSS media queries)
      const isMobileOrTablet = window.innerWidth <= 1024;
     
     // Hide all children inside middle-layer
@@ -388,11 +384,12 @@ function showFullNews(clickedItem) {
       child.style.display = 'none';
     });
 
-    // ✅ hide first & third layer only for mobile/tablet
-    if (isMobileOrTablet) {
-      document.body.classList.add("full-view-active");
+    // Close any previously open full article
+    const existingFullView = middleLayer.querySelector('.news-full-view');
+    if (existingFullView) {
+      existingFullView.remove();
     }
-
+    
     // Get news data on clicked 
     const index = clickedItem.dataset.index;
     const section = clickedItem.dataset.section;
@@ -498,6 +495,16 @@ function showFullNews(clickedItem) {
       </article>
     `;
 
+   // ✅ Insert the full article *after* the clicked item
+    clickedItem.insertAdjacentElement('afterend', fullView);
+
+    // ✅ Auto scroll into view only on mobile/tablet
+    if (isMobileOrTablet) {
+      setTimeout(() => {
+        fullView.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+    
     // back button → restore state
     const backButton = fullView.querySelector('.back-button');
     backButton.onclick = () => {
@@ -513,9 +520,6 @@ function showFullNews(clickedItem) {
 
       updateRelativeTime();
     };
-
-    middleLayer.insertBefore(fullView, middleLayer.firstChild);
-
   } catch (err) {
     console.error("Failed to render full news view", err);
     alert("Something went wrong displaying the full article.");

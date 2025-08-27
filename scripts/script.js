@@ -217,7 +217,7 @@ async function loadNews(sectionId, endpoint, retries = 2) {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/sports-summaries');
+    
     const response = await fetch(endpoint, { cache: "no-cache" });
 
     if (!response.ok) {

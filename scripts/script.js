@@ -217,6 +217,7 @@ async function loadNews(sectionId, endpoint, retries = 2) {
   if (loader) loader.style.display = 'block';
 
   try {
+    const response = await fetch('/api/sports-summaries');
     const response = await fetch(endpoint, { cache: "no-cache" });
 
     if (!response.ok) {
@@ -238,14 +239,36 @@ async function loadNews(sectionId, endpoint, retries = 2) {
     populateNewsSection(sectionId, newsData);
     updateRelativeTime();
 
+     // ✅ Hide error banner if shown earlier
+    const errorBox = document.getElementById("news-error");
+    if (errorBox) errorBox.classList.add("hidden");
+
   } catch (error) {
     console.error('⚠️ loadNews error:', error);
 
-    if (retries > 0) {
-      console.log(`🔁 Retrying ${sectionId} in 2s... (${retries} left)`);
-      setTimeout(() => loadNews(sectionId, endpoint, retries - 1), 2000);
-    } else {
-      alert("⚠️ Could not load news. Please try again later.");
+    const errorBox = document.getElementById("news-error");
+    const errorText = document.getElementById("news-error-text");
+
+    // 🔄 Retry once
+    if (retry) {
+      console.log('🔁 Retrying in 2 seconds...');
+      setTimeout(() => loadNews(false), 2000);
+      return;
+    }
+
+    let message = "❓ Unexpected error occurred while loading news.";
+
+    if (!navigator.onLine) {
+      message = "📡 You appear to be offline. Please check your internet connection.";
+    } else if (error.message.startsWith("Failed to fetch news")) {
+      message = "🛑 Our servers are temporarily unavailable. Please try again later.";
+    } else if (error.message.includes("Empty response")) {
+      message = "⚠️ No news available right now. Please check back soon.";
+    }
+
+    if (errorBox && errorText) {
+      errorText.textContent = message;
+      errorBox.classList.remove("hidden");
     }
   } finally {
     if (loader) loader.style.display = 'none';
@@ -2064,7 +2087,7 @@ function closeFixedAd() {
 document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.getElementById("sidebar");
     const toggleBtn = document.querySelector(".toggle-btn");
-    const menuLogo = document.querySelector(".mobileMenu-logo"); // safer than ion-icon
+    const menuLogo = document.querySelector(".mobileMenu-logo");
     const closeIcon = document.querySelector(".iconX");
 
     function isMobileOrTablet() {
@@ -2074,20 +2097,25 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateSidebarVisibility() {
         if (isMobileOrTablet()) {
             if (toggleBtn) toggleBtn.style.display = "block";
+            sidebar.classList.remove("collapsed"); // ❌ never collapsed on mobile
             sidebar.classList.remove("active");
             sidebar.style.display = "none";
         } else {
             if (toggleBtn) toggleBtn.style.display = "none";
-            sidebar.classList.remove("collapsed");
-            sidebar.classList.remove("active");
+            sidebar.classList.remove("active"); // ❌ never active on desktop
             sidebar.style.display = "block";
+            // ✅ here desktop may use .collapsed (CSS handles the narrow width)
         }
     }
 
     function toggleSidebar() {
         if (isMobileOrTablet()) {
+            sidebar.classList.remove("collapsed"); // ensure not collapsed
             sidebar.classList.toggle("active");
             sidebar.style.display = sidebar.classList.contains("active") ? "block" : "none";
+        } else {
+            // optional: allow collapse/expand on desktop
+            sidebar.classList.toggle("collapsed");
         }
     }
 
@@ -2106,7 +2134,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Move h1 under logo
+    // Move h1 under logo (mobile only)
     if (isMobileOrTablet()) {
         const headerTopbar = document.querySelector(".header-topbar");
         const h1 = headerTopbar?.querySelector("h1");
@@ -2118,6 +2146,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateSidebarVisibility();
     window.addEventListener("resize", updateSidebarVisibility);
 });
+
 
 
 // searchbar

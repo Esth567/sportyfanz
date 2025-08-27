@@ -97,41 +97,65 @@ function updateRelativeTime() {
 
 const MAX_VISIBLE_NEWS = 5;
 
-// ========== LOAD NEWS ==========
-async function loadNews(retry = true) {
+
+// ========== LOAD NEWS DETAILS ==========
+async function loadNews(sectionId, endpoint, retries = 2) {
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch(`${API_BASE}/api/sports-summaries`);
+    const response = await fetch(endpoint, { cache: "no-cache" });
 
     if (!response.ok) {
       const text = await response.text();
       throw new Error(`Failed to fetch news: ${response.status}\n${text}`);
     }
 
-    const text = await response.text();
-    if (!text || text.trim() === '') {
+    const data = await response.json();
+    if (!data || Object.keys(data).length === 0) {
       throw new Error("Empty response from server");
     }
 
-    const data = JSON.parse(text);
-    window.trendingNews = data.trending;
-    window.updatesNews = data.updates;
+    // ✅ Pick correct dataset
+    const newsData = sectionId === 'trending-stories' ? data.trending : data.updates;
+    const newsKey = sectionId === 'trending-stories' ? 'trendingNews' : 'updatesNews';
+    window[newsKey] = newsData;
 
-    populateNewsSection('trending-news', data.trending);
-    populateNewsSection('updates-news', data.updates);
+    // ✅ Render section
+    populateNewsSection(sectionId, newsData);
     updateRelativeTime();
+
+    // ✅ Hide error banner if shown earlier
+    const errorBox = document.getElementById("news-error");
+    if (errorBox) errorBox.classList.add("hidden");
 
   } catch (error) {
     console.error('⚠️ loadNews error:', error);
 
-    // Retry logic
-    if (retry) {
-      console.log('🔁 Retrying in 2 seconds...');
-      setTimeout(() => loadNews(false), 2000); // one retry
-    } else {
-      alert("⚠️ Could not load news. Please try again later.");
+    const errorBox = document.getElementById("news-error");
+    const errorText = document.getElementById("news-error-text");
+
+    // 🔄 Retry if retries remain
+    if (retries > 0) {
+      console.log(`🔁 Retrying in 2 seconds... (${retries} left)`);
+      setTimeout(() => loadNews(sectionId, endpoint, retries - 1), 2000);
+      return;
+    }
+
+    // ❌ All retries failed → show user-friendly error
+    let message = "❓ Unexpected error occurred while loading news.";
+
+    if (!navigator.onLine) {
+      message = "📡 You appear to be offline. Please check your internet connection.";
+    } else if (error.message.startsWith("Failed to fetch news")) {
+      message = "🛑 Our servers are temporarily unavailable. Please try again later.";
+    } else if (error.message.includes("Empty response")) {
+      message = "⚠️ No news available right now. Please check back soon.";
+    }
+
+    if (errorBox && errorText) {
+      errorText.textContent = message;
+      errorBox.classList.remove("hidden");
     }
   } finally {
     if (loader) loader.style.display = 'none';

@@ -106,11 +106,17 @@ function cleanArticleText(text) {
     .replace(/Explore more/gi, '')
     .replace(/READ MORE:.*/gi, '')
     .replace(/LISTEN:.*/gi, '')
+
+    // NEW FILTERS for intros/promo
+    .replace(/introducing[^.]+(\.|\n)/gi, '') 
+    .replace(/subscribe to .*? youtube channel/gi, '') 
+    .replace(/watch (the )?video(s)? (here|above)/gi, '') 
+    .replace(/click here to find out more/gi, '') 
     .trim();
 
   // Apply boilerplate filters from JSON config
   boilerplateFilters.patterns.forEach(phrase => {
-    const regex = new RegExp(phrase, 'gi'); // case-insensitive, global
+    const regex = new RegExp(phrase, 'gi');
     stripped = stripped.replace(regex, '');
   });
 

@@ -217,8 +217,6 @@ async function loadNews(sectionId, endpoint, retries = 2) {
   if (loader) loader.style.display = 'block';
 
   try {
-    const response = await fetch('/api/sports-summaries');
-    const response = await fetch(endpoint, { cache: "no-cache" });
 
     if (!response.ok) {
       const text = await response.text();
@@ -583,7 +581,7 @@ window.onpopstate = function (event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
-    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
+    loadNews(sectionId, `${API_BASE}/api/sports-summaries`, { cache: "no-cache" });
   });
 });
                                                                                                                                                                                                                                                                                                                                                                                                

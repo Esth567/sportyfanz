@@ -138,161 +138,209 @@ async function fetchAndRenderMatches() {
 
 
 //funtion to render matches
+/* ===============================
+   RENDER MATCHES
+================================= */
+
+// Function to render matches
 function renderMatches(matchesData, category) {
-    const matchesContainer = document.querySelector(".matches");
-    if (!matchesContainer) return;
+  const matchesContainer = document.querySelector(".matches");
+  if (!matchesContainer) return;
 
-    let selectedMatches = matchesData[category] || [];
+  let selectedMatches = matchesData[category] || [];
 
-    // ✅ If live is empty, fallback to upcoming
-    if (category === "live" && selectedMatches.length === 0) {
-        category = "upcoming";
-        selectedMatches = matchesData.upcoming || [];
+  // ✅ If live is empty, fallback to upcoming
+  if (category === "live" && selectedMatches.length === 0) {
+    category = "upcoming";
+    selectedMatches = matchesData.upcoming || [];
+  }
+
+  // Group matches by league_id
+  const grouped = selectedMatches.reduce((acc, match) => {
+    const leagueId = match.league_id;
+    if (!acc[leagueId]) {
+      acc[leagueId] = {
+        league: match.league_name,
+        country: match.country_name,
+        league_logo: match.league_logo,
+        matches: []
+      };
+    }
+    acc[leagueId].matches.push(match);
+    return acc;
+  }, {});
+
+  // Preferred leagues
+  const preferredLeagues = [
+    { name: "Premier League", country: "England" },
+    { name: "La Liga", country: "Spain" },
+    { name: "Bundesliga", country: "Germany" },
+    { name: "UEFA Champions League", country: "eurocups" },
+    { name: "UEFA Europa League", country: "eurocups" },
+    { name: "UEFA Europa Conference League", country: "eurocups" },
+    { name: "Serie A", country: "Italy" },
+    { name: "NPFL", country: "Nigeria" },
+    { name: "FIFA World Cup", country: "World" },
+    { name: "UEFA Euro", country: "eurocups" },
+    { name: "AFCON", country: "Africa" },
+    { name: "Gold Cup", country: "North America" },
+    { name: "Asian Cup", country: "Asia" }
+  ];
+
+  const leagueArray = Object.values(grouped).sort((a, b) => {
+    const indexA = preferredLeagues.findIndex(
+      (l) => l.name === a.league && l.country === a.country
+    );
+    const indexB = preferredLeagues.findIndex(
+      (l) => l.name === b.league && l.country === b.country
+    );
+    if (indexA === -1 && indexB === -1) return 0;
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  let html = "";
+
+  if (selectedMatches.length === 0) {
+    html += `<p>No ${category} matches found.</p>`;
+    matchesContainer.innerHTML = html;
+    return;
+  }
+
+  // Render leagues and matches
+// Render leagues and matches
+leagueArray.forEach((league, index) => {
+  if (league.matches.length === 0) return;
+
+  // ✅ League header
+  html += `
+    <div class="league-header">
+      <img src="${league.league_logo || '/assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
+      <div class="league-titleCountry">
+        <h4 class="league-title">${league.league}</h4>
+        <span class="league-country">${league.country}</span>
+      </div>
+      <div class="more-league" onclick="toggleLeagueMatches('${league.league}')">
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+        <a href="#" id="toggle-${league.league}">See All</a>
+      </div>
+    </div>`;
+
+  // ✅ League container opens here
+  html += `<div class="league-container">`;
+
+  // ✅ If it’s the first league, drop matches-header at the TOP of its container
+  if (index === 0) {
+    html += getMatchesHeader(category);
+  }
+
+  // Matches list
+  html += `<div class="match-category-content">`;
+
+  league.matches.forEach((match) => {
+    const matchBerlin = luxon.DateTime.fromFormat(
+      `${match.match_date} ${match.match_time}`,
+      "yyyy-MM-dd HH:mm",
+      { zone: "Europe/Berlin" }
+    );
+    const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+    const matchDay = matchLocal.toFormat("MMM d");
+
+    let matchMinute;
+    if (category === "highlight") {
+      matchMinute = "FT";
+    } else if (category === "live") {
+      matchMinute =
+        parseInt(match.match_status) > 0 &&
+        parseInt(match.match_status) < 90
+          ? `${match.match_status}'`
+          : matchLocal.toFormat("h:mm");
+    } else if (category === "upcoming") {
+      matchMinute = matchLocal.toFormat("h:mm a");
     }
 
-    // Group matches by league_id
-    const grouped = selectedMatches.reduce((acc, match) => {
-        const leagueId = match.league_id;
-        if (!acc[leagueId]) {
-            acc[leagueId] = {
-                league: match.league_name,
-                country: match.country_name,
-                league_logo: match.league_logo,
-                matches: []
-            };
-        }
-        acc[leagueId].matches.push(match);
-        return acc;
-    }, {});
-
-    // Preferred leagues
-    const preferredLeagues = [
-      { name: "Premier League", country: "England" },
-      { name: "La Liga", country: "Spain" },
-      { name: "Bundesliga", country: "Germany" },
-      { name: "UEFA Champions League", country: "eurocups" },
-      { name: "UEFA Europa League", country: "eurocups" },
-      { name: "UEFA Europa Conference League", country: "eurocups" },
-      { name: "Serie A", country: "Italy" },
-      { name: "NPFL", country: "Nigeria" },
-      { name: "FIFA World Cup", country: "World" },
-      { name: "UEFA Euro", country: "eurocups" },
-      { name: "AFCON", country: "Africa" },
-      { name: "Gold Cup", country: "North America" },
-      { name: "Asian Cup", country: "Asia" }
-    ];
-
-    const leagueArray = Object.values(grouped).sort((a, b) => {
-        const indexA = preferredLeagues.findIndex(l => l.name === a.league && l.country === a.country);
-        const indexB = preferredLeagues.findIndex(l => l.name === b.league && l.country === b.country);
-        if (indexA === -1 && indexB === -1) return 0;
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
-        return indexA - indexB;
-    });
-
-    let html = "";
-
-    // ✅ Always render the matches header
     html += `
-        <div class="matches-header">
-            <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesByCategory('live')">Live</div>
-            <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesByCategory('highlight')">Highlight</div>
-            <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesByCategory('upcoming')">Upcoming</div>
-            <div class="calendar-wrapper" style="position: relative;">
-             <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
-               <div class="calendar-icon">
-               <div class="calendar-header"></div>
-              <div id="calendar-day" class="calendar-day"></div>
+      <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
+        <div class="matches-teams">
+          <div class="matches-time">
+            ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
+            <div>${matchMinute}</div>
+          </div>
+          <div class="matches-datas">
+            <div class="Matchteam">
+              <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
+              <span>${match.match_hometeam_name}</span>
+            </div>
+            <div class="Matchteam">
+              <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
+              <span>${match.match_awayteam_name}</span>
             </div>
           </div>
-         <input type="text" id="match-date" style="display:none;">
+          <div class="matches-scores">
+            <div class="score">${match.match_hometeam_score ?? "-"}</div>
+            <div class="score">${match.match_awayteam_score ?? "-"}</div>
+          </div>
         </div>
-      </div>
-      `;
+      </div>`;
+  });
 
-    if (selectedMatches.length === 0) {
-        html += `<p>No ${category} matches found.</p>`;
-        matchesContainer.innerHTML = html;
-        return;
-    }
+  // ✅ Close content + container
+  html += `</div></div>`;
+});
 
-    // Render leagues and matches
-    leagueArray.forEach(league => {
-        if (league.matches.length === 0) return;
+  matchesContainer.innerHTML = html;
 
-        const leagueId = league.matches[0].league_id;
-
-        html += `
-        <div class="league-header">
-            <img src="${league.league_logo || '/assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
-            <div class="league-titleCountry">
-                <h4 class="league-title">${league.league}</h4>
-                <span class="league-country">${league.country}</span>
-            </div>
-            <div class="more-league" onclick="toggleLeagueMatches('${league.league}')">
-                <ion-icon name="arrow-forward-outline"></ion-icon>
-                <a href="#" id="toggle-${league.league}">See All</a>
-            </div>
-        </div>
-        <div class="league-container"><div class="match-category-content">`;
-
-        league.matches.forEach(match => {
-            const matchBerlin = luxon.DateTime.fromFormat(
-                `${match.match_date} ${match.match_time}`,
-                "yyyy-MM-dd HH:mm",
-                { zone: "Europe/Berlin" }
-            );
-            const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-
-            const matchDay = matchLocal.toFormat("MMM d");
-
-            let matchMinute;
-            if (category === "highlight") {
-                matchMinute = "FT";
-            } else if (category === "live") {
-                matchMinute = parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90
-                    ? `${match.match_status}'`
-                    : matchLocal.toFormat("h:mm");
-            } else if (category === "upcoming") {
-                matchMinute = matchLocal.toFormat("h:mm a");
-            }
-
-            html += `
-            <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-                <div class="matches-teams">
-                    <div class="matches-time">
-                        ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
-                        <div>${matchMinute}</div>
-                    </div>
-                    <div class="matches-datas">
-                        <div class="Matchteam">
-                            <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
-                            <span>${match.match_hometeam_name}</span>
-                        </div>
-                        <div class="Matchteam">
-                            <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
-                            <span>${match.match_awayteam_name}</span>
-                        </div>
-                    </div>
-                    <div class="matches-scores">
-                        <div class="score">${match.match_hometeam_score ?? "-"}</div>
-                        <div class="score">${match.match_awayteam_score ?? "-"}</div>
-                    </div>
-                </div>
-            </div>`;
-        });
-
-        html += `</div></div>`;
-    });
-
-    matchesContainer.innerHTML = html;
-
-    setTodayInCalendar();
-   initCalendarPicker(category);
+  setTodayInCalendar();
+  initCalendarPicker(); // no arg; binds to the freshly rendered header
 }
 
- // Calendar Functions
+/* ===============================
+   MATCHES-HEADER (filters + calendar)
+================================= */
+
+function getMatchesHeader(category) {
+  return `
+    <div class="matches-header">
+      <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="handleMatchCategory('live')">Live</div>
+      <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="handleMatchCategory('highlight')">Highlight</div>
+      <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="handleMatchCategory('upcoming')">Upcoming</div>
+      <div class="calendar-wrapper" style="position: relative;">
+        <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
+          <div class="calendar-icon">
+            <div class="calendar-header"></div>
+            <div id="calendar-day" class="calendar-day"></div>
+          </div>
+        </div>
+        <input type="text" id="match-date" style="display:none;">
+      </div>
+    </div>`;
+}
+
+/* ===============================
+   CATEGORY HANDLERS (fix click issue)
+================================= */
+
+// Single source of truth used by header buttons
+function handleMatchCategory(category) {
+  // Optional: track current category
+  window.currentCategory = category;
+
+  // Re-render with chosen category (this also regenerates the header in right spot)
+  renderMatches(matchesData, category);
+}
+
+// Backward/forward compatibility aliases (so either name works)
+function filterMatchesCategory(category) { handleMatchCategory(category); }
+function filterMatchesByCategory(category) { handleMatchCategory(category); }
+
+// Also keep showMatches used by your date filter
+function showMatches(data, category) { renderMatches(data, category); }
+
+/* ===============================
+   CALENDAR FUNCTIONS
+================================= */
+
 function getAvailableMatchDates() {
   return [
     ...matchesData.live.map(m => m.match_date),
@@ -305,10 +353,9 @@ function getAvailableMatchDates() {
 function initCalendarPicker() {
   const calendarWrapper = document.querySelector(".calendar-wrapper");
   const matchDateInput = document.getElementById("match-date");
-
   if (!matchDateInput || !calendarWrapper) return;
 
-  // ✅ Prevent re-initialization
+  // ✅ Prevent re-initialization on the same input
   if (matchDateInput._flatpickr) {
     matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
   } else {
@@ -319,22 +366,22 @@ function initCalendarPicker() {
       appendTo: calendarWrapper,
       position: "below left",
       onChange: (dates, dateStr) => {
+        // Use upcoming for date selection (your original behavior)
         filterByDate("upcoming", dateStr);
       }
     });
   }
 
-  // ✅ Safe bind after element exists
+  // ✅ Bind calendar open button
   const calendarBtn = document.querySelector(".calendar");
   if (calendarBtn) {
     calendarBtn.addEventListener("click", () => {
-      matchDateInput._flatpickr.open();
+      if (matchDateInput && matchDateInput._flatpickr) {
+        matchDateInput._flatpickr.open();
+      }
     });
   }
 }
-
-
-
 
 // Update filterByDate to accept selected date
 function filterByDate(category, selectedDate) {
@@ -346,9 +393,8 @@ function filterByDate(category, selectedDate) {
   showMatches(filteredData, category);
 }
 
-
-  //calender function
-  function setTodayInCalendar() {
+// Calendar day fill + rollover
+function setTodayInCalendar() {
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
 
@@ -366,29 +412,18 @@ function filterByDate(category, selectedDate) {
   window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
 }
 
+/* ===============================
+   OPTIONAL: INITIALIZATION HOOKS
+   (Assumes you have fetchAndRenderMatches that sets `matchesData`
+    and calls renderMatches(matchesData, defaultCategory))
+================================= */
 
-
-function filterMatchesCategory(category) {
-  currentCategory = category;
-
-  // Reset active state
-  document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
-
-  // Highlight the clicked button
-  document.querySelectorAll(".match-category-btn").forEach(btn => {
-    if (btn.textContent.toLowerCase() === category) {
-      btn.classList.add("active");
-    }
-  });
-
-  // Show matches for the category
-  showMatches(matchesData, category);
-}
-
-// Init on load
 document.addEventListener("DOMContentLoaded", () => {
+  // Your existing loader should set `matchesData` globally.
+  // Make sure it eventually calls: renderMatches(matchesData, 'live' /* or your default */);
   fetchAndRenderMatches();
 });
+
 
 
 // Function to fetch match video (unchanged)
@@ -566,7 +601,7 @@ async function displayLiveMatch(matchId, category) {
                                 <h4>${match.match_hometeam_system || "No Formation"}</h4>
                             </div>
                         </div>
-                         <div>${matchMinute}</div>
+                        
                         <div class="lineUpsteam-info">
                             <div class="team-formation">
                                 <h3>${match.match_awayteam_name}</h3>
@@ -577,8 +612,18 @@ async function displayLiveMatch(matchId, category) {
                     </div>
 
                    
-                   <div id="football-field-wrapper"></div>
-
+                   <div id="football-field" class="field">
+                     <!-- Center line and circle -->
+                     <div class="center-line"></div>
+                     <div class="center-circle"></div>
+                     <!-- Left Goal and Penalty Area -->
+                     <div class="penalty-arc left-arc"></div>
+                     <div class="penalty-arc right-arc"></div>
+                     <div class="penalty-box left-box"></div>
+                     <div class="penalty-box right-box"></div>
+                     <div class="goal left-goal"></div>
+                     <div class="goal right-goal"></div>  
+                    </div>
 
                     <div class="lineup-players-names">
                         <h4>Players</h4>

@@ -25,7 +25,7 @@ router.get('/matches/by-date', getMatchesByDate);
 router.get('/match/statistics', getMatchStatistics);
 router.get('/h2h', getH2HData);
 router.get('/standings', getStandings);
-router.get('/h2h', getLineups);
+router.get('/lineups', getLineups);
 router.get('/predictions', getTodayPredictions);
 
 

@@ -186,11 +186,11 @@ body{
     margin-right: 0;
 }
 .sidebar.collapsed .img-back {
-    height: 80px; /* Reduced height */
+    height: 80px; 
 }
 
 .sidebar.collapsed .text-overlay {
-    font-size: 0.8rem; /* Smaller text for collapsed sidebar */
+    font-size: 0.8rem; 
     font-family: 'Lato';
 }
 
@@ -201,7 +201,7 @@ body{
     flex-direction: column;
     transition: margin-left 0.3s ease-in-out;
     overflow: hidden;
-    min-height: 100vh; /* Ensure the container takes up the full viewport height */
+    min-height: 100vh; 
 }
 
 .page-wrapper {
@@ -212,19 +212,19 @@ body{
   
 
 .sidebar.collapsed ~ .body-container {
-    margin-left: 60px; /* Adjusted margin for collapsed sidebar */
+    margin-left: 60px; 
 }
 
 
 
 /* Header */
 .header {
-    position: fixed; /* Make the header fixed */
+    position: fixed; 
     top: 0;
     width: calc(100% - 220px); /* Adjust width to account for the sidebar */
-    background: #0A131F; /* Solid background color */
+    background: #0A131F; 
     color: white;
-    z-index: 999; /* Ensure the header is above other elements */
+    z-index: 999; 
     padding: 15px;
     display: flex;
     flex-direction: column;
@@ -241,7 +241,7 @@ body{
 
 .header-topbar{
     display: flex;
-    justify-content: space-between; /* Push items to opposite ends */
+    justify-content: space-between; 
     align-items: center;
     width: 100%;
 }
@@ -370,10 +370,10 @@ body{
     display: flex;
     justify-content: space-between;
     align-items: stretch; /* Ensure layers fill the height */
-    padding-top: 40px;
     padding: 15px;
     gap: 10px;
-    margin: 0px;
+    margin: 0;
+    margin-top: 70px;
     height: calc(100vh - 150px);
     overflow: auto;
     background: #0A131F;
@@ -1102,9 +1102,12 @@ body{
   .calendar-wrapper {
     position: relative; /* makes dropdown position relative to wrapper */
     display: inline-block;
+    width: 100%; 
    }
   
 .calendar-icon {
+  position: absolute;
+  right: 10px;
   width: 20px;
   height: 20px;
   border-radius: 4px;
@@ -1112,12 +1115,13 @@ body{
   display: flex;
   flex-direction: column;
   background: #b7bfbd;
+  cursor: pointer;
 }
 
 .calendar-header {
   width: 100%;
   height: 7px;
-  background: #1A2F4B;
+  background: #fff;
 }
 
 .calendar-day {
@@ -1127,30 +1131,44 @@ body{
   justify-content: center;
   font-size: 12px;
   font-weight: 500;
-  color: #1a2f4b;
+  color: #000;
 }
 
+/* Calendar container */
 .flatpickr-calendar {
-  background: #1A2F4B !important;
-  z-index: 9999 !important; 
-  top: 100% !important;  /* dropdown directly below */
+  background: #fff !important;
+  z-index: 9999 !important;
+  top: 100% !important;
   left: 0 !important;
-  margin-top: 5px;       /* small gap below icon */
-  border: 1px solid #0b1d39;        /* optional darker border */
-  border-radius: 8px;
-  width: 240px !important;
-  
+  margin-top: 5px;
+  border-radius: 15px;
+  width: auto !important;       /* 🔑 allow it to size naturally */
+  min-width: 290px;             /* keep it usable */
+  max-width: 350px;             /* optional cap */
 }
-/* Days inside */
+
+
+/* Each day cell */
 .flatpickr-day {
-  color: #fff !important;           /* text color */
+  text-align: center;
+  padding: 6px 0;
+  box-sizing: border-box;
+  color: #000 !important; /* text color */ 
   background: transparent !important;
+}
+
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  color: #dcdcdc !important;   /* black instead of faint grey */
+  opacity: 1 !important;    /* remove the faded look */
 }
 
 /* Today’s date */
 .flatpickr-day.today {
   background: #0b1d39 !important;
   border-radius: 4px;
+  color: #fff !important;
+  align-items: center;
 }
 
 /* Selected date */
@@ -1164,27 +1182,19 @@ body{
 .flatpickr-months,
 .flatpickr-current-month,
 .flatpickr-weekdays {
-  background: #0b1d39 !important;
-  color: #fff !important;
+  background: #fff !important;
+  color: #000 !important;
   border-radius: 8px 8px 0 0;
 }
 
-/* Navigation arrows (prev & next month) */
-.flatpickr-prev-month svg,
-.flatpickr-next-month svg {
-  fill: #fff !important;   /* make arrows white */
-  stroke: #fff !important;
-  width: 16px;
-  height: 16px;
-}
 
 /* Weekday names (Mon, Tue, etc.) */
 .flatpickr-weekdays {
-  background: #0b1d39 !important;
+  background: #fff !important;
 }
 
 .flatpickr-weekday {
-  color: #fff !important;   /* make text white */
+  color: #000 !important;   /* make text white */
   font-weight: 600;
 }
 
@@ -1585,6 +1595,22 @@ body{
     border-radius: 8px;
     margin-top: 20px;
     border: 1px solid #c4c4c41c;
+}
+
+.advert {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.advert iframe {
+  display: inline-block;
+  padding:0px; 
+  margin-top:20px; 
+  border:0px;
+  border-style:none;
+  border-style:none;
+  width: 240px; 
+  height: 337px;
 }
 
 
@@ -2023,7 +2049,7 @@ news-time {
 
 /* social icon*/
 .social-icons a {
-  font-size: 1.5rem; /* a bit larger */
+  font-size: 16px;
   text-decoration: none;
   transition: transform 0.2s ease;
   color: inherit; /* prevent anchor from turning icons blue */
@@ -2035,7 +2061,7 @@ news-time {
 
 /* Brand colors with stronger specificity */
 .social-icons .fa-x-twitter {
-  color: #000000 !important; /* X black */
+  color: #fff !important; /* X black */
 }
 
 .social-icons .fa-facebook-f {
@@ -2706,6 +2732,52 @@ news-time {
     color: #fff;
 }
 
+.matches .loading {
+  text-align: center;
+  color: #555;
+  font-style: italic;
+  padding: 1rem;
+}
+
+.matches .error {
+  text-align: center;
+  color: #dce;
+  font-weight: bold;
+  padding: 1rem;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #555;
+  font-size: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ddd;
+  border-top: 4px solid #70c172; /* blue highlight */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  text-align: center;
+  color: #c00;
+  font-weight: bold;
+  padding: 1rem;
+}
+
+
 #match-date {
     position: absolute;
     top: 155%; /* directly below the icon */
@@ -2733,7 +2805,7 @@ news-time {
     background-color: #1b364ea2;
     margin-bottom: 15px;
     padding: 15px;
-    color: white;
+    color: #fff;
     border-radius: 10px;
 }
 .matches-live-ongoing {
@@ -2745,7 +2817,7 @@ news-time {
 
 .league-container {
     background-color: #1b364ea2;
-    color: white; 
+    color: #fff; 
     padding: 10px;
     margin-bottom: 15px;
     border-radius: 8px;
@@ -2920,6 +2992,7 @@ news-time {
     background-color: #1f3750;
     margin-top: 10px;
     padding: 10px;
+    gap: 100px;
     border-radius: 5px;
   }
 
@@ -3193,32 +3266,43 @@ news-time {
 .lineUpsteam-logo {
     width: 45px;
     height: 45px;
+    border-radius: 56px;
     object-fit: cover;
 }
 
-.team-formation h3{
+.awayteam-formation h3,
+.hometeam-formation h3{
     font-size: 16px;
     font-family: 'Lato';
     font-weight: 500;
 }
 
-.team-formation h4{
+.hometeam-formation h4{
     font-size: 16px;
     font-family: 'Lato';
     font-weight: 400;
-    margin-left: -12px;
+    color: #a4a4a4;
     margin-top: 2px;
+    text-align: left;
 }  
   
+.awayteam-formation h4 {
+  font-size: 16px;
+    font-family: 'Lato';
+    font-weight: 400;
+    color: #a4a4a4;
+    margin-top: 2px;
+    text-align: right;
+}
 
 /* Main field styling */
 
 .field {
     position: relative;
     width: 100%;
-    height: 300px;
-    background: #228B22;
-    border: 2px solid white;
+    height: 429.08px;
+    background: #70c172;
+    border: 3px solid white;
     margin: 20px auto;
     border-radius: 10px;
     overflow: hidden;
@@ -3231,8 +3315,8 @@ news-time {
   .center-line {
     position: absolute;
     height: 100%;
-    width: 2px;
-    background: white;
+    width: 3px;
+    background: #fff;
     left: 50%;
     top: 0;
   }
@@ -3241,7 +3325,7 @@ news-time {
     position: absolute;
     width: 100px;
     height: 100px;
-    border: 2px solid white;
+    border: 3px solid #fff;
     border-radius: 50%;
     top: 50%;
     left: 50%;
@@ -3252,9 +3336,11 @@ news-time {
     position: absolute;
     width: 50px;
     height: 110px;
-    border: 2px solid;
+    border: 3px solid;
     top: calc(50% - 60px);
 }
+
+
 .left-goal {
     left: 0;
 }
@@ -3267,7 +3353,7 @@ news-time {
     width: 90px;
     height: 180px;
     top: calc(50% - 90px);
-    border: 2px solid;
+    border: 3px solid;
     background-color: #228B22;
 }
 .left-box {
@@ -3281,7 +3367,7 @@ news-time {
     position: absolute;
     width: 120px;
     height: 120px;
-    border: 2px solid;
+    border: 3px solid;
     border-radius: 50%;
     top: calc(50% - 60px);
 }
@@ -3299,29 +3385,26 @@ news-time {
     border: 4px solid white;
   }
   
-  .player-dot {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2px;
-    z-index: 3;
-    cursor: pointer;
+.player-dot {
+  position: absolute;
+  width: 35.19px;
+  height: 35.19px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 30px;
+  border: 2px solid;
+  transform: translate(-50%, -50%);
 }
 
+
 .player-number {
-    font-weight: bold;
+    font-size: 14px;
+   font-weight: 500;
+   font-family: 'Lato';
 }
 
 .no-lineup-message {
-    font-family: sans-serif;
+    font-family: 'Lato';
 }
 
 /* 🟡 players names styling */
@@ -3348,11 +3431,12 @@ news-time {
     font-size: 14px;
     font-family: 'Lato';
     font-weight: 500;
+    color: #dce5e3;
 }
 
 .lineup-home-players h4, .lineup-away-players h4 {
     text-align: center;
-    color: #fbc02d;
+    color: #ffc107;
     margin-bottom: 10px;
     font-size: 16px;
     font-family: 'Lato';
@@ -3748,18 +3832,6 @@ news-time {
     color: #dce5e3;
     margin-top: 4px;
 }
-
-  
-
-  
-
-
-
-
-
-
-
-
 
 
 /*.....................................predition page css............................*/
@@ -4404,7 +4476,6 @@ news-time {
     .content {
      display: flex;
      flex-direction: column;
-      
     }
 
  .layer {
@@ -4536,13 +4607,13 @@ news-time {
     .footer-banner {
       left: 0;
       transform: none;
-       width: 50%;                     /* Full width */
+       width: 10%;                     /* Full width */
        border-radius: 0;                /* Flat edges like Livescore */
   }
 
   .footer-banner iframe {
-    width: 50% !important;          /* Stretch across screen */
-    height: 60px;                    /* Slightly smaller */
+    width: 10% !important;          /* Stretch across screen */
+    height: 40px;                    /* Slightly smaller */
   }
 
     
@@ -4699,7 +4770,7 @@ news-time {
 
      body.matches-page .middle-layer {
         padding: 0; 
-        margin: 0 auto; 
+        margin: 0; 
     }
 
 
@@ -4736,6 +4807,27 @@ news-time {
         flex-grow: 1;
     }
 
+    .live-match-teams{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #1f3750;
+    margin-top: 10px;
+    padding: 10px;
+    gap: 30px;
+    border-radius: 5px;
+  }
+
+
+  .live-match-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+     margin-left: 10px;
+     margin-right: 10px;
+
+  }
       /* Team Names */
     .Matchteam {
         display: flex;
@@ -4767,19 +4859,29 @@ news-time {
       border: none;
     }
 
+    
+    /* line-ups team and formaation header styling */
+
+
+
+.lineUpsteam-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+} 
+
   /* Main field styling */
 
 .field {
     position: relative;
     width: 100%;
-    height: 350px;
-    margin-top: 10px
-    background: #228B22;
+    height: 200px;
+    background: #70c172;
     border: 2px solid white;
     margin: 20px auto;
     border-radius: 10px;
     overflow: hidden;
-    transform: rotate(90deg);
+    transform: rotate(0deg);
     transform-origin: center;
   }
   
@@ -4796,8 +4898,8 @@ news-time {
   
   .center-circle {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 52.91px;
+    height: 52.91px;
     border: 2px solid white;
     border-radius: 50%;
     top: 50%;
@@ -4807,10 +4909,10 @@ news-time {
  
   .goal {
     position: absolute;
-    width: 50px;
-    height: 110px;
+    width: 23.56px;
+    height: 61.36px;
     border: 2px solid;
-    top: calc(50% - 60px);
+    top: calc(50% - 30px);
 }
 .left-goal {
     left: 0;
@@ -4821,12 +4923,13 @@ news-time {
 
 .penalty-box {
     position: absolute;
-    width: 90px;
-    height: 180px;
-    top: calc(50% - 90px);
+    width: 47.57px;
+    height: 100.04px;
+    top: calc(50% - 45px);
     border: 2px solid;
     background-color: #228B22;
 }
+
 .left-box {
     left: 0;
 }
@@ -4836,11 +4939,11 @@ news-time {
 
 .penalty-arc {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: 9.78px;
+    height: 33.79px;
     border: 2px solid;
     border-radius: 50%;
-    top: calc(50% - 60px);
+    top: calc(50% - 30px);
 }
 .left-arc {
     left: 0;
@@ -4859,11 +4962,12 @@ news-time {
   .player-dot {
     position: absolute;
     transform: translate(-50%, -50%);
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 8px;
+    font-weight: 500;
+    font-family: 'Lato';
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4879,35 +4983,14 @@ news-time {
 
    
 .flatpickr-calendar {
-    width: 320px !important;
-    max-width: 120vw !important;  /* shrink if too wide */
-    font-size: 14px !important;
-  }
-  
-
-  .lineUpsteams-container {
-    flex-direction: column; 
-    align-items: center;
-  }
-
-  .lineUpsteam-info {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .lineup-players-names {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .lineUp-cont {
-    flex-direction: column; 
-    align-items: center;
-  }
-
-  .lineup-home-players, .lineup-away-players {
-    width: 100%;
-    margin-bottom: 20px;
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;   /* full width */
+    max-width: none !important;
+    border-radius: 15px 15px 0 0;
+    animation: slideUp 0.3s ease-out;
   }
 
 
@@ -4919,7 +5002,7 @@ news-time {
       
       body.league-table-page .middle-layer {
         padding: 0; 
-        margin: 0 auto; 
+        margin: 0; 
     }
 
     body.league-table-page .header-top .mobileMenu-logo img,
@@ -4991,24 +5074,24 @@ news-time {
    .form-button-container {
     text-align: left;
     margin-bottom: 10px;
-}
+   }
 
    .form-stat.mobile-visible {
     display: flex !important;
     flex-direction: row;
     align-items: center;
     margin: 0 4px;
-}
+   }
 
-.form-box {
-    width: 17px;
-    height: 17px;
-    font-size: 12px;
-}
+  .form-box {
+     width: 17px;
+     height: 17px;
+     font-size: 12px;
+  }
 
      .stat-headerF.mobile-visible {
         display: inline-block !important;
-    }
+      }
 
     .hidden-on-mobile {
         display: none !important;
@@ -5023,7 +5106,7 @@ news-time {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-}
+  }
 
     
 
@@ -5031,7 +5114,7 @@ news-time {
 
      body.matches-page .middle-layer {
         padding: 0; 
-        margin: 0 auto; 
+        margin: 0; 
     }
 
 
@@ -5069,24 +5152,31 @@ news-time {
   }
 
   .flatpickr-calendar {
-    width: auto !important;        /* flexible width */
-    max-width: 95vw !important;    /* always fit within viewport */
-    left: 0 !important;            /* align left */
-    right: auto !important;
-    transform: none !important;    /* avoid centering issues */
-    font-size: 13px !important;
-  }
-
-  .flatpickr-days {
-    display: grid !important;
-    grid-template-columns: repeat(7, 1fr); /* keep 7 columns */
-  }
-
-  .flatpickr-day {
-    min-width: 0 !important;   /* prevent overflow */
-    padding: 8px 0 !important; /* better tap size */
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    right: 0 !important;
+    top: auto !important;              /* 🔑 override inline top */
+    transform: none !important;        /* 🔑 cancel Flatpickr’s inline transform */
+    width: 100% !important;
+    max-width: 308px !important;
+    max-height: 289px !important;
+    margin: 0 !important;
+    border-radius: 15px 15px 0 0;
+    animation: slideUp 0.3s ease-out;
   }
   
+ @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
   .footer-banner {
     left: 0;
     transform: none;
@@ -5102,9 +5192,9 @@ news-time {
   /*......league table page .....*/
 
   .content {
-  display: flex;
-  flex-direction: column;
-}
+   display: flex;
+   flex-direction: column;
+  }
   
 }
 

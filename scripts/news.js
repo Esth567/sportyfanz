@@ -1,36 +1,52 @@
 
-document.addEventListener("DOMContentLoaded", async function () {
-    await loadNews(); // Make sure news loads first
-    showInitialNews("trending-news");
-    showInitialNews("updates-news");
-    updateRelativeTime();
+const MAX_VISIBLE_NEWS = 5;
 
-    // Ensure .middle-layer is available before modifying
-    const middleLayer = document.querySelector(".middle-layer");
-    if (middleLayer) middleLayer.style.display = "block";
+document.addEventListener("DOMContentLoaded", async function () {
+  // Load both sections separately
+  await loadNews('trending-news');
+  showInitialNews('trending-news');
+
+  await loadNews('updates-news');
+  showInitialNews('updates-news');
+
+  updateRelativeTime();
+
+  const middleLayer = document.querySelector(".middle-layer");
+  if (middleLayer) middleLayer.style.display = "block";
+
+  // Refresh relative time every minute
+  setInterval(updateRelativeTime, 60000);
 });
 
 
   
   // ========== DISPLAY INITIAL 5 ========== //
 function showInitialNews(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) return;
+  const section = document.getElementById(sectionId);
+  if (!section) return;
 
-    const items = section.querySelectorAll('.news-infomat');
-    items.forEach((item, index) => {
-        item.style.display = index < MAX_VISIBLE_NEWS ? 'flex' : 'none';
-    });
+  const items = section.querySelectorAll('.news-infomat');
+  items.forEach((item, index) => {
+    item.style.display = index < MAX_VISIBLE_NEWS ? 'flex' : 'none';
+  });
 
-    section.style.display = 'flex';
-    section.style.flexDirection = 'column';
+  section.style.display = 'flex';
+  section.style.flexDirection = 'column';
+
+  // Hide "See more" button if ≤5 items
+  const header = section.previousElementSibling; 
+  const seeMore = header?.querySelector('.see-more');
+  if (seeMore) {
+    seeMore.style.display = items.length <= MAX_VISIBLE_NEWS ? 'none' : 'flex';
+  }
 }
 
 
-  
-  // ========== TOGGLE SEE MORE ========== //
+
+// ========== TOGGLE SEE MORE / SEE LESS ==========
 function toggleNews(section) {
-  const newsSection = document.getElementById(`${section}-news`);
+  const sectionId = `${section}-news`;   // e.g. "trending-news"
+  const newsSection = document.getElementById(sectionId);
   const header = newsSection?.previousElementSibling; // .news-text-cont
   const seeMoreText = header?.querySelector('.see-more p');
   const seeMoreImg = header?.querySelector('.see-more img');
@@ -49,57 +65,56 @@ function toggleNews(section) {
 
   seeMoreText.innerText = expanded ? 'See more' : 'See less';
 
-  // Optional: swap arrow image
   if (seeMoreImg) {
     seeMoreImg.src = expanded 
       ? "/assets/icons/ankle-vector.png"     // collapsed
       : "/assets/icons/ankle-vector-up.png"; // expanded
   }
 }
-
-
   
   // ========== RELATIVE TIME ========== //
 function updateRelativeTime() {
-    const timeElements = document.querySelectorAll('.news-time');
-    const now = new Date();
+  const timeElements = document.querySelectorAll('.news-time');
+  const now = new Date();
 
-    timeElements.forEach(el => {
-        const postedMs = Date.parse(el.dataset.posted);
-        if (isNaN(postedMs)) {
-            el.textContent = 'Invalid time';
-            return;
-        }
+  timeElements.forEach(el => {
+    const postedMs = Date.parse(el.dataset.posted);
+    if (isNaN(postedMs)) {
+      el.textContent = 'Invalid time';
+      return;
+    }
 
-        const diff = Math.floor((now.getTime() - postedMs) / 1000);
-        let text;
+    const diff = Math.floor((now.getTime() - postedMs) / 1000);
+    let text;
 
-        if (diff < 1) text = '1 second ago';
-        else if (diff < 60) {
-            const seconds = diff;
-            text = `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
-        } else if (diff < 3600) {
-            const minutes = Math.floor(diff / 60);
-            text = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-        } else if (diff < 86400) {
-            const hours = Math.floor(diff / 3600);
-            text = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-        } else {
-            const days = Math.floor(diff / 86400);
-            text = `${days} day${days !== 1 ? 's' : ''} ago`;
-        }
+    if (diff <= 0) text = '1 second'; 
+    else if (diff < 60) {
+      const seconds = diff;
+      text = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    } else if (diff < 3600) {
+      const minutes = Math.floor(diff / 60);
+      text = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else if (diff < 86400) {
+      const hours = Math.floor(diff / 3600);
+      text = `${hours} hour${hours !== 1 ? 's' : ''}`;
+    } else {
+      const days = Math.floor(diff / 86400);
+      text = `${days} day${days !== 1 ? 's' : ''}`;
+    }
 
-        el.textContent = text;
-    });
+    el.textContent = text;
+  });
 }
-
-
-
-const MAX_VISIBLE_NEWS = 5;
 
 
 // ========== LOAD NEWS DETAILS ==========
 async function loadNews(sectionId, endpoint, retries = 2) {
+  // ✅ Only allow trending-news or updates-news
+  if (!['trending-news', 'updates-news'].includes(sectionId)) {
+    console.warn(`Ignoring unsupported section: ${sectionId}`);
+    return;
+  }
+
   const loader = document.querySelector('.loading-indicator');
   if (loader) loader.style.display = 'block';
 
@@ -117,8 +132,8 @@ async function loadNews(sectionId, endpoint, retries = 2) {
     }
 
     // ✅ Pick correct dataset
-    const newsData = sectionId === 'trending-stories' ? data.trending : data.updates;
-    const newsKey = sectionId === 'trending-stories' ? 'trendingNews' : 'updatesNews';
+    const newsData = sectionId === 'trending-news' ? data.trending : data.updates;
+    const newsKey = sectionId === 'trending-news' ? 'trendingNews' : 'updatesNews';
     window[newsKey] = newsData;
 
     // ✅ Render section
@@ -131,36 +146,12 @@ async function loadNews(sectionId, endpoint, retries = 2) {
 
   } catch (error) {
     console.error('⚠️ loadNews error:', error);
-
-    const errorBox = document.getElementById("news-error");
-    const errorText = document.getElementById("news-error-text");
-
-    // 🔄 Retry if retries remain
-    if (retries > 0) {
-      console.log(`🔁 Retrying in 2 seconds... (${retries} left)`);
-      setTimeout(() => loadNews(sectionId, endpoint, retries - 1), 2000);
-      return;
-    }
-
-    // ❌ All retries failed → show user-friendly error
-    let message = "❓ Unexpected error occurred while loading news.";
-
-    if (!navigator.onLine) {
-      message = "📡 You appear to be offline. Please check your internet connection.";
-    } else if (error.message.startsWith("Failed to fetch news")) {
-      message = "🛑 Our servers are temporarily unavailable. Please try again later.";
-    } else if (error.message.includes("Empty response")) {
-      message = "⚠️ No news available right now. Please check back soon.";
-    }
-
-    if (errorBox && errorText) {
-      errorText.textContent = message;
-      errorBox.classList.remove("hidden");
-    }
+    
   } finally {
     if (loader) loader.style.display = 'none';
   }
 }
+
 
 
 

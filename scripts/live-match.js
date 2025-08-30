@@ -78,7 +78,6 @@ fetch(`${API_BASE}/api/leagues`)
 
 
 
-   // === LUXON Time Functions ===
 
 // === Utility Functions ===
 function getTodayDate(offset = 0) {
@@ -117,30 +116,39 @@ function getMinutesSince(dateStr, timeStr) {
 
 //function to fetch matches
 async function fetchAndRenderMatches() {
+  const container = document.querySelector(".matches");
+  if (container) {
+    container.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+    `;
+  }
+
   try {
     const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
-    matchesData = data;
-    matchesData = data;
-      if (data.live?.length > 0) currentCategory = "live";
-      else if (data.upcoming?.length > 0) currentCategory = "upcoming";
-      else if (data.highlight?.length > 0) currentCategory = "highlight";
+    matchesData = data; 
+
+    if (data.live?.length > 0) currentCategory = "live";
+    else if (data.upcoming?.length > 0) currentCategory = "upcoming";
+    else if (data.highlight?.length > 0) currentCategory = "highlight";
 
     // ✅ Render matches (this also applies "active" to the correct tab)
     renderMatches(matchesData, currentCategory);
 
   } catch (error) {
     console.error("Error fetching match data:", error);
-    document.querySelector(".matches-container").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+
+    if (container) {
+      container.innerHTML = `<p class="error">Network connection lost. Please refresh.</p>`;
+    } else {
+      console.warn("⚠️ No .matches container found in DOM to render error message.");
+    }
   }
 }
 
-
-//funtion to render matches
-/* ===============================
-   RENDER MATCHES
-================================= */
 
 // Function to render matches
 function renderMatches(matchesData, category) {
@@ -208,7 +216,7 @@ function renderMatches(matchesData, category) {
     return;
   }
 
-  // Render leagues and matches
+
 // Render leagues and matches
 leagueArray.forEach((league, index) => {
   if (league.matches.length === 0) return;
@@ -295,10 +303,8 @@ leagueArray.forEach((league, index) => {
   initCalendarPicker(); // no arg; binds to the freshly rendered header
 }
 
-/* ===============================
-   MATCHES-HEADER (filters + calendar)
-================================= */
 
+//function for match header
 function getMatchesHeader(category) {
   return `
     <div class="matches-header">
@@ -317,30 +323,22 @@ function getMatchesHeader(category) {
     </div>`;
 }
 
-/* ===============================
-   CATEGORY HANDLERS (fix click issue)
-================================= */
 
-// Single source of truth used by header buttons
+// category header
 function handleMatchCategory(category) {
-  // Optional: track current category
   window.currentCategory = category;
-
-  // Re-render with chosen category (this also regenerates the header in right spot)
   renderMatches(matchesData, category);
 }
 
-// Backward/forward compatibility aliases (so either name works)
+
 function filterMatchesCategory(category) { handleMatchCategory(category); }
 function filterMatchesByCategory(category) { handleMatchCategory(category); }
 
-// Also keep showMatches used by your date filter
+// Also keep showMatches 
 function showMatches(data, category) { renderMatches(data, category); }
 
-/* ===============================
-   CALENDAR FUNCTIONS
-================================= */
 
+// CALENDAR FUNCTIONS
 function getAvailableMatchDates() {
   return [
     ...matchesData.live.map(m => m.match_date),
@@ -412,15 +410,8 @@ function setTodayInCalendar() {
   window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
 }
 
-/* ===============================
-   OPTIONAL: INITIALIZATION HOOKS
-   (Assumes you have fetchAndRenderMatches that sets `matchesData`
-    and calls renderMatches(matchesData, defaultCategory))
-================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Your existing loader should set `matchesData` globally.
-  // Make sure it eventually calls: renderMatches(matchesData, 'live' /* or your default */);
   fetchAndRenderMatches();
 });
 
@@ -428,18 +419,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Function to fetch match video (unchanged)
 async function fetchMatchVideo(matchId) {
-    try {
-        const response = await fetch(`${API_BASE}/api/video/${matchId}`);
-        const data = await response.json();
-
-        console.log("🎥 Video Data:", data);
-
-        return data.videoUrl || null;
-    } catch (error) {
-        console.error("❌ Error fetching match video:", error);
-        return null;
+  try {
+    const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
+
+    const data = await response.json();
+    console.log("🎥 Video Data:", data);
+
+    return data.videoUrl || null;
+  } catch (error) {
+    console.error("❌ Error fetching match video:", error);
+    return null;
+  }
 }
+
 
 
 
@@ -596,22 +592,23 @@ async function displayLiveMatch(matchId, category) {
                     <div class="lineUpsteams-container">
                         <div class="lineUpsteam-info">
                             <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="lineUpsteam-logo">
-                            <div class="team-formation">
+                            <div class="hometeam-formation">
                                 <h3>${match.match_hometeam_name}</h3>
-                                <h4>${match.match_hometeam_system || "No Formation"}</h4>
+                                <h4>${match.match_hometeam_system || "NA"}</h4>
                             </div>
                         </div>
                         
                         <div class="lineUpsteam-info">
-                            <div class="team-formation">
+                            <div class="awayteam-formation">
                                 <h3>${match.match_awayteam_name}</h3>
-                                <h4>${match.match_awayteam_system || "No Formation"}</h4>
+                                <h4>${match.match_awayteam_system || "NA"}</h4>
                             </div>
                             <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="lineUpsteam-logo">
                         </div>
                     </div>
 
-                   
+                     
+                   <div id="football-field-wrapper">
                    <div id="football-field" class="field">
                      <!-- Center line and circle -->
                      <div class="center-line"></div>
@@ -624,6 +621,7 @@ async function displayLiveMatch(matchId, category) {
                      <div class="goal left-goal"></div>
                      <div class="goal right-goal"></div>  
                     </div>
+                  </div>
 
                     <div class="lineup-players-names">
                         <h4>Players</h4>
@@ -633,14 +631,16 @@ async function displayLiveMatch(matchId, category) {
                                 <ul>${renderPlayers(match.lineup?.home?.starting_lineups)}</ul>
                                 <h4>Substitutes</h4>
                                 <ul>${renderPlayers(match.lineup?.home?.substitutes)}</ul>
-                                <ul>${renderPlayers(match.lineup?.home?.coach_name)}</ul>
+                                <h4>Coach</h4>
+                                <ul>${renderPlayers(match.lineup?.home?.coach)}</ul>
                             </div>
                             <div class="lineup-away-players">
                                 <h4>${match.match_awayteam_name}</h4>
                                 <ul>${renderPlayers(match.lineup?.away?.starting_lineups)}</ul>
                                 <h4>Substitutes</h4>
                                 <ul>${renderPlayers(match.lineup?.away?.substitutes)}</ul>
-                                <ul>${renderPlayers(match.lineup?.away?.coach_name)}</ul>
+                                <h4>Coach</h4>
+                                <ul>${renderPlayers(match.lineup?.away?.coach)}</ul>
                             </div>
                         </div>
                     </div>
@@ -918,50 +918,52 @@ function loadH2HData(homeTeam, awayTeam) {
      
   
   // ✅ Fetch lineup and dynamically infer formation
-     function fetchAndRenderLineups(match_id, match) {
+  function fetchAndRenderLineups(match_id) {
   const containerWrapper = document.getElementById("football-field-wrapper");
 
   fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
     .then(res => res.json())
-    .then(({ lineup }) => {
-      containerWrapper.innerHTML = ""; // Clear previous content
+    .then(({ lineup, match }) => {
+      // instead of overwriting, just clear old players
+      const field = document.getElementById("football-field");
+     if (!field) {
+      console.error("❌ Field container not found!");
+      return;
+    }
+     field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
 
       if (!lineup) {
         displayNoLineupMessage(containerWrapper, "No lineup data found.");
         return;
       }
 
-      const homePlayers = lineup.home?.starting_lineups || lineup.home?.starting_lineup || [];
-      const awayPlayers = lineup.away?.starting_lineups || lineup.away?.starting_lineup || [];
-
+      const homePlayers = lineup.home?.starting_lineups ?? [];
+      const awayPlayers = lineup.away?.starting_lineups ?? [];
 
       if (homePlayers.length === 0 && awayPlayers.length === 0) {
         displayNoLineupMessage(containerWrapper, "No lineup formation available.");
         return;
       }
 
-      // If we got here, lineup exists. Now render the field and players.
-      containerWrapper.innerHTML = `
-        <div id="football-field" class="field">
-          <div class="center-line"></div>
-          <div class="center-circle"></div>
-          <div class="penalty-arc left-arc"></div>
-          <div class="penalty-arc right-arc"></div>
-          <div class="penalty-box left-box"></div>
-          <div class="penalty-box right-box"></div>
-          <div class="goal left-goal"></div>
-          <div class="goal right-goal"></div>  
-        </div>
-      `;
+      const homeFormation =
+        parseFormation(match?.match_hometeam_system) ||
+        inferFormation(homePlayers, match?.match_hometeam_system);
 
-      const container = document.getElementById("football-field");
-      const homeFormation = match?.match_hometeam_system ?? inferFormation(homePlayers);
-      const awayFormation = match?.match_awayteam_system ?? inferFormation(awayPlayers);
+      const awayFormation =
+        parseFormation(match?.match_awayteam_system) ||
+        inferFormation(awayPlayers, match?.match_awayteam_system);
 
+      if (!homeFormation && !awayFormation) {
+        displayNoLineupMessage(containerWrapper, "No lineup formation available.");
+        return;
+      }
 
-
-      renderPlayersOnField("home", homePlayers, homeFormation, "home");
-      renderPlayersOnField("away", awayPlayers, awayFormation, "away");
+      if (homeFormation) {
+        renderPlayersOnField("home", homePlayers, homeFormation, "home");
+      }
+      if (awayFormation) {
+        renderPlayersOnField("away", awayPlayers, awayFormation, "away");
+      }
     })
     .catch(err => {
       console.error("Error fetching lineups:", err);
@@ -971,45 +973,53 @@ function loadH2HData(homeTeam, awayTeam) {
 }
 
 
-function displayNoLineupMessage(container, message) {
+ function displayNoLineupMessage(container, message) {
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("no-lineup-message");
     msgDiv.textContent = message;
     msgDiv.style.textAlign = "center";
     msgDiv.style.marginTop = "20px";
     msgDiv.style.color = "#888";
-    msgDiv.style.fontSize = "1.2em";
+    msgDiv.style.fontSize = "1.2rem";
     container.appendChild(msgDiv);
-}
+ }
 
 
-// ✅ Parse inferred formation or fallback string-based one
-function parseFormation(formation, players) {
-    if (Array.isArray(formation)) return formation;
-
-    const defaultFormation = "4-4-2";
-    console.log("🔍 Raw formation string:", formation);
-
+ // ✅ Parse formation from API string only
+ function parseFormation(formation) {
     if (!formation || typeof formation !== "string") {
-        console.warn("Formation missing or invalid. Using default:", defaultFormation);
-        return defaultFormation.split("-").map(Number);
+        console.warn("⚠️ No formation string provided.");
+        return null; // ⬅️ return null if no formation
     }
 
-    const parts = formation.split("-").map(p => parseInt(p.trim())).filter(n => !isNaN(n));
-    const sum = parts.reduce((a, b) => a + b, 0);
+    let parts = formation
+        .split("-")
+        .map(p => parseInt(p.trim()))
+        .filter(n => !isNaN(n));
+
+    let sum = parts.reduce((a, b) => a + b, 0);
+
+    // ✅ Handle "1-4-4-2" (goalkeeper included)
+    if (sum === 11 && parts[0] === 1) {
+        console.log("⚽ Formation includes GK, removing leading '1'");
+        parts.shift();
+        sum = parts.reduce((a, b) => a + b, 0);
+    }
+
     const isValid = parts.every(n => Number.isInteger(n) && n > 0) && sum === 10;
 
     if (!isValid) {
         console.warn("❌ Malformed formation:", formation, "(sum =", sum, ")");
-        return defaultFormation.split("-").map(Number);
+        return null; // ⬅️ return null if invalid
     }
 
-    console.log("✅ Parsed formation:", parts);
+    console.log(" Parsed formation:", parts);
     return parts;
 }
 
-// ✅ Inference: derive formation from lineup_position
-function inferFormation(players, fallbackFormationStr) {
+
+ // Inference: derive formation from lineup_position
+ function inferFormation(players, fallbackFormationStr) {
     const outfield = players
      .filter(p => p.lineup_position !== "1")
      .sort((a, b) => parseInt(a.lineup_position) - parseInt(b.lineup_position));
@@ -1043,37 +1053,64 @@ function inferFormation(players, fallbackFormationStr) {
     return result;
 }
 
-// ✅ Render player dots based on formation array
-function renderPlayersOnField(team, players, formation, side = "home") {
+  // ✅ Render player dots based on formation array
+  function renderPlayersOnField(team, players, formation, side = "home") {
     const container = document.getElementById("football-field");
     if (!container || !formation) return;
 
-    const formationArray = parseFormation(formation);
-    const isHome = side === "home";
-    const vertical = isVerticalMode();
+    // 🔑 Always normalize using parseFormation (works with string OR array)
+    let formationArray = Array.isArray(formation)
+     ? formation
+    : parseFormation(formation);
 
-    // Goalkeeper position
-    const goalkeeper = players.find(p => p.lineup_position === "1");
-    if (goalkeeper) {
-        const gkX = vertical ? 50 : (isHome ? 10 : 90);
-        const gkY = vertical ? (isHome ? 10 : 90) : 50;
-        const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
-        container.appendChild(gkDiv);
+
+    const isHome = side === "home";
+    const vertical = false;
+  
+      // Goalkeeper position
+      const goalkeeper = players.find(p => p.lineup_position === "1");
+      if (goalkeeper) {
+      let gkX, gkY;
+
+      if (vertical) {
+      // Field rotated vertically
+      gkX = 50; // middle horizontally
+      gkY = isHome ? 2 : 98; // sit on top/bottom goal line
+    } else {
+    // Normal horizontal field
+     gkY = 50; // middle vertically
+     gkX = isHome ? 6 : 94; // sit on left/right goal line
     }
+
+    const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
+    gkDiv.classList.add("goalkeeper"); // optional for styling
+    container.appendChild(gkDiv);
+  }
+
 
     // Outfield players
     const outfield = players.filter(p => p.lineup_position !== "1");
     let currentIndex = 0;
+
     formationArray.forEach((playersInLine, lineIndex) => {
         const totalLines = formationArray.length;
 
         // Calculate line position (X in horizontal, Y in vertical)
-        const linePos = ((lineIndex + 1) / (totalLines + 1)) * 45 + 5;
-        const lineCoord = isHome ? linePos : linePos + 50;
+      let linePos = ((lineIndex + 1) / (totalLines + 1)) * 40 + 10;
+
+       // Home starts from left side (or top if vertical)
+       if (isHome) {
+        lineCoord = linePos;
+       } else {
+        // Away team mirrored but offset closer to opponent goal arc
+      lineCoord = 100 - linePos;
+     }
+
 
         for (let j = 0; j < playersInLine; j++) {
             const spread = ((j + 1) / (playersInLine + 1)) * 100;
             const player = outfield[currentIndex];
+
             if (player) {
                 const x = vertical ? spread : lineCoord;
                 const y = vertical ? lineCoord : spread;
@@ -1083,8 +1120,15 @@ function renderPlayersOnField(team, players, formation, side = "home") {
             }
         }
     });
-}
 
+    // ✅ Safety: place leftover players if formation mismatch
+    while (currentIndex < outfield.length) {
+        const player = outfield[currentIndex];
+        const div = createPlayerDiv({ ...player, team_type: side }, 50, 50); // center fallback
+        container.appendChild(div);
+        currentIndex++;
+    }
+}
 
 // ✅ Create player dot element
 function createPlayerDiv(player, xPercent, yPercent) {
@@ -1193,7 +1237,7 @@ window.addEventListener('resize', () => {
     // Optionally clear and re-render field
     const container = document.getElementById("football-field");
     if (container) container.innerHTML = '';
-    fetchAndRenderLineups(match_id, match); // re-render
+    fetchAndRenderLineups(); // re-render
 });
 
 function isVerticalMode() {

@@ -8,7 +8,7 @@ const playerImageMap = require('../utils/playerImageMap');
 const APIkey = process.env.FOOTBALL_API_KEY;
 
 // Display matches for live-match-demo
-const getMatchesCache = new NodeCache({ stdTTL: 300 });
+const getMatchesCache = new NodeCache({ stdTTL: 60 });
 
 exports.getMatches = async (req, res) => {
   const { from, to } = req.query;
@@ -78,10 +78,8 @@ exports.getMatches = async (req, res) => {
 };
 
 
-
 // function to fetch top scorer
-// function to fetch top scorer
-const topScorersCache = new NodeCache({ stdTTL: 300 });
+const topScorersCache = new NodeCache({ stdTTL: 60 });
 
 exports.getTopScorers = async (req, res) => {
   try {
@@ -252,7 +250,7 @@ exports.getTopStandings = async (req, res) => {
 
 // Function to fetch all matches with caching
 
-const allMatchesCache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes
+const allMatchesCache = new NodeCache({ stdTTL: 60 }); // cache for 1 minutes
 
 exports.getAllMatches = async (req, res) => {
   const cacheKey = "allMatches_last14days";
@@ -307,7 +305,7 @@ exports.getAllMatches = async (req, res) => {
 
 //cntroller to get matches by date and cache
 
-const matchesByDateCache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes
+const matchesByDateCache = new NodeCache({ stdTTL: 60 }); // cache for 1 minutes
 
 exports.getMatchesByDate = async (req, res) => {
   const { date } = req.query;
@@ -369,7 +367,7 @@ exports.getMatchesByDate = async (req, res) => {
 
 //function to load statistic
 
-const matchStatsCache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes
+const matchStatsCache = new NodeCache({ stdTTL: 60 }); // cache for 1 minutes
 
 exports.getMatchStatistics = async (req, res) => {
   const { matchId } = req.query;
@@ -504,10 +502,17 @@ exports.getStandings = async (req, res) => {
   }
 };
 
+async function safeJson(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Invalid JSON response: ${text.slice(0, 200)}`);
+  }
+}
 
-
-// ✅ Fetch lineup and dynamically infer formation
-const lineupCache = new NodeCache({ stdTTL: 300 }); // 5 minutes cache
+// backend/controllers/lineupController.js
+const lineupCache = new NodeCache({ stdTTL: 300 }); // 5 min cache
 
 exports.getLineups = async (req, res) => {
   const { matchId } = req.query;
@@ -518,38 +523,37 @@ exports.getLineups = async (req, res) => {
 
   const cacheKey = `lineup_${matchId}`;
   const cached = lineupCache.get(cacheKey);
-
   if (cached) {
-    return res.json({ lineup: cached });
+    return res.json(cached);
   }
 
   try {
-    const url = `https://apiv3.apifootball.com/?action=get_lineups&match_id=${matchId}&APIkey=${APIkey}`;
-    const response = await fetch(url);
+    // Fetch both endpoints in parallel
+    const [lineupRes, eventRes] = await Promise.all([
+      fetch(`https://apiv3.apifootball.com/?action=get_lineups&match_id=${matchId}&APIkey=${APIkey}`),
+      fetch(`https://apiv3.apifootball.com/?action=get_events&match_id=${matchId}&APIkey=${APIkey}`)
+    ]);
 
-    if (!response.ok) {
-      const text = await response.text();
-      return res.status(502).json({ error: "API response failed", details: text });
+    if (!lineupRes.ok || !eventRes.ok) {
+      return res.status(502).json({ error: "API response failed" });
     }
 
-    const data = await response.json();
+    const lineupData = await safeJson(lineupRes);
+    const eventData = await safeJson(eventRes);
 
-    if (!data || typeof data !== 'object') {
-      return res.status(500).json({ error: "Invalid API response" });
-    }
+    const lineup = lineupData[matchId]?.lineup || null;
+    const match = Array.isArray(eventData) ? eventData[0] : eventData[matchId];
 
-    const lineup = data[matchId]?.lineup || null;
+    const responsePayload = { lineup, match };
 
-    // ✅ Store in cache
-    lineupCache.set(cacheKey, lineup);
+    lineupCache.set(cacheKey, responsePayload);
 
-    res.json({ lineup });
-  } catch (error) {
-    console.error("❌ Error fetching lineups (backend):", error);
-    res.status(500).json({ error: "Failed to fetch lineups" });
+    res.json(responsePayload);
+  } catch (err) {
+    console.error("❌ Error fetching lineups/events:", err);
+    res.status(500).json({ error: "Failed to fetch lineup data" });
   }
 };
-
 
 
 

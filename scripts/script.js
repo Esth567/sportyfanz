@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
 
     // === LUXON Time Functions ===
-    function getMinutesSince(dateStr, timeStr) {
+  function getMinutesSince(dateStr, timeStr) {
   try {
     const now = DateTime.local().setZone("Europe/Berlin");
     const matchBerlin = getBerlinTime(dateStr, timeStr);
@@ -177,36 +177,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ========== RELATIVE TIME ========== //
 function updateRelativeTime() {
-    const timeElements = document.querySelectorAll('.news-time');
-    const now = new Date();
+  const timeElements = document.querySelectorAll('.news-time');
+  const now = new Date();
 
-    timeElements.forEach(el => {
-        const postedMs = Date.parse(el.dataset.posted);
-        if (isNaN(postedMs)) {
-            el.textContent = 'Invalid time';
-            return;
-        }
+  timeElements.forEach(el => {
+    const postedMs = Date.parse(el.dataset.posted);
+    if (isNaN(postedMs)) {
+      el.textContent = 'Invalid time';
+      return;
+    }
 
-        const diff = Math.floor((now.getTime() - postedMs) / 1000);
-        let text;
+    const diff = Math.floor((now.getTime() - postedMs) / 1000);
+    let text;
 
-        if (diff < 1) text = '1 second ago';
-        else if (diff < 60) {
-            const seconds = diff;
-            text = `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
-        } else if (diff < 3600) {
-            const minutes = Math.floor(diff / 60);
-            text = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-        } else if (diff < 86400) {
-            const hours = Math.floor(diff / 3600);
-            text = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-        } else {
-            const days = Math.floor(diff / 86400);
-            text = `${days} day${days !== 1 ? 's' : ''} ago`;
-        }
+    if (diff <= 0) text = '1 second'; 
+    else if (diff < 60) {
+      const seconds = diff;
+      text = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    } else if (diff < 3600) {
+      const minutes = Math.floor(diff / 60);
+      text = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else if (diff < 86400) {
+      const hours = Math.floor(diff / 3600);
+      text = `${hours} hour${hours !== 1 ? 's' : ''}`;
+    } else {
+      const days = Math.floor(diff / 86400);
+      text = `${days} day${days !== 1 ? 's' : ''}`;
+    }
 
-        el.textContent = text;
-    });
+    el.textContent = text;
+  });
 }
 
 
@@ -217,9 +217,10 @@ async function loadNews(sectionId, endpoint, retries = 2) {
   if (loader) loader.style.display = 'block';
 
   try {
+    const response = await fetch(endpoint, { cache: "no-cache" });
 
     if (!response.ok) {
-      const text = await response.text();
+      const text = await response.text(); 
       throw new Error(`Failed to fetch news: ${response.status}\n${text}`);
     }
 
@@ -248,9 +249,9 @@ async function loadNews(sectionId, endpoint, retries = 2) {
     const errorText = document.getElementById("news-error-text");
 
     // 🔄 Retry once
-    if (retry) {
-      console.log('🔁 Retrying in 2 seconds...');
-      setTimeout(() => loadNews(false), 2000);
+    if (retries > 0) {
+      console.log(`🔁 Retrying in 2 seconds... (${retries} left)`);
+      setTimeout(() => loadNews(sectionId, endpoint, retries - 1), 2000);
       return;
     }
 
@@ -541,6 +542,7 @@ function showFullNews(clickedItem) {
 
       updateRelativeTime();
     };
+    middleLayer.insertBefore(fullView, middleLayer.firstChild);
   } catch (err) {
     console.error("Failed to render full news view", err);
     alert("Something went wrong displaying the full article.");
@@ -581,7 +583,7 @@ window.onpopstate = function (event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
-    loadNews(sectionId, `${API_BASE}/api/sports-summaries`, { cache: "no-cache" });
+    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
   });
 });
                                                                                                                                                                                                                                                                                                                                                                                                
@@ -1159,7 +1161,6 @@ function initCalendarPicker() {
 
 
 
-
 // Update filterByDate to accept selected date
 function filterByDate(category, selectedDate) {
   const filteredData = {
@@ -1217,17 +1218,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Function to fetch match video 
 async function fetchMatchVideo(matchId) {
-    try {
-        const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
-        const data = await response.json();
-
-        console.log("🎥 Video Data:", data);
-
-        return data.videoUrl || null;
-    } catch (error) {
-        console.error("❌ Error fetching match video:", error);
-        return null;
+  try {
+    const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
     }
+
+    const data = await response.json();
+    console.log("🎥 Video Data:", data);
+
+    return data.videoUrl || null;
+  } catch (error) {
+    console.error("❌ Error fetching match video:", error);
+    return null;
+  }
 }
 
 
@@ -1407,7 +1412,7 @@ async function displayLiveMatch(matchId, category) {
                         </div>
                     </div>
 
-                   
+                   <div id="football-field-wrapper">
                    <div id="football-field" class="field">
                      <!-- Center line and circle -->
                      <div class="center-line"></div>
@@ -1420,6 +1425,7 @@ async function displayLiveMatch(matchId, category) {
                      <div class="goal left-goal"></div>
                      <div class="goal right-goal"></div>  
                     </div>
+                    </div>
 
                     <div class="lineup-players-names">
                         <h4>Players</h4>
@@ -1429,14 +1435,16 @@ async function displayLiveMatch(matchId, category) {
                                 <ul>${renderPlayers(match.lineup?.home?.starting_lineups)}</ul>
                                 <h4>Substitutes</h4>
                                 <ul>${renderPlayers(match.lineup?.home?.substitutes)}</ul>
-                                <ul>${renderPlayers(match.lineup?.home?.coach_name)}</ul>
+                                <h4>Coach</h4>
+                                <ul>${renderPlayers(match.lineup?.home?.coach)}</ul>
                             </div>
                             <div class="lineup-away-players">
                                 <h4>${match.match_awayteam_name}</h4>
                                 <ul>${renderPlayers(match.lineup?.away?.starting_lineups)}</ul>
                                 <h4>Substitutes</h4>
                                 <ul>${renderPlayers(match.lineup?.away?.substitutes)}</ul>
-                                <ul>${renderPlayers(match.lineup?.away?.coach_name)}</ul>
+                                <h4>Coach</h4>
+                                <ul>${renderPlayers(match.lineup?.away?.coach)}</ul>
                             </div>
                         </div>
                     </div>
@@ -1707,59 +1715,117 @@ function loadH2HData(homeTeam, awayTeam) {
     }
      
   
-    // ✅ Fetch lineup and dynamically infer formation
-     function fetchAndRenderLineups(match_id, match) {
-       fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
-        .then(res => res.json())
-        .then(({ lineup }) => {
-                const container = document.getElementById("football-field");
-                container.innerHTML = ""; // Clear previous content
-             if (!lineup) {
-             console.warn("No lineup data found for match_id:", match_id);
-             return;
-            }
+    // Fetch lineup and dynamically infer formation
+  function fetchAndRenderLineups(match_id) {
+  const containerWrapper = document.getElementById("football-field-wrapper");
 
-            const homePlayers = lineup.home?.starting_lineup || [];
-            const awayPlayers = lineup.away?.starting_lineup || [];
+  fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
+    .then(res => res.json())
+    .then(({ lineup, match }) => {
+      // instead of overwriting, just clear old players
+      const field = document.getElementById("football-field");
+     if (!field) {
+      console.error("❌ Field container not found!");
+      return;
+    }
+     field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
 
-            const homeFormation = inferFormation(homePlayers);
-            const awayFormation = inferFormation(awayPlayers);
+      if (!lineup) {
+        displayNoLineupMessage(containerWrapper, "No lineup data found.");
+        return;
+      }
 
-            renderPlayersOnField("home", homePlayers, homeFormation, "home");
-            renderPlayersOnField("away", awayPlayers, awayFormation, "away");
-        })
-        .catch(err => console.error("Error fetching lineups:", err));
+      const homePlayers = lineup.home?.starting_lineups ?? [];
+      const awayPlayers = lineup.away?.starting_lineups ?? [];
+
+      if (homePlayers.length === 0 && awayPlayers.length === 0) {
+        displayNoLineupMessage(containerWrapper, "No lineup formation available.");
+        return;
+      }
+
+      const homeFormation =
+        parseFormation(match?.match_hometeam_system) ||
+        inferFormation(homePlayers, match?.match_hometeam_system);
+
+      const awayFormation =
+        parseFormation(match?.match_awayteam_system) ||
+        inferFormation(awayPlayers, match?.match_awayteam_system);
+
+      if (!homeFormation && !awayFormation) {
+        displayNoLineupMessage(containerWrapper, "No lineup formation available.");
+        return;
+      }
+
+      if (homeFormation) {
+        renderPlayersOnField("home", homePlayers, homeFormation, "home");
+      }
+      if (awayFormation) {
+        renderPlayersOnField("away", awayPlayers, awayFormation, "away");
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching lineups:", err);
+      containerWrapper.innerHTML = "";
+      displayNoLineupMessage(containerWrapper, "Error loading lineups.");
+    });
 }
 
 
-// ✅ Parse inferred formation or fallback string-based one
-function parseFormation(formation, players) {
-    if (Array.isArray(formation)) return formation;
+ function displayNoLineupMessage(container, message) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("no-lineup-message");
+    msgDiv.textContent = message;
+    msgDiv.style.textAlign = "center";
+    msgDiv.style.marginTop = "20px";
+    msgDiv.style.color = "#888";
+    msgDiv.style.fontSize = "1.2rem";
+    container.appendChild(msgDiv);
+ }
 
-    const defaultFormation = "4-4-2";
-    console.log("🔍 Raw formation string:", formation);
 
+ // ✅ Parse formation from API string only
+ function parseFormation(formation) {
     if (!formation || typeof formation !== "string") {
-        console.warn("Formation missing or invalid. Using default:", defaultFormation);
-        return defaultFormation.split("-").map(Number);
+        console.warn("⚠️ No formation string provided.");
+        return null; // ⬅️ return null if no formation
     }
 
-    const parts = formation.split("-").map(p => parseInt(p.trim())).filter(n => !isNaN(n));
-    const sum = parts.reduce((a, b) => a + b, 0);
+    let parts = formation
+        .split("-")
+        .map(p => parseInt(p.trim()))
+        .filter(n => !isNaN(n));
+
+    let sum = parts.reduce((a, b) => a + b, 0);
+
+    // ✅ Handle "1-4-4-2" (goalkeeper included)
+    if (sum === 11 && parts[0] === 1) {
+        console.log("⚽ Formation includes GK, removing leading '1'");
+        parts.shift();
+        sum = parts.reduce((a, b) => a + b, 0);
+    }
+
     const isValid = parts.every(n => Number.isInteger(n) && n > 0) && sum === 10;
 
     if (!isValid) {
         console.warn("❌ Malformed formation:", formation, "(sum =", sum, ")");
-        return defaultFormation.split("-").map(Number);
+        return null; // ⬅️ return null if invalid
     }
 
-    console.log("✅ Parsed formation:", parts);
+    console.log(" Parsed formation:", parts);
     return parts;
 }
 
-// ✅ Inference: derive formation from lineup_position
-function inferFormation(players) {
-    const outfield = players.filter(p => p.lineup_position !== "1");
+
+ // Inference: derive formation from lineup_position
+ function inferFormation(players, fallbackFormationStr) {
+    const outfield = players
+     .filter(p => p.lineup_position !== "1")
+     .sort((a, b) => parseInt(a.lineup_position) - parseInt(b.lineup_position));
+
+
+    if (outfield.length === 0 && fallbackFormationStr) {
+        return parseFormation(fallbackFormationStr);
+    }
 
     const grouped = {
         defense: [],
@@ -1773,35 +1839,52 @@ function inferFormation(players) {
         if (pos <= 4) grouped.defense.push(p);
         else if (pos <= 7) grouped.midfield.push(p);
         else if (pos <= 10) grouped.attack.push(p);
-        else grouped.extra.push(p); // Position 11+
+        else grouped.extra.push(p);
     });
 
     const result = [];
     if (grouped.defense.length) result.push(grouped.defense.length);
     if (grouped.midfield.length) result.push(grouped.midfield.length);
     if (grouped.attack.length) result.push(grouped.attack.length);
-    if (grouped.extra.length) result.push(grouped.extra.length); // e.g. a 3-4-1-2 shape
+    if (grouped.extra.length) result.push(grouped.extra.length);
 
-    console.log("🔧 Inferred formation:", result);
     return result;
 }
 
-// ✅ Render player dots based on formation array
-function renderPlayersOnField(team, players, formation, side = "home") {
+  // ✅ Render player dots based on formation array
+  function renderPlayersOnField(team, players, formation, side = "home") {
     const container = document.getElementById("football-field");
     if (!container || !formation) return;
 
-    const formationArray = parseFormation(formation, players);
-    const isHome = side === "home";
+    // 🔑 Always normalize using parseFormation (works with string OR array)
+    let formationArray = Array.isArray(formation)
+     ? formation
+    : parseFormation(formation);
 
-    // Goalkeeper
-    const goalkeeper = players.find(p => p.lineup_position === "1");
-    if (goalkeeper) {
-        const gkX = isHome ? 10 : 90;
-        const gkY = 50;
-        const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
-        container.appendChild(gkDiv);
+
+    const isHome = side === "home";
+    const vertical = false;
+  
+      // Goalkeeper position
+      const goalkeeper = players.find(p => p.lineup_position === "1");
+      if (goalkeeper) {
+      let gkX, gkY;
+
+      if (vertical) {
+      // Field rotated vertically
+      gkX = 50; // middle horizontally
+      gkY = isHome ? 2 : 98; // sit on top/bottom goal line
+    } else {
+    // Normal horizontal field
+     gkY = 50; // middle vertically
+     gkX = isHome ? 6 : 94; // sit on left/right goal line
     }
+
+    const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
+    gkDiv.classList.add("goalkeeper"); // optional for styling
+    container.appendChild(gkDiv);
+  }
+
 
     // Outfield players
     const outfield = players.filter(p => p.lineup_position !== "1");
@@ -1809,20 +1892,40 @@ function renderPlayersOnField(team, players, formation, side = "home") {
 
     formationArray.forEach((playersInLine, lineIndex) => {
         const totalLines = formationArray.length;
-        const x = isHome
-            ? ((lineIndex + 1) / (totalLines + 1)) * 45 + 5
-            : ((lineIndex + 1) / (totalLines + 1)) * 45 + 50;
+
+        // Calculate line position (X in horizontal, Y in vertical)
+      let linePos = ((lineIndex + 1) / (totalLines + 1)) * 40 + 10;
+
+       // Home starts from left side (or top if vertical)
+       if (isHome) {
+        lineCoord = linePos;
+       } else {
+        // Away team mirrored but offset closer to opponent goal arc
+      lineCoord = 100 - linePos;
+     }
+
 
         for (let j = 0; j < playersInLine; j++) {
-            const y = ((j + 1) / (playersInLine + 1)) * 100;
+            const spread = ((j + 1) / (playersInLine + 1)) * 100;
             const player = outfield[currentIndex];
+
             if (player) {
+                const x = vertical ? spread : lineCoord;
+                const y = vertical ? lineCoord : spread;
                 const div = createPlayerDiv({ ...player, team_type: side }, x, y);
                 container.appendChild(div);
                 currentIndex++;
             }
         }
     });
+
+    // ✅ Safety: place leftover players if formation mismatch
+    while (currentIndex < outfield.length) {
+        const player = outfield[currentIndex];
+        const div = createPlayerDiv({ ...player, team_type: side }, 50, 50); // center fallback
+        container.appendChild(div);
+        currentIndex++;
+    }
 }
 
 // ✅ Create player dot element
@@ -1853,7 +1956,6 @@ function createPlayerDiv(player, xPercent, yPercent) {
 
     
 
- 
 
   window.addEventListener("DOMContentLoaded", () => {
     fetchMatchesData(); // This ensures everything waits until the DOM is ready

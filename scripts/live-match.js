@@ -844,8 +844,8 @@ function loadH2HData(homeTeam, awayTeam) {
 
 
 
-    //function to load standings
-    async function loadStandings(match) {
+  //function to load standings
+  async function loadStandings(match) {
     const tableContainer = document.getElementById("standing-table");
     const spinner = document.getElementById("standing-spinner");
 
@@ -917,8 +917,8 @@ function loadH2HData(homeTeam, awayTeam) {
 
      
   
-  // ✅ Fetch lineup and dynamically infer formation
-  function fetchAndRenderLineups(match_id) {
+// ✅ Fetch lineup and dynamically infer formation
+function fetchAndRenderLineups(match_id) {
   const containerWrapper = document.getElementById("football-field-wrapper");
 
   fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)

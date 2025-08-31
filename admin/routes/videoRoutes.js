@@ -1,7 +1,10 @@
-const express = require('express');
+// routes/videoRoutes.js
+const express = require("express");
 const router = express.Router();
-const { getMatchVideo } = require('../controllers/videoController');
+const { getMatchVideo } = require("../controllers/videoController");
 
-router.get('/match-video/:matchId', getMatchVideo); // /api/match-video/:matchId
+// GET /api/videos/:matchId
+router.get("/:matchId", getMatchVideo);
 
 module.exports = router;
+

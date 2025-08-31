@@ -5,7 +5,6 @@ const cors = require("cors");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
-const mime = require("mime");
 
 const imageProxyRoutes = require("../routes/imageProxy");
 const dashboardRoutes = require("../routes/dashboard");
@@ -13,7 +12,7 @@ const leagueRoutes = require("../routes/leagueRoutes");
 const videoRoutes = require("../routes/videoRoutes");
 const playerImageRoutes = require("../routes/playerImageRoutes");
 const fetchnlpnews = require("../routes/fetchnlpnews");
-const entitydadabase = require("../routes/entitydatabase");
+const entityDatabase = require("../routes/entitydatabase");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,38 +22,11 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-// ✅ Serve static files from admin/public (React build, CSS, JS, etc.)
-app.use(express.static(path.join(__dirname, "public")));
-
-// ✅ Serve /assets with UTF-8 safe decoding
-app.use("/assets", (req, res, next) => {
-  try {
-    // Decode URL so %20 → space, %C4%B1 → ı, etc.
-    const decodedPath = decodeURIComponent(req.path);
-
-    // Build absolute file path
-    const filePath = path.join(__dirname, "public/assets", decodedPath);
-
-    // Log request (optional)
-    console.log("👉 Serving asset:", filePath);
-
-    res.sendFile(filePath, (err) => {
-      if (err) {
-        console.error("❌ Asset not found:", filePath);
-        res.status(404).send("Asset not found");
-      }
-    });
-  } catch (e) {
-    console.error("❌ Error decoding asset path:", e);
-    res.status(400).send("Invalid asset path");
-  }
-});
-
 // ✅ Middleware
 app.use(compression());
 app.use(express.json());
 
-// ✅ CORS Configuration
+// ✅ CORS configuration
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -64,12 +36,9 @@ app.use(
         "https://sportyfanz.onrender.com",
         "http://localhost:3000",
       ];
-
       const allowedPatterns = [/^https:\/\/your-username-.*\.app\.github\.dev$/];
 
-      if (!origin) {
-        return callback(null, true); // Allow curl/Postman
-      }
+      if (!origin) return callback(null, true); // allow curl/Postman
 
       if (
         allowedOrigins.includes(origin) ||
@@ -83,37 +52,42 @@ app.use(
   })
 );
 
-// ✅ Rate Limiting for API routes
-const limiter = rateLimit({
+// ✅ Rate limiting for API routes
+const apiLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: process.env.NODE_ENV === "production" ? 30 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use("/api/", limiter);
+app.use("/api/", apiLimiter);
 
-// ✅ API Routes
+// ✅ Serve static assets
+app.use("/assets", express.static(path.join(__dirname, "assets")));
+app.use(express.static(path.join(__dirname, "public")));
+
+// ✅ API routes
 app.use("/api", imageProxyRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", leagueRoutes);
-app.use("/api", videoRoutes);
+app.use("/api/videos", videoRoutes);
 app.use("/api", playerImageRoutes);
 app.use("/api", fetchnlpnews);
-app.use("/api", entitydadabase);
+app.use("/api", entityDatabase);
 
-// ✅ Health check route
+// ✅ Health check
 app.get("/api/health", (req, res) => res.send("✅ API is live."));
 
-// ✅ Serve frontend (React index.html) for non-API routes
-app.get("*", (req, res) => {
+// ✅ SPA fallback: serve index.html only for non-API GET requests
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
-// 404 handler
+
+// ✅ 404 handler (for non-GET or unmatched API routes)
 app.use((req, res, next) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// Error handler
+// ✅ Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something went wrong" });

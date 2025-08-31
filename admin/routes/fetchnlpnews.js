@@ -85,6 +85,14 @@ function cleanArticleText(text) {
   if (!text) return '';
 
   let stripped = text
+  // remove possessives like "Adam Schefter's"
+    .replace(/^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*'s\s+/g, '')
+    // remove fantasy/promo boilerplate
+    .replace(/\bfantasy football cheat sheet\b/gi, '')
+    .replace(/\bcheat sheet\b/gi, '')
+    .replace(/\bfantasy football\b/gi, '')
+    // remove leading/trailing separators
+    .replace(/^[\s\-:|]+|[\s\-:|]+$/g, '')
     // collapse excessive whitespace
     .replace(/\s{2,}/g, ' ')
     // remove embedded JSON-LD / schema.org objects
@@ -248,7 +256,7 @@ async function generateFreshNews() {
           const matchedEntity = detectEntityFromText(item.title, entityDb);
 
           const articleData = {
-            title: cleanUnicode(item.title),
+            title: cleanArticleText(cleanUnicode(item.title)),
             seoTitle,
             link: articleUrl,
             image: imageUrl,

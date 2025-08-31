@@ -649,7 +649,7 @@ async function fetchTopScorers() {
       playerItem.innerHTML = `
         <div class="player-image">
           <img src="${imgSrc}" alt="${playerName}"
-               onerror="this.onerror=null;this.src='assets/images/default-player.png';">
+               onerror="this.onerror=null;this.src='assets/images/avatar.png';">
         </div>
         <div class="players-data">
           <div class="player-name">${playerName}</div>
@@ -828,17 +828,9 @@ async function fetchTopFourStandings(leagueId) {
 
 
 
-
 // middle hero banner header slider
 function initSlider() {
   let currentIndex = 0;
-
-  function showSlide(index) {
-    const slides = document.querySelectorAll(".header-slider .slider-content");
-    slides.forEach((slide, i) => {
-      slide.classList.toggle("active", i === index);
-    });
-  }
 
   // Show first slide immediately
   showSlide(currentIndex);
@@ -851,11 +843,31 @@ function initSlider() {
   }, 4000);
 }
 
+// New unified showSlide (handles enter + exit animations)
+function showSlide(index) {
+  const slides = document.querySelectorAll(".header-slider .slider-content");
+  
+  slides.forEach((slide, i) => {
+    if (i === index) {
+      // entering
+      slide.classList.add("active");
+      slide.classList.remove("exit-left");
+    } else if (slide.classList.contains("active")) {
+      // exiting
+      slide.classList.remove("active");
+      slide.classList.add("exit-left");
+      // cleanup so it can be reused later
+      setTimeout(() => slide.classList.remove("exit-left"), 800);
+    } else {
+      slide.classList.remove("active", "exit-left");
+    }
+  });
+}
+
 // Run this right after DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
   initSlider(); 
 });
-
 
 
 
@@ -875,8 +887,15 @@ const { DateTime } = luxon;
 
 // Convert a match date/time string to a Luxon DateTime in Berlin time
 function getBerlinTime(dateStr, timeStr) {
-  return DateTime.fromFormat(`${dateStr} ${timeStr}`, "yyyy-MM-dd HH:mm", { zone: "Europe/Berlin" });
+  return DateTime.fromFormat(
+    `${dateStr} ${timeStr}`,
+    "yyyy-MM-dd HH:mm",   // ✅ force two-digit hours
+    { zone: "Europe/Berlin" }
+  );
 }
+
+
+
 
 // Convert Berlin time to the user's local timezone
 function convertToUserLocalTime(berlinTime) {
@@ -886,11 +905,13 @@ function convertToUserLocalTime(berlinTime) {
 // Format match time for display in local time
 function formatToUserLocalTime(dateStr, timeStr) {
   try {
-    return convertToUserLocalTime(getBerlinTime(dateStr, timeStr)).toFormat("h:mm");
+    return convertToUserLocalTime(getBerlinTime(dateStr, timeStr)).toFormat("HH:mm"); 
+    // "07:00", "13:30", "16:45" etc.
   } catch {
     return "TBD";
   }
 }
+
 
 // Calculate minutes since match start
 function getMinutesSince(dateStr, timeStr) {
@@ -911,7 +932,7 @@ async function fetchMatchesData() {
     const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
-    matchesData = data;
+    
     matchesData = data;
       if (data.live?.length > 0) currentCategory = "live";
       else if (data.upcoming?.length > 0) currentCategory = "upcoming";
@@ -984,16 +1005,40 @@ function showMatches(matchesData, category) {
  ];
 
 
-  // ✅ Sorting helper
-  const getPriority = (m) => {
-    const index = preferredLeagues.findIndex(
-      l => l.name === m.league_name && l.country === m.country_name
-    );
-    return index === -1 ? Infinity : index;
-  };
+  //Sorting helper for league priority
+const getPriority = (m) => {
+  const index = preferredLeagues.findIndex(
+    l => l.name === m.league_name && l.country === m.country_name
+  );
+  return index === -1 ? Infinity : index;
+};
 
-  // Sort matches (preferred leagues first)
-  const sortedMatches = selectedMatches.sort((a, b) => getPriority(a) - getPriority(b));
+
+// Sort matches based on category
+let sortedMatches = selectedMatches.sort((a, b) => {
+  const priorityDiff = getPriority(a) - getPriority(b);
+  if (priorityDiff !== 0) return priorityDiff;
+
+  const dateA = getBerlinTime(a.match_date, a.match_time);
+  const dateB = getBerlinTime(b.match_date, b.match_time);
+
+  if (!dateA.isValid || !dateB.isValid) {
+    // fallback to keep stable order if parsing failed
+    return 0;
+  }
+
+  if (category === "live") {
+    // Live: Latest → Earliest
+    return dateB.toMillis() - dateA.toMillis();
+  } else if (category === "highlight") {
+    // ✅ Highlight: Latest finished match → Earliest
+    return dateB.toMillis() - dateA.toMillis();
+  } else {
+    // ✅ Upcoming: Earliest → Latest
+    return dateA.toMillis() - dateB.toMillis();
+  }
+});
+
 
   let html = "";
   const MAX_MATCHES = 5;
@@ -1018,12 +1063,16 @@ function showMatches(matchesData, category) {
       </div>
     </div>`;
 
-  if (sortedMatches.length === 0) {
+   if (sortedMatches.length === 0) {
     html += `<p class="no-matches-msg">No ${category} matches found.</p>`;
     html += `</div>`;
-    matchesContainer.innerHTML = html;
-    return;
-  }
+   matchesContainer.innerHTML = html;
+
+   setTodayInCalendar();   // ✅ always set day
+   initCalendarPicker(category); // ✅ also init calendar
+
+   return;
+ }
 
   // ✅ Display matches (priority leagues first, max 5)
   for (const match of sortedMatches) {
@@ -1145,7 +1194,7 @@ function initCalendarPicker() {
       appendTo: calendarWrapper,
       position: "below left",
       onChange: (dates, dateStr) => {
-        filterByDate("upcoming", dateStr);
+        filterByDate(currentCategory, dateStr);
       }
     });
   }
@@ -1168,6 +1217,10 @@ function filterByDate(category, selectedDate) {
     highlight: matchesData.highlight.filter(m => m.match_date === selectedDate),
     upcoming: matchesData.upcoming.filter(m => m.match_date === selectedDate),
   };
+
+   //update calendar display
+  setCalendarDate(selectedDate);
+
   showMatches(filteredData, category);
 }
 
@@ -1191,6 +1244,17 @@ function filterByDate(category, selectedDate) {
   window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
 }
 
+function setCalendarDate(dateStr) {
+  const date = new Date(dateStr);
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  const dayEl = document.getElementById("calendar-day");
+  const inputEl = document.getElementById("match-date");
+
+  if (dayEl) dayEl.textContent = dd;
+  if (inputEl) inputEl.value = dateStr;
+}
+
 
 function filterMatchesCategory(category) {
   currentCategory = category;
@@ -1205,9 +1269,15 @@ function filterMatchesCategory(category) {
     }
   });
 
-  // Show matches for the category
-  showMatches(matchesData, category);
+  // ✅ Use currently selected calendar date if available
+  const selectedDate = document.getElementById("match-date")?.value;
+  if (selectedDate) {
+    filterByDate(category, selectedDate);
+  } else {
+    showMatches(matchesData, category);
+  }
 }
+
 
 // Init on load
 document.addEventListener("DOMContentLoaded", () => {
@@ -1219,13 +1289,9 @@ document.addEventListener("DOMContentLoaded", () => {
 // Function to fetch match video 
 async function fetchMatchVideo(matchId) {
   try {
-    const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
+    let response = await fetch(`${API_BASE}/api/videos/${matchId}`);
+    let data = await response.json();
 
-    const data = await response.json();
     console.log("🎥 Video Data:", data);
 
     return data.videoUrl || null;
@@ -1234,9 +1300,6 @@ async function fetchMatchVideo(matchId) {
     return null;
   }
 }
-
-
-
 
 
 // Function to display match details with video
@@ -1318,6 +1381,12 @@ async function displayLiveMatch(matchId, category) {
         const headerSlider = document.querySelector('.header-slider');
           if (headerSlider) {
             headerSlider.style.display = 'none';
+           }
+
+            // Hide the header slider when showing match details
+        const newspodcastwrapper = document.querySelector('.news-podcast-wrapper');
+          if (newspodcastwrapper) {
+            newspodcastwrapper.style.display = 'none';
            }
 
     // Attach tab click events

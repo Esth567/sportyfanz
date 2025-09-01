@@ -19,7 +19,7 @@ body{
 }
 
 body::-webkit-scrollbar {
-  width: 0;                    /* Chrome, Safari, Opera */
+  width: 0;
   background: transparent;
 }
 /* Sidebar Container */
@@ -226,7 +226,7 @@ body::-webkit-scrollbar {
 .header {
     position: fixed; 
     top: 0;
-    width: calc(100% - 220px); /* Adjust width to account for the sidebar */
+    width: calc(100% - 220px); 
     background: #0A131F; 
     color: white;
     z-index: 999; 
@@ -371,14 +371,15 @@ body::-webkit-scrollbar {
 
 /* Content Section */
 .content {
-    flex: 1 1 auto;
+    flex: 1;
     display: flex;
-    justify-content: flex-start;
-    flex-direction: coumn;
+    justify-content: space-between;
+    align-items: stretch; /* Ensure layers fill the height */
     padding: 15px;
     gap: 10px;
-    margin: 0;
     margin-top: 70px;
+    height: calc(100vh - 150px);
+    overflow: auto;
     background: #0A131F;
     padding-bottom: 60px;
 }
@@ -445,6 +446,10 @@ body::-webkit-scrollbar {
 }
 
 .more:hover{
+  color: #70c172;
+}
+
+.more a:hover{
   color: #70c172;
 }
 
@@ -1418,11 +1423,18 @@ body::-webkit-scrollbar {
         font-size: 22.5px;
     }
 
-    .match-btn:hover {
+    .match-btn button:hover {
       background: #70c172;
       color: #fff;
     }
 
+     .match-btn img:hover {
+      background: #70c172;
+      color: #fff;
+    }
+
+
+    
     .advert-container {
         position: absolute;
         bottom: 0;
@@ -2322,7 +2334,7 @@ news-time {
 
 
 
-/*---------------------league names page css ---------------------------*/
+/*---------------------league page css ---------------------------*/
 
 .leagueNames {
     display: flex;
@@ -2445,6 +2457,14 @@ news-time {
     font-size: 20px;
 }
 
+.more-league-table:hover{
+  color: #70c172;
+}
+
+.more-league-table span:hover{
+  color: #70c172;
+}
+
   .table-headers {
     display: flex;
     align-items: center;
@@ -2496,8 +2516,11 @@ news-time {
 .team-position {
     display: flex;
     justify-content: flex-start;
-    min-width: 25px; /* Ensure spacing */
-    font-size: 0.62rem;
+    min-width: 25px; 
+    font-size: 16px;
+    font-family: 'Lato';
+    font-weight: 500;
+    color: #9fbad9;
 }
 
 .team-infos {
@@ -2510,6 +2533,7 @@ news-time {
 .teamLeague-name{
     font-size: 16px;
     font-weight: 500;
+    color: #fff;
     font-family: 'Lato';
     text-align: left;  
 }
@@ -2544,7 +2568,7 @@ news-time {
    .team-stat {
     color: #fff;
     font-size: 16px; 
-    font-weight: 700;
+    font-weight: 500;
     font-family: 'Lato';
   }
 
@@ -2567,8 +2591,8 @@ news-time {
 }
 
 .form-box {
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     font-size: 12px;
     font-family: 'Lato';
     font-weight: 500;
@@ -2576,7 +2600,7 @@ news-time {
     align-items: center;
     justify-content: center;
     border-radius: 3px;
-    color: white;
+    color: #fff;
     line-height: 1;
 }
 
@@ -5075,19 +5099,52 @@ news-time {
         flex-grow: 1;
     }
 
-    .team-position,
-    .position-header,
-    .team-name-header,
-    .team-stat,
-    .teamLeague-name,
-    .stat-header {
-       font-size: 15px;
-     }
+    /* Hide Form, W, D, L, G */
+  .stat-headerF,
+  .form-stat {
+    display: none !important;
+  }
 
-     .teamLeague-name{
-       text-align: left;  
-     }
-     
+  /* hide W, D, L, G headers */
+  .table-headers .stat-header:nth-of-type(5), /* W */
+  .table-headers .stat-header:nth-of-type(6), /* D */
+  .table-headers .stat-header:nth-of-type(7), /* L */
+  .table-headers .stat-header:nth-of-type(8)  /* G */ {
+    display: none !important;
+  }
+
+  /* hide W, D, L, G stats in rows */
+  .team-rows .team-stat:nth-of-type(2), /* W */
+  .team-rows .team-stat:nth-of-type(3), /* D */
+  .team-rows .team-stat:nth-of-type(4), /* L */
+  .team-rows .team-stat:nth-of-type(5)  /* G */ {
+    display: none !important;
+  }
+
+  /* --- REORDER --- */
+.position-header { order: 1; }
+.team-position   { order: 1; }   /* stays as POS values */
+
+.team-name-header { order: 2; }
+.team-infos       { order: 2; }
+
+/* "P" */
+.table-headers .stat-header:nth-of-type(4),
+.team-rows .team-stat:nth-of-type(7) {
+  order: 3;
+}
+
+/* "GD" */
+.table-headers .stat-header:nth-of-type(9),
+.team-rows .team-stat:nth-of-type(6) {
+  order: 4;
+}
+
+/* "PTS" */
+.table-headers .stat-header:nth-of-type(10),
+.team-rows .team-stat:nth-of-type(8) {
+  order: 5;
+}
    
       .hide-on-mobile {
         display: none !important;

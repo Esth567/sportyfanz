@@ -64,10 +64,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             });
     
-            // Load the Premier League table by default on page load
-            if (firstLeagueId) {
-                updateLeagueTable("Premier League", firstLeagueId);
-            }
+            // ✅ Load default league(s) after fetching leagues
+          // ✅ Load default league(s) after fetching leagues
+if (window.innerWidth <= 1024) {
+    // Mobile/Tablet → show multiple leagues stacked (Premier League first)
+    ["Premier League", "La Liga", "Serie A", "NPFL", "Bundesliga"].forEach(name => {
+        const leagueInfo = selectedLeagues[name];
+        if (leagueInfo && leagueInfo.league_id) {
+            updateLeagueTable(name, leagueInfo.league_id);
+        }
+    });
+   } else {
+      // Desktop → show only Premier League by default
+      if (firstLeagueId) {
+        updateLeagueTable("Premier League", firstLeagueId);
+      }
+  }
+
     
         } catch (error) {
             console.error("Error fetching leagues:", error);
@@ -98,7 +111,7 @@ async function updateLeagueTable(leagueName, leagueId) {
         const middleLayer = document.querySelector(".middle-layer");
 
         if (!Array.isArray(leagueData) || leagueData.length === 0) {
-            middleLayer.innerHTML = `<p>No data available for ${leagueName}</p>`;
+            middleLayer.innerHTML += `<p>No data available for ${leagueName}</p>`;
             return;
         }
 
@@ -106,45 +119,68 @@ async function updateLeagueTable(leagueName, leagueId) {
         let tableHTML = generateTableHTML(initialData, formMap, leagueName, leagueData);
 
         // Use the league logo mapping (local images)
-        const leagueLogo = leagueLogos[leagueName] || '/assets/images/default-logo.png'; // Fallback to default logo
-        console.log("League Logo:", leagueLogo); // Log the logo URL to check
+        const leagueLogo = leagueLogos[leagueName] || '/assets/images/default-logo.png';
 
-        middleLayer.innerHTML = `
-            <div class="league-table">
-                <div class="league-headers">
-                    <img src="${leagueLogo}" alt="${leagueName} Logo" class="league-logo">
-                    <div class="league-details">
-                        <h3 class="league-name">${leagueName}</h3>
-                        <p class="league-country">${leagueData[0].country_name}</p>
+        // ✅ On mobile/tablet → append, on desktop → overwrite
+        if (window.innerWidth <= 1024) {
+            middleLayer.innerHTML += `
+                <div class="league-table">
+                    <div class="league-headers">
+                        <img src="${leagueLogo}" alt="${leagueName} Logo" class="league-logo">
+                        <div class="league-details">
+                            <h3 class="league-name">${leagueName}</h3>
+                            <p class="league-country">${leagueData[0].country_name}</p>
+                        </div>
+                        <div class="more-league-table">
+                            <ion-icon name="arrow-forward-outline"></ion-icon>
+                            <span class="see-more-text">See More</span>
+                        </div>
                     </div>
-                    <div class="more-league-table">
-                        <ion-icon name="arrow-forward-outline"></ion-icon>
-                        <span class="see-more-text">See More</span>
+                    <div class="league-tables-details">
+                        ${tableHTML}
                     </div>
                 </div>
-                <div class="league-tables-details">
-                    ${tableHTML}
+            `;
+        } else {
+            middleLayer.innerHTML = `
+                <div class="league-table">
+                    <div class="league-headers">
+                        <img src="${leagueLogo}" alt="${leagueName} Logo" class="league-logo">
+                        <div class="league-details">
+                            <h3 class="league-name">${leagueName}</h3>
+                            <p class="league-country">${leagueData[0].country_name}</p>
+                        </div>
+                        <div class="more-league-table">
+                            <ion-icon name="arrow-forward-outline"></ion-icon>
+                            <span class="see-more-text">See More</span>
+                        </div>
+                    </div>
+                    <div class="league-tables-details">
+                        ${tableHTML}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
 
-        const seeMoreButton = document.querySelector(".more-league-table");
-        let expanded = false;
+        // See More toggle
+        const seeMoreButtons = document.querySelectorAll(".more-league-table");
+        seeMoreButtons.forEach(seeMoreButton => {
+            let expanded = false;
+            seeMoreButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+                expanded = !expanded;
+                const leagueTablesDetails = seeMoreButton.parentElement.nextElementSibling;
 
-        seeMoreButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            expanded = !expanded;
-            const leagueTablesDetails = document.querySelector(".league-tables-details");
-
-            if (expanded) {
-                leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap, leagueName, leagueData);
-                seeMoreButton.querySelector(".see-more-text").textContent = "See Less";
-                seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-back-outline");
-            } else {
-                leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap, leagueName, leagueData);
-                seeMoreButton.querySelector(".see-more-text").textContent = "See More";
-                seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-forward-outline");
-            }
+                if (expanded) {
+                    leagueTablesDetails.innerHTML = generateTableHTML(leagueData, formMap, leagueName, leagueData);
+                    seeMoreButton.querySelector(".see-more-text").textContent = "See Less";
+                    seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-back-outline");
+                } else {
+                    leagueTablesDetails.innerHTML = generateTableHTML(initialData, formMap, leagueName, leagueData);
+                    seeMoreButton.querySelector(".see-more-text").textContent = "See More";
+                    seeMoreButton.querySelector("ion-icon").setAttribute("name", "arrow-forward-outline");
+                }
+            });
         });
 
     } catch (err) {

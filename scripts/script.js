@@ -926,7 +926,7 @@ function getMinutesSince(dateStr, timeStr) {
 
 
 
-//function to fetch matches
+//function to fetch matches for middle layer
 async function fetchMatchesData() {
   try {
     const response = await fetch(`${API_BASE}/api/all_matches`);

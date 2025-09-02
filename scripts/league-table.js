@@ -64,8 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             });
     
-            // ✅ Load default league(s) after fetching leagues
-          // ✅ Load default league(s) after fetching leagues
+            
+// ✅ Load default league(s) after fetching leagues
 if (window.innerWidth <= 1024) {
     // Mobile/Tablet → show multiple leagues stacked (Premier League first)
     ["Premier League", "La Liga", "Serie A", "NPFL", "Bundesliga"].forEach(name => {
@@ -191,7 +191,7 @@ async function updateLeagueTable(leagueName, leagueId) {
 
 
 
-// Prevent sidebar from collapsing when clicking .leag-count or .more-league-table
+// Prevent sidebar from collapsing when clicking more-league-table
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".leag-count, .more-league-table").forEach(element => {
         element.addEventListener("click", (event) => {

@@ -4879,7 +4879,6 @@ news-time {
     justify-content: center;
     background-color: #1f3750;
     margin-top: 10px;
-    padding: 10px;
     gap: 30px;
     border-radius: 5px;
   }
@@ -4924,7 +4923,6 @@ news-time {
       border: none;
     }
 
-    
     /* line-ups team and formaation header styling */
 
 
@@ -4943,7 +4941,8 @@ news-time {
     height: 200px;
     background: #70c172;
     border: 2px solid white;
-    margin: 20px auto;
+    margin: 0;
+    padding: 0;
     border-radius: 10px;
     overflow: hidden;
     transform: rotate(0deg);
@@ -5206,7 +5205,12 @@ news-time {
     cursor: pointer;
   }
 
-    
+  /* --- REORDER FOR FORM--- */
+.table-headers .stat-headerF:nth-of-type(3),
+.team-rows .form-stat:nth-of-type(2) {
+  order: 3;
+}
+
 
     /*......prediction page .....*/
 

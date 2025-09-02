@@ -1469,13 +1469,13 @@ async function displayLiveMatch(matchId, category) {
                             <img src="${match.team_home_badge}" alt="${match.match_hometeam_name}" class="lineUpsteam-logo">
                             <div class="team-formation">
                                 <h3>${match.match_hometeam_name}</h3>
-                                <h4>${match.match_hometeam_system || "Unknown Formation"}</h4>
+                                <h4>${match.match_hometeam_system || "NA"}</h4>
                             </div>
                         </div>
                         <div class="lineUpsteam-info">
                             <div class="team-formation">
                                 <h3>${match.match_awayteam_name}</h3>
-                                <h4>${match.match_awayteam_system || "Unknown Formation"}</h4>
+                                <h4>${match.match_awayteam_system || "NA"}</h4>
                             </div>
                             <img src="${match.team_away_badge}" alt="${match.match_awayteam_name}" class="lineUpsteam-logo">
                         </div>

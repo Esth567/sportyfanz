@@ -22,9 +22,15 @@ body::-webkit-scrollbar {
   width: 0;
   background: transparent;
 }
+
+:root {
+  --sidebar-width: 223px;
+  --sidebar-collapsed-width: 85px;
+}
+
 /* Sidebar Container */
 .sidebar {
-    width: 223px;
+    width: var(--sidebar-width);
     height: 100vh;
     background: linear-gradient(to bottom, #1a2f4b 0%, #265a3f 50%, #70c172 100%);
     color: #fff;
@@ -43,10 +49,6 @@ body::-webkit-scrollbar {
     z-index: 1000;
 }
 
-/* Collapsed Sidebar */
-.sidebar.collapsed {
-    width: 80px;
-}
 
 /* Stroke Divider */
 .stroke {
@@ -177,11 +179,13 @@ body::-webkit-scrollbar {
     text-align: center;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Adds depth to the text */
 }
-/* Collapsed Menu Items */
+
+/* Collapsed Sidebar */
 .sidebar.collapsed {
-    width: 50px; /* Reduced width when collapsed */
+    width: var(--sidebar-collapsed-width);
     border-radius: 10px;
 }
+
 .sidebar.collapsed .menu ul li a {
     display: none;
     
@@ -201,7 +205,7 @@ body::-webkit-scrollbar {
 
 .body-container {
     flex: 1;
-    margin-left: 225px; /* Matches sidebar width */
+     margin-left: calc(var(--sidebar-width, 223px)); 
     display: flex;
     flex-direction: column;
     transition: margin-left 0.3s ease-in-out;
@@ -218,6 +222,7 @@ body::-webkit-scrollbar {
 
 .sidebar.collapsed ~ .body-container {
     margin-left: 60px; 
+    margin-left: calc(var(--sidebar-collapsed-width, 80px))
 }
 
 
@@ -225,14 +230,20 @@ body::-webkit-scrollbar {
 /* Header */
 .header {
     position: fixed; 
-    top: 0;
-    width: calc(100% - 220px); 
+    top: 0; 
+    width: calc(100% - var(--sidebar-width, 223px)); 
     background: #0A131F; 
     color: white;
     z-index: 999; 
     padding: 15px;
     display: flex;
     flex-direction: column;
+}
+
+/* Collapsed */
+.sidebar.collapsed ~ .body-container .header {
+  left: var(--sidebar-collapsed-width, 80px);
+  width: calc(100% - var(--sidebar-collapsed-width, 80px));
 }
 
 .header-top h3 {
@@ -314,8 +325,7 @@ body::-webkit-scrollbar {
 .icons img {
     border: none; /* Remove any border */
     padding: 6px;
-    width: 30px;
-    height: 30px;
+    font-size: 28px;
     gap: 10px;
     border-radius: 50%; /* Circular shape */
     background: linear-gradient(90deg, #1a2f4b3d 50%, #1b334d49 75.03%, #1b364e6e 100%);
@@ -374,7 +384,7 @@ body::-webkit-scrollbar {
     flex: 1;
     display: flex;
     justify-content: space-between;
-    align-items: stretch; /* Ensure layers fill the height */
+    align-items: stretch; 
     padding: 15px;
     gap: 10px;
     margin-top: 70px;
@@ -917,6 +927,61 @@ body::-webkit-scrollbar {
   line-height: 1.2;
 }
 
+/* Arrows */
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent; 
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px 10px;
+  z-index: 10;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.slider-arrow:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Left arrow */
+.slider-arrow.left {
+  left: 20px;
+}
+
+/* Right arrow */
+.slider-arrow.right {
+  right: 20px;
+}
+
+/* Dots container */
+.slider-box {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+/* Individual dots */
+.slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.slider-dot.active {
+  background: #1a2f4b; 
+  transform: scale(1.2);
+}
 
 
 /* advert */
@@ -2077,8 +2142,12 @@ news-time {
   line-height: 1.6;
 }
 
+.back-button {
+  background: transparent; 
+}
+
 .back-button:hover {
-  color: #0A131F;
+  color: #70c172;
 }
 
 .news-thumb {
@@ -4449,7 +4518,7 @@ news-time {
         width: 100%;
     }
 
-        /* Ensure header is flexed properly */
+    /* Ensure header is flexed properly */
    .header-topbar {
       display: flex;
       flex-direction: column;
@@ -4457,7 +4526,7 @@ news-time {
       width: 100%;
     }
 
-      /* Make sure the logo and menu icon are in a row */
+    /* Make sure the logo and menu icon are in a row */
     .mobileMenu-logo {
         display: flex;
         align-items: center;
@@ -4489,7 +4558,7 @@ news-time {
         display: flex;
         align-items: center;
         gap: 10px;
-       margin-top: -35px;
+        margin-top: -35px;
     }
 
 
@@ -4535,21 +4604,22 @@ news-time {
     .search-container img {
         display: block;
         right: 20px;
+        font-size: 28px;
         margin-top: -30px
     }
 
     .content {
-     display: flex;
-     flex-direction: column;
+      display: flex;
+      flex-direction: column;
     }
 
- .layer {
+  .layer {
      display: flex;
      flex-direction: column;
      padding: 0;
      margin: 0;
      margin-top: 10px;
-    }
+   }
 
     .live-match-demo,
     .league-table-demo,

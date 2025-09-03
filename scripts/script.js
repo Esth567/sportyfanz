@@ -390,6 +390,8 @@ function populateNewsSection(sectionId, newsList) {
 
       container.appendChild(slide);
     });
+    // Rebuild dots
+   createDots();  
   }
 }
 
@@ -829,46 +831,96 @@ async function fetchTopFourStandings(leagueId) {
 
 
 // middle hero banner header slider
+let currentIndex = 0;
+let autoRotate;
+
+// Create dots dynamically
+function createDots() {
+  const slides = document.querySelectorAll(".header-slider .slider-content");
+  const sliderBox = document.querySelector(".header-slider .slider-box");
+  sliderBox.innerHTML = ""; // clear old dots
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement("div");
+    dot.classList.add("slider-dot");
+    if (i === currentIndex) dot.classList.add("active");
+    dot.addEventListener("click", () => {
+      currentIndex = i;
+      showSlide(currentIndex);
+      resetAutoplay();
+    });
+    sliderBox.appendChild(dot);
+  });
+}
+
 function initSlider() {
-  let currentIndex = 0;
-
-  // Show first slide immediately
+  createDots();
   showSlide(currentIndex);
+  startAutoplay();
 
-  // Rotate every 4s
-  setInterval(() => {
+  // ✅ Bind arrows dynamically with fresh slides count
+  const leftArrow = document.querySelector(".slider-arrow.left");
+  const rightArrow = document.querySelector(".slider-arrow.right");
+
+  if (leftArrow) {
+    leftArrow.addEventListener("click", () => {
+      const slides = document.querySelectorAll(".header-slider .slider-content");
+      currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showSlide(currentIndex);
+      resetAutoplay();
+    });
+  }
+
+  if (rightArrow) {
+    rightArrow.addEventListener("click", () => {
+      const slides = document.querySelectorAll(".header-slider .slider-content");
+      currentIndex = (currentIndex + 1) % slides.length;
+      showSlide(currentIndex);
+      resetAutoplay();
+    });
+  }
+}
+
+// Autoplay
+function startAutoplay() {
+  autoRotate = setInterval(() => {
     const slides = document.querySelectorAll(".header-slider .slider-content");
     currentIndex = (currentIndex + 1) % slides.length;
     showSlide(currentIndex);
   }, 4000);
 }
 
-// New unified showSlide (handles enter + exit animations)
+function resetAutoplay() {
+  clearInterval(autoRotate);
+  startAutoplay();
+}
+
+// Show slide
 function showSlide(index) {
   const slides = document.querySelectorAll(".header-slider .slider-content");
-  
+  const dots = document.querySelectorAll(".slider-box .slider-dot");
+  if (!slides.length) return;
+
   slides.forEach((slide, i) => {
     if (i === index) {
-      // entering
       slide.classList.add("active");
       slide.classList.remove("exit-left");
     } else if (slide.classList.contains("active")) {
-      // exiting
       slide.classList.remove("active");
       slide.classList.add("exit-left");
-      // cleanup so it can be reused later
       setTimeout(() => slide.classList.remove("exit-left"), 800);
     } else {
       slide.classList.remove("active", "exit-left");
     }
   });
+
+  dots.forEach((dot, i) => {
+    dot.classList.toggle("active", i === index);
+  });
 }
 
-// Run this right after DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  initSlider(); 
-});
 
+document.addEventListener("DOMContentLoaded", initSlider);
 
 
 //function to display matches for the middle layers in home page

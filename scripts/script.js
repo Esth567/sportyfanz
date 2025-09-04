@@ -594,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // function to fetch top scorer
 
 
-// ✅ Utility: Normalize player names into safe filenames
+//Utility: Normalize player names into safe filenames
 function normalizeNameForAsset(name) {
   if (!name) return "default-player";
 
@@ -606,13 +606,13 @@ function normalizeNameForAsset(name) {
 }
 
 
-// ✅ Main function
+//Main function to fetch topscorere
 async function fetchTopScorers() {
   try {
     const response = await fetch(`${API_BASE}/api/topscorers`);
     const topScorers = await response.json();
 
-    // ✅ Check if backend returned an array
+    //Check if backend returned an array
     if (!Array.isArray(topScorers)) {
       console.error("❌ Invalid data from backend:", topScorers);
       return;
@@ -675,9 +675,12 @@ async function fetchTopScorers() {
       playerIndex++;
     }
 
-    if (playerElements.length > 10) {
-      dotsContainer.style.display = "none";
+    if (playerElements.length <= 1) {
+      dotsContainer.style.display = "none"; 
+    } else {
+     dotsContainer.style.display = "flex";
     }
+
 
     if (playerElements.length > 0) {
       startSlider(playerElements);
@@ -695,7 +698,7 @@ let players = [];
 let dots = [];
 let sliderInterval;
 
-function startSlider(playerElements) {
+function startSlider() {
     players = document.querySelectorAll(".player-item");
     dots = document.querySelectorAll(".dot");
 
@@ -711,8 +714,16 @@ function showNextPlayer() {
     players[currentPlayer].classList.add("active");
     dots[currentPlayer].classList.add("active-dot");
 
+    // ✅ Keep active dot visible
+    dots[currentPlayer].scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest"
+    });
+
     currentPlayer = (currentPlayer + 1) % players.length;
 }
+
 
 function setActiveSlide(index) {
     clearInterval(sliderInterval); // Stop automatic sliding
@@ -981,7 +992,7 @@ function getMinutesSince(dateStr, timeStr) {
 //function to fetch matches for middle layer
 async function fetchMatchesData() {
   try {
-    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const response = await fetch(`/api/all_matches`);
     const data = await response.json();
 
     
@@ -1339,19 +1350,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // Function to fetch match video 
-async function fetchMatchVideo(matchId) {
+async function fetchMatchVideo(matchId, homeTeam, awayTeam) {
   try {
-    let response = await fetch(`${API_BASE}/api/videos/${matchId}`);
+    let response = await fetch(
+      `${API_BASE}/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
+    );
     let data = await response.json();
 
     console.log("🎥 Video Data:", data);
 
-    return data.videoUrl || null;
+    // Return embed code if available
+    return data.embed || null;
   } catch (error) {
     console.error("❌ Error fetching match video:", error);
     return null;
   }
 }
+
 
 
 // Function to display match details with video
@@ -1377,8 +1392,14 @@ async function displayLiveMatch(matchId, category) {
         return;
     }
 
-    let videoUrl = await fetchMatchVideo(matchId);
-    console.log("🎥 Video Data:", videoUrl);
+   
+    let videoEmbed = await fetchMatchVideo(
+         matchId,
+         match.match_hometeam_name,
+         match.match_awayteam_name
+        );
+
+    console.log("🎥 Video Data:", videoEmbed);
 
     let matchesContainer = document.querySelector(".matches-container");
 
@@ -1412,7 +1433,7 @@ async function displayLiveMatch(matchId, category) {
             <button class="tab-btn" data-tab="standing">Standing</button>
         </div>`;
 
-    const adHTML = `<img src="/assets/images/Ad5.png" alt="Ad5" class="ad5-logo">`;
+    const adHTML = `<div class="ad5-logo"><h5>Advertisement</h5></div>`;
 
     const contentHTML = `
         <div class="live-match-info">
@@ -1421,13 +1442,13 @@ async function displayLiveMatch(matchId, category) {
             <div class="tab-content" id="tab-content">${getTabContent("info", match)}</div>
         </div>`;
 
-    matchesContainer.innerHTML = `
+      matchesContainer.innerHTML = `
         <div class="live-match">
-            ${videoUrl ? `<iframe width="100%" height="313" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>` 
-            : `<div class="no-video-message">No video available for the match.</div>`}
-            <div class="live-match-teams">${teamHTML}</div>
-            ${contentHTML}
-        </div>`;
+         ${videoEmbed ? videoEmbed : `<div class="no-video-message">No video available</div>`}
+        <div class="live-match-teams">${teamHTML}</div>
+        ${contentHTML}
+       </div>`;
+
 
         // Hide the header slider when showing match details
         const headerSlider = document.querySelector('.header-slider');
@@ -1533,7 +1554,7 @@ async function displayLiveMatch(matchId, category) {
                         </div>
                     </div>
 
-                   <div id="football-field-wrapper">
+                  <div id="football-field-wrapper">
                    <div id="football-field" class="field">
                      <!-- Center line and circle -->
                      <div class="center-line"></div>
@@ -1837,7 +1858,7 @@ function loadH2HData(homeTeam, awayTeam) {
      
   
     // Fetch lineup and dynamically infer formation
-  function fetchAndRenderLineups(match_id) {
+function fetchAndRenderLineups(match_id) {
   const containerWrapper = document.getElementById("football-field-wrapper");
 
   fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)

@@ -933,28 +933,28 @@ body::-webkit-scrollbar {
   top: 50%;
   transform: translateY(-50%);
   border: none;
+  font-size: 14px;
   background: transparent; 
-  font-size: 2rem;
-  color: #fff;
+  padding: 10px 5px;
+  color: #9fbad9;
   cursor: pointer;
-  padding: 8px 10px;
   z-index: 10;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .slider-arrow:hover {
-  background: rgba(0, 0, 0, 0.8);
+  color: #70c172;
   transform: translateY(-50%) scale(1.1);
 }
 
 /* Left arrow */
 .slider-arrow.left {
-  left: 20px;
+  left: 5px;
 }
 
 /* Right arrow */
 .slider-arrow.right {
-  right: 20px;
+  right: 5px;
 }
 
 /* Dots container */
@@ -970,8 +970,8 @@ body::-webkit-scrollbar {
 
 /* Individual dots */
 .slider-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: rgba(255,255,255,0.5);
   cursor: pointer;
@@ -1524,28 +1524,22 @@ body::-webkit-scrollbar {
 }
 /* Top Scorer Section */
 
-.players-container {
-    position: relative;
-    width: 100%;
-    height: 160px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
 .slider {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     position: relative;
     overflow: hidden;
     width: 100%;
     height: 160px;
     background: linear-gradient(to bottom, #244537 40%, #1b364e 80%);
     border-radius: 10px;
-    border: 1px solid #ffc107a2;
+    border: 1px solid #efb930;
     margin-top: 15px;
+}
+
+/* container only positions items inside */
+.players-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 /* Player Image */
@@ -1606,6 +1600,7 @@ body::-webkit-scrollbar {
 }
 
 /* Slider Dots Container */
+/* Slider Dots Container */
 .slider-dots {
     position: absolute;
     bottom: 10px;
@@ -1613,13 +1608,20 @@ body::-webkit-scrollbar {
     transform: translateX(-50%);
     display: flex;
     gap: 6px;
+    z-index: 10;
+    max-width: 60%;          /* keep dots inside player-data area */
+    overflow-x: auto;        /* allow horizontal scroll */
+    scrollbar-width: none;   /* hide scrollbar (Firefox) */
+}
+.slider-dots::-webkit-scrollbar {
+    display: none;           /* hide scrollbar (Chrome/Safari) */
 }
 
 /* Individual Dot */
 .dot {
-    width: 5px;
-    height: 5px;
-    background-color: #ffffff50; /* Light white */
+    width: 8px;
+    height: 8px;
+    background-color: #dce5e3; 
     border-radius: 50%;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
@@ -3160,8 +3162,7 @@ news-time {
      justify-content: space-between;
      gap: 15px;
      background-color: #1a2f4be0;
-     padding: 10px;
-     border-radius: 10px;
+    border-radius: 10px;
      margin-top: 10px;
  }
 
@@ -3251,9 +3252,8 @@ news-time {
 
   .match-tabs {
     display: flex;
-    padding: 8px;
     align-items: center;
-    margin-bottom: 20px;
+    padding-bottom: 20px;
     gap: 16px;
     overflow-x: auto;       
     -webkit-overflow-scrolling: touch; 
@@ -3264,7 +3264,7 @@ news-time {
   .match-tabs .tab-btn {
     color: #fff;
     border-radius: 20px;
-    padding: 4px 15px;
+    padding: 4px 12px;
     background-color: #1f3750;
     cursor: pointer;
     text-align: center;
@@ -3288,7 +3288,6 @@ news-time {
   #tab-content {
     display: block; 
     min-height: 100px; 
-    padding: 10px;
     border-radius: 5px;
 }
 
@@ -3297,16 +3296,17 @@ news-time {
   }
   
 .ad5-logo {
-    width: 97%;
+    width: 100%;
     height: 96px;
-    margin-top: -10px;
+    margin-top: 5px;
+    border-radius: 16px;
     border: 1px solid #c4c4c41c;
     
 }
 
   /* info styling */
 
-  .info-match-container {
+.info-match-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start; /* Align content to the left */
@@ -3378,22 +3378,19 @@ news-time {
 }
 
 
-
-
-
-
 /* line-ups team and formaation header styling */
 
 .lineUpsteams-container {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-top: 10px;
     width: 100%;
 }
 
 .lineUpsteam-info {
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap: 5px;
 }
 
@@ -3415,16 +3412,16 @@ news-time {
     font-size: 16px;
     font-family: 'Lato';
     font-weight: 400;
-    color: #a4a4a4;
+    color: #b7bfbd;
     margin-top: 2px;
     text-align: left;
 }  
   
-.awayteam-formation h4 {
-  font-size: 16px;
+ .awayteam-formation h4 {
+    font-size: 16px;
     font-family: 'Lato';
     font-weight: 400;
-    color: #a4a4a4;
+    color: #b7bfbd;
     margin-top: 2px;
     text-align: right;
 }
@@ -3488,7 +3485,7 @@ news-time {
     height: 180px;
     top: calc(50% - 90px);
     border: 3px solid;
-    background-color: #228B22;
+    background-color: #70c172;
 }
 .left-box {
     left: 0;
@@ -3526,7 +3523,6 @@ news-time {
   border-radius: 50%;
   text-align: center;
   line-height: 30px;
-  border: 2px solid;
   transform: translate(-50%, -50%);
 }
 
@@ -4942,7 +4938,7 @@ news-time {
         flex-grow: 1;
     }
 
-    .live-match-teams{
+  .live-match-teams{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -5008,11 +5004,12 @@ news-time {
 .field {
     position: relative;
     width: 100%;
-    height: 200px;
+    height: 168.06px;
     background: #70c172;
     border: 2px solid white;
     margin: 0;
     padding: 0;
+    margin-top: 10px;
     border-radius: 10px;
     overflow: hidden;
     transform: rotate(0deg);
@@ -5061,7 +5058,7 @@ news-time {
     height: 100.04px;
     top: calc(50% - 45px);
     border: 2px solid;
-    background-color: #228B22;
+    background-color: #70c172;
 }
 
 .left-box {
@@ -5096,8 +5093,8 @@ news-time {
   .player-dot {
     position: absolute;
     transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
+    width: 13.75px;
+    height: 13.78px;
     border-radius: 50%;
     font-size: 8px;
     font-weight: 500;
@@ -5112,9 +5109,41 @@ news-time {
 }
 
 .player-number {
-    font-weight: bold;
+    font-size: 5.48px;
+    font-weight: 500;
+    color: #fff;
+    font-family: 'Lato';
 }
 
+/* listed players */
+.listed-player-number {
+    flex: 0 0 40px; 
+    text-align: center;
+    font-size: 12px;
+    color: #9fbad9;
+    font-family: 'Lato';
+    font-weight: 500;
+    margin-left: -10px;
+}
+
+.listed-player-name{
+    flex: 1;
+    text-align: left;
+    font-weight: 600;
+    font-family: 'Lato';
+    font-size: 12px;
+    color: #fff;
+    
+}
+
+.lineup-home-players h4, .lineup-away-players h4 {
+    text-align: center;
+    color: #ffc107;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-family: 'Lato';
+    font-weight: 700;
+}
    
 .flatpickr-calendar {
     position: fixed !important;

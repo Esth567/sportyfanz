@@ -418,24 +418,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // Function to fetch match video (unchanged)
-async function fetchMatchVideo(matchId) {
+async function fetchMatchVideo(matchId, homeTeam, awayTeam) {
   try {
-    const response = await fetch(`${API_BASE}/api/match-video/${matchId}`);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
+    let response = await fetch(
+      `${API_BASE}/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
+    );
+    let data = await response.json();
 
-    const data = await response.json();
     console.log("🎥 Video Data:", data);
 
-    return data.videoUrl || null;
+    // Return embed code if available
+    return data.embed || null;
   } catch (error) {
     console.error("❌ Error fetching match video:", error);
     return null;
   }
 }
-
 
 
 
@@ -462,7 +460,12 @@ async function displayLiveMatch(matchId, category) {
         return;
     }
 
-    let videoUrl = await fetchMatchVideo(matchId);
+    let videoEmbed = await fetchMatchVideo(
+         matchId,
+         match.match_hometeam_name,
+         match.match_awayteam_name
+        );
+
     console.log("🎥 Video Data:", videoUrl);
 
     let matchesContainer = document.querySelector(".matches");
@@ -508,11 +511,10 @@ async function displayLiveMatch(matchId, category) {
 
     matchesContainer.innerHTML = `
         <div class="live-match">
-            ${videoUrl ? `<iframe width="100%" height="455px" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>` 
-            : `<div class="no-video-message">No video available for the match.</div>`}
-            <div class="live-match-teams">${teamHTML}</div>
-            ${contentHTML}
-        </div>`;
+         ${videoEmbed ? videoEmbed : `<div class="no-video-message">No video available</div>`}
+        <div class="live-match-teams">${teamHTML}</div>
+        ${contentHTML}
+       </div>`;
 
     // Attach tab click events
     document.querySelectorAll(".tab-btn").forEach(button => {

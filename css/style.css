@@ -769,7 +769,10 @@ body::-webkit-scrollbar {
   text-decoration: none;
 }
 
-
+.news-headline:hover {
+  text-decoration: underline;
+   color: #70c172;
+}
 
 
 .button{
@@ -871,7 +874,7 @@ body::-webkit-scrollbar {
     padding-top: 15px;
 }
 
-/* Heading styling */
+/* Heading styling*/
 .slider-title {
     color: #ffffffd0; 
     font-weight: bold;
@@ -885,46 +888,58 @@ body::-webkit-scrollbar {
   height: 100%; /* Match slider-content */
   overflow: hidden;
   border-radius: 10px;
-}
+ }
 
-.sliderNews-image::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 40%; /* adjust as needed */
-  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-  border-radius: 0 0 20px 20px;
-}
 
 .sliderNews-image img {
-  width: 100%;
+ width: 100%;
   height: auto;            /* keep natural aspect ratio */
   object-fit: contain;     /* no cropping */
   background: #000;        /* black bars fill empty space */
   border-radius: 20px;
   display: block;
-  margin: 0 auto;          /* keep centered */
 }
 
 .sliderNews-info {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
-  width: 100%;
-  padding: 12px 16px;
+  height: 100%;           
+  width: 100%;            
+  background: linear-gradient(
+    to right, 
+    rgba(0, 0, 0, 0.8) 0%,  
+    rgba(0, 0, 0, 0.6) 50%,  
+    rgba(0, 0, 0, 0) 100%   
+  );
   color: #fff;
-  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;     
+  padding: 20px;
+  box-sizing: border-box;
+  border-radius: 20px 0 0 20px;
 }
 
 
 .sliderNews-header {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-family: 'Lato';
   font-weight: bold;
   margin: 0;
+  padding-top: 110px;
   line-height: 1.2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sliderNews-header a {
+  color: #fff;
+  text-decoration: none;
+  word-break: break-word;  
+  white-space: normal;
 }
 
 /* Arrows */
@@ -933,9 +948,9 @@ body::-webkit-scrollbar {
   top: 50%;
   transform: translateY(-50%);
   border: none;
-  font-size: 14px;
+  font-size: 20px;
   background: transparent; 
-  padding: 10px 5px;
+  padding: 10px 10px;
   color: #9fbad9;
   cursor: pointer;
   z-index: 10;
@@ -981,6 +996,8 @@ body::-webkit-scrollbar {
 .slider-dot.active {
   background: #1a2f4b; 
   transform: scale(1.2);
+   width: 15px;
+  height: 8px;
 }
 
 
@@ -1254,7 +1271,9 @@ body::-webkit-scrollbar {
   max-width: 350px;             /* optional cap */
 }
 
-
+.calendar-icon:hover {
+  color: #70c172;
+}
 /* Each day cell */
 .flatpickr-day {
   text-align: center;
@@ -1490,16 +1509,15 @@ body::-webkit-scrollbar {
 
     .match-btn button:hover {
       background: #70c172;
-      color: #fff;
+      color: #1A2F4B;
     }
 
      .match-btn img:hover {
       background: #70c172;
-      color: #fff;
+      color: #1A2F4B;
     }
 
 
-    
     .advert-container {
         position: absolute;
         bottom: 0;
@@ -1600,7 +1618,6 @@ body::-webkit-scrollbar {
 }
 
 /* Slider Dots Container */
-/* Slider Dots Container */
 .slider-dots {
     position: absolute;
     bottom: 10px;
@@ -1609,9 +1626,10 @@ body::-webkit-scrollbar {
     display: flex;
     gap: 6px;
     z-index: 10;
-    max-width: 60%;          /* keep dots inside player-data area */
-    overflow-x: auto;        /* allow horizontal scroll */
-    scrollbar-width: none;   /* hide scrollbar (Firefox) */
+    max-width: 60%;          
+    overflow-x: auto;        
+    scrollbar-width: none;   
+    scroll-behavior: smooth;
 }
 .slider-dots::-webkit-scrollbar {
     display: none;           /* hide scrollbar (Chrome/Safari) */
@@ -1733,23 +1751,6 @@ body::-webkit-scrollbar {
 }
 
 
-.about-details h4{
-    color: #fff;
-    font-family: 'Lato';
-    font-weight: 500;
-}
-
-.brandVission {
-   background-color: #fff;
-   color: #000;
-}
-.brandVission span{
-   font-weight: bold;
-    font-size: 0.80rem;
-}
-.brandPersonality span {
-    font-weight: bold;
-}
 
 .main-footer {
     background-color: #9fbad98f; color: #fff; padding: 2rem 1rem; text-align: center;
@@ -1933,6 +1934,97 @@ body::-webkit-scrollbar {
   }
 
 
+/*----------------------- About page css------------------------------------*/
+
+.about-details {
+   max-width: 960px;
+   padding: 56px 20px 80px;
+   margin: 0 auto;
+   gap: 10px;
+ }
+
+.lead {
+  color: var(--muted);
+  font-size: clamp(16px, 2.6vw, 18px);
+  margin: 8px 0 0;
+ }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  text-transform: uppercase;
+  color: #fff;
+  font-family: 'Lato';
+ }
+
+h1 {
+  margin-top: 10px;
+  color: #fff;
+  font-family: 'Lato';
+  font-weight: 700;
+ }
+
+.lead {
+  color: #fff;
+  font-size: 16px;
+   font-family: 'Lato';
+   font-weight: 500;
+  }
+
+ p { 
+  margin: 0 0 10px; 
+  color: #fff;
+  font-family: 'Lato';
+  font-weight: 400;
+  line-height: 1.6;
+ }
+ .tagrow {
+  color: #fff;
+  font-family: 'Lato';
+  font-weight: 500;
+  font-size: 16px;
+ }
+
+ .panel {
+  margin-top: 20px;
+ }
+ .panel p{
+  line-height: 1.6;
+ }
+
+ .kicker {
+  color: #fff;
+  font-family: 'Lato';
+  font-size: 16px;
+  gap: 10px;
+ }
+ .cta {
+  color: #70c172;
+  font-family: 'Lato';
+  font-size: 16px;
+  font-weight: 700;
+ }
+
+ .tagrow {
+  display: flex;  
+  flex-direction: column;       
+  gap: 20px;   
+  font-size: 16px;
+  font-family: 'Lato';
+  font-weight: 500;
+  color: #fff;
+ }
+ .tagrow a {
+  
+  color: #fff;
+
+ }
+
+  .tagrow a:hover {
+    color: #70c172;
+  }
 
 /*------------------------------News css------------------------------------ */
 
@@ -1962,10 +2054,6 @@ body.news-page .news-update {
     color: inherit;
     text-decoration: none;
 
-}
-
-.news-container:hover {
-    transform: scale(1.05); 
 }
 
 .news-text-cont {
@@ -1999,6 +2087,11 @@ body.news-page .news-update {
     height: 20px; /* Maintain aspect ratio */
     object-fit: contain;
 }
+
+.see-more:hover{
+  color: #70c172;
+}
+
 
 .news-infomat {
     display: flex;
@@ -2055,6 +2148,10 @@ body.news-page .news-update {
     flex-direction: row;
 }
 
+.news-meta:hover {
+  text-decoration: underline;
+   color: #70c172;
+}
  .news-desc {
     flex: 4;
     font-size: 14px;
@@ -4624,26 +4721,6 @@ news-time {
     .latest-match {
         width: 100%;
     }
-
-   
-    .header-slider {
-        width: 100%;
-        height: 159.17px;
-        padding-top: 20px;
-    }
-
-
-    .sliderNews-image img {
-      object-fit: contain;   
-      object-position: top;  
-      background-color: #000; 
-     }
-     
-     .sliderNews-header {
-       font-size: 24px;
-       font-family: 'Lato';
-       font-weight: 700;
-      }
     
     .text-cont1 { order: 2; }
     .news-update { order: 3; }
@@ -4659,6 +4736,59 @@ news-time {
     .advert1 { order: 13; }
     .news-podcast { order: 14; } 
     
+
+       
+    .header-slider {
+        width: 100%;
+        height: 159.17px;
+        padding-top: 20px;
+    }
+
+
+    .sliderNews-image img {
+      object-fit: contain;   
+      object-position: top;  
+      background-color: #000; 
+     }
+     
+      .sliderNews-header {
+       font-size: 18px;
+       margin-bottom: 50px;
+       -webkit-line-clamp: 2;
+      }
+
+    /* Arrows */
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  font-size: 15px;
+  background: transparent; 
+  padding: 10px 10px;
+  color: #9fbad9;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Individual dots */
+.slider-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.slider-dot.active {
+  background: #1a2f4b; 
+  transform: scale(1.2);
+   width: 10px;
+  height: 5px;
+}
+
 
   .match-details {
     display: flex;
@@ -5365,6 +5495,12 @@ news-time {
     margin: 0 !important;
     border-radius: 15px 15px 0 0;
     animation: slideUp 0.3s ease-out;
+  }
+
+   .sliderNews-header {
+    font-size: 16px;
+    margin-bottom: 50px;
+    -webkit-line-clamp: 2; /* limit to 2 lines */
   }
   
  @keyframes slideUp {

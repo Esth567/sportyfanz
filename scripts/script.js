@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             limit: 100
         });
 
-        const res = await fetch(`${API_BASE}/api/matches?${params}`);
+        const res = await fetch(`/api/matches?${params}`);
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -606,7 +606,7 @@ function normalizeNameForAsset(name) {
 }
 
 
-//Main function to fetch topscorere
+//Main function to fetch topscorers
 async function fetchTopScorers() {
   try {
     const response = await fetch(`${API_BASE}/api/topscorers`);
@@ -713,13 +713,6 @@ function showNextPlayer() {
 
     players[currentPlayer].classList.add("active");
     dots[currentPlayer].classList.add("active-dot");
-
-    // ✅ Keep active dot visible
-    dots[currentPlayer].scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest"
-    });
 
     currentPlayer = (currentPlayer + 1) % players.length;
 }
@@ -992,7 +985,7 @@ function getMinutesSince(dateStr, timeStr) {
 //function to fetch matches for middle layer
 async function fetchMatchesData() {
   try {
-    const response = await fetch(`/api/all_matches`);
+    const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
     

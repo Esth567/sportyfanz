@@ -109,7 +109,7 @@ function updateRelativeTime() {
 
 // ========== LOAD NEWS DETAILS ==========
 async function loadNews(sectionId, endpoint, retries = 2) {
-  // ✅ Only allow trending-news or updates-news
+  // Only allow trending-news or updates-news
   if (!['trending-news', 'updates-news'].includes(sectionId)) {
     console.warn(`Ignoring unsupported section: ${sectionId}`);
     return;
@@ -284,13 +284,27 @@ function showFullNews(clickedItem) {
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
+
+    // determine image credit (improved fallback logic)
+     let imageCreditText = '';
+     if (newsItem.image) {
+      if (newsItem.imageCredit) {
+        imageCreditText = newsItem.imageCredit;
+       } else if (newsItem.entity && newsItem.entity.name) {
+        imageCreditText = `Photo: ${newsItem.entity.name}`;
+       } else if (newsItem.title) {
+        imageCreditText = `Photo: ${newsItem.title}`;
+       } else {
+        imageCreditText = 'Photo: Source not specified';
+       }
+      }
+
         
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
       <article class="blog-post">
-        <!-- ✅ keep only this back button -->
-        <button class="back-button">← Back to news</button>
+        <button class="back-button">← Back</button>
         <h1 class="blog-title">${newsItem.title}</h1>
 
         <div class="blog-meta">
@@ -308,9 +322,10 @@ function showFullNews(clickedItem) {
           </div>` : ''}
 
         ${newsItem.image ? `
-          <div class="blog-image-wrapper">
+          <figure class="blog-image-wrapper">
             <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-          </div>` : ''}
+            <figcaption class="image-caption">${imageCreditText}</figcaption>
+          </figure>` : ''}
 
         <div class="social-icons">
           <a href="https://x.com/sporty_fanz/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
@@ -333,6 +348,9 @@ function showFullNews(clickedItem) {
         <div class="blog-content">${formattedDesc}</div>
       </article>
     `;
+
+     //Insert the full article *after* the clicked item
+    clickedItem.insertAdjacentElement('afterend', fullView);
 
     // back button → restore state
     const backButton = fullView.querySelector('.back-button');

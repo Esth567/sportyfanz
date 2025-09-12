@@ -46,7 +46,7 @@ function isTopNewsArticle(article) {
   return topNewsKeywords.some(keyword => content.includes(keyword));
 }
 
-function isFootballArticle(item) {
+function isFootballArticle(article) {
   const footballKeywords = [
     'football', 'soccer', 'futbol',
     'premier league', 'la liga', 'serie a', 'bundesliga', 'ligue 1',
@@ -57,28 +57,36 @@ function isFootballArticle(item) {
     'fifa', 'uefa', 'caf'
   ];
 
-  const title = item.title?.toString().toLowerCase() || '';
-  const summary = item.fullSummary?.toString().toLowerCase() || '';
-  const link = item.link?.toString().toLowerCase() || '';
+  // Non-soccer exclusions (American football, other sports)
+  const excludedKeywords = [
+    'nfl', 'american football', 'super bowl', 'college football',
+    'nba', 'basketball', 'mlb', 'baseball',
+    'nhl', 'hockey', 'rugby', 'cricket',
+    'golf', 'tennis', 'volleyball', 'handball'
+  ];
 
-  const categories = Array.isArray(item.categories)
-    ? item.categories
-        .map(c => {
-          if (!c) return '';
-          if (typeof c === 'string') return c.toLowerCase();
-          if (typeof c === 'object' && c._) return String(c._).toLowerCase();
-          return String(c).toLowerCase();
-        })
-        .join(' ')
-    : '';
+  const textParts = [
+    article.title || '',
+    article.fullSummary || '',
+    article.description || '',
+    article.link || '',
+    Array.isArray(article.categories) ? article.categories.join(' ') : ''
+  ].map(s => s.toString().toLowerCase());
 
+  // If excluded sport keywords appear → reject immediately
+  if (excludedKeywords.some(keyword => 
+        textParts.some(txt => txt.includes(keyword)))) {
+    return false;
+  }
+
+  // ✅ Otherwise, require soccer-related keywords
   return footballKeywords.some(keyword =>
-    title.includes(keyword) ||
-    summary.includes(keyword) ||
-    categories.includes(keyword) ||
-    link.includes(keyword.replace(/\s+/g, '-'))
+    textParts.some(txt => 
+      txt.includes(keyword) || txt.includes(keyword.replace(/\s+/g, '-')))
   );
 }
+
+
 
 
 function cleanArticleText(text) {
@@ -269,7 +277,7 @@ async function generateFreshNews() {
             entity: matchedEntity || null,
           };
 
-          if (isTopNewsArticle(articleData) && isFootballArticle(item)) {
+          if (isTopNewsArticle(articleData) && isFootballArticle(articleData)) {
             topNews.push(articleData);
           } else {
             updates.push(articleData);

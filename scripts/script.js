@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             limit: 100
         });
 
-        const res = await fetch(`/api/matches?${params}`);
+        const res = await fetch(`${API_BASE}/api/matches?${params}`);
         const data = await res.json();
 
         if (Array.isArray(data)) {
@@ -375,7 +375,7 @@ function populateNewsSection(sectionId, newsList) {
           ${getImageHtml(item)}
           <div class="sliderNews-info">
             <h2 class="sliderNews-header">
-              <a href="/news/${item.seoTitle}" class="news-link">${item.title}</a>
+              <a href="/news/${item.seoTitle}" class="sliderNews-link">${item.title}</a>
             </h2>
           </div>
         </div>
@@ -469,13 +469,27 @@ function showFullNews(clickedItem) {
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
+    
+    // determine image credit (improved fallback logic)
+    let imageCreditText = '';
+    if (newsItem.image) {
+     if (newsItem.imageCredit) {
+      imageCreditText = newsItem.imageCredit;
+      } else if (newsItem.entity && newsItem.entity.name) {
+      imageCreditText = `Photo: ${newsItem.entity.name}`;
+     } else if (newsItem.title) {
+      imageCreditText = `Photo: ${newsItem.title}`;
+    } else {
+     imageCreditText = 'Photo: Source not specified';
+    }
+   }
+
         
     const fullView = document.createElement('div');
     fullView.className = 'news-full-view';
     fullView.innerHTML = `
       <article class="blog-post">
-        <!-- ✅ keep only this back button -->
-        <button class="back-button">← Back to news</button>
+        <button class="back-button">← Back</button>
         <h1 class="blog-title">${newsItem.title}</h1>
 
         <div class="blog-meta">
@@ -493,9 +507,10 @@ function showFullNews(clickedItem) {
           </div>` : ''}
 
         ${newsItem.image ? `
-          <div class="blog-image-wrapper">
+          <figure class="blog-image-wrapper">
             <img class="blog-image" src="${newsItem.image}" alt="Image for ${newsItem.title}" />
-          </div>` : ''}
+            <figcaption class="image-caption">${imageCreditText}</figcaption>
+          </figure>` : ''}
 
         <div class="social-icons">
           <a href="https://x.com/sporty_fanz/tweet?text=${encodeURIComponent(newsItem.title)}&url=${encodeURIComponent(articleUrl)}" target="_blank" rel="noopener noreferrer">
@@ -519,7 +534,7 @@ function showFullNews(clickedItem) {
       </article>
     `;
 
-   // ✅ Insert the full article *after* the clicked item
+   //Insert the full article *after* the clicked item
     clickedItem.insertAdjacentElement('afterend', fullView);
 
     // ✅ Auto scroll into view only on mobile/tablet
@@ -643,6 +658,8 @@ async function fetchTopScorers() {
       const imgSrc = apiImage && apiImage.trim() !== ""
         ? apiImage
         : `assets/players/${safeName}.png`;
+
+           console.log(`🎯 Player: ${playerName}, Image Path: ${imgSrc}`);
 
       const playerItem = document.createElement("div");
       playerItem.classList.add("player-item");
@@ -984,7 +1001,10 @@ function getMinutesSince(dateStr, timeStr) {
 
 //function to fetch matches for middle layer
 async function fetchMatchesData() {
+    const spinner = document.getElementById("matches-spinner");
   try {
+        spinner.style.display = "block";
+
     const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
@@ -1000,6 +1020,9 @@ async function fetchMatchesData() {
   } catch (error) {
     console.error("Error fetching match data:", error);
     document.querySelector(".matches-container").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+  }finally {
+    // Hide spinner after load/error
+    spinner.style.display = "none";
   }
 }
 
@@ -1850,22 +1873,32 @@ function loadH2HData(homeTeam, awayTeam) {
     }
      
   
-    // Fetch lineup and dynamically infer formation
+// Fetch lineup and dynamically infer formation
 function fetchAndRenderLineups(match_id) {
   const containerWrapper = document.getElementById("football-field-wrapper");
+  const field = document.getElementById("football-field");
 
   fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
     .then(res => res.json())
     .then(({ lineup, match }) => {
-      // instead of overwriting, just clear old players
-      const field = document.getElementById("football-field");
-     if (!field) {
-      console.error("❌ Field container not found!");
-      return;
-    }
-     field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
+      if (!field) {
+        console.error("❌ Field container not found!");
+        return;
+      }
+
+      // Clear old players and messages
+      field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
+      containerWrapper.querySelectorAll(".no-lineup-message").forEach(msg => msg.remove());
+
+      // ✅ Hide field if match hasn’t started
+      if (!match || match.match_status === "Not Started" || match.match_status === "") {
+        field.style.display = "none";
+        displayNoLineupMessage(containerWrapper, "Lineups will be available when the match starts.");
+        return;
+      }
 
       if (!lineup) {
+        field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup data found.");
         return;
       }
@@ -1873,7 +1906,9 @@ function fetchAndRenderLineups(match_id) {
       const homePlayers = lineup.home?.starting_lineups ?? [];
       const awayPlayers = lineup.away?.starting_lineups ?? [];
 
+      // ✅ Hide field if no players
       if (homePlayers.length === 0 && awayPlayers.length === 0) {
+        field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup formation available.");
         return;
       }
@@ -1886,10 +1921,15 @@ function fetchAndRenderLineups(match_id) {
         parseFormation(match?.match_awayteam_system) ||
         inferFormation(awayPlayers, match?.match_awayteam_system);
 
+      // ✅ Hide field if no valid formation
       if (!homeFormation && !awayFormation) {
+        field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup formation available.");
         return;
       }
+
+      // ✅ Show field only if formations exist
+      field.style.display = "block";
 
       if (homeFormation) {
         renderPlayersOnField("home", homePlayers, homeFormation, "home");
@@ -1900,7 +1940,7 @@ function fetchAndRenderLineups(match_id) {
     })
     .catch(err => {
       console.error("Error fetching lineups:", err);
-      containerWrapper.innerHTML = "";
+      if (field) field.style.display = "none";
       displayNoLineupMessage(containerWrapper, "Error loading lineups.");
     });
 }

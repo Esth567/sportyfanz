@@ -118,9 +118,9 @@ function getMinutesSince(dateStr, timeStr) {
 async function fetchAndRenderMatches() {
   const container = document.querySelector(".matches");
   if (container) {
+        <div class="spinner"></div>
     container.innerHTML = `
       <div class="loading-spinner">
-        <div class="spinner"></div>
       </div>
     `;
   }
@@ -922,19 +922,29 @@ function loadH2HData(homeTeam, awayTeam) {
 // ✅ Fetch lineup and dynamically infer formation
 function fetchAndRenderLineups(match_id) {
   const containerWrapper = document.getElementById("football-field-wrapper");
+  const field = document.getElementById("football-field");
 
   fetch(`${API_BASE}/api/lineups?matchId=${match_id}`)
     .then(res => res.json())
     .then(({ lineup, match }) => {
-      // instead of overwriting, just clear old players
-      const field = document.getElementById("football-field");
-     if (!field) {
-      console.error("❌ Field container not found!");
-      return;
-    }
-     field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
+      if (!field) {
+        console.error("❌ Field container not found!");
+        return;
+      }
+
+      // Clear old players and messages
+      field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
+      containerWrapper.querySelectorAll(".no-lineup-message").forEach(msg => msg.remove());
+
+      // ✅ Hide field if match hasn’t started
+      if (!match || match.match_status === "Not Started" || match.match_status === "") {
+        field.style.display = "none";
+        displayNoLineupMessage(containerWrapper, "Lineups will be available when the match starts.");
+        return;
+      }
 
       if (!lineup) {
+        field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup data found.");
         return;
       }
@@ -942,7 +952,9 @@ function fetchAndRenderLineups(match_id) {
       const homePlayers = lineup.home?.starting_lineups ?? [];
       const awayPlayers = lineup.away?.starting_lineups ?? [];
 
+      // ✅ Hide field if no players
       if (homePlayers.length === 0 && awayPlayers.length === 0) {
+        field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup formation available.");
         return;
       }
@@ -955,10 +967,15 @@ function fetchAndRenderLineups(match_id) {
         parseFormation(match?.match_awayteam_system) ||
         inferFormation(awayPlayers, match?.match_awayteam_system);
 
+      // ✅ Hide field if no valid formation
       if (!homeFormation && !awayFormation) {
+        field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup formation available.");
         return;
       }
+
+      // ✅ Show field only if formations exist
+      field.style.display = "block";
 
       if (homeFormation) {
         renderPlayersOnField("home", homePlayers, homeFormation, "home");
@@ -969,7 +986,7 @@ function fetchAndRenderLineups(match_id) {
     })
     .catch(err => {
       console.error("Error fetching lineups:", err);
-      containerWrapper.innerHTML = "";
+      if (field) field.style.display = "none";
       displayNoLineupMessage(containerWrapper, "Error loading lineups.");
     });
 }

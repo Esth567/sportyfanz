@@ -81,6 +81,12 @@ exports.getMatches = async (req, res) => {
 // function to fetch top scorer
 const topScorersCache = new NodeCache({ stdTTL: 60 });
 
+function truncateWords(str, limit = 2) {
+  if (!str || typeof str !== "string") return str;
+  return str.split(" ").slice(0, limit).join(" ");
+}
+
+
 exports.getTopScorers = async (req, res) => {
   try {
     const limitPerLeague = parseInt(req.query.limitPerLeague) || 3;
@@ -139,15 +145,15 @@ exports.getTopScorers = async (req, res) => {
           leagueName.includes("africa cup") ||
           leagueName.includes("copa america")
         ) {
-          passesThreshold = goals >= 2;
+          passesThreshold = goals >= 5;
         }
 
         if (passesThreshold) {
           result.push({
-            league: league.league_name,
+            league: truncateWords(league.league_name),
             player: scorer.player_name,
             goals: goals,
-            team: scorer.team_name,
+            team: truncateWords(scorer.team_name),
             image: scorer.player_image,
           });
         }

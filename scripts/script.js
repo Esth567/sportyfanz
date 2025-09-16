@@ -1147,8 +1147,7 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     html += `</div>`;
    matchesContainer.innerHTML = html;
 
-   setTodayInCalendar();   // ✅ always set day
-   initCalendarPicker(category); // ✅ also init calendar
+   initCalendarPicker(category); //init calendar
 
    return;
  }

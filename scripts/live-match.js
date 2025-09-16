@@ -116,36 +116,28 @@ function getMinutesSince(dateStr, timeStr) {
 
 //function to fetch matches
 async function fetchAndRenderMatches() {
-  const container = document.querySelector(".matches");
-  if (container) {
-        <div class="spinner"></div>
-    container.innerHTML = `
-      <div class="loading-spinner">
-      </div>
-    `;
-  }
-
+    const spinner = document.getElementById("matches-spinner");
   try {
+        spinner.style.display = "block";
+
     const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
-    matchesData = data; 
-
-    if (data.live?.length > 0) currentCategory = "live";
-    else if (data.upcoming?.length > 0) currentCategory = "upcoming";
-    else if (data.highlight?.length > 0) currentCategory = "highlight";
+    
+    matchesData = data;
+      if (data.live?.length > 0) currentCategory = "live";
+      else if (data.upcoming?.length > 0) currentCategory = "upcoming";
+      else if (data.highlight?.length > 0) currentCategory = "highlight";
 
     // ✅ Render matches (this also applies "active" to the correct tab)
     renderMatches(matchesData, currentCategory);
 
   } catch (error) {
     console.error("Error fetching match data:", error);
-
-    if (container) {
-      container.innerHTML = `<p class="error">Network connection lost. Please refresh.</p>`;
-    } else {
-      console.warn("⚠️ No .matches container found in DOM to render error message.");
-    }
+    document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+  }finally {
+    // Hide spinner after load/error
+    spinner.style.display = "none";
   }
 }
 
@@ -300,7 +292,7 @@ leagueArray.forEach((league, index) => {
   matchesContainer.innerHTML = html;
 
   setTodayInCalendar();
-  initCalendarPicker(); // no arg; binds to the freshly rendered header
+  initCalendarPicker(); 
 }
 
 
@@ -308,9 +300,9 @@ leagueArray.forEach((league, index) => {
 function getMatchesHeader(category) {
   return `
     <div class="matches-header">
-      <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="handleMatchCategory('live')">Live</div>
-      <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="handleMatchCategory('highlight')">Highlight</div>
-      <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="handleMatchCategory('upcoming')">Upcoming</div>
+      <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesCategory('live')">Live</div>
+      <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesCategory('highlight')">Highlight</div>
+      <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesCategory('upcoming')">Upcoming</div>
       <div class="calendar-wrapper" style="position: relative;">
         <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
           <div class="calendar-icon">
@@ -323,19 +315,6 @@ function getMatchesHeader(category) {
     </div>`;
 }
 
-
-// category header
-function handleMatchCategory(category) {
-  window.currentCategory = category;
-  renderMatches(matchesData, category);
-}
-
-
-function filterMatchesCategory(category) { handleMatchCategory(category); }
-function filterMatchesByCategory(category) { handleMatchCategory(category); }
-
-// Also keep showMatches 
-function showMatches(data, category) { renderMatches(data, category); }
 
 
 // CALENDAR FUNCTIONS
@@ -351,9 +330,10 @@ function getAvailableMatchDates() {
 function initCalendarPicker() {
   const calendarWrapper = document.querySelector(".calendar-wrapper");
   const matchDateInput = document.getElementById("match-date");
+
   if (!matchDateInput || !calendarWrapper) return;
 
-  // ✅ Prevent re-initialization on the same input
+  // ✅ Prevent re-initialization
   if (matchDateInput._flatpickr) {
     matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
   } else {
@@ -364,8 +344,7 @@ function initCalendarPicker() {
       appendTo: calendarWrapper,
       position: "below left",
       onChange: (dates, dateStr) => {
-        // Use upcoming for date selection (your original behavior)
-        filterByDate("upcoming", dateStr);
+        filterByDate(currentCategory, dateStr);
       }
     });
   }
@@ -374,9 +353,7 @@ function initCalendarPicker() {
   const calendarBtn = document.querySelector(".calendar");
   if (calendarBtn) {
     calendarBtn.addEventListener("click", () => {
-      if (matchDateInput && matchDateInput._flatpickr) {
-        matchDateInput._flatpickr.open();
-      }
+      matchDateInput._flatpickr.open();
     });
   }
 }
@@ -388,7 +365,11 @@ function filterByDate(category, selectedDate) {
     highlight: matchesData.highlight.filter(m => m.match_date === selectedDate),
     upcoming: matchesData.upcoming.filter(m => m.match_date === selectedDate),
   };
-  showMatches(filteredData, category);
+
+   //update calendar display
+  setCalendarDate(selectedDate);
+
+  renderMatches(filteredData, category);
 }
 
 // Calendar day fill + rollover
@@ -408,6 +389,39 @@ function setTodayInCalendar() {
   tomorrow.setHours(24, 0, 0, 0);
   if (window.calendarRolloverTimer) clearTimeout(window.calendarRolloverTimer);
   window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
+}
+
+function setCalendarDate(dateStr) {
+  const date = new Date(dateStr);
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  const dayEl = document.getElementById("calendar-day");
+  const inputEl = document.getElementById("match-date");
+
+  if (dayEl) dayEl.textContent = dd;
+  if (inputEl) inputEl.value = dateStr;
+}
+
+function filterMatchesCategory(category) {
+  currentCategory = category;
+
+  // Reset active state
+  document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
+
+  // Highlight the clicked button
+  document.querySelectorAll(".match-category-btn").forEach(btn => {
+    if (btn.textContent.toLowerCase() === category) {
+      btn.classList.add("active");
+    }
+  });
+
+  // ✅ Use currently selected calendar date if available
+  const selectedDate = document.getElementById("match-date")?.value;
+  if (selectedDate) {
+    filterByDate(category, selectedDate);
+  } else {
+    renderMatches(matchesData, category);
+  }
 }
 
 

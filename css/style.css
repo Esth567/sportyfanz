@@ -3002,8 +3002,8 @@ body.news-page .news-update {
 }
 
 .spinner {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border: 4px solid #70c172;
   border-top-color: #1A2F4B;
   border-radius: 50%;
@@ -3230,6 +3230,15 @@ body.news-page .news-update {
   .back-btn:hover {
     background-color: #e03e00;
   }
+
+ .live-match iframe {
+  display: block;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 70vh; /* or 500px, depending on your design */
+  border: none;
+}
+
 
 
   .live-match-teams{

@@ -436,7 +436,7 @@ function showFullNews(clickedItem) {
       return;
     }
 
-    // Format description into paragraphs
+    //Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
       const googleAdCode = `
         <div class="ad-container" style="margin: 15px 0;">
@@ -456,17 +456,17 @@ function showFullNews(clickedItem) {
         </div>
       `;
 
-      const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
+     const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
       const adCode = typeof window !== "undefined" && window.adsbygoogle ? googleAdCode : placeholderAdCode;
 
       return paragraphs.map((p, i) => 
         `<p>${p.trim()}</p>${((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) ? adCode : ''}`
       ).join('');
-    }
+     }
 
     const formattedDesc = Array.isArray(newsItem.paragraphs)
       ? injectAdParagraphs(newsItem.paragraphs, Math.floor(Math.random() * 2) + 3)
-      : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
+    : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
     
@@ -607,7 +607,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 // function to fetch top scorer
-
 
 //Utility: Normalize player names into safe filenames
 function normalizeNameForAsset(name) {
@@ -1001,30 +1000,38 @@ function getMinutesSince(dateStr, timeStr) {
 
 //function to fetch matches for middle layer
 async function fetchMatchesData() {
-    const spinner = document.getElementById("matches-spinner");
+  const spinner = document.getElementById("matches-spinner");
   try {
-        spinner.style.display = "block";
+    spinner.style.display = "block";
 
     const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
-    
-    matchesData = data;
-      if (data.live?.length > 0) currentCategory = "live";
-      else if (data.upcoming?.length > 0) currentCategory = "upcoming";
-      else if (data.highlight?.length > 0) currentCategory = "highlight";
+    // ✅ Explicitly build matchesData with allHighlights included
+    matchesData = {
+      live: data.live || [],
+      upcoming: data.upcoming || [],
+      highlight: data.highlight || [],
+      allHighlights: data.highlight || []  // keep full history
+    };
 
-    // ✅ Render matches (this also applies "active" to the correct tab)
+    // ✅ Pick starting category
+    if (matchesData.live.length > 0) currentCategory = "live";
+    else if (matchesData.upcoming.length > 0) currentCategory = "upcoming";
+    else if (matchesData.highlight.length > 0) currentCategory = "highlight";
+    else currentCategory = "live"; // fallback default
+
+    // ✅ Render matches
     showMatches(matchesData, currentCategory);
 
   } catch (error) {
     console.error("Error fetching match data:", error);
     document.querySelector(".matches-container").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
-  }finally {
-    // Hide spinner after load/error
+  } finally {
     spinner.style.display = "none";
   }
 }
+
 
 // Calculate live match minute display
 function formatLiveMinute(dateStr, timeStr, matchStatus = "") {
@@ -1066,7 +1073,7 @@ function showMatches(matchesData, category) {
 
   const selectedMatches = matchesData[category] || [];
 
-  // ✅ Preferred leagues to display first
+  //key leagues to display first
   const preferredLeagues = [
   { name: "Premier League", country: "England" },
   { name: "La Liga", country: "Spain" },
@@ -1085,7 +1092,7 @@ function showMatches(matchesData, category) {
 
 
   //Sorting helper for league priority
-const getPriority = (m) => {
+ const getPriority = (m) => {
   const index = preferredLeagues.findIndex(
     l => l.name === m.league_name && l.country === m.country_name
   );
@@ -1142,11 +1149,13 @@ let sortedMatches = selectedMatches.sort((a, b) => {
       </div>
     </div>`;
 
-   if (sortedMatches.length === 0) {
+     if (sortedMatches.length === 0) {
     html += `<p class="no-matches-msg">No ${category} matches found.</p>`;
     html += `</div>`;
    matchesContainer.innerHTML = html;
 
+   const bestDate = getBestDateForCategory(category);
+   setCalendarDate(bestDate);
    initCalendarPicker(category); //init calendar
 
    return;
@@ -1170,7 +1179,6 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     let formattedTime = "";
 
     if (category === "live") {
-      const minutesElapsed = getMinutesSince(match.match_date, match.match_time);
       const matchMinute = formatLiveMinute(match.match_date, match.match_time, match.match_status);
 
       scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
@@ -1238,12 +1246,37 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     });
   });
 
-  setTodayInCalendar();
+   // Before initializing calendar
+  const bestDate = getBestDateForCategory(category);
+   setCalendarDate(bestDate);
   initCalendarPicker(category);
 }
 
     
-  
+function getBestDateForCategory(category) {
+  const today = getTodayDate(); // YYYY-MM-DD
+
+  if (category === "upcoming") {
+    const futureDates = matchesData.upcoming
+      .map(m => m.match_date)
+      .filter(d => d >= today)
+      .sort(); // ascending
+    return futureDates.length > 0 ? futureDates[0] : today;
+  }
+
+  if (category === "highlight") {
+    const pastDates = matchesData.allHighlights
+      .map(m => m.match_date)
+      .filter(d => d <= today)
+      .sort(); // ascending
+    return pastDates.length > 0 ? pastDates[pastDates.length - 1] : today;
+  }
+
+  // Default (live & fallback)
+  return today;
+}
+
+
   
  // Calendar Functions
 function getAvailableMatchDates() {
@@ -1261,13 +1294,17 @@ function initCalendarPicker() {
 
   if (!matchDateInput || !calendarWrapper) return;
 
-  // ✅ Prevent re-initialization
+  // ✅ use best date for the current category
+  const bestDate = getBestDateForCategory(currentCategory);
+  const currentVal = matchDateInput.value || bestDate;
+
   if (matchDateInput._flatpickr) {
     matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
+    matchDateInput._flatpickr.setDate(currentVal, true);
   } else {
     flatpickr(matchDateInput, {
       dateFormat: "Y-m-d",
-      defaultDate: new Date(),
+      defaultDate: currentVal,  // ✅ anchored to category’s best date
       enable: getAvailableMatchDates(),
       appendTo: calendarWrapper,
       position: "below left",
@@ -1277,7 +1314,6 @@ function initCalendarPicker() {
     });
   }
 
-  // ✅ Safe bind after element exists
   const calendarBtn = document.querySelector(".calendar");
   if (calendarBtn) {
     calendarBtn.addEventListener("click", () => {
@@ -1288,19 +1324,20 @@ function initCalendarPicker() {
 
 
 
+
+
 // Update filterByDate to accept selected date
 function filterByDate(category, selectedDate) {
   const filteredData = {
     live: matchesData.live.filter(m => m.match_date === selectedDate),
-    highlight: matchesData.highlight.filter(m => m.match_date === selectedDate),
+    highlight: matchesData.allHighlights.filter(m => m.match_date === selectedDate),
     upcoming: matchesData.upcoming.filter(m => m.match_date === selectedDate),
   };
 
-   //update calendar display
   setCalendarDate(selectedDate);
-
   showMatches(filteredData, category);
 }
+
 
 
   //calender function
@@ -1339,27 +1376,29 @@ function filterMatchesCategory(category) {
 
   // Reset active state
   document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
-
-  // Highlight the clicked button
   document.querySelectorAll(".match-category-btn").forEach(btn => {
     if (btn.textContent.toLowerCase() === category) {
       btn.classList.add("active");
     }
   });
 
-  // ✅ Use currently selected calendar date if available
   const selectedDate = document.getElementById("match-date")?.value;
   if (selectedDate) {
     filterByDate(category, selectedDate);
   } else {
-    showMatches(matchesData, category);
+    const bestDate = getBestDateForCategory(category);
+    filterByDate(category, bestDate);
   }
 }
 
 
+
 // Init on load
 document.addEventListener("DOMContentLoaded", () => {
-  fetchMatchesData();
+  fetchMatchesData().then(() => {
+    //calendar to today only once when app starts
+    setTodayInCalendar();
+  });
 });
 
 
@@ -1368,7 +1407,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchMatchVideo(matchId, homeTeam, awayTeam) {
   try {
     let response = await fetch(
-      `${API_BASE}/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
+      `/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
     );
     let data = await response.json();
 
@@ -1459,7 +1498,7 @@ async function displayLiveMatch(matchId, category) {
 
       matchesContainer.innerHTML = `
         <div class="live-match">
-         ${videoEmbed ? videoEmbed : `<div class="no-video-message">No video available</div>`}
+         ${videoEmbed ? cleanVideoEmbed(videoEmbed) : `<div class="no-video-message">No video available</div>`}
         <div class="live-match-teams">${teamHTML}</div>
         ${contentHTML}
        </div>`;

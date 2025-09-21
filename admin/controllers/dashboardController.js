@@ -86,19 +86,28 @@ function truncateWords(str, limit = 2) {
   return str.split(" ").slice(0, limit).join(" ");
 }
 
+// Utility to get current season as string, e.g., "2025-2026"
+function getCurrentSeason() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1; // JS months 0-11
+  // Season usually starts around August, ends May
+  return month >= 7 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+}
 
 exports.getTopScorers = async (req, res) => {
   try {
-    const limitPerLeague = parseInt(req.query.limitPerLeague) || 3;
-    const globalLimit = parseInt(req.query.limit) || 100;
+    const globalLimit = parseInt(req.query.limit) || 200;
+    const currentSeason = getCurrentSeason();
 
-    const cacheKey = `topScorers_${limitPerLeague}_${globalLimit}`;
+    const cacheKey = `topScorers_${currentSeason}_${globalLimit}`;
     const cachedData = topScorersCache.get(cacheKey);  
     if (cachedData) {
       console.log("✅ Returning cached top scorers");
       return res.json(cachedData);
     }
 
+    // Fetch all leagues
     const leaguesRes = await fetch(
       `https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`
     );
@@ -111,62 +120,62 @@ exports.getTopScorers = async (req, res) => {
     let result = [];
 
     for (const league of leaguesData) {
-      const scorersRes = await fetch(
-        `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${league.league_id}&APIkey=${APIkey}`
-      );
-      const scorersData = await scorersRes.json();
-
-      if (!Array.isArray(scorersData) || scorersData.length === 0) continue;
-
-      scorersData.sort((a, b) => b.goals - a.goals);
-
-      const topScorers = scorersData.slice(0, limitPerLeague);
-
-      for (const scorer of topScorers) {
-        const goals = scorer.goals ? parseInt(scorer.goals) : 0;
-
-        // ✅ Apply thresholds depending on competition
-        let passesThreshold = true;
+      try {
         const leagueName = league.league_name.toLowerCase();
+        const countryName = (league.country_name || '').toLowerCase();
 
-        if (leagueName.includes("champions league")) {
-          passesThreshold = goals >= 5;
-        } else if (
-          leagueName.includes("premier league") ||
-          leagueName.includes("la liga") ||
-          leagueName.includes("serie a") ||
-          leagueName.includes("bundesliga") ||
-          leagueName.includes("ligue 1")
-        ) {
-          passesThreshold = goals >= 15;
-        } else if (
-          leagueName.includes("world cup") ||
-          leagueName.includes("euro") ||
-          leagueName.includes("africa cup") ||
-          leagueName.includes("copa america")
-        ) {
-          passesThreshold = goals >= 5;
-        }
+        // Only process EPL if it's in England
+       const isEPL = leagueName.includes('premier league') && countryName === 'england';
 
-        if (passesThreshold) {
+       // Label EPL differently in the result
+       const displayLeagueName = isEPL ? 'EPL' : truncateWords(league.league_name);
+
+        const scorersRes = await fetch(
+          `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${league.league_id}&season=${currentSeason}&APIkey=${APIkey}`
+        );
+        const scorersData = await scorersRes.json();
+
+        if (!Array.isArray(scorersData) || scorersData.length === 0) continue;
+
+        // Sort by goals (highest first)
+        scorersData.sort((a, b) => b.goals - a.goals);
+
+        // Get highest goal count
+        const highestGoals = parseInt(scorersData[0].goals) || 0;
+        if (highestGoals === 0) continue; 
+
+        // Include all players tied with highestGoals
+        const topScorers = scorersData.filter(
+          s => parseInt(s.goals) === highestGoals
+        );
+
+        for (const scorer of topScorers) {
           result.push({
-            league: truncateWords(league.league_name),
+            league: displayLeagueName,
             player: scorer.player_name,
-            goals: goals,
+            goals: highestGoals,
             team: truncateWords(scorer.team_name),
             image: scorer.player_image,
           });
         }
+
+      } catch (innerErr) {
+        console.warn(`Skipped league ${league.league_name}:`, innerErr.message);
+        continue;
       }
     }
 
+    // Apply global limit
     if (result.length > globalLimit) {
       result = result.slice(0, globalLimit);
     }
 
+    // Cache results
     topScorersCache.set(cacheKey, result);
 
-    res.json(result);  // always return array
+    // Return top scorer(s) per league for current season
+    res.json(result);
+
   } catch (err) {
     console.error("❌ Backend error:", err.message, err.stack);
     res.status(500).json({ error: "Failed to fetch top scorers", details: err.message });
@@ -635,12 +644,3 @@ exports.getTodayPredictions = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch predictions" });
   }
 };
-
-
-
-
-
-
-
-
-

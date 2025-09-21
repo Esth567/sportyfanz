@@ -43,7 +43,7 @@ async function getMatchVideo(req, res) {
         date: matchVideo.date,
       });
     } else {
-      return res.json({ videoUrl: null });
+      return res.json({ embed: null });
     }
   } catch (error) {
     console.error("❌ Error fetching match video:", error.message);

@@ -15,6 +15,7 @@ const leaguesSelected = {
 
 let selectedLeagueId = null;
 let selectedLeagueName = null;
+let isInitialLoad = true;
 
 
 function displayMatchesByLeagueId(leagueId, leagueName, category) {
@@ -124,10 +125,19 @@ async function fetchAndRenderMatches() {
     const data = await response.json();
 
     
-    matchesData = data;
-      if (data.live?.length > 0) currentCategory = "live";
-      else if (data.upcoming?.length > 0) currentCategory = "upcoming";
-      else if (data.highlight?.length > 0) currentCategory = "highlight";
+    matchesData = {
+      live: data.live || [],
+      upcoming: data.upcoming || [],
+      highlight: data.highlight || [],
+      allHighlights: data.highlight || []  // keep full history
+    };
+
+    //Pick starting category
+    if (matchesData.live.length > 0) currentCategory = "live";
+    else if (matchesData.upcoming.length > 0) currentCategory = "upcoming";
+    else if (matchesData.highlight.length > 0) currentCategory = "highlight";
+    else currentCategory = "live"; // fallback default
+
 
     // ✅ Render matches (this also applies "active" to the correct tab)
     renderMatches(matchesData, currentCategory);
@@ -150,7 +160,7 @@ function renderMatches(matchesData, category) {
   let selectedMatches = matchesData[category] || [];
 
   // ✅ If live is empty, fallback to upcoming
-  if (category === "live" && selectedMatches.length === 0) {
+  if (category === "live" && selectedMatches.length === 0 && isInitialLoad) {
     category = "upcoming";
     selectedMatches = matchesData.upcoming || [];
   }
@@ -202,8 +212,14 @@ function renderMatches(matchesData, category) {
 
   let html = "";
 
-  if (selectedMatches.length === 0) {
-    html += `<p>No ${category} matches found.</p>`;
+   if (selectedMatches.length === 0) {
+    html += `
+      <div class="matches-content">
+        <div class="no-matches">
+          <p>No ${category} matches available.</p>
+        </div>
+      </div>
+    `;
     matchesContainer.innerHTML = html;
     return;
   }
@@ -225,12 +241,11 @@ leagueArray.forEach((league, index) => {
         <ion-icon name="arrow-forward-outline"></ion-icon>
         <a href="#" id="toggle-${league.league}">See All</a>
       </div>
-    </div>`;
+    </div>
+     <div class="league-container">`;
 
-  // ✅ League container opens here
-  html += `<div class="league-container">`;
 
-  // ✅ If it’s the first league, drop matches-header at the TOP of its container
+  //first league drop matches-header at the TOP of its container
   if (index === 0) {
     html += getMatchesHeader(category);
   }
@@ -290,6 +305,16 @@ leagueArray.forEach((league, index) => {
 });
 
   matchesContainer.innerHTML = html;
+
+   // Add "View Details" button listeners
+  document.querySelectorAll('.view-details-btn').forEach(btn => {
+    btn.addEventListener('click', function (event) {
+      event.stopPropagation(); // Prevent parent .match-details click
+      const matchId = this.getAttribute('data-match-id');
+      const category = this.getAttribute('data-category');
+      displayLiveMatch(matchId, category);
+    });
+  });
 
   setTodayInCalendar();
   initCalendarPicker(); 
@@ -435,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchMatchVideo(matchId, homeTeam, awayTeam) {
   try {
     let response = await fetch(
-      `${API_BASE}/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
+      `/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
     );
     let data = await response.json();
 
@@ -447,6 +472,30 @@ async function fetchMatchVideo(matchId, homeTeam, awayTeam) {
     console.error("❌ Error fetching match video:", error);
     return null;
   }
+}
+
+function cleanVideoEmbed(embedCode) {
+  if (!embedCode) return null;
+
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = embedCode;
+
+  const iframe = tempDiv.querySelector("iframe");
+  if (iframe) {
+    // Remove inline sizing
+    iframe.removeAttribute("width");
+    iframe.removeAttribute("height");
+
+    // Force it to fit screen
+    iframe.style.width = "100%";
+    iframe.style.maxWidth = "100%";
+    iframe.style.height = "70vh"; // adjust height to your liking
+    iframe.style.border = "none";
+
+    return iframe.outerHTML;
+  }
+
+  return null;
 }
 
 
@@ -466,27 +515,31 @@ async function displayLiveMatch(matchId, category) {
     }
 
     if (!match) {
-        console.error(`Match with ID ${matchId} not found in ${category}`);
-        document.querySelector(".match-detail").innerHTML = `
+    console.error(`Match with ID ${matchId} not found in ${category}`);
+    const container = document.querySelector(".matches");
+    if (container) {
+        container.innerHTML = `
             <div class="no-video">
                 <p>Match details not found.</p>
             </div>`;
-        return;
-    }
+     }
+     return;
+  }
 
+   
     let videoEmbed = await fetchMatchVideo(
          matchId,
          match.match_hometeam_name,
          match.match_awayteam_name
         );
 
-    console.log("🎥 Video Data:", videoUrl);
+    console.log("🎥 Video Data:", videoEmbed);
 
     let matchesContainer = document.querySelector(".matches");
 
     const teamHTML = `
         <div class="live-match-team">
-            <img src="${match.team_home_badge || '/assets/images/default-team.png'}" alt="${match.match_hometeam_name} Logo">
+            <img src="${match.team_home_badge || `/assets/images/default-team.png`}" alt="${match.match_hometeam_name} Logo">
             <span>${match.match_hometeam_name}</span>
         </div>
         <div class="match-time-scores">
@@ -514,7 +567,7 @@ async function displayLiveMatch(matchId, category) {
             <button class="tab-btn" data-tab="standing">Standing</button>
         </div>`;
 
-    const adHTML = `<img src="/assets/images/Ad5.png" alt="Ad5" class="ad5-logo">`;
+    const adHTML = `<div class="ad5-logo"><h5>Advertisement</h5></div>`;
 
     const contentHTML = `
         <div class="live-match-info">
@@ -523,12 +576,25 @@ async function displayLiveMatch(matchId, category) {
             <div class="tab-content" id="tab-content">${getTabContent("info", match)}</div>
         </div>`;
 
-    matchesContainer.innerHTML = `
+      matchesContainer.innerHTML = `
         <div class="live-match">
-         ${videoEmbed ? videoEmbed : `<div class="no-video-message">No video available</div>`}
+         ${videoEmbed ? cleanVideoEmbed(videoEmbed) : `<div class="no-video-message">No video available</div>`}
         <div class="live-match-teams">${teamHTML}</div>
         ${contentHTML}
        </div>`;
+
+
+        // Hide the header slider when showing match details
+        const headerSlider = document.querySelector('.header-slider');
+          if (headerSlider) {
+            headerSlider.style.display = 'none';
+           }
+
+            // Hide the header slider when showing match details
+        const newspodcastwrapper = document.querySelector('.news-podcast-wrapper');
+          if (newspodcastwrapper) {
+            newspodcastwrapper.style.display = 'none';
+           }
 
     // Attach tab click events
     document.querySelectorAll(".tab-btn").forEach(button => {
@@ -568,7 +634,6 @@ async function displayLiveMatch(matchId, category) {
         document.head.appendChild(spinnerStyle);
     }
 }
-
   
 
     // Function to update tab content dynamically

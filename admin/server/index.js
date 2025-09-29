@@ -17,16 +17,16 @@ const entityDatabase = require("../routes/entitydatabase");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ✅ Trust reverse proxy in production
+//Trust reverse proxy in production
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
 
-// ✅ Middleware
+//Middleware
 app.use(compression());
 app.use(express.json());
 
-// ✅ CORS configuration
+//CORS configuration
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -34,7 +34,7 @@ app.use(
         "https://sportyfanz.com",
         "https://www.sportyfanz.com",
         "https://sportyfanz.onrender.com",
-        "http://localhost:3000",
+        //"http://localhost:3000",
       ];
       const allowedPatterns = [/^https:\/\/your-username-.*\.app\.github\.dev$/];
 
@@ -52,7 +52,7 @@ app.use(
   })
 );
 
-// ✅ Rate limiting for API routes
+//Rate limiting for API routes
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: process.env.NODE_ENV === "production" ? 30 : 1000,
@@ -61,11 +61,11 @@ const apiLimiter = rateLimit({
 });
 app.use("/api/", apiLimiter);
 
-// ✅ Serve static assets
+//Serve static assets
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ API routes
+//API routes
 app.use("/api", imageProxyRoutes);
 app.use("/api", dashboardRoutes);
 app.use("/api", leagueRoutes);
@@ -74,26 +74,26 @@ app.use("/api", playerImageRoutes);
 app.use("/api", fetchnlpnews);
 app.use("/api", entityDatabase);
 
-// ✅ Health check
-app.get("/api/health", (req, res) => res.send("✅ API is live."));
+//Health check
+app.get("/api/health", (req, res) => res.send("API is live."));
 
-// ✅ SPA fallback: serve index.html only for non-API GET requests
+//SPA fallback: serve index.html only for non-API GET requests
 app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-// ✅ 404 handler (for non-GET or unmatched API routes)
+//404 handler (for non-GET or unmatched API routes)
 app.use((req, res, next) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-// ✅ Error handler
+//Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something went wrong" });
 });
 
-// ✅ Start the server
+//Start the server
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 });

@@ -79,7 +79,6 @@ fetch(`${API_BASE}/api/leagues`)
 
 
 
-
 // === Utility Functions ===
 function getTodayDate(offset = 0) {
   const date = new Date();
@@ -118,228 +117,303 @@ function getMinutesSince(dateStr, timeStr) {
 //function to fetch matches
 async function fetchAndRenderMatches() {
     const spinner = document.getElementById("matches-spinner");
-  try {
+    try {
         spinner.style.display = "block";
 
-    const response = await fetch(`${API_BASE}/api/all_matches`);
-    const data = await response.json();
+        const response = await fetch(`${API_BASE}/api/all_matches`);
+        const data = await response.json();
 
-    
-    matchesData = {
-      live: data.live || [],
-      upcoming: data.upcoming || [],
-      highlight: data.highlight || [],
-      allHighlights: data.highlight || []  // keep full history
-    };
+        matchesData = {
+            live: data.live || [],
+            upcoming: data.upcoming || [],
+            highlight: data.highlight || [],
+            allHighlights: data.highlight || []
+        };
 
-    //Pick starting category
-    if (matchesData.live.length > 0) currentCategory = "live";
-    else if (matchesData.upcoming.length > 0) currentCategory = "upcoming";
-    else if (matchesData.highlight.length > 0) currentCategory = "highlight";
-    else currentCategory = "live"; // fallback default
+        // Pick starting category
+        if (matchesData.live.length > 0) {
+            currentCategory = "live";
+        } else if (matchesData.upcoming.length > 0) {
+            currentCategory = "upcoming";
+        } else if (matchesData.highlight.length > 0) {
+            currentCategory = "highlight";
+        } else {
+            currentCategory = "live"; // default fallback
+        }
 
+        // ⚡ Safeguard: if no matches today for the chosen category, auto-shift to upcoming
+        const today = getTodayDate();
+        const { selectedMatches } = getMatchesForCategory(matchesData, currentCategory, today);
 
-    // ✅ Render matches (this also applies "active" to the correct tab)
-    renderMatches(matchesData, currentCategory);
+        if (selectedMatches.length === 0 && currentCategory === "live" && matchesData.upcoming.length > 0) {
+            currentCategory = "upcoming";
+        }
 
-  } catch (error) {
-    console.error("Error fetching match data:", error);
-    document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
-  }finally {
-    // Hide spinner after load/error
-    spinner.style.display = "none";
-  }
+        renderMatches(matchesData, currentCategory);
+
+    } catch (error) {
+        console.error("Error fetching match data:", error);
+        document.querySelector(".matches").innerHTML = `<p>Failed to load matches. Please refresh.</p>`;
+    } finally {
+        spinner.style.display = "none";
+    }
 }
 
 
 // Function to render matches
 function renderMatches(matchesData, category) {
-  const matchesContainer = document.querySelector(".matches");
-  if (!matchesContainer) return;
+    const matchesContainer = document.querySelector(".matches");
+    if (!matchesContainer) return;
 
-  let selectedMatches = matchesData[category] || [];
+    
+     if (!currentSelectedDate) {
+      currentSelectedDate = getTodayDate();
+     }
 
-  // ✅ If live is empty, fallback to upcoming
-  if (category === "live" && selectedMatches.length === 0 && isInitialLoad) {
-    category = "upcoming";
-    selectedMatches = matchesData.upcoming || [];
-  }
+    const { selectedMatches, dateToShow } = getMatchesForCategory(matchesData, category, currentSelectedDate);
 
-  // Group matches by league_id
-  const grouped = selectedMatches.reduce((acc, match) => {
-    const leagueId = match.league_id;
-    if (!acc[leagueId]) {
-      acc[leagueId] = {
-        league: match.league_name,
-        country: match.country_name,
-        league_logo: match.league_logo,
-        matches: []
-      };
-    }
-    acc[leagueId].matches.push(match);
-    return acc;
-  }, {});
+//update currentSelectedDate if we are NOT in highlight
+  if (category !== "highlight") {
+     currentSelectedDate = dateToShow;
+  } 
+ 
 
-  // Preferred leagues
-  const preferredLeagues = [
-    { name: "Premier League", country: "England" },
-    { name: "La Liga", country: "Spain" },
-    { name: "Bundesliga", country: "Germany" },
-    { name: "UEFA Champions League", country: "eurocups" },
-    { name: "UEFA Europa League", country: "eurocups" },
-    { name: "UEFA Europa Conference League", country: "eurocups" },
-    { name: "Serie A", country: "Italy" },
-    { name: "NPFL", country: "Nigeria" },
-    { name: "FIFA World Cup", country: "World" },
-    { name: "UEFA Euro", country: "eurocups" },
-    { name: "AFCON", country: "Africa" },
-    { name: "Gold Cup", country: "North America" },
-    { name: "Asian Cup", country: "Asia" }
-  ];
+    let html = "";
 
-  const leagueArray = Object.values(grouped).sort((a, b) => {
-    const indexA = preferredLeagues.findIndex(
-      (l) => l.name === a.league && l.country === a.country
-    );
-    const indexB = preferredLeagues.findIndex(
-      (l) => l.name === b.league && l.country === b.country
-    );
-    if (indexA === -1 && indexB === -1) return 0;
-    if (indexA === -1) return 1;
-    if (indexB === -1) return -1;
-    return indexA - indexB;
-  });
-
-  let html = "";
-
-   if (selectedMatches.length === 0) {
-    html += `
-      <div class="matches-content">
-        <div class="no-matches">
-          <p>No ${category} matches available.</p>
+    // --- If no matches, show header + message ---
+    if (selectedMatches.length === 0) {
+        html += `
+        <div class="matches-header">
+            <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesCategory('live')">Live</div>
+            <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesCategory('highlight')">Highlight</div>
+            <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesCategory('upcoming')">Upcoming</div>
+            <div class="calendar-wrapper" style="position: relative;">
+                <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
+                    <div class="calendar-icon">
+                        <div class="calendar-header"></div>
+                        <div id="calendar-day" class="calendar-day"></div>
+                    </div>
+                </div>
+                <input type="text" id="match-date" style="display:none;">
+            </div>
         </div>
-      </div>
-    `;
-    matchesContainer.innerHTML = html;
-    return;
-  }
+        `;
 
+        html += `<p>No ${category} matches for ${dateToShow}.</p>`;
+        matchesContainer.innerHTML = html;
 
-// Render leagues and matches
-leagueArray.forEach((league, index) => {
-  if (league.matches.length === 0) return;
+         const dayEl = document.getElementById("calendar-day");
+          if (dayEl && currentSelectedDate) {
+             const dateObj = luxon.DateTime.fromISO(currentSelectedDate);
+             dayEl.textContent = dateObj.toFormat("d");
+          }
 
-  // ✅ League header
-  html += `
-    <div class="league-header">
-      <img src="${league.league_logo || '/assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
-      <div class="league-titleCountry">
-        <h4 class="league-title">${league.league}</h4>
-        <span class="league-country">${league.country}</span>
-      </div>
-      <div class="more-league" onclick="toggleLeagueMatches('${league.league}')">
-        <ion-icon name="arrow-forward-outline"></ion-icon>
-        <a href="#" id="toggle-${league.league}">See All</a>
-      </div>
-    </div>
-     <div class="league-container">`;
-
-
-  //first league drop matches-header at the TOP of its container
-  if (index === 0) {
-    html += getMatchesHeader(category);
-  }
-
-  // Matches list
-  html += `<div class="match-category-content">`;
-
-  league.matches.forEach((match) => {
-    const matchBerlin = luxon.DateTime.fromFormat(
-      `${match.match_date} ${match.match_time}`,
-      "yyyy-MM-dd HH:mm",
-      { zone: "Europe/Berlin" }
-    );
-    const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
-    const matchDay = matchLocal.toFormat("MMM d");
-
-    let matchMinute;
-    if (category === "highlight") {
-      matchMinute = "FT";
-    } else if (category === "live") {
-      matchMinute =
-        parseInt(match.match_status) > 0 &&
-        parseInt(match.match_status) < 90
-          ? `${match.match_status}'`
-          : matchLocal.toFormat("h:mm");
-    } else if (category === "upcoming") {
-      matchMinute = matchLocal.toFormat("h:mm a");
+        // Always update calendar-day
+        setTodayInCalendar();
+        initCalendarPicker();
+        return;
     }
 
-    html += `
-      <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-        <div class="matches-teams">
-          <div class="matches-time">
-            ${category !== "live" ? `<div class="match-date">${matchDay}</div>` : ""}
-            <div>${matchMinute}</div>
-          </div>
-          <div class="matches-datas">
-            <div class="Matchteam">
-              <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
-              <span>${match.match_hometeam_name}</span>
-            </div>
-            <div class="Matchteam">
-              <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
-              <span>${match.match_awayteam_name}</span>
-            </div>
-          </div>
-          <div class="matches-scores">
-            <div class="score">${match.match_hometeam_score ?? "-"}</div>
-            <div class="score">${match.match_awayteam_score ?? "-"}</div>
-          </div>
-        </div>
-      </div>`;
-  });
+    // --- Group matches by league_id ---
+    const grouped = selectedMatches.reduce((acc, match) => {
+        const leagueId = match.league_id;
+        if (!acc[leagueId]) {
+            acc[leagueId] = {
+                league: match.league_name,
+                country: match.country_name,
+                league_logo: match.league_logo,
+                matches: []
+            };
+        }
+        acc[leagueId].matches.push(match);
+        return acc;
+    }, {});
 
-  // ✅ Close content + container
-  html += `</div></div>`;
-});
+    //Sort leagues by preferred order 
+    const preferredLeagues = [
+        { name: "Premier League", country: "England" },
+        { name: "La Liga", country: "Spain" },
+        { name: "Bundesliga", country: "Germany" },
+        { name: "UEFA Champions League", country: "eurocups" },
+        { name: "UEFA Europa League", country: "eurocups" },
+        { name: "UEFA Europa Conference League", country: "eurocups" },
+        { name: "Serie A", country: "Italy" },
+        { name: "NPFL", country: "Nigeria" },
+        { name: "FIFA World Cup", country: "World" },
+        { name: "UEFA Euro", country: "eurocups" },
+        { name: "AFCON", country: "Africa" },
+        { name: "Gold Cup", country: "North America" },
+        { name: "Asian Cup", country: "Asia" }
+    ];
 
-  matchesContainer.innerHTML = html;
-
-   // Add "View Details" button listeners
-  document.querySelectorAll('.view-details-btn').forEach(btn => {
-    btn.addEventListener('click', function (event) {
-      event.stopPropagation(); // Prevent parent .match-details click
-      const matchId = this.getAttribute('data-match-id');
-      const category = this.getAttribute('data-category');
-      displayLiveMatch(matchId, category);
+    const leagueArray = Object.values(grouped).sort((a, b) => {
+        const indexA = preferredLeagues.findIndex(l => l.name === a.league && l.country === a.country);
+        const indexB = preferredLeagues.findIndex(l => l.name === b.league && l.country === b.country);
+        if (indexA === -1 && indexB === -1) return 0;
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
     });
-  });
 
-  setTodayInCalendar();
-  initCalendarPicker(); 
-}
+    // --- Render leagues and matches ---
+    leagueArray.forEach((league, index) => {
+        if (league.matches.length === 0) return;
 
-
-//function for match header
-function getMatchesHeader(category) {
-  return `
-    <div class="matches-header">
-      <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesCategory('live')">Live</div>
-      <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesCategory('highlight')">Highlight</div>
-      <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesCategory('upcoming')">Upcoming</div>
-      <div class="calendar-wrapper" style="position: relative;">
-        <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
-          <div class="calendar-icon">
-            <div class="calendar-header"></div>
-            <div id="calendar-day" class="calendar-day"></div>
-          </div>
+        html += `
+        <div class="league-header">
+            <img src="${league.league_logo || '/assets/images/default-league.png'}" alt="${league.league} Logo" class="league-logo">
+            <div class="league-titleCountry">
+                <h4 class="league-title">${league.league}</h4>
+                <span class="league-country">${league.country}</span>
+            </div>
+            <div class="more-league" onclick="toggleLeagueMatches('${league.league}')">
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+                <a href="#" id="toggle-${league.league}">See All</a>
+            </div>
         </div>
-        <input type="text" id="match-date" style="display:none;">
-      </div>
-    </div>`;
+        <div class="league-container">
+        `;
+
+        // --- Insert matches-header ONLY inside the first league ---
+        if (index === 0 && !selectedLeagueId) {
+            html += `
+            <div class="matches-header">
+                <div class="match-category-btn ${category === 'live' ? 'active' : ''}" onclick="filterMatchesCategory('live')">Live</div>
+                <div class="match-category-btn ${category === 'highlight' ? 'active' : ''}" onclick="filterMatchesCategory('highlight')">Highlight</div>
+                <div class="match-category-btn ${category === 'upcoming' ? 'active' : ''}" onclick="filterMatchesCategory('upcoming')">Upcoming</div>
+                <div class="calendar-wrapper" style="position: relative;">
+                    <div class="match-category-btn calendar" onclick="document.getElementById('match-date').click()">
+                        <div class="calendar-icon">
+                            <div class="calendar-header"></div>
+                            <div id="calendar-day" class="calendar-day"></div>
+                        </div>
+                    </div>
+                    <input type="text" id="match-date" style="display:none;">
+                </div>
+            </div>
+            `;
+        }
+
+        html += `<div class="match-category-content">`;
+
+        league.matches.forEach(match => {
+            const matchBerlin = luxon.DateTime.fromFormat(
+                `${match.match_date} ${match.match_time}`,
+                "yyyy-MM-dd HH:mm",
+                { zone: "Europe/Berlin" }
+            );
+            const matchLocal = matchBerlin.setZone(luxon.DateTime.local().zoneName);
+            const matchDay = matchLocal.toFormat("MMM d");
+
+            let matchMinute;
+            if (category === "highlight") {
+                matchMinute = "FT";
+            } else if (category === "live") {
+                matchMinute =
+                    parseInt(match.match_status) > 0 && parseInt(match.match_status) < 90
+                        ? `${match.match_status}'`
+                        : matchLocal.toFormat("h:mm");
+            } else if (category === "upcoming") {
+                matchMinute = matchLocal.toFormat("h:mm");
+            }
+
+            let timeDisplay = matchMinute;
+
+      // If it's a live match, add the live indicator
+      if (category === "live") {
+        timeDisplay = `
+         <div class="live-indicator">
+            <span class="red-dot"></span>
+            <span class="live-text">Live</span> - ${matchMinute}
+         </div>
+        `;
+     }
+
+            html += `
+            <div class="matches-item" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
+                <div class="matches-teams">
+                    <div class="matches-time">
+                        ${timeDisplay}
+                    </div>
+                    <div class="matches-datas">
+                        <div class="matches-team">
+                            <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
+                            <span>${match.match_hometeam_name}</span>
+                        </div>
+                        <div class="matches-team">
+                            <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
+                            <span>${match.match_awayteam_name}</span>
+                        </div>
+                    </div>
+                    <div class="matches-scores">
+                        <div class="score">${match.match_hometeam_score ?? "-"}</div>
+                        <div class="score">${match.match_awayteam_score ?? "-"}</div>
+                    </div>
+                </div>
+            </div>
+            `;
+        });
+
+        html += `</div></div>`; 
+    });
+
+    matchesContainer.innerHTML = html;
+    history.replaceState({ type: "matches", category }, "", "#matches");
+
+   const dayEl = document.getElementById("calendar-day");
+    if (dayEl) {
+    const dateObj = luxon.DateTime.fromISO(dateToShow);
+    dayEl.textContent = dateObj.toFormat("d");
+   }
+
+    initCalendarPicker();
+ }
+
+
+// get matches for a category + date (with highlight fallback) ---
+function getMatchesForCategory(matchesData, category, date) {
+    let dateToShow = date || getTodayDate();
+    let selectedMatches = matchesData[category] || [];
+
+    selectedMatches = selectedMatches
+        .filter(m => m.match_date === dateToShow)
+        .sort((a, b) => a.match_time.localeCompare(b.match_time));
+
+    // --- Special case for highlight ---
+    if (category === "highlight" && selectedMatches.length === 0) {
+        const pastDates = matchesData.highlight
+            .map(m => m.match_date)
+            .filter(d => d <= getTodayDate())
+            .sort((a, b) => b.localeCompare(a)); // descending
+
+        if (pastDates.length > 0) {
+            // ⚡ Only override the local dateToShow for highlight
+            const highlightDate = pastDates[0];
+            selectedMatches = matchesData.highlight
+                .filter(m => m.match_date === highlightDate)
+                .sort((a, b) => a.match_time.localeCompare(b.match_time));
+
+            return { selectedMatches, dateToShow: highlightDate };
+        }
+    }
+
+    return { selectedMatches, dateToShow };
 }
 
+// filterByDate to accept selected date
+function filterByDate(category, selectedDate) {
+    if (!selectedDate) selectedDate = getTodayDate();
+
+    const { dateToShow } = getMatchesForCategory(matchesData, category, selectedDate);
+
+    //Keep global currentSelectedDate
+    if (category !== "highlight") {
+        currentSelectedDate = dateToShow;
+    }
+
+    setCalendarDate(currentSelectedDate);
+    renderMatches(matchesData, category);
+}
 
 
 // CALENDAR FUNCTIONS
@@ -353,107 +427,95 @@ function getAvailableMatchDates() {
 
 // Initialize Flatpickr
 function initCalendarPicker() {
-  const calendarWrapper = document.querySelector(".calendar-wrapper");
-  const matchDateInput = document.getElementById("match-date");
+    const matchDateInput = document.getElementById("match-date");
+    const calendarWrapper = document.querySelector(".calendar-wrapper");
+    if (!matchDateInput || !calendarWrapper) return;
 
-  if (!matchDateInput || !calendarWrapper) return;
+    if (!matchDateInput._flatpickr) {
+        flatpickr(matchDateInput, {
+         dateFormat: "Y-m-d",
+         defaultDate: currentSelectedDate || getTodayDate(),
+         enable: getAvailableMatchDates(),
+         appendTo: calendarWrapper,
+         position: "below left",
+         onChange: (dates, dateStr) => {
+          if (!dateStr) return;
 
-  // ✅ Prevent re-initialization
-  if (matchDateInput._flatpickr) {
-    matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
-  } else {
-    flatpickr(matchDateInput, {
-      dateFormat: "Y-m-d",
-      defaultDate: new Date(),
-      enable: getAvailableMatchDates(),
-      appendTo: calendarWrapper,
-      position: "below left",
-      onChange: (dates, dateStr) => {
-        filterByDate(currentCategory, dateStr);
-      }
-    });
-  }
+           currentSelectedDate = dateStr;
 
-  // ✅ Bind calendar open button
-  const calendarBtn = document.querySelector(".calendar");
-  if (calendarBtn) {
-    calendarBtn.addEventListener("click", () => {
-      matchDateInput._flatpickr.open();
-    });
-  }
+          //Update the calendar icon immediately
+           const dayEl = document.getElementById("calendar-day");
+          if (dayEl) {
+            const dateObj = luxon.DateTime.fromISO(dateStr);
+            dayEl.textContent = dateObj.toFormat("d"); // Only day number
+          }
+
+
+          //Filter matches for the selected date
+          filterByDate(currentCategory, dateStr);
+       }
+     });
+    } else {
+        matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
+    }
+
+    const calendarBtn = document.querySelector(".calendar");
+    if (calendarBtn) {
+        calendarBtn.addEventListener("click", () => {
+            matchDateInput._flatpickr.open();
+        });
+    }
 }
 
-// Update filterByDate to accept selected date
-function filterByDate(category, selectedDate) {
-  const filteredData = {
-    live: matchesData.live.filter(m => m.match_date === selectedDate),
-    highlight: matchesData.highlight.filter(m => m.match_date === selectedDate),
-    upcoming: matchesData.upcoming.filter(m => m.match_date === selectedDate),
-  };
-
-   //update calendar display
-  setCalendarDate(selectedDate);
-
-  renderMatches(filteredData, category);
-}
 
 // Calendar day fill + rollover
 function setTodayInCalendar() {
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2, "0");
+    const today = getTodayDate();
+    const dayEl = document.getElementById("calendar-day");
+    const inputEl = document.getElementById("match-date");
 
-  const dayEl = document.getElementById("calendar-day");
-  const inputEl = document.getElementById("match-date");
+    // Only set today if currentSelectedDate is null
+    if (!currentSelectedDate) {
+        currentSelectedDate = today;
+        if (dayEl) dayEl.textContent = luxon.DateTime.fromISO(today).toFormat("d");
+        if (inputEl) inputEl.value = today;
+    }
 
-  if (dayEl) dayEl.textContent = dd;
-  if (inputEl) inputEl.value = today.toISOString().split("T")[0];
+    // Rollover for next day
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setHours(24, 0, 0, 0);
 
-  // Auto-rollover at midnight
-  const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setHours(24, 0, 0, 0);
-  if (window.calendarRolloverTimer) clearTimeout(window.calendarRolloverTimer);
-  window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
+    if (window.calendarRolloverTimer) clearTimeout(window.calendarRolloverTimer);
+    window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
 }
+
+
 
 function setCalendarDate(dateStr) {
-  const date = new Date(dateStr);
-  const dd = String(date.getDate()).padStart(2, "0");
+    if (!dateStr) return;
+    const dayEl = document.getElementById("calendar-day");
+    const inputEl = document.getElementById("match-date");
 
-  const dayEl = document.getElementById("calendar-day");
-  const inputEl = document.getElementById("match-date");
+    if (dayEl) {
+        const dateObj = luxon.DateTime.fromISO(dateStr);
+        dayEl.textContent = dateObj.toFormat("d"); // Only day number
+    }
+    if (inputEl) inputEl.value = dateStr;
 
-  if (dayEl) dayEl.textContent = dd;
-  if (inputEl) inputEl.value = dateStr;
+    currentSelectedDate = dateStr; // Store globally
 }
+
 
 function filterMatchesCategory(category) {
-  currentCategory = category;
+    currentCategory = category;
+    document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".match-category-btn").forEach(btn => {
+        if (btn.textContent.toLowerCase() === category) btn.classList.add("active");
+    });
 
-  // Reset active state
-  document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
-
-  // Highlight the clicked button
-  document.querySelectorAll(".match-category-btn").forEach(btn => {
-    if (btn.textContent.toLowerCase() === category) {
-      btn.classList.add("active");
-    }
-  });
-
-  // ✅ Use currently selected calendar date if available
-  const selectedDate = document.getElementById("match-date")?.value;
-  if (selectedDate) {
-    filterByDate(category, selectedDate);
-  } else {
-    renderMatches(matchesData, category);
-  }
+    filterByDate(category, currentSelectedDate || getTodayDate());
 }
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  fetchAndRenderMatches();
-});
-
 
 
 // Function to fetch match video (unchanged)
@@ -596,6 +658,8 @@ async function displayLiveMatch(matchId, category) {
             newspodcastwrapper.style.display = 'none';
            }
 
+        history.pushState({ type: "match", matchId, category }, "", `#match-${matchId}`);
+
     // Attach tab click events
     document.querySelectorAll(".tab-btn").forEach(button => {
         button.addEventListener("click", function () {
@@ -604,11 +668,11 @@ async function displayLiveMatch(matchId, category) {
     
             const tabContentDiv = document.getElementById("tab-content");
             if (!tabContentDiv) {
-                console.error("❌ ERROR: #tab-content div not found!");
+                console.error("ERROR: #tab-content div not found!");
                 return;
             }
     
-            // ✅ Pass APIkey to getTabContent
+            //to getTabContent
             const tab = this.dataset.tab;
             tabContentDiv.innerHTML = getTabContent(tab, match);
     
@@ -921,10 +985,6 @@ function loadH2HData(homeTeam, awayTeam) {
     });
 }
 
-
-
-
-
   //function to load standings
   async function loadStandings(match) {
     const tableContainer = document.getElementById("standing-table");
@@ -998,7 +1058,7 @@ function loadH2HData(homeTeam, awayTeam) {
 
      
   
-// ✅ Fetch lineup and dynamically infer formation
+//Fetch lineup and dynamically infer formation
 function fetchAndRenderLineups(match_id) {
   const containerWrapper = document.getElementById("football-field-wrapper");
   const field = document.getElementById("football-field");
@@ -1015,26 +1075,26 @@ function fetchAndRenderLineups(match_id) {
       field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
       containerWrapper.querySelectorAll(".no-lineup-message").forEach(msg => msg.remove());
 
-      // ✅ Hide field if match hasn’t started
+      //Hide field if match hasn’t started
       if (!match || match.match_status === "Not Started" || match.match_status === "") {
         field.style.display = "none";
-        displayNoLineupMessage(containerWrapper, "Lineups will be available when the match starts.");
-        return;
+        displayNoLineupMessage(containerWrapper, "Lineups available at kick-off.");
+       return;
       }
 
       if (!lineup) {
         field.style.display = "none";
-        displayNoLineupMessage(containerWrapper, "No lineup data found.");
+        displayNoLineupMessage(containerWrapper, "Not available.");
         return;
       }
 
       const homePlayers = lineup.home?.starting_lineups ?? [];
       const awayPlayers = lineup.away?.starting_lineups ?? [];
 
-      // ✅ Hide field if no players
+      //Hide field if no players
       if (homePlayers.length === 0 && awayPlayers.length === 0) {
         field.style.display = "none";
-        displayNoLineupMessage(containerWrapper, "No lineup formation available.");
+        displayNoLineupMessage(containerWrapper, "Not available.");
         return;
       }
 
@@ -1046,14 +1106,14 @@ function fetchAndRenderLineups(match_id) {
         parseFormation(match?.match_awayteam_system) ||
         inferFormation(awayPlayers, match?.match_awayteam_system);
 
-      // ✅ Hide field if no valid formation
+      //Hide field if no valid formation
       if (!homeFormation && !awayFormation) {
         field.style.display = "none";
-        displayNoLineupMessage(containerWrapper, "No lineup formation available.");
+        displayNoLineupMessage(containerWrapper, "Not available.");
         return;
       }
 
-      // ✅ Show field only if formations exist
+      //Show field only if formations exist
       field.style.display = "block";
 
       if (homeFormation) {
@@ -1083,11 +1143,11 @@ function fetchAndRenderLineups(match_id) {
  }
 
 
- // ✅ Parse formation from API string only
+ //Parse formation from API string only
  function parseFormation(formation) {
     if (!formation || typeof formation !== "string") {
-        console.warn("⚠️ No formation string provided.");
-        return null; // ⬅️ return null if no formation
+        console.warn("No formation string provided.");
+        return null; 
     }
 
     let parts = formation
@@ -1097,7 +1157,7 @@ function fetchAndRenderLineups(match_id) {
 
     let sum = parts.reduce((a, b) => a + b, 0);
 
-    // ✅ Handle "1-4-4-2" (goalkeeper included)
+    //Handle "1-4-4-2" (goalkeeper included)
     if (sum === 11 && parts[0] === 1) {
         console.log("⚽ Formation includes GK, removing leading '1'");
         parts.shift();
@@ -1107,8 +1167,8 @@ function fetchAndRenderLineups(match_id) {
     const isValid = parts.every(n => Number.isInteger(n) && n > 0) && sum === 10;
 
     if (!isValid) {
-        console.warn("❌ Malformed formation:", formation, "(sum =", sum, ")");
-        return null; // ⬅️ return null if invalid
+        console.warn("Malformed formation:", formation, "(sum =", sum, ")");
+        return null; 
     }
 
     console.log(" Parsed formation:", parts);
@@ -1151,12 +1211,12 @@ function fetchAndRenderLineups(match_id) {
     return result;
 }
 
-  // ✅ Render player dots based on formation array
+  //Render player dots based on formation array
   function renderPlayersOnField(team, players, formation, side = "home") {
     const container = document.getElementById("football-field");
     if (!container || !formation) return;
 
-    // 🔑 Always normalize using parseFormation (works with string OR array)
+    //Always normalize using parseFormation
     let formationArray = Array.isArray(formation)
      ? formation
     : parseFormation(formation);
@@ -1165,7 +1225,7 @@ function fetchAndRenderLineups(match_id) {
     const isHome = side === "home";
     const vertical = false;
   
-      // Goalkeeper position
+      //Goalkeeper position
       const goalkeeper = players.find(p => p.lineup_position === "1");
       if (goalkeeper) {
       let gkX, gkY;
@@ -1219,7 +1279,7 @@ function fetchAndRenderLineups(match_id) {
         }
     });
 
-    // ✅ Safety: place leftover players if formation mismatch
+    //Safety: place leftover players if formation mismatch
     while (currentIndex < outfield.length) {
         const player = outfield[currentIndex];
         const div = createPlayerDiv({ ...player, team_type: side }, 50, 50); // center fallback
@@ -1228,7 +1288,7 @@ function fetchAndRenderLineups(match_id) {
     }
 }
 
-// ✅ Create player dot element
+//Create player dot element
 function createPlayerDiv(player, xPercent, yPercent) {
     const div = document.createElement("div");
     div.classList.add("player-dot");
@@ -1244,19 +1304,18 @@ function createPlayerDiv(player, xPercent, yPercent) {
 
     // Colors
     if (player.team_type === "home") {
-        div.style.backgroundColor = "black";
-        div.style.color = "white";
-    } else {
-        div.style.backgroundColor = "white";
-        div.style.color = "black";
-    }
+       div.classList.add("home-dot");
+     } else {
+       div.classList.add("away-dot");
+     }
+
 
     return div;
 }
 
 
   window.addEventListener("DOMContentLoaded", () => {
-    fetchAndRenderMatches(); // This ensures everything waits until the DOM is ready
+    fetchAndRenderMatches(); 
 });
 
 

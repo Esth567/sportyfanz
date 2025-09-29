@@ -1171,15 +1171,15 @@ body::-webkit-scrollbar {
 
 
 .live-indicator {
-    display: inline-flex;       /* keep content inline and flexible */
+    display: inline-flex;       
     align-items: center;
     gap: 7px;
     font-weight: bold;
     color: #70c172;
     font-size: 14px;
-    white-space: nowrap;        /* prevent text wrapping */
-    overflow: hidden;           /* hide overflow if too long */
-    text-overflow: ellipsis;    /* show "..." if overflow */
+    white-space: nowrap;       
+    overflow: hidden;           
+    text-overflow: ellipsis;
 }
 
 .red-dot {
@@ -1188,7 +1188,7 @@ body::-webkit-scrollbar {
     background-color: #228B22;
     border-radius: 50%;
     animation: blink 1s infinite;
-    flex-shrink: 0;             /* prevent shrinking */
+    flex-shrink: 0;            
 }
 @keyframes blink {
     0%, 100% { opacity: 1; }
@@ -1197,7 +1197,7 @@ body::-webkit-scrollbar {
 
 .fallback-message {
     text-align: center;
-    color: #888; /* light gray text */
+    color: #888; 
     font-size: 1.1rem;
     margin-top: 20px;
     font-weight: 500;
@@ -1205,14 +1205,14 @@ body::-webkit-scrollbar {
 
   #match-date {
     position: absolute;
-    opacity: 0;         /* invisible */
-    pointer-events: none; /* not clickable */
+    opacity: 0;        
+    pointer-events: none; 
     height: 0;
     width: 0;
   }
 
   .calendar-wrapper {
-    position: relative; /* makes dropdown position relative to wrapper */
+    position: relative; 
     display: inline-block;
     width: 100%; 
    }
@@ -1231,7 +1231,8 @@ body::-webkit-scrollbar {
 }
 
 .calendar-icon:hover {
-  background: #70c172;
+  background: #fff;
+  color: #1A2F4B;
 }
 .calendar-header {
   width: 100%;
@@ -1257,32 +1258,30 @@ body::-webkit-scrollbar {
   left: 0 !important;
   margin-top: 5px;
   border-radius: 15px;
-  width: auto !important;       /* 🔑 allow it to size naturally */
-  min-width: 290px;             /* keep it usable */
-  max-width: 350px;             /* optional cap */
+  width: auto !important;       
+  min-width: 290px;           
+  max-width: 350px;            
 }
 
-.calendar-icon:hover {
-  color: #70c172;
-}
+
 /* Each day cell */
 .flatpickr-day {
   text-align: center;
   padding: 6px 0;
   box-sizing: border-box;
-  color: #000 !important; /* text color */ 
+  color: #000 !important;  
   background: transparent !important;
 }
 
 .flatpickr-day.prevMonthDay,
 .flatpickr-day.nextMonthDay {
-  color: #dcdcdc !important;   /* black instead of faint grey */
-  opacity: 1 !important;    /* remove the faded look */
+  color: #dcdcdc !important;   
+  opacity: 1 !important;    
 }
 
 /* Today’s date */
 .flatpickr-day.today {
-  background: #0b1d39 !important;
+  background: #1A2F4B !important;
   border-radius: 4px;
   color: #fff !important;
   align-items: center;
@@ -1290,9 +1289,10 @@ body::-webkit-scrollbar {
 
 /* Selected date */
 .flatpickr-day.selected {
-  background: #1a73e8 !important;   /* highlight color */
+  background: #70c172 !important;   
   color: #fff !important;
   border-radius: 4px;
+  text-align: center;
 }
 
 /* Month & navigation arrows */
@@ -1311,11 +1311,11 @@ body::-webkit-scrollbar {
 }
 
 .flatpickr-weekday {
-  color: #000 !important;   /* make text white */
+  color: #000 !important;  
   font-weight: 600;
 }
 
-    .matches-container {
+  .matches-container {
         background-color: #141e30;
         padding: 10px;
         margin-top: 10px;
@@ -1554,9 +1554,9 @@ body::-webkit-scrollbar {
 /* Player Image */
 .player-image img {
     height: 103px;
-    width: 103px; /* Adjust size as needed */
-    object-fit: cover; /* Ensures the image maintains aspect ratio */
-    transition: opacity 0.3s ease; /* Smooth transition for opacity */
+    width: 103px; 
+    object-fit: cover; 
+    transition: opacity 0.3s ease; 
 }
 
 
@@ -1586,9 +1586,7 @@ body::-webkit-scrollbar {
 .players-data {
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Spacing between player details */
-    padding-top: 10px;
- 
+    gap: 5px;  
 }
 
 .player-name {
@@ -1603,7 +1601,7 @@ body::-webkit-scrollbar {
 .leagues {
     font-size: 14px;
     font-family: 'Lato';
-    color: #ffffffa2; /* White text for other details */
+    color: #ffffffa2; 
     font-weight: 600;
     margin-right: 10px;
 }
@@ -1623,7 +1621,7 @@ body::-webkit-scrollbar {
     scroll-behavior: smooth;
 }
 .slider-dots::-webkit-scrollbar {
-    display: none;           /* hide scrollbar (Chrome/Safari) */
+    display: none;          
 }
 
 /* Individual Dot */
@@ -1637,7 +1635,7 @@ body::-webkit-scrollbar {
 
 /* Active Dot */
 .active-dot {
-    background-color: #fff; /* Highlight color */
+    background-color: #fff; 
     transform: scale(1.3);
 }
 
@@ -2277,14 +2275,17 @@ body.news-page .news-update {
 
 /* social icon*/
 .social-icons {
-  gap: 10px;
+  display: flex;       
+  gap: 15px;         
   margin-top: 20px;
+  align-items: center; 
 }
+
 .social-icons a {
   font-size: 16px;
   text-decoration: none;
   transition: transform 0.2s ease;
-  color: inherit; /* prevent anchor from turning icons blue */
+  color: inherit; 
 }
 
 .social-icons a:hover {
@@ -2895,7 +2896,7 @@ body.news-page .news-update {
 
 
 
-/*..................................................live match page........................*/
+/*.................................live match page........................*/
 
 .league-header {
     margin: 0;
@@ -2963,8 +2964,14 @@ body.news-page .news-update {
     transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 } 
 
+.match-category-btn:hover {
+    background-color: #f0f0f0; 
+    color: #1A2F4B;
+}
+
+
 .match-category-btn.active {
-    background-color: #fff; /* Highlight color */
+    background-color: #fff;
     color: #1A2F4B;
     font-weight: bold;
 }
@@ -3029,7 +3036,7 @@ body.news-page .news-update {
 
 #match-date {
     position: absolute;
-    top: 155%; /* directly below the icon */
+    top: 155%;
     left: -30px;
     z-index: 999;
     display: none;
@@ -3091,10 +3098,10 @@ body.news-page .news-update {
 }
 
  .league-logo {
-    width: 24px; /* Adjust the logo size */
+    width: 24px; 
     height: 24px;
-    object-fit: contain; /* Ensure the logo maintains its aspect ratio */
-    border-radius: 50%; /* Optional: Make the logo circular */
+    object-fit: contain; 
+    border-radius: 50%; 
   }
 
   .league-title {
@@ -3168,6 +3175,7 @@ body.news-page .news-update {
   
   .matches-item:hover {
     background: #70c172;
+    color: #fff;
   }
   
   .matches-teams {
@@ -3185,9 +3193,9 @@ body.news-page .news-update {
   }
 
  .matches-team img {
-    width: 20px; /* Reduce the size of logos */
+    width: 20px; 
     height: 20px;
-    object-fit: cover; /* Ensure logos maintain their aspect ratio */
+    object-fit: cover;
  }
 
 
@@ -3235,7 +3243,7 @@ body.news-page .news-update {
   display: block;
   max-width: 100% !important;
   width: 100% !important;
-  height: 70vh; /* or 500px, depending on your design */
+  height: 70vh;
   border: none;
 }
 
@@ -3356,7 +3364,7 @@ body.news-page .news-update {
   
 
   .live-match iframe {
-    border: 2px solid #ccc; /* Add a border */
+    border: 2px solid #ccc; 
     border-radius: 12px; /
     overflow: hidden; 
 }
@@ -3430,15 +3438,15 @@ body.news-page .news-update {
 .info-match-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align content to the left */
+    align-items: flex-start; 
 }
 
-  /* Container to hold both left and right sections */
+
 .info-match-details {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Ensures it stays left-aligned */
-    margin-top: 8px; /* Adds spacing below .info-teamNames */
+    align-items: flex-start; 
+    margin-top: 8px;
 }
 
 .info-match-container h3 {
@@ -3462,7 +3470,7 @@ body.news-page .news-update {
 
 .infoMatch-details {
     display: flex;
-    justify-content: flex-start; /* Push left and right apart */
+    justify-content: flex-start; 
     gap: 24px;
     width: 100%;
 }
@@ -3479,7 +3487,7 @@ body.news-page .news-update {
 }
 
 .infoRight-wing {
-    margin-left: auto; /* Pushes it to the right */
+    margin-left: auto; 
 }
 
 
@@ -3608,6 +3616,7 @@ body.news-page .news-update {
     border: 3px solid;
     background-color: #70c172;
 }
+
 .left-box {
     left: 0;
 }
@@ -3639,26 +3648,39 @@ body.news-page .news-update {
   
 .player-dot {
   position: absolute;
-  width: 35.19px;
-  height: 35.19px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  text-align: center;
-  line-height: 30px;
+  display: flex;
+  align-items: center;        
+  justify-content: center;     
+  font-size: 14px;             
+  font-weight: 500;
+  font-family: 'Lato';
   transform: translate(-50%, -50%);
+  overflow: visible;           
 }
 
-
-.player-number {
-    font-size: 14px;
-   font-weight: 500;
-   font-family: 'Lato';
+.home-dot {
+    background-color: black;
 }
+.home-dot .player-number {
+    color: white;
+}
+
+.away-dot {
+    background-color: white;
+}
+.away-dot .player-number {
+    color: black;
+}
+
 
 .no-lineup-message {
     font-family: 'Lato';
 }
 
-/* 🟡 players names styling */
+/*players names styling */
 
 .lineUp-cont {
     display: flex;
@@ -3668,8 +3690,6 @@ body.news-page .news-update {
 }
 
 
-
-/* Ensuring both team containers take full width */
 .lineup-home-players, .lineup-away-players {
     flex: 1; 
     margin-top: 10px;
@@ -3712,7 +3732,7 @@ body.news-page .news-update {
     width: 100%;
 }
 
-/* Ensure proper spacing for number, name, and position */
+
 .listed-player-number {
     flex: 0 0 40px; 
     text-align: center;
@@ -3771,14 +3791,14 @@ body.news-page .news-update {
 }
 
 .h2h-matches-container {
-    background: #1f3750; /* Dark background for each league section */
+    background: #1f3750; 
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 15px;
 }
 
 
-/* 🏆 League Name */
+/*League Name */
 .h2h-league .league-title {
     display: flex;
     flex-direction: column;
@@ -3793,7 +3813,7 @@ body.news-page .news-update {
     
 }
 
-/* 🌍 League Country Styling */
+/*League Country Styling */
 .h2h-league .league-country {
     font-size: 0.80rem;
     font-family: 'Lato';
@@ -3930,7 +3950,7 @@ body.news-page .news-update {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 6px; /* spacing between icon and text */
+    gap: 6px; 
     font-weight: 500;
     font-size: 16px;
     color: #fff;
@@ -3938,31 +3958,31 @@ body.news-page .news-update {
 
   /* Color coding by stat type */
 .stat-possession-label {
-    color: #1e90ff; /* blue */
+    color: #1e90ff; 
   }
   
   .stat-shots-label {
-    color: #ff4500; /* orange-red */
+    color: #ff4500; 
   }
   
   .stat-goals-label {
-    color: #32cd32; /* lime green */
+    color: #32cd32; 
   }
   
   .stat-fouls-label {
-    color: #dc143c; /* crimson */
+    color: #dc143c; 
   }
   
   .stat-cards-label {
-    color: #daa520; /* goldenrod */
+    color: #daa520; 
   }
   
   .stat-offsides-label {
-    color: #8a2be2; /* blue violet */
+    color: #8a2be2; 
   }
   
   .stat-corners-label {
-    color: #20b2aa; /* light sea green */
+    color: #20b2aa; 
   }
 
   .match-status-icon.spinner {
@@ -4830,17 +4850,41 @@ body.news-page .news-update {
         padding: 10px;
     }
 
+     /*top scorer*/    
      .slider {
        width: 100%;
        height: 120px;
      }
 
+  .player-item {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    left: 0;
+    top: 0;
+    gap: 16px;
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, #244537 40%, #1b364e 80%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out;
+}
 
-     .players-data {
-        margin-left: 15px;
-        margin-top: 10px;
-        padding-bottom: 10px;
-     }
+.player-image img {
+    height: 95px;
+    width: 95px; 
+    object-fit: cover; 
+    transition: opacity 0.3s ease; 
+}
+   .player-name {
+    font-size: 18px;
+    font-family: 'Lato';
+    margin-top: 5px;
+    font-weight: 600;
+    color: #fff;
+}
 
   
     .predition-content h4{
@@ -4856,7 +4900,7 @@ body.news-page .news-update {
 
  
   .top-stories {
-    display: block; /* show */
+    display: block; 
   }
 
   .transferNews {
@@ -4865,7 +4909,7 @@ body.news-page .news-update {
   }
 
   .podcast-updates {
-    display: block; /* hide */
+    display: block; 
   }
 
     .transferNews-header {
@@ -4875,13 +4919,13 @@ body.news-page .news-update {
     .footer-banner {
       left: 0;
       transform: none;
-       width: 10%;                     /* Full width */
-       border-radius: 0;                /* Flat edges like Livescore */
+       width: 10%;                     
+       border-radius: 0;               
   }
 
   .footer-banner iframe {
-    width: 10% !important;          /* Stretch across screen */
-    height: 40px;                    /* Slightly smaller */
+    width: 10% !important;        
+    height: 40px;                  
   }
 
     
@@ -5126,10 +5170,7 @@ body.news-page .news-update {
       border: none;
     }
 
-    /* line-ups team and formaation header styling */
-
-
-
+  
 .lineUpsteam-logo {
     width: 24px;
     height: 24px;
@@ -5137,6 +5178,9 @@ body.news-page .news-update {
 } 
 
   /* Main field styling */
+#football-field {
+  display: none; 
+}
 
 .field {
     position: relative;
@@ -5233,7 +5277,7 @@ body.news-page .news-update {
     width: 13.75px;
     height: 13.78px;
     border-radius: 50%;
-    font-size: 8px;
+    font-size: 6px;
     font-weight: 500;
     font-family: 'Lato';
     display: flex;
@@ -5243,13 +5287,6 @@ body.news-page .news-update {
     padding: 2px;
     z-index: 3;
     cursor: pointer;
-}
-
-.player-number {
-    font-size: 5.48px;
-    font-weight: 500;
-    color: #fff;
-    font-family: 'Lato';
 }
 
 /* listed players */
@@ -5287,7 +5324,7 @@ body.news-page .news-update {
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100% !important;   /* full width */
+    width: 100% !important;   
     max-width: none !important;
     border-radius: 15px 15px 0 0;
     animation: slideUp 0.3s ease-out;
@@ -5494,8 +5531,8 @@ body.news-page .news-update {
     bottom: 20px !important;
     left: 20px !important;
     right: 0 !important;
-    top: auto !important;              /* 🔑 override inline top */
-    transform: none !important;        /* 🔑 cancel Flatpickr’s inline transform */
+    top: auto !important;              
+    transform: none !important;        
     width: 100% !important;
     max-width: 308px !important;
     max-height: 289px !important;

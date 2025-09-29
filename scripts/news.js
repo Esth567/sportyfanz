@@ -253,6 +253,7 @@ function showFullNews(clickedItem) {
 
     // Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
+     /*
       const googleAdCode = `
         <div class="ad-container" style="margin: 15px 0;">
           <ins class="adsbygoogle"
@@ -270,9 +271,13 @@ function showFullNews(clickedItem) {
           </script>
         </div>
       `;
+      */
 
-      const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
-      const adCode = typeof window !== "undefined" && window.adsbygoogle ? googleAdCode : placeholderAdCode;
+      //const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
+      //const adCode = typeof window !== "undefined" && window.adsbygoogle ? googleAdCode : placeholderAdCode;
+
+      // Disable ads for now
+       const adCode = '';
 
       return paragraphs.map((p, i) => 
         `<p>${p.trim()}</p>${((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) ? adCode : ''}`

@@ -438,6 +438,7 @@ function showFullNews(clickedItem) {
 
     //Format description into paragraphs
     function injectAdParagraphs(paragraphs, adEvery = Math.floor(Math.random() * 3) + 4) {
+       /*
       const googleAdCode = `
         <div class="ad-container" style="margin: 15px 0;">
           <ins class="adsbygoogle"
@@ -455,9 +456,14 @@ function showFullNews(clickedItem) {
           </script>
         </div>
       `;
+      */
+      
 
-     const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
-      const adCode = typeof window !== "undefined" && window.adsbygoogle ? googleAdCode : placeholderAdCode;
+      //const placeholderAdCode = `<div class="ad-container placeholder-ad">Advertisement</div>`;
+      //const adCode = typeof window !== "undefined" && window.adsbygoogle ? googleAdCode : placeholderAdCode;
+       
+       // Disable ads for now
+       const adCode = '';
 
       return paragraphs.map((p, i) => 
         `<p>${p.trim()}</p>${((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) ? adCode : ''}`
@@ -749,7 +755,7 @@ document.addEventListener("DOMContentLoaded", fetchTopScorers);
 //league table for 5 team beased on ranking
 
 const DEFAULT_LEAGUE_ID = 152; // Premier League
-const BACKUP_LEAGUE_IDS = [168, 169]; // Example: Euro, Copa America (update as needed)
+const BACKUP_LEAGUE_IDS = [168, 169]; 
 
 // Get the active league ID based on date
 async function getActiveLeagueId() {
@@ -757,7 +763,7 @@ async function getActiveLeagueId() {
     const leagues = await fetch(`${API_BASE}/api/leagues`).then(r => r.json());
     const now = new Date();
 
-    // 1. Check for Club World Cup in existing league data
+    //Club World Cup in existing league data
     const club = leagues.find(l => l.league_name.includes("FIFA Club World Cup"));
     if (club) {
       const start = new Date(club.season_start);
@@ -765,7 +771,7 @@ async function getActiveLeagueId() {
       if (now >= start && now <= end) return club.league_id;
     }
 
-    // 2. Check other backup leagues
+    //other backup leagues
     for (let id of BACKUP_LEAGUE_IDS) {
       const backupLeague = leagues.find(l => l.league_id == id);
       if (backupLeague) {
@@ -945,6 +951,7 @@ document.addEventListener("DOMContentLoaded", initSlider);
 
 //function to display matches for the middle layers in home page
 let currentCategory = "live";
+let currentSelectedDate = null;
 let selectedDate = null;
 let matchesData = { live: [], highlight: [], upcoming: [], allHighlights: [] };
 
@@ -961,12 +968,10 @@ const { DateTime } = luxon;
 function getBerlinTime(dateStr, timeStr) {
   return DateTime.fromFormat(
     `${dateStr} ${timeStr}`,
-    "yyyy-MM-dd HH:mm",   // ✅ force two-digit hours
+    "yyyy-MM-dd HH:mm",  
     { zone: "Europe/Berlin" }
   );
 }
-
-
 
 
 // Convert Berlin time to the user's local timezone
@@ -997,7 +1002,6 @@ function getMinutesSince(dateStr, timeStr) {
 }
 
 
-
 //function to fetch matches for middle layer
 async function fetchMatchesData() {
   const spinner = document.getElementById("matches-spinner");
@@ -1007,21 +1011,34 @@ async function fetchMatchesData() {
     const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
-    // ✅ Explicitly build matchesData with allHighlights included
+    
     matchesData = {
       live: data.live || [],
       upcoming: data.upcoming || [],
       highlight: data.highlight || [],
-      allHighlights: data.highlight || []  // keep full history
+      allHighlights: data.highlight || []  
     };
 
-    // ✅ Pick starting category
-    if (matchesData.live.length > 0) currentCategory = "live";
-    else if (matchesData.upcoming.length > 0) currentCategory = "upcoming";
-    else if (matchesData.highlight.length > 0) currentCategory = "highlight";
-    else currentCategory = "live"; // fallback default
+       // Pick starting category
+        if (matchesData.live.length > 0) {
+            currentCategory = "live";
+        } else if (matchesData.upcoming.length > 0) {
+            currentCategory = "upcoming";
+        } else if (matchesData.highlight.length > 0) {
+            currentCategory = "highlight";
+        } else {
+            currentCategory = "live"; // default fallback
+        }
 
-    // ✅ Render matches
+        // ⚡ Safeguard: if no matches today for the chosen category, auto-shift to upcoming
+        const today = getTodayDate();
+        const { selectedMatches } = getMatchesForCategory(matchesData, currentCategory, today);
+
+        if (selectedMatches.length === 0 && currentCategory === "live" && matchesData.upcoming.length > 0) {
+            currentCategory = "upcoming";
+        }
+
+    //Render matches
     showMatches(matchesData, currentCategory);
 
   } catch (error) {
@@ -1071,8 +1088,17 @@ function showMatches(matchesData, category) {
   const matchesContainer = document.querySelector(".matches-container");
   if (!matchesContainer) return;
 
-  const selectedMatches = matchesData[category] || [];
+   if (!currentSelectedDate) {
+      currentSelectedDate = getTodayDate();
+     }
 
+    const { selectedMatches, dateToShow } = getMatchesForCategory(matchesData, category, currentSelectedDate);
+
+     //update currentSelectedDate if we are NOT in highlight
+     if (category !== "highlight") {
+       currentSelectedDate = dateToShow;
+     } 
+ 
   //key leagues to display first
   const preferredLeagues = [
   { name: "Premier League", country: "England" },
@@ -1117,10 +1143,10 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     // Live: Latest → Earliest
     return dateB.toMillis() - dateA.toMillis();
   } else if (category === "highlight") {
-    // ✅ Highlight: Latest finished match → Earliest
+    //Highlight: Latest finished match → Earliest
     return dateB.toMillis() - dateA.toMillis();
   } else {
-    // ✅ Upcoming: Earliest → Latest
+    //Upcoming: Earliest → Latest
     return dateA.toMillis() - dateB.toMillis();
   }
 });
@@ -1154,14 +1180,20 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     html += `</div>`;
    matchesContainer.innerHTML = html;
 
-   const bestDate = getBestDateForCategory(category);
-   setCalendarDate(bestDate);
-   initCalendarPicker(category); //init calendar
+    const dayEl = document.getElementById("calendar-day");
+          if (dayEl && currentSelectedDate) {
+             const dateObj = luxon.DateTime.fromISO(currentSelectedDate);
+             dayEl.textContent = dateObj.toFormat("d");
+          }
+
+        // Always update calendar-day
+        setTodayInCalendar();
+   initCalendarPicker(category); 
 
    return;
  }
 
-  // ✅ Display matches (priority leagues first, max 5)
+  //Display matches (priority leagues first, max 5)
   for (const match of sortedMatches) {
     if (displayedMatchCount >= MAX_MATCHES) break;
 
@@ -1235,8 +1267,9 @@ let sortedMatches = selectedMatches.sort((a, b) => {
 
   html += `</div>`;
   matchesContainer.innerHTML = html;
+   history.replaceState({ type: "matches", category }, "", "#matches");
 
-  // Add "View Details" button listeners
+    // Add "View Details" button listeners
   document.querySelectorAll('.view-details-btn').forEach(btn => {
     btn.addEventListener('click', function (event) {
       event.stopPropagation(); // Prevent parent .match-details click
@@ -1246,34 +1279,42 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     });
   });
 
-   // Before initializing calendar
-  const bestDate = getBestDateForCategory(category);
-   setCalendarDate(bestDate);
+    const dayEl = document.getElementById("calendar-day");
+    if (dayEl) {
+    const dateObj = luxon.DateTime.fromISO(dateToShow);
+    dayEl.textContent = dateObj.toFormat("d");
+   }
   initCalendarPicker(category);
 }
 
     
-function getBestDateForCategory(category) {
-  const today = getTodayDate(); // YYYY-MM-DD
+function getMatchesForCategory(matchesData, category, date) {
+    let dateToShow = date || getTodayDate();
+    let selectedMatches = matchesData[category] || [];
 
-  if (category === "upcoming") {
-    const futureDates = matchesData.upcoming
-      .map(m => m.match_date)
-      .filter(d => d >= today)
-      .sort(); // ascending
-    return futureDates.length > 0 ? futureDates[0] : today;
-  }
+    selectedMatches = selectedMatches
+        .filter(m => m.match_date === dateToShow)
+        .sort((a, b) => a.match_time.localeCompare(b.match_time));
 
-  if (category === "highlight") {
-    const pastDates = matchesData.allHighlights
-      .map(m => m.match_date)
-      .filter(d => d <= today)
-      .sort(); // ascending
-    return pastDates.length > 0 ? pastDates[pastDates.length - 1] : today;
-  }
+    // --- Special case for highlight ---
+    if (category === "highlight" && selectedMatches.length === 0) {
+        const pastDates = matchesData.highlight
+            .map(m => m.match_date)
+            .filter(d => d <= getTodayDate())
+            .sort((a, b) => b.localeCompare(a)); // descending
 
-  // Default (live & fallback)
-  return today;
+        if (pastDates.length > 0) {
+            // ⚡ Only override the local dateToShow for highlight
+            const highlightDate = pastDates[0];
+            selectedMatches = matchesData.highlight
+                .filter(m => m.match_date === highlightDate)
+                .sort((a, b) => a.match_time.localeCompare(b.match_time));
+
+            return { selectedMatches, dateToShow: highlightDate };
+        }
+    }
+
+    return { selectedMatches, dateToShow };
 }
 
 
@@ -1289,118 +1330,109 @@ function getAvailableMatchDates() {
 
 // Initialize Flatpickr
 function initCalendarPicker() {
-  const calendarWrapper = document.querySelector(".calendar-wrapper");
-  const matchDateInput = document.getElementById("match-date");
+    const matchDateInput = document.getElementById("match-date");
+    const calendarWrapper = document.querySelector(".calendar-wrapper");
+    if (!matchDateInput || !calendarWrapper) return;
 
-  if (!matchDateInput || !calendarWrapper) return;
+    if (!matchDateInput._flatpickr) {
+        flatpickr(matchDateInput, {
+         dateFormat: "Y-m-d",
+         defaultDate: currentSelectedDate || getTodayDate(),
+         enable: getAvailableMatchDates(),
+         appendTo: calendarWrapper,
+         position: "below left",
+         onChange: (dates, dateStr) => {
+          if (!dateStr) return;
 
-  // ✅ use best date for the current category
-  const bestDate = getBestDateForCategory(currentCategory);
-  const currentVal = matchDateInput.value || bestDate;
+           currentSelectedDate = dateStr;
 
-  if (matchDateInput._flatpickr) {
-    matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
-    matchDateInput._flatpickr.setDate(currentVal, true);
-  } else {
-    flatpickr(matchDateInput, {
-      dateFormat: "Y-m-d",
-      defaultDate: currentVal,  // ✅ anchored to category’s best date
-      enable: getAvailableMatchDates(),
-      appendTo: calendarWrapper,
-      position: "below left",
-      onChange: (dates, dateStr) => {
-        filterByDate(currentCategory, dateStr);
-      }
-    });
-  }
+          //Update the calendar icon immediately
+           const dayEl = document.getElementById("calendar-day");
+          if (dayEl) {
+            const dateObj = luxon.DateTime.fromISO(dateStr);
+            dayEl.textContent = dateObj.toFormat("d"); // Only day number
+          }
 
-  const calendarBtn = document.querySelector(".calendar");
-  if (calendarBtn) {
-    calendarBtn.addEventListener("click", () => {
-      matchDateInput._flatpickr.open();
-    });
-  }
+
+          //Filter matches for the selected date
+          filterByDate(currentCategory, dateStr);
+       }
+     });
+    } else {
+        matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
+    }
+
+    const calendarBtn = document.querySelector(".calendar");
+    if (calendarBtn) {
+        calendarBtn.addEventListener("click", () => {
+            matchDateInput._flatpickr.open();
+        });
+    }
 }
-
-
-
 
 
 // Update filterByDate to accept selected date
 function filterByDate(category, selectedDate) {
-  const filteredData = {
-    live: matchesData.live.filter(m => m.match_date === selectedDate),
-    highlight: matchesData.allHighlights.filter(m => m.match_date === selectedDate),
-    upcoming: matchesData.upcoming.filter(m => m.match_date === selectedDate),
-  };
+    if (!selectedDate) selectedDate = getTodayDate();
 
-  setCalendarDate(selectedDate);
-  showMatches(filteredData, category);
+    const { dateToShow } = getMatchesForCategory(matchesData, category, selectedDate);
+
+    //Keep global currentSelectedDate
+    if (category !== "highlight") {
+        currentSelectedDate = dateToShow;
+    }
+
+    setCalendarDate(currentSelectedDate);
+    showMatches(matchesData, category);
 }
 
 
 
   //calender function
   function setTodayInCalendar() {
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2, "0");
+    const today = getTodayDate();
+    const dayEl = document.getElementById("calendar-day");
+    const inputEl = document.getElementById("match-date");
 
-  const dayEl = document.getElementById("calendar-day");
-  const inputEl = document.getElementById("match-date");
+    // Only set today if currentSelectedDate is null
+    if (!currentSelectedDate) {
+        currentSelectedDate = today;
+        if (dayEl) dayEl.textContent = luxon.DateTime.fromISO(today).toFormat("d");
+        if (inputEl) inputEl.value = today;
+    }
 
-  if (dayEl) dayEl.textContent = dd;
-  if (inputEl) inputEl.value = today.toISOString().split("T")[0];
+    // Rollover for next day
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setHours(24, 0, 0, 0);
 
-  // Auto-rollover at midnight
-  const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setHours(24, 0, 0, 0);
-  if (window.calendarRolloverTimer) clearTimeout(window.calendarRolloverTimer);
-  window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
+    if (window.calendarRolloverTimer) clearTimeout(window.calendarRolloverTimer);
+    window.calendarRolloverTimer = setTimeout(setTodayInCalendar, tomorrow - now + 1000);
 }
 
 function setCalendarDate(dateStr) {
-  const date = new Date(dateStr);
-  const dd = String(date.getDate()).padStart(2, "0");
+    if (!dateStr) return;
+    const dayEl = document.getElementById("calendar-day");
+    const inputEl = document.getElementById("match-date");
 
-  const dayEl = document.getElementById("calendar-day");
-  const inputEl = document.getElementById("match-date");
+    if (dayEl) {
+        const dateObj = luxon.DateTime.fromISO(dateStr);
+        dayEl.textContent = dateObj.toFormat("d"); // Only day number
+    }
+    if (inputEl) inputEl.value = dateStr;
 
-  if (dayEl) dayEl.textContent = dd;
-  if (inputEl) inputEl.value = dateStr;
+    currentSelectedDate = dateStr; // Store globally
 }
-
 
 function filterMatchesCategory(category) {
-  currentCategory = category;
+    currentCategory = category;
+    document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".match-category-btn").forEach(btn => {
+        if (btn.textContent.toLowerCase() === category) btn.classList.add("active");
+    });
 
-  // Reset active state
-  document.querySelectorAll(".match-category-btn").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".match-category-btn").forEach(btn => {
-    if (btn.textContent.toLowerCase() === category) {
-      btn.classList.add("active");
-    }
-  });
-
-  const selectedDate = document.getElementById("match-date")?.value;
-  if (selectedDate) {
-    filterByDate(category, selectedDate);
-  } else {
-    const bestDate = getBestDateForCategory(category);
-    filterByDate(category, bestDate);
-  }
+    filterByDate(category, currentSelectedDate || getTodayDate());
 }
-
-
-
-// Init on load
-document.addEventListener("DOMContentLoaded", () => {
-  fetchMatchesData().then(() => {
-    //calendar to today only once when app starts
-    setTodayInCalendar();
-  });
-});
-
 
 
 // Function to fetch match video 
@@ -1515,6 +1547,8 @@ async function displayLiveMatch(matchId, category) {
           if (newspodcastwrapper) {
             newspodcastwrapper.style.display = 'none';
            }
+
+            history.pushState({ type: "match", matchId, category }, "", `#match-${matchId}`);
 
     // Attach tab click events
     document.querySelectorAll(".tab-btn").forEach(button => {
@@ -1966,7 +2000,7 @@ function fetchAndRenderLineups(match_id) {
         return;
       }
 
-      // ✅ Show field only if formations exist
+      //Show field only if formations exist
       field.style.display = "block";
 
       if (homeFormation) {
@@ -1999,8 +2033,8 @@ function fetchAndRenderLineups(match_id) {
  // ✅ Parse formation from API string only
  function parseFormation(formation) {
     if (!formation || typeof formation !== "string") {
-        console.warn("⚠️ No formation string provided.");
-        return null; // ⬅️ return null if no formation
+        console.warn("No formation string provided.");
+        return null; 
     }
 
     let parts = formation
@@ -2010,9 +2044,9 @@ function fetchAndRenderLineups(match_id) {
 
     let sum = parts.reduce((a, b) => a + b, 0);
 
-    // ✅ Handle "1-4-4-2" (goalkeeper included)
+    //Handle "1-4-4-2" (goalkeeper included)
     if (sum === 11 && parts[0] === 1) {
-        console.log("⚽ Formation includes GK, removing leading '1'");
+        console.log("Formation includes GK, removing leading '1'");
         parts.shift();
         sum = parts.reduce((a, b) => a + b, 0);
     }
@@ -2020,8 +2054,8 @@ function fetchAndRenderLineups(match_id) {
     const isValid = parts.every(n => Number.isInteger(n) && n > 0) && sum === 10;
 
     if (!isValid) {
-        console.warn("❌ Malformed formation:", formation, "(sum =", sum, ")");
-        return null; // ⬅️ return null if invalid
+        console.warn("Malformed formation:", formation, "(sum =", sum, ")");
+        return null; 
     }
 
     console.log(" Parsed formation:", parts);
@@ -2064,12 +2098,12 @@ function fetchAndRenderLineups(match_id) {
     return result;
 }
 
-  // ✅ Render player dots based on formation array
+  //Render player dots based on formation array
   function renderPlayersOnField(team, players, formation, side = "home") {
     const container = document.getElementById("football-field");
     if (!container || !formation) return;
 
-    // 🔑 Always normalize using parseFormation (works with string OR array)
+    // 🔑 Always normalize using parseFormation 
     let formationArray = Array.isArray(formation)
      ? formation
     : parseFormation(formation);
@@ -2094,7 +2128,7 @@ function fetchAndRenderLineups(match_id) {
     }
 
     const gkDiv = createPlayerDiv({ ...goalkeeper, team_type: side }, gkX, gkY);
-    gkDiv.classList.add("goalkeeper"); // optional for styling
+    gkDiv.classList.add("goalkeeper"); 
     container.appendChild(gkDiv);
   }
 
@@ -2132,16 +2166,16 @@ function fetchAndRenderLineups(match_id) {
         }
     });
 
-    // ✅ Safety: place leftover players if formation mismatch
+    //Safety: place leftover players if formation mismatch
     while (currentIndex < outfield.length) {
         const player = outfield[currentIndex];
-        const div = createPlayerDiv({ ...player, team_type: side }, 50, 50); // center fallback
+        const div = createPlayerDiv({ ...player, team_type: side }, 50, 50); 
         container.appendChild(div);
         currentIndex++;
     }
 }
 
-// ✅ Create player dot element
+//Create player dot element
 function createPlayerDiv(player, xPercent, yPercent) {
     const div = document.createElement("div");
     div.classList.add("player-dot");
@@ -2171,7 +2205,7 @@ function createPlayerDiv(player, xPercent, yPercent) {
 
 
   window.addEventListener("DOMContentLoaded", () => {
-    fetchMatchesData(); // This ensures everything waits until the DOM is ready
+    fetchMatchesData(); 
 });
 
 

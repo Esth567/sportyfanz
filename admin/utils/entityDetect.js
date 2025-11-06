@@ -1,59 +1,35 @@
 // utils/entityDetect.js
-function buildEntityDatabase({ players = [], teams = [], countries = [] }) {
+const { sports, leagues, teams, players } = require('./entities');
+
+function buildEntityDatabase() {
   const db = {};
 
-  players.forEach(player => {
-    const name = player.player_name?.toLowerCase();
-    if (name) {
-      db[name] = {
-        name: player.player_name,
-        logo: player.player_image,
-        category: 'Player'
-      };
-    }
+  players.forEach(p => {
+    db[p.name.toLowerCase()] = { ...p, category: 'Player' };
   });
-
-  teams.forEach(team => {
-    const name = team.team_name?.toLowerCase();
-    if (name) {
-      db[name] = {
-        name: team.team_name,
-        logo: team.team_badge,
-        category: 'Team'
-      };
-    }
+  teams.forEach(t => {
+    db[t.name.toLowerCase()] = { ...t, category: 'Team' };
   });
-
-  countries.forEach(country => {
-    const name = country.country_name?.toLowerCase();
-    if (name) {
-      db[name] = {
-        name: country.country_name,
-        logo: country.country_logo,
-        category: 'Country'
-      };
-    }
+  leagues.forEach(l => {
+    db[l.name.toLowerCase()] = { ...l, category: 'League' };
+  });
+  sports.forEach(s => {
+    db[s.name.toLowerCase()] = { ...s, category: 'Sport' };
   });
 
   return db;
 }
 
 function detectEntityFromText(text, entityDb) {
-  if (!entityDb || !text) return null;
-
+  if (!text || !entityDb) return null;
   const lowerText = text.toLowerCase();
-  const keys = Object.keys(entityDb).sort((a, b) => b.length - a.length); // longest match first
+  const keys = Object.keys(entityDb).sort((a, b) => b.length - a.length);
 
   for (const key of keys) {
-    if (lowerText.includes(key)) {
-      return entityDb[key]; // { name, logo, category }
-    }
+    if (lowerText.includes(key)) return entityDb[key];
   }
 
   return null;
 }
 
-module.exports = {
-  buildEntityDatabase,
-  detectEntityFromText
-};
+module.exports = { buildEntityDatabase, detectEntityFromText };

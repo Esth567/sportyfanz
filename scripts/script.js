@@ -1,6 +1,6 @@
 const API_BASE = location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://backend.sportyfanz.com';
+  : 'https://admin.sportyfanz.com';
 
   
 //sidebar toggle for web view
@@ -183,26 +183,29 @@ function updateRelativeTime() {
   timeElements.forEach(el => {
     const postedMs = Date.parse(el.dataset.posted);
     if (isNaN(postedMs)) {
-      el.textContent = 'Invalid time';
+      // Default to "just now" if invalid or missing
+      el.textContent = 'just now';
       return;
     }
 
-    const diff = Math.floor((now.getTime() - postedMs) / 1000);
+    const diff = Math.max(0, Math.floor((now.getTime() - postedMs) / 1000));
     let text;
 
-    if (diff <= 0) text = '1 second'; 
-    else if (diff < 60) {
+    if (diff < 5) {
+      // Anything under 5 seconds = "just now"
+      text = 'just now';
+    } else if (diff < 60) {
       const seconds = diff;
-      text = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      text = `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
     } else if (diff < 3600) {
       const minutes = Math.floor(diff / 60);
-      text = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+      text = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
     } else if (diff < 86400) {
       const hours = Math.floor(diff / 3600);
-      text = `${hours} hour${hours !== 1 ? 's' : ''}`;
+      text = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
     } else {
       const days = Math.floor(diff / 86400);
-      text = `${days} day${days !== 1 ? 's' : ''}`;
+      text = `${days} day${days !== 1 ? 's' : ''} ago`;
     }
 
     el.textContent = text;
@@ -238,31 +241,31 @@ async function loadNews(sectionId, endpoint, retries = 2) {
     populateNewsSection(sectionId, newsData);
     updateRelativeTime();
 
-     // ✅ Hide error banner if shown earlier
+     //Hide error banner if shown earlier
     const errorBox = document.getElementById("news-error");
     if (errorBox) errorBox.classList.add("hidden");
 
   } catch (error) {
-    console.error('⚠️ loadNews error:', error);
+    console.error('loadNews error:', error);
 
     const errorBox = document.getElementById("news-error");
     const errorText = document.getElementById("news-error-text");
 
-    // 🔄 Retry once
+    //Retry once
     if (retries > 0) {
-      console.log(`🔁 Retrying in 2 seconds... (${retries} left)`);
+      console.log(`Retrying in 2 seconds... (${retries} left)`);
       setTimeout(() => loadNews(sectionId, endpoint, retries - 1), 2000);
       return;
     }
 
-    let message = "❓ Unexpected error occurred while loading news.";
+    let message = "Unexpected error occurred while loading news.";
 
     if (!navigator.onLine) {
-      message = "📡 You appear to be offline. Please check your internet connection.";
+      message = "You appear to be offline. Please check your internet connection.";
     } else if (error.message.startsWith("Failed to fetch news")) {
-      message = "🛑 Our servers are temporarily unavailable. Please try again later.";
+      message = "Our servers are temporarily unavailable. Please try again later.";
     } else if (error.message.includes("Empty response")) {
-      message = "⚠️ No news available right now. Please check back soon.";
+      message = "No news available right now. Please check back soon.";
     }
 
     if (errorBox && errorText) {
@@ -281,9 +284,9 @@ async function loadEntityDatabase() {
     const res = await fetch(`${API_BASE}/api/entity-database`);
     if (!res.ok) throw new Error("Failed to fetch entity DB");
     window.entityDatabase = await res.json();
-    console.log("✅ Entity DB loaded", Object.keys(window.entityDatabase).length);
+    console.log("Entity DB loaded", Object.keys(window.entityDatabase).length);
   } catch (err) {
-    console.error("❌ Entity DB load failed:", err.message);
+    console.error("Entity DB load failed:", err.message);
   }
 }
 
@@ -476,7 +479,7 @@ function showFullNews(clickedItem) {
 
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;
     
-    // determine image credit (improved fallback logic)
+    //fallback image logic
     let imageCreditText = '';
     if (newsItem.image) {
      if (newsItem.imageCredit) {
@@ -543,7 +546,7 @@ function showFullNews(clickedItem) {
    //Insert the full article *after* the clicked item
     clickedItem.insertAdjacentElement('afterend', fullView);
 
-    // ✅ Auto scroll into view only on mobile/tablet
+    //Auto scroll into view only on mobile/tablet
     if (isMobileOrTablet) {
       setTimeout(() => {
         fullView.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -558,7 +561,7 @@ function showFullNews(clickedItem) {
         child.style.display = ''; // restores previous display
       });
 
-      // ✅ restore first & third layers only if mobile/tablet
+      //restore first & third layers only if mobile/tablet
       if (isMobileOrTablet) {
         document.body.classList.remove("full-view-active");
       }
@@ -634,7 +637,7 @@ async function fetchTopScorers() {
 
     //Check if backend returned an array
     if (!Array.isArray(topScorers)) {
-      console.error("❌ Invalid data from backend:", topScorers);
+      console.error("Invalid data from backend:", topScorers);
       return;
     }
 
@@ -642,7 +645,7 @@ async function fetchTopScorers() {
     const dotsContainer = document.querySelector(".slider-dots");
 
     if (!playersContainer || !dotsContainer) {
-      console.error("❌ Slider container elements not found.");
+      console.error("Slider container elements not found.");
       return;
     }
 
@@ -664,7 +667,7 @@ async function fetchTopScorers() {
         ? apiImage
         : `assets/players/${safeName}.png`;
 
-           console.log(`🎯 Player: ${playerName}, Image Path: ${imgSrc}`);
+           console.log(`Player: ${playerName}, Image Path: ${imgSrc}`);
 
       const playerItem = document.createElement("div");
       playerItem.classList.add("player-item");
@@ -708,7 +711,7 @@ async function fetchTopScorers() {
       startSlider(playerElements);
     }
   } catch (err) {
-    console.error("❌ Error fetching top scorers:", err);
+    console.error("Error fetching top scorers:", err);
   }
 }
 
@@ -781,7 +784,7 @@ async function getActiveLeagueId() {
       }
     }
 
-    // 3. Default to Premier League
+    //Default to Premier League
     return DEFAULT_LEAGUE_ID;
 
   } catch (err) {
@@ -1304,7 +1307,7 @@ function getMatchesForCategory(matchesData, category, date) {
             .sort((a, b) => b.localeCompare(a)); // descending
 
         if (pastDates.length > 0) {
-            // ⚡ Only override the local dateToShow for highlight
+            //Only override the local dateToShow for highlight
             const highlightDate = pastDates[0];
             selectedMatches = matchesData.highlight
                 .filter(m => m.match_date === highlightDate)
@@ -1443,12 +1446,12 @@ async function fetchMatchVideo(matchId, homeTeam, awayTeam) {
     );
     let data = await response.json();
 
-    console.log("🎥 Video Data:", data);
+    console.log("Video Data:", data);
 
     // Return embed code if available
     return data.embed || null;
   } catch (error) {
-    console.error("❌ Error fetching match video:", error);
+    console.error("Error fetching match video:", error);
     return null;
   }
 }
@@ -1485,7 +1488,7 @@ async function displayLiveMatch(matchId, category) {
          match.match_awayteam_name
         );
 
-    console.log("🎥 Video Data:", videoEmbed);
+    console.log("Video Data:", videoEmbed);
 
     let matchesContainer = document.querySelector(".matches-container");
 
@@ -1558,11 +1561,11 @@ async function displayLiveMatch(matchId, category) {
     
             const tabContentDiv = document.getElementById("tab-content");
             if (!tabContentDiv) {
-                console.error("❌ ERROR: #tab-content div not found!");
+                console.error("ERROR: #tab-content div not found!");
                 return;
             }
     
-            // ✅ Pass APIkey to getTabContent
+            //Pass APIkey to getTabContent
             const tab = this.dataset.tab;
             tabContentDiv.innerHTML = getTabContent(tab, match);
     
@@ -1716,7 +1719,7 @@ async function displayLiveMatch(matchId, category) {
                     `;
 
                     case "standing":
-        // 🔄 Load standing and highlight teams
+        //Load standing and highlight teams
         setTimeout(() => loadStandings(match), 0); 
         return `
             <div class="standing-header">                         
@@ -1881,7 +1884,7 @@ function loadH2HData(homeTeam, awayTeam) {
         const spinner = document.getElementById("standing-spinner");
     
         if (!tableContainer) {
-            console.error("❌ #standing-table element not found in DOM.");
+            console.error("#standing-table element not found in DOM.");
             return;
         }
     
@@ -2030,7 +2033,7 @@ function fetchAndRenderLineups(match_id) {
  }
 
 
- // ✅ Parse formation from API string only
+ //Parse formation from API string only
  function parseFormation(formation) {
     if (!formation || typeof formation !== "string") {
         console.warn("No formation string provided.");
@@ -2282,7 +2285,7 @@ async function fetchTodayPredictions(predictionContainer) {
     const data = await response.json();
 
     if (!Array.isArray(data) || data.length === 0) {
-      predictionContainer.innerHTML = "<p>⚠️ No predictions available.</p>";
+      predictionContainer.innerHTML = "<p>No predictions available.</p>";
       return;
     }
 
@@ -2303,7 +2306,7 @@ async function fetchTodayPredictions(predictionContainer) {
 
   } catch (error) {
     console.error("Prediction fetch error:", error);
-    predictionContainer.innerHTML = "<p>⚠️ Error loading predictions.</p>";
+    predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
   }
 }
 
@@ -2385,7 +2388,7 @@ function closeFixedAd() {
 }
 
 
-// css code to restructure page layout for mobile and tablet view
+//page layout restructure for mobile and tablet view
  document.addEventListener("DOMContentLoaded", function () {
   function reorderElements() {
       if (window.innerWidth <= 1024) {
@@ -2444,14 +2447,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateSidebarVisibility() {
         if (isMobileOrTablet()) {
             if (toggleBtn) toggleBtn.style.display = "block";
-            sidebar.classList.remove("collapsed"); // ❌ never collapsed on mobile
+            sidebar.classList.remove("collapsed");
             sidebar.classList.remove("active");
             sidebar.style.display = "none";
         } else {
             if (toggleBtn) toggleBtn.style.display = "none";
-            sidebar.classList.remove("active"); // ❌ never active on desktop
+            sidebar.classList.remove("active");
             sidebar.style.display = "block";
-            // ✅ here desktop may use .collapsed (CSS handles the narrow width)
         }
     }
 
@@ -2509,18 +2511,27 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-
-
-// layout-fix
+// Debounce resize handler
 let resizeTimer;
 
 window.addEventListener("resize", () => {
   clearTimeout(resizeTimer);
 
   resizeTimer = setTimeout(() => {
+    // Optional visual indicator (if you have CSS for .resizing-refresh)
     document.body.classList.add("resizing-refresh");
 
-    // refresh ads
+    // --- FIX: Reset layout without losing CSS context ---
+    try {
+      document.documentElement.style.display = 'block';
+      document.body.style.transform = 'scale(1)'; // GPU-triggered repaint
+      document.body.offsetHeight; // force reflow
+      document.body.style.transform = '';
+    } catch (err) {
+      console.warn("Layout refresh error:", err);
+    }
+
+    // --- Refresh Ads (your existing logic) ---
     if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
       try {
         (adsbygoogle = window.adsbygoogle || []).push({});
@@ -2529,14 +2540,21 @@ window.addEventListener("resize", () => {
       }
     }
 
+    // Remove the temporary refresh class after short delay
     setTimeout(() => {
       document.body.classList.remove("resizing-refresh");
-    }, 50);
-  }, 200);
+    }, 150);
+  }, 300);
 });
 
-
-
+// Auto reload on large viewport switch (like switching in Chrome Inspect)
+let lastWidth = window.innerWidth;
+window.addEventListener("resize", () => {
+  if (Math.abs(window.innerWidth - lastWidth) > 400) {
+    location.reload(); // reload only on major viewport changes
+  }
+  lastWidth = window.innerWidth;
+});
 
 
 

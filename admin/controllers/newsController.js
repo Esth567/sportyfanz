@@ -25,14 +25,14 @@ exports.getNews = async (req, res) => {
           throw new Error("Fallback cache also has invalid structure");
         }
 
-        res.json({ trending, updates });  // ✅ FIXED
+        res.json({ trending, updates });
 
       } catch (fsErr) {
         console.error("❌ Failed to read fallback cache:", fsErr.message);
         res.status(500).json({ error: "Failed to load news" });
       }
     } else {
-      res.json({ trending, updates });  // ✅ FIXED
+      res.json({ trending, updates }); 
     }
 
   } catch (err) {

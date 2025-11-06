@@ -12,7 +12,7 @@ async function extractArticle(url) {
     return nlpData;  // Includes title, text, sentiment, entities, summaries
 
   } catch (err) {
-    console.warn('⚠️ Failed to process article:', err.message);
+    console.warn('Failed to process article:', err.message);
     return null;
   }
 }

@@ -1,4 +1,5 @@
-module.exports = [
+// Only real RSS feeds here
+const feedUrls = [
   'https://www.espn.com/espn/rss/news',
   'https://www.skysports.com/rss/12040',
   'https://feeds.bbci.co.uk/sport/rss.xml?edition=uk',
@@ -6,3 +7,14 @@ module.exports = [
   'https://www.cbssports.com/rss/headlines',
   'https://www.theguardian.com/uk/sport/rss',  
 ];
+
+// Only HTML pages here (CAF, NPFL)
+const cafNewsUrls = [
+  'https://www.cafonline.com/caf-champions-league/news/',
+  'https://www.cafonline.com/caf-confederation-cup/news/',
+  'https://www.cafonline.com/caf-u-20-africa-cup-of-nations/news/',
+  'https://npfl.ng/news/',
+];
+
+// Correct export
+module.exports = { feedUrls, cafNewsUrls };

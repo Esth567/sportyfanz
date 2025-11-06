@@ -177,7 +177,7 @@ body::-webkit-scrollbar {
     font-family: 'Lato';
     font-weight: bold;
     text-align: center;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Adds depth to the text */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); 
 }
 
 /* Collapsed Sidebar */
@@ -218,7 +218,6 @@ body::-webkit-scrollbar {
     flex-direction: row;
     align-items: stretch;
   }
-  
 
 .sidebar.collapsed ~ .body-container {
     margin-left: 60px; 
@@ -296,7 +295,7 @@ body::-webkit-scrollbar {
     outline: none;
     transition: background 0.3s;
     background: linear-gradient(90deg, #1a2f4b3d 50%, #1b334d36 75.03%, #1b364e3d 100%);
-    border: none; /* Remove any border from the search bar */
+    border: none; 
 }
 .search-icon {
     position: absolute;
@@ -307,7 +306,7 @@ body::-webkit-scrollbar {
     color: #fff;
 }
 .search-bar:focus {
-    outline: none; /* Ensure no outline on focus */
+    outline: none; 
     background: rgba(31, 92, 68, 0.5);
 }
 
@@ -323,11 +322,11 @@ body::-webkit-scrollbar {
 }
 
 .icons img {
-    border: none; /* Remove any border */
+    border: none; 
     padding: 6px;
     font-size: 28px;
     gap: 10px;
-    border-radius: 50%; /* Circular shape */
+    border-radius: 50%; 
     background: linear-gradient(90deg, #1a2f4b3d 50%, #1b334d49 75.03%, #1b364e6e 100%);
     transition: background 0.3s ease, transform 0.3s ease;
 }
@@ -366,7 +365,7 @@ body::-webkit-scrollbar {
 }
 
 .signup-btn:hover .arrow-icon {
-    transform: translateX(5px); /* Moves arrow slightly to the right on hover */
+    transform: translateX(5px); 
 }
 
 
@@ -378,7 +377,6 @@ body::-webkit-scrollbar {
 }
 
 
-
 /* Content Section */
 .content {
     flex: 1;
@@ -388,7 +386,7 @@ body::-webkit-scrollbar {
     padding: 15px;
     gap: 10px;
     margin-top: 70px;
-    height: calc(100vh - 150px);
+    min-height: 0;
     overflow: auto;
     background: #0A131F;
     padding-bottom: 60px;
@@ -440,7 +438,7 @@ body::-webkit-scrollbar {
 .more {
     display: flex;
     align-items: center;
-    gap: 5px; /* Space between icon and text */
+    gap: 5px;
     color: #fff;
     cursor: pointer;
 }
@@ -481,15 +479,14 @@ body::-webkit-scrollbar {
     border: 1px solid #fbc12d8c;
     padding: 10px;
     margin-top: 15px;
-    overflow: hidden; /* Prevents overflow */
-    max-width: 100%; /* Ensures the width is constrained */
-
+    overflow: hidden; 
+    max-width: 100%; 
 }
 
 .teams-time {
     display: flex;
-    justify-content: space-between; /* Even spacing between teams and event */
-    align-items: center; /* Vertically center everything */
+    justify-content: space-between; 
+    align-items: center; 
     gap: 8px;
     width: 100%;
     padding: 5px;
@@ -506,7 +503,7 @@ body::-webkit-scrollbar {
     word-break: break-word;
     overflow: hidden;
     white-space: normal;
-    text-overflow: ellipsis; /* Adds '...' if the text overflows */
+    text-overflow: ellipsis; 
     display: flex;
     flex-direction: column;
 }
@@ -522,7 +519,7 @@ body::-webkit-scrollbar {
  }
 
 .live-match-event{
-    flex: 0 0 100px; /* Fixed width to prevent expansion */
+    flex: 0 0 100px; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -628,7 +625,7 @@ body::-webkit-scrollbar {
 .table-header,
 .team-row {
     display: grid;
-    grid-template-columns: 3fr repeat(6, 1fr); /* Adjust column sizes */
+    grid-template-columns: 3fr repeat(6, 1fr); 
     margin: 0;
     gap: 0;
     padding: 5px 2px;
@@ -844,7 +841,7 @@ body::-webkit-scrollbar {
     z-index: 0;
 }
 
-/* ✅ Ensure text/content is above the overlay */
+/*Ensure text/content is above the overlay */
 .slider-content > * {
     position: relative;
     z-index: 1;
@@ -860,11 +857,16 @@ body::-webkit-scrollbar {
     background-image: url('../assets/images/podcasterImg.png');
 }
 
-/* Banner 3 background image 
+/* Banner 3 background image */
 .banner3 {
-    background-image: url('../assets/images/sportbanner.png');
+    background-image: url('../assets/images/fanCheerwhite.png');
 }
-*/
+
+/* Banner 5 background image */
+.banner5 {
+    background-image: url('../assets/images/fanscheerBlack.png');
+}
+
 /* Overlay text box */
 .banne2item-contnt {
     background: rgba(0, 0, 0, 0.3);
@@ -885,17 +887,18 @@ body::-webkit-scrollbar {
 .sliderNews-image {
   position: relative;
   width: 100%;
-  height: 100%; /* Match slider-content */
+  height: 100%; 
   overflow: hidden;
   border-radius: 10px;
+  object-fit: contain;
  }
 
 
 .sliderNews-image img {
  width: 100%;
-  height: auto;            /* keep natural aspect ratio */
-  object-fit: contain;     /* no cropping */
-  background: #000;        /* black bars fill empty space */
+  height: auto;            
+  object-fit: contain;     
+  background: #000;        
   border-radius: 20px;
   display: block;
 }
@@ -1026,8 +1029,8 @@ body::-webkit-scrollbar {
 }
 
 .transferNews {
-   display: flex; /* Align items in a row */
-   gap: 2px; /* Adjust spacing between news items */
+   display: flex; 
+   gap: 2px; 
    border-radius: 10px;
    background: #1A2F4B;
    padding: 3px;
@@ -1038,12 +1041,12 @@ body::-webkit-scrollbar {
 .news-short-message {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* ✅ Keep text at the top */
+    justify-content: flex-start; 
     align-items: stretch;
     text-align: left;
     padding: 5px;
     gap: 2px;
-    flex: 1; /* Ensures equal width for all items */
+    flex: 1; 
     text-decoration: none;
     color: inherit;
     transition: transform 0.2s ease, background 0.2s ease;
@@ -1052,9 +1055,9 @@ body::-webkit-scrollbar {
 
 .transferNews-header {
   margin: 5px 0;
-  min-height: 40px; /* ✅ Reserve space so headers align */
+  min-height: 40px; 
   display: flex;
-  align-items: flex-start; /* text stays top-aligned */
+  align-items: flex-start; 
 }
 
 /* Headline */
@@ -1068,7 +1071,7 @@ body::-webkit-scrollbar {
     word-spacing: 1px;
     display: -webkit-box;
    -webkit-box-orient: vertical;
-   -webkit-line-clamp: 2; /* ✅ Force consistent header height */
+   -webkit-line-clamp: 2; 
    overflow: hidden;
    text-overflow: ellipsis;
   }
@@ -1107,7 +1110,7 @@ body::-webkit-scrollbar {
 .transferNews-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* ✅ Ensures it fills the container cleanly */
+  object-fit: cover; 
   border-radius: 5px;
 }
 
@@ -1379,7 +1382,7 @@ body::-webkit-scrollbar {
     .time-date-col {
       display: flex;
       flex-direction: column;
-      align-items: center; /* center under clock icon */
+      align-items: center; 
       gap: 2px;
     }
 
@@ -2257,6 +2260,18 @@ body.news-page .news-update {
 .blog-content p {
   line-height: 1.6;
 }
+
+.news-content h2 {
+  font-weight: bold;
+}
+
+.article-body h2 {
+  font-weight: 700;     
+  font-size: 1.25rem;
+  margin: 1em 0 0.5em;
+  color: #222;
+}
+
 
 .back-button {
   color: #fff;

@@ -890,7 +890,6 @@ body::-webkit-scrollbar {
   height: 100%; 
   overflow: hidden;
   border-radius: 10px;
-  object-fit: contain;
  }
 
 

@@ -34,7 +34,7 @@ app.use(
         "https://sportyfanz.com",
         "https://www.sportyfanz.com",
         "https://sportyfanz.onrender.com",
-        "http://localhost:3000",
+        //"http://localhost:3000",
       ];
       const allowedPatterns = [/^https:\/\/your-username-.*\.app\.github\.dev$/];
 

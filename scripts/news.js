@@ -45,7 +45,7 @@ function showInitialNews(sectionId) {
 
 // ========== TOGGLE SEE MORE / SEE LESS ==========
 function toggleNews(section) {
-  const sectionId = `${section}-news`;   // e.g. "trending-news"
+  const sectionId = `${section}-news`;   //"trending-news"
   const newsSection = document.getElementById(sectionId);
   const header = newsSection?.previousElementSibling; // .news-text-cont
   const seeMoreText = header?.querySelector('.see-more p');
@@ -67,12 +67,12 @@ function toggleNews(section) {
 
   if (seeMoreImg) {
     seeMoreImg.src = expanded 
-      ? "/assets/icons/ankle-vector.png"     // collapsed
+      ? "/assets/icons/ankle-vector.png"     //collapsed
       : "/assets/icons/ankle-vector-up.png"; // expanded
   }
 }
   
-  // ========== RELATIVE TIME ========== //
+// ========== RELATIVE TIME ========== //
 function updateRelativeTime() {
   const timeElements = document.querySelectorAll('.news-time');
   const now = new Date();
@@ -80,26 +80,29 @@ function updateRelativeTime() {
   timeElements.forEach(el => {
     const postedMs = Date.parse(el.dataset.posted);
     if (isNaN(postedMs)) {
-      el.textContent = 'Invalid time';
+      // Default to "just now" if invalid or missing
+      el.textContent = 'just now';
       return;
     }
 
-    const diff = Math.floor((now.getTime() - postedMs) / 1000);
+    const diff = Math.max(0, Math.floor((now.getTime() - postedMs) / 1000));
     let text;
 
-    if (diff <= 0) text = '1 second'; 
-    else if (diff < 60) {
+    if (diff < 5) {
+      // Anything under 5 seconds = "just now"
+      text = 'just now';
+    } else if (diff < 60) {
       const seconds = diff;
-      text = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      text = `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
     } else if (diff < 3600) {
       const minutes = Math.floor(diff / 60);
-      text = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+      text = `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
     } else if (diff < 86400) {
       const hours = Math.floor(diff / 3600);
-      text = `${hours} hour${hours !== 1 ? 's' : ''}`;
+      text = `${hours} hour${hours !== 1 ? 's' : ''} ago`;
     } else {
       const days = Math.floor(diff / 86400);
-      text = `${days} day${days !== 1 ? 's' : ''}`;
+      text = `${days} day${days !== 1 ? 's' : ''} ago`;
     }
 
     el.textContent = text;
@@ -107,8 +110,9 @@ function updateRelativeTime() {
 }
 
 
+
 // ========== LOAD NEWS DETAILS ==========
-async function loadNews(sectionId, endpoint, retries = 2) {
+async function loadNews(sectionId, retries = 2) {
   // Only allow trending-news or updates-news
   if (!['trending-news', 'updates-news'].includes(sectionId)) {
     console.warn(`Ignoring unsupported section: ${sectionId}`);
@@ -131,21 +135,21 @@ async function loadNews(sectionId, endpoint, retries = 2) {
       throw new Error("Empty response from server");
     }
 
-    // ✅ Pick correct dataset
+    //Pick correct dataset
     const newsData = sectionId === 'trending-news' ? data.trending : data.updates;
     const newsKey = sectionId === 'trending-news' ? 'trendingNews' : 'updatesNews';
     window[newsKey] = newsData;
 
-    // ✅ Render section
+    //Render section
     populateNewsSection(sectionId, newsData);
     updateRelativeTime();
 
-    // ✅ Hide error banner if shown earlier
+    //Hide error banner if shown earlier
     const errorBox = document.getElementById("news-error");
     if (errorBox) errorBox.classList.add("hidden");
 
   } catch (error) {
-    console.error('⚠️ loadNews error:', error);
+    console.error('loadNews error:', error);
     
   } finally {
     if (loader) loader.style.display = 'none';
@@ -227,15 +231,15 @@ function showFullNews(clickedItem) {
       child.style.display = 'none';
     });
 
-    // ✅ hide first & third layer only for mobile/tablet
+    //hide first & third layer only for mobile/tablet
     if (isMobileOrTablet) {
       document.body.classList.add("full-view-active");
     }
 
-    // ✅ On news page only → show hidden elements
+    //show hidden elements On news page only 
     if (document.body.classList.contains("news-page")) {
       document.querySelectorAll('.text-cont1, .news-update').forEach(el => {
-        el.style.display = ''; // restore
+        el.style.display = ''; 
       });
     }
     // Get news data on clicked 
@@ -279,13 +283,14 @@ function showFullNews(clickedItem) {
       // Disable ads for now
        const adCode = '';
 
-      return paragraphs.map((p, i) => 
-        `<p>${p.trim()}</p>${((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) ? adCode : ''}`
-      ).join('');
+      return paragraphs.map((p, i) => {
+       // p is already HTML from backend
+       return `${p}${((i + 1) % adEvery === 0 && i !== paragraphs.length - 1) ? '' : ''}`;
+     }).join('');
     }
 
-    const formattedDesc = Array.isArray(newsItem.paragraphs)
-      ? injectAdParagraphs(newsItem.paragraphs, Math.floor(Math.random() * 2) + 3)
+    const formattedDesc = Array.isArray(newsItem.paragraphsHtml)
+      ? injectAdParagraphs(newsItem.paragraphsHtml, Math.floor(Math.random() * 2) + 3)
       : injectAdParagraphs([newsItem.fullSummary || 'No content available.']);
 
     const articleUrl = `${window.location.origin}/news/${newsItem.seoTitle}`;

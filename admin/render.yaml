@@ -6,8 +6,8 @@ services:
     buildCommand: npm install
     startCommand: node server/index.js
     envVars:
-      - key: FOOTBALL_API_KEY
-        fromSecret: football_api_key 
+      - key: APIFOOTBALL_API_KEY
+        fromSecret: apifootball_api_key 
       - key: REDIS_URL
         fromSecret: redis_url
 
@@ -15,5 +15,6 @@ databases:
   - name: redis-database
     type: redis
     plan: starter
+
 
 

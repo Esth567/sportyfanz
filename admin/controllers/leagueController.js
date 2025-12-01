@@ -3,7 +3,7 @@ const axios = require('axios');
 const cache = require('../utils/cache/redisCache');
 require('dotenv').config();
 
-const API_KEY = process.env.FOOTBALL_API_KEY;
+const API_KEY = process.env.APIFOOTBALL_API_KEY;
 const API_URL = 'https://apiv3.apifootball.com/';
 
 const LEAGUE_TTL = 60 * 60;      // 1 hour

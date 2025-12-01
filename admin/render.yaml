@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: sports-news-api
+    name: sportyfanz-project
     env: node
     plan: starter  # or whatever plan fits you
     buildCommand: npm install
@@ -15,4 +15,5 @@ databases:
   - name: redis-database
     type: redis
     plan: starter
+
 

@@ -5,7 +5,7 @@ const cache = require('../utils/cache/redisCache');
 const playerImageMap = require('../utils/playerImageMap');
 
 
-const APIkey = process.env.FOOTBALL_API_KEY;
+const APIkey = process.env.APIFOOTBALL_API_KEY;
 
 // Display matches for live-match-demo
 const getMatchesCache = new NodeCache({ stdTTL: 60 });
@@ -18,7 +18,7 @@ exports.getMatches = async (req, res) => {
     return res.status(400).json({ error: 'Missing query parameters' });
   }
 
-  const cacheKey = `matches_${from}_${to}_${limit}`; // ✅ specific key
+  const cacheKey = `matches_${from}_${to}_${limit}`; //specific key
   const cached = getMatchesCache.get(cacheKey);
   if (cached) return res.json(cached);
 
@@ -67,7 +67,7 @@ exports.getMatches = async (req, res) => {
     });
 
     const result = matchesList.slice(0, limit);
-    getMatchesCache.set(cacheKey, result); // ✅ cache based on key
+    getMatchesCache.set(cacheKey, result); //cache based on key
     res.json(result);
 
   } catch (err) {
@@ -103,7 +103,7 @@ exports.getTopScorers = async (req, res) => {
     const cacheKey = `topScorers_${currentSeason}_${globalLimit}`;
     const cachedData = topScorersCache.get(cacheKey);  
     if (cachedData) {
-      console.log("✅ Returning cached top scorers");
+      console.log("Returning cached top scorers");
       return res.json(cachedData);
     }
 
@@ -210,7 +210,7 @@ exports.getLeagues = async (req, res) => {
       return res.status(500).json({ error: 'Invalid response structure for leagues' });
     }
 
-    // ✅ Set to cache
+    //Set to cache
     leaguesCache.set(cacheKey, data);
 
     res.json(data);

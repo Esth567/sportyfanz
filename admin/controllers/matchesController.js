@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 const cache = require("../utils/cache/redisCache");
 require("dotenv").config();
 
-const API_KEY = process.env.FOOTBALL_API_KEY;
+const API_KEY = process.env.APIFOOTBALL_API_KEY;
 
 const baseUrl = `https://apiv3.apifootball.com`;
 

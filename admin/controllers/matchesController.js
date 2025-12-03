@@ -32,7 +32,7 @@ exports.getMatches = async (req, res) => {
   try {
     const url = `${baseUrl}/?action=get_events&from=${from}&to=${to}&APIkey=${API_KEY}`;
     const response = await fetch(url, {
-      headers: { 'Accept-Encoding': 'identity' } // Prevent gzip issues
+      headers: { 'Accept-Encoding': 'identity' }
     });
 
     const text = await response.text();

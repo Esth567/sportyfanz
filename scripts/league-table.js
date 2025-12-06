@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     
             
-// ✅ Load default league(s) after fetching leagues
+//Load default league(s) after fetching leagues
 if (window.innerWidth <= 1024) {
     // Mobile/Tablet → show multiple leagues stacked (Premier League first)
     ["Premier League", "La Liga", "Serie A", "NPFL", "Bundesliga"].forEach(name => {

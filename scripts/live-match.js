@@ -141,7 +141,7 @@ async function fetchAndRenderMatches() {
             currentCategory = "live"; // default fallback
         }
 
-        // ⚡ Safeguard: if no matches today for the chosen category, auto-shift to upcoming
+        
         const today = getTodayDate();
         const { selectedMatches } = getMatchesForCategory(matchesData, currentCategory, today);
 
@@ -387,7 +387,7 @@ function getMatchesForCategory(matchesData, category, date) {
             .sort((a, b) => b.localeCompare(a)); // descending
 
         if (pastDates.length > 0) {
-            // ⚡ Only override the local dateToShow for highlight
+            //Only override the local dateToShow for highlight
             const highlightDate = pastDates[0];
             selectedMatches = matchesData.highlight
                 .filter(m => m.match_date === highlightDate)

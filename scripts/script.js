@@ -887,7 +887,7 @@ function initSlider() {
   showSlide(currentIndex);
   startAutoplay();
 
-  // ✅ Bind arrows dynamically with fresh slides count
+  //Bind arrows dynamically with fresh slides count
   const leftArrow = document.querySelector(".slider-arrow.left");
   const rightArrow = document.querySelector(".slider-arrow.right");
 
@@ -1442,7 +1442,7 @@ function filterMatchesCategory(category) {
 async function fetchMatchVideo(matchId, homeTeam, awayTeam) {
   try {
     let response = await fetch(
-      `/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
+      `${API_BASE}/api/videos/${matchId}?homeTeam=${encodeURIComponent(homeTeam)}&awayTeam=${encodeURIComponent(awayTeam)}`
     );
     let data = await response.json();
 

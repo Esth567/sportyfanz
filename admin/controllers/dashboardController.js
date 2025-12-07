@@ -7,6 +7,33 @@ const playerImageMap = require('../utils/playerImageMap');
 
 const APIkey = process.env.APIFOOTBALL_API_KEY;
 
+async function fetchRetry(url, retries = 3, timeout = 10000) {
+  const controller = new AbortController();
+  const to = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+
+    if (!res.ok) {
+      if (retries > 1) {
+        return fetchRetry(url, retries - 1, timeout);
+      }
+      throw new Error("API request failed: " + res.status);
+    }
+
+    clearTimeout(to);
+    return res.json();
+
+  } catch (err) {
+    clearTimeout(to);
+    if (retries > 1) {
+      return fetchRetry(url, retries - 1, timeout);
+    }
+    throw err;
+  }
+}
+
+
 // Display matches for live-match-demo
 const getMatchesCache = new NodeCache({ stdTTL: 60 });
 

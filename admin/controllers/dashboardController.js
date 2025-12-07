@@ -158,14 +158,14 @@ exports.getTopScorers = async (req, res) => {
 
       const tiedPlayers = data.filter(s => parseInt(s.goals) === topGoals);
 
-      for (const s of tiedPlayers) {
-        results.push({
-          league: s.league_name,
-          player: s.player_name,
-          goals: s.goals,
-          team: s.team_name,
-          image: s.player_image,
-        });
+      for (const scorer of topScorers) {
+          result.push({
+            league: displayLeagueName,
+            player: scorer.player_name,
+            goals: highestGoals,
+            team: truncateWords(scorer.team_name),
+            image: scorer.player_image,
+          });
       }
     }
 

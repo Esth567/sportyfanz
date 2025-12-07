@@ -7,33 +7,6 @@ const playerImageMap = require('../utils/playerImageMap');
 
 const APIkey = process.env.APIFOOTBALL_API_KEY;
 
-async function fetchRetry(url, retries = 3, timeout = 10000) {
-  const controller = new AbortController();
-  const to = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-
-    if (!res.ok) {
-      if (retries > 1) {
-        return fetchRetry(url, retries - 1, timeout);
-      }
-      throw new Error("API request failed: " + res.status);
-    }
-
-    clearTimeout(to);
-    return res.json();
-
-  } catch (err) {
-    clearTimeout(to);
-    if (retries > 1) {
-      return fetchRetry(url, retries - 1, timeout);
-    }
-    throw err;
-  }
-}
-
-
 // Display matches for live-match-demo
 const getMatchesCache = new NodeCache({ stdTTL: 60 });
 
@@ -106,78 +79,124 @@ exports.getMatches = async (req, res) => {
 
 
 // function to fetch top scorer
+const NodeCache = require("node-cache");
 const topScorersCache = new NodeCache({ stdTTL: 60 });
 
+// --- CONFIG ---
+const leaguesToFetch = [
+  152, // EPL
+  302, // La Liga
+  175, // Serie A
+  168, // Bundesliga
+  207, // Ligue 1
+  28,  // World Cup
+  24,  // UEFA Qualifiers
+  195, // NPFL
+];
+
+// Retry + Timeout wrapper -------------------------
+async function fetchRetry(url, retries = 3, timeout = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+
+    if (!res.ok) {
+      if (retries > 0) {
+        return fetchRetry(url, retries - 1, timeout);
+      }
+      throw new Error("Bad response " + res.status);
+    }
+
+    clearTimeout(timer);
+    return res.json();
+
+  } catch (err) {
+    clearTimeout(timer);
+    if (retries > 0) {
+      return fetchRetry(url, retries - 1, timeout);
+    }
+    throw err;
+  }
+}
+
+// Truncate utility
 function truncateWords(str, limit = 2) {
-  if (!str || typeof str !== "string") return str;
+  if (!str) return str;
   return str.split(" ").slice(0, limit).join(" ");
 }
 
-// Utility to get current season as string, e.g., "2025-2026"
+// Season helper
 function getCurrentSeason() {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth() + 1; // JS months 0-11
-  // Season usually starts around August, ends May
+  const month = now.getMonth() + 1;
   return month >= 7 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
 }
 
+// MAIN ENDPOINT ----------------------------------
 exports.getTopScorers = async (req, res) => {
   try {
-    const globalLimit = parseInt(req.query.limit) || 50;
-    const currentSeason = getCurrentSeason();
+    const limit = parseInt(req.query.limit) || 200;
+    const season = getCurrentSeason();
+    const cacheKey = `topscorers_${season}_${limit}`;
 
-    const leaguesToFetch = [
-      152, // EPL
-      302, // La Liga
-      175, // Serie A
-      168, // Bundesliga
-      207, // Ligue 1
-      28,  // World Cup
-      24,  // UEFA Qualifiers
-      195, // NPFL (Nigeria Professional Football League)
-    ];
-
-    const cacheKey = `topscorers_${currentSeason}`;
+    // Serve cached response
     const cached = topScorersCache.get(cacheKey);
-
-    if (cached) return res.json(cached);
+    if (cached) {
+      console.log("Returning cached top scorers");
+      return res.json(cached);
+    }
 
     let results = [];
 
-    for (const id of leaguesToFetch) {
+    for (const leagueId of leaguesToFetch) {
+      try {
+        const url = `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&season=${season}&APIkey=${APIkey}`;
 
-      const url = `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${id}&season=${currentSeason}&APIkey=${APIkey}`;
+        const data = await fetchRetry(url);
 
-      const data = await fetch(url).then(r => r.json());
+        if (!Array.isArray(data) || data.length === 0) continue;
 
-      if (!Array.isArray(data) || !data.length) continue;
+        // Sort highest goal scorer
+        data.sort((a, b) => b.goals - a.goals);
 
-      data.sort((a, b) => b.goals - a.goals);
+        const highestGoals = parseInt(data[0].goals) || 0;
+        if (highestGoals === 0) continue;
 
-      const topGoals = parseInt(data[0].goals) || 0;
+        // Take all players tied with top scorer
+        const topPlayers = data.filter(p => parseInt(p.goals) === highestGoals);
 
-      const tiedPlayers = data.filter(s => parseInt(s.goals) === topGoals);
-
-      for (const scorer of topScorers) {
-          result.push({
-            league: displayLeagueName,
-            player: scorer.player_name,
+        for (const p of topPlayers) {
+          results.push({
+            league: truncateWords(p.league_name || "Unknown League"),
+            player: p.player_name,
             goals: highestGoals,
-            team: truncateWords(scorer.team_name),
-            image: scorer.player_image,
+            team: truncateWords(p.team_name),
+            image: p.player_image,
           });
+        }
+
+      } catch (leagueErr) {
+        console.warn(`Skipped league ${leagueId}: ${leagueErr.message}`);
+        continue;
       }
     }
 
-    results = results.slice(0, globalLimit);
+    // Apply limit
+    if (results.length > limit) {
+      results = results.slice(0, limit);
+    }
 
+    // Cache final output
     topScorersCache.set(cacheKey, results);
 
     res.json(results);
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("❌ Topscorers backend error:", err.stack);
+    res.status(500).json({ error: "Failed to fetch top scorers", details: err.message });
   }
 };
 

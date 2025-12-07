@@ -79,7 +79,7 @@ exports.getMatches = async (req, res) => {
 
 
 // function to fetch top scorer
-const NodeCache = require("node-cache");
+
 const topScorersCache = new NodeCache({ stdTTL: 60 });
 
 // --- CONFIG ---

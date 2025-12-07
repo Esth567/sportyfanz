@@ -135,6 +135,7 @@ exports.getTopScorers = async (req, res) => {
       207, // Ligue 1
       28,  // World Cup
       24,  // UEFA Qualifiers
+      195, // NPFL (Nigeria Professional Football League)
     ];
 
     const cacheKey = `topscorers_${currentSeason}`;

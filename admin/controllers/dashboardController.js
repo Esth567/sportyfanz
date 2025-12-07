@@ -124,88 +124,62 @@ function getCurrentSeason() {
 
 exports.getTopScorers = async (req, res) => {
   try {
-    const globalLimit = parseInt(req.query.limit) || 200;
+    const globalLimit = parseInt(req.query.limit) || 50;
     const currentSeason = getCurrentSeason();
 
-    const cacheKey = `topScorers_${currentSeason}_${globalLimit}`;
-    const cachedData = topScorersCache.get(cacheKey);
-    if (cachedData) {
-      console.log("Returning cached top scorers");
-      return res.json(cachedData);
-    }
+    const leaguesToFetch = [
+      152, // EPL
+      302, // La Liga
+      175, // Serie A
+      168, // Bundesliga
+      207, // Ligue 1
+      28,  // World Cup
+      24,  // UEFA Qualifiers
+    ];
 
-    // Fetch leagues (retry + timeout)
-    const leaguesData = await fetchRetry(
-      `https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`
-    );
+    const cacheKey = `topscorers_${currentSeason}`;
+    const cached = topScorersCache.get(cacheKey);
 
-    if (!Array.isArray(leaguesData)) {
-      return res.status(500).json({ error: "Invalid leagues data" });
-    }
+    if (cached) return res.json(cached);
 
     let results = [];
 
-    // Process leagues in batches (5 at a time)
-    const processed = await processInBatches(
-      leaguesData,
-      async (league) => {
-        try {
-          const leagueName = league.league_name.toLowerCase();
-          const countryName = (league.country_name || '').toLowerCase();
+    for (const id of leaguesToFetch) {
 
-          const isEPL = leagueName.includes("premier league") &&
-                        countryName === "england";
+      const url = `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${id}&season=${currentSeason}&APIkey=${APIkey}`;
 
-          const displayLeagueName = isEPL
-            ? "EPL"
-            : truncateWords(league.league_name);
+      const data = await fetch(url).then(r => r.json());
 
-          // Fetch scorers with retry
-          const scorersData = await fetchRetry(
-            `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${league.league_id}&season=${currentSeason}&APIkey=${APIkey}`
-          );
+      if (!Array.isArray(data) || !data.length) continue;
 
-          if (!Array.isArray(scorersData) || scorersData.length === 0) return null;
+      data.sort((a, b) => b.goals - a.goals);
 
-          // Sort & get highest goal
-          scorersData.sort((a, b) => b.goals - a.goals);
-          const highestGoals = parseInt(scorersData[0].goals) || 0;
-          if (highestGoals === 0) return null;
+      const topGoals = parseInt(data[0].goals) || 0;
 
-          const top = scorersData.filter(
-            s => parseInt(s.goals) === highestGoals
-          );
+      const tiedPlayers = data.filter(s => parseInt(s.goals) === topGoals);
 
-          return top.map(scorer => ({
-            league: displayLeagueName,
-            player: scorer.player_name,
-            goals: highestGoals,
-            team: truncateWords(scorer.team_name),
-            image: scorer.player_image,
-          }));
+      for (const s of tiedPlayers) {
+        results.push({
+          league: s.league_name,
+          player: s.player_name,
+          goals: s.goals,
+          team: s.team_name,
+          image: s.player_image,
+        });
+      }
+    }
 
-        } catch (err) {
-          console.warn(`Skipped league ${league.league_name}:`, err.message);
-          return null;
-        }
-      },
-      5 // <= LIMIT: only 5 API calls at once
-    );
+    results = results.slice(0, globalLimit);
 
-    // Flatten & clean
-    const finalData = processed.flat().filter(Boolean);
+    topScorersCache.set(cacheKey, results);
 
-    // Apply limit
-    const sliced = finalData.slice(0, globalLimit);
-
-    topScorersCache.set(cacheKey, sliced);
-    res.json(sliced);
+    res.json(results);
 
   } catch (err) {
-    console.error("Backend error:", err.message);
-    res.status(500).json({ error: "Failed to fetch top scorers" });
+    res.status(500).json({ error: err.message });
   }
 };
+
 
 
 // Get the active league ID

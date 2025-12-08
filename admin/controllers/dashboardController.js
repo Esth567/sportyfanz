@@ -15,66 +15,52 @@ exports.getMatches = async (req, res) => {
   const limit = parseInt(req.query.limit) || 100;
 
   if (!from || !to) {
-    return res.status(400).json({ error: 'Missing query parameters' });
+    return res.status(400).json({ error: "Missing query parameters" });
   }
 
-  const cacheKey = `matches_${from}_${to}_${limit}`; //specific key
+  const cacheKey = `matches_${from}_${to}_${limit}`;
   const cached = getMatchesCache.get(cacheKey);
   if (cached) return res.json(cached);
 
   try {
-    const leaguesRes = await fetch(`https://apiv3.apifootball.com/?action=get_leagues&APIkey=${APIkey}`);
-    if (!leaguesRes.ok) {
-      return res.status(502).json({ error: 'Failed to fetch leagues from external API' });
+    //DIRECT MATCHES FETCH — No league loop
+    const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&timezone=Europe/Berlin&APIkey=${APIkey}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      return res.status(502).json({ error: "Failed to fetch events" });
     }
 
-    const leagues = await leaguesRes.json();
-    if (!Array.isArray(leagues)) {
-      return res.status(500).json({ error: 'Invalid league response structure' });
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      return res.status(500).json({ error: "Unable to parse match data" });
     }
 
-    let matchesList = [];
-
-    for (const league of leagues) {
-      try {
-        const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&league_id=${league.league_id}&timezone=Europe/Berlin&APIkey=${APIkey}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          console.warn(`Bad response for league ${league.league_name}: ${response.status}`);
-          continue;
-        }
-
-        let data;
-        try {
-          data = await response.json();
-        } catch (jsonErr) {
-          console.warn(`JSON parse error for league ${league.league_name}`);
-          continue;
-        }
-
-        if (Array.isArray(data)) {
-          matchesList.push(...data);
-        }
-      } catch (err) {
-        console.warn(`Error fetching matches for league ${league.league_name}:`, err.message);
-      }
+    if (!Array.isArray(data)) {
+      return res.status(500).json({ error: "Invalid match data format" });
     }
 
-    matchesList.sort((a, b) => {
-      const aTime = new Date(`${a.match_date}T${a.match_time}`);
-      const bTime = new Date(`${b.match_date}T${b.match_time}`);
-      return aTime - bTime;
+    // Sort by date/time
+    data.sort((a, b) => {
+      const A = new Date(`${a.match_date}T${a.match_time}`);
+      const B = new Date(`${b.match_date}T${b.match_time}`);
+      return A - B;
     });
 
-    const result = matchesList.slice(0, limit);
-    getMatchesCache.set(cacheKey, result); //cache based on key
+    // Apply limit
+    const result = data.slice(0, limit);
+
+    // Cache result
+    getMatchesCache.set(cacheKey, result);
+
     res.json(result);
 
   } catch (err) {
-    console.error('Error fetching matches:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching matches:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
-    
 };
 
 

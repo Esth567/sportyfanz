@@ -7,6 +7,34 @@ const playerImageMap = require('../utils/playerImageMap');
 
 const APIkey = process.env.APIFOOTBALL_API_KEY;
 
+// Reusable fetch with retry + timeout-------------------------
+async function fetchRetry(url, retries = 3, timeout = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+
+    if (!res.ok) {
+      if (retries > 0) {
+        return fetchRetry(url, retries - 1, timeout);
+      }
+      throw new Error("Bad response: " + res.status);
+    }
+
+    clearTimeout(timer);
+    return res.json();
+
+  } catch (err) {
+    clearTimeout(timer);
+    if (retries > 0) {
+      return fetchRetry(url, retries - 1, timeout);
+    }
+    throw err;
+  }
+}
+
+
 // Display matches for live-match-demo
 const getMatchesCache = new NodeCache({ stdTTL: 60 });
 
@@ -91,33 +119,6 @@ const leagueNames = {
   24:  "UEFA Qualifiers",
   195: "NPFL",
 };
-
-// Retry + Timeout wrapper -------------------------
-async function fetchRetry(url, retries = 3, timeout = 8000) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-
-    if (!res.ok) {
-      if (retries > 0) {
-        return fetchRetry(url, retries - 1, timeout);
-      }
-      throw new Error("Bad response: " + res.status);
-    }
-
-    clearTimeout(timer);
-    return res.json();
-
-  } catch (err) {
-    clearTimeout(timer);
-    if (retries > 0) {
-      return fetchRetry(url, retries - 1, timeout);
-    }
-    throw err;
-  }
-}
 
 // truncate helper
 function truncateWords(str, limit = 2) {
@@ -283,71 +284,99 @@ exports.getTopStandings = async (req, res) => {
 
 // Function to fetch all matches with caching
 
-const allMatchesCache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes
+const allMatchesCache = new NodeCache({ stdTTL: 60 }); // cache for 5 minutes
 
 exports.getAllMatches = async (req, res) => {
-  const cacheKey = "allMatches_last14days";
-  const cached = allMatchesCache.get(cacheKey);
-
-  if (cached) return res.json(cached);
-
-  const getDate = (offset) => {
-    const d = new Date();
-    d.setDate(d.getDate() + offset);
-    return d.toISOString().split("T")[0];
-  };
-
   try {
+    const cacheKey = "allMatches_last14days";
+    const cached = allMatchesCache.get(cacheKey);
+
+    if (cached) {
+      return res.json(cached);
+    }
+
+    // Date helpers
+    const getDate = (offset) => {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().split("T")[0];
+    };
+
     const from = getDate(-7);
     const to = getDate(7);
 
     const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`;
 
-    // Timeout handling
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-
-    const response = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeout);
-
-    const raw = await response.text();
-
-    if (!response.ok) {
-      return res.status(502).json({ error: "API fetch failed", raw });
-    }
-
-    let data;
-    try {
-      data = JSON.parse(raw);
-    } catch (e) {
-      console.error("Invalid JSON:", raw);
-      return res.status(500).json({ error: "Invalid API JSON", raw });
-    }
+    const data = await fetchRetry(url);
 
     if (!Array.isArray(data)) {
-      return res.status(500).json({ error: "Unexpected API format", raw });
+      return res.status(500).json({
+        error: "Invalid response from APIFootball",
+        raw: data,
+      });
     }
 
-    const matchesData = {
-      live: data.filter(m =>
-        m.match_status?.trim().toLowerCase() === "live" ||
-        (parseInt(m.match_status) > 0 && parseInt(m.match_status) < 90)
-      ),
-      highlight: data.filter(m => m.match_status === "Finished"),
-      upcoming: data.filter(m => !m.match_status),
+    // LIVE status detection logic
+    const isLive = (status) => {
+      if (!status) return false;
+      const s = status.trim().toLowerCase();
+
+      return (
+        s === "live" ||
+        s === "in progress" ||
+        (parseInt(s) > 0 && parseInt(s) < 90)
+      );
     };
 
-    allMatchesCache.set(cacheKey, matchesData);
+    // Group matches
+    const listed = {
+      live: [],
+      highlight: [],
+      upcoming: []
+    };
 
-    return res.json(matchesData);
+    for (const match of data) {
+      const status = match.match_status;
+
+      if (isLive(status)) {
+        listed.live.push(match);
+      } 
+      else if (status === "Finished") {
+        listed.highlight.push(match);
+      } 
+      else {
+        listed.upcoming.push(match);
+      }
+    }
+
+    // Sort each group by date/time (ascending)
+    const sortByTime = (arr) =>
+      arr.sort((a, b) => {
+        const aTime = new Date(`${a.match_date}T${a.match_time || "00:00"}`);
+        const bTime = new Date(`${b.match_date}T${b.match_time || "00:00"}`);
+        return aTime - bTime;
+      });
+
+    sortByTime(listed.live);
+    sortByTime(listed.highlight);
+    sortByTime(listed.upcoming);
+
+    // Cache final output
+    allMatchesCache.set(cacheKey, listed);
+
+    return res.json(listed);
 
   } catch (err) {
-    console.error("Error fetching matches:", err);
-    return res.status(500).json({ error: "Fetch error", details: err.message });
+    console.error("❌ /all_matches Error:", err);
+    return res.status(500).json({
+      error: "Failed to fetch all matches",
+      details: err.message,
+    });
   }
 };
 
-//cntroller to get matches by date and cache
+
+//cntroller to get matches by date and cache 
 
 const matchesByDateCache = new NodeCache({ stdTTL: 60 }); // cache for 1 minutes
 

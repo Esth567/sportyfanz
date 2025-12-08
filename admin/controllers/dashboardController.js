@@ -94,6 +94,18 @@ const leaguesToFetch = [
   195, // NPFL
 ];
 
+// Display names for leagues
+const leagueNames = {
+  152: "EPL",
+  302: "La Liga",
+  175: "Serie A",
+  168: "Bundesliga",
+  207: "Ligue 1",
+  28:  "World Cup",
+  24:  "UEFA Qualifiers",
+  195: "NPFL",
+};
+
 // Retry + Timeout wrapper -------------------------
 async function fetchRetry(url, retries = 3, timeout = 8000) {
   const controller = new AbortController();
@@ -106,7 +118,7 @@ async function fetchRetry(url, retries = 3, timeout = 8000) {
       if (retries > 0) {
         return fetchRetry(url, retries - 1, timeout);
       }
-      throw new Error("Bad response " + res.status);
+      throw new Error("Bad response: " + res.status);
     }
 
     clearTimeout(timer);
@@ -121,13 +133,13 @@ async function fetchRetry(url, retries = 3, timeout = 8000) {
   }
 }
 
-// Truncate utility
+// truncate helper
 function truncateWords(str, limit = 2) {
   if (!str) return str;
   return str.split(" ").slice(0, limit).join(" ");
 }
 
-// Season helper
+// season helper
 function getCurrentSeason() {
   const now = new Date();
   const year = now.getFullYear();
@@ -135,14 +147,14 @@ function getCurrentSeason() {
   return month >= 7 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
 }
 
-// MAIN ENDPOINT ----------------------------------
+// MAIN ENDPOINT
 exports.getTopScorers = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 200;
     const season = getCurrentSeason();
     const cacheKey = `topscorers_${season}_${limit}`;
 
-    // Serve cached response
+    // Serve cached version
     const cached = topScorersCache.get(cacheKey);
     if (cached) {
       console.log("Returning cached top scorers");
@@ -154,52 +166,53 @@ exports.getTopScorers = async (req, res) => {
     for (const leagueId of leaguesToFetch) {
       try {
         const url = `https://apiv3.apifootball.com/?action=get_topscorers&league_id=${leagueId}&season=${season}&APIkey=${APIkey}`;
-
         const data = await fetchRetry(url);
 
         if (!Array.isArray(data) || data.length === 0) continue;
 
-        // Sort highest goal scorer
+        // sort by highest goals
         data.sort((a, b) => b.goals - a.goals);
 
         const highestGoals = parseInt(data[0].goals) || 0;
         if (highestGoals === 0) continue;
 
-        // Take all players tied with top scorer
-        const topPlayers = data.filter(p => parseInt(p.goals) === highestGoals);
+        // include ties
+        const topPlayers = data.filter(
+          (p) => parseInt(p.goals) === highestGoals
+        );
 
         for (const p of topPlayers) {
           results.push({
-            league: truncateWords(p.league_name || "Unknown League"),
+            league: leagueNames[leagueId] || "Unknown League",
             player: p.player_name,
             goals: highestGoals,
             team: truncateWords(p.team_name),
             image: p.player_image,
           });
         }
-
       } catch (leagueErr) {
-        console.warn(`Skipped league ${leagueId}: ${leagueErr.message}`);
-        continue;
+        console.warn(`Skipped league ${leagueId}:`, leagueErr.message);
       }
     }
 
-    // Apply limit
+    // limit
     if (results.length > limit) {
       results = results.slice(0, limit);
     }
 
-    // Cache final output
+    // save to cache
     topScorersCache.set(cacheKey, results);
 
-    res.json(results);
+    return res.json(results);
 
   } catch (err) {
     console.error("❌ Topscorers backend error:", err.stack);
-    res.status(500).json({ error: "Failed to fetch top scorers", details: err.message });
+    return res.status(500).json({
+      error: "Failed to fetch top scorers",
+      details: err.message,
+    });
   }
 };
-
 
 
 // Get the active league ID

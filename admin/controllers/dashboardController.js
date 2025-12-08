@@ -283,58 +283,69 @@ exports.getTopStandings = async (req, res) => {
 
 // Function to fetch all matches with caching
 
-const allMatchesCache = new NodeCache({ stdTTL: 60 }); // cache for 1 minutes
+const allMatchesCache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes
 
 exports.getAllMatches = async (req, res) => {
   const cacheKey = "allMatches_last14days";
   const cached = allMatchesCache.get(cacheKey);
 
-  if (cached) {
-    return res.json(cached);
-  }
+  if (cached) return res.json(cached);
 
-  const getTodayDate = (offsetDays) => {
-    const date = new Date();
-    date.setDate(date.getDate() + offsetDays);
-    return date.toISOString().split("T")[0];
+  const getDate = (offset) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    return d.toISOString().split("T")[0];
   };
 
   try {
-    const from = getTodayDate(-7);
-    const to = getTodayDate(7);
+    const from = getDate(-7);
+    const to = getDate(7);
 
-    const response = await fetch(`https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`);
-    
+    const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`;
+
+    // Timeout handling
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    const raw = await response.text();
+
     if (!response.ok) {
-      const text = await response.text();
-      return res.status(502).json({ error: "Failed to fetch from API", details: text });
+      return res.status(502).json({ error: "API fetch failed", raw });
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      console.error("Invalid JSON:", raw);
+      return res.status(500).json({ error: "Invalid API JSON", raw });
+    }
 
     if (!Array.isArray(data)) {
-      return res.status(500).json({ error: "Unexpected API response format" });
+      return res.status(500).json({ error: "Unexpected API format", raw });
     }
 
     const matchesData = {
-      live: data.filter(match => {
-        const status = match.match_status?.trim().toLowerCase();
-        return status === "live" || (parseInt(status) > 0 && parseInt(status) < 90);
-      }),
-      highlight: data.filter(match => match.match_status === "Finished"),
-      upcoming: data.filter(match => match.match_status === "" || match.match_status == null),
+      live: data.filter(m =>
+        m.match_status?.trim().toLowerCase() === "live" ||
+        (parseInt(m.match_status) > 0 && parseInt(m.match_status) < 90)
+      ),
+      highlight: data.filter(m => m.match_status === "Finished"),
+      upcoming: data.filter(m => !m.match_status),
     };
 
-    // ✅ Cache the result
     allMatchesCache.set(cacheKey, matchesData);
 
-    res.json(matchesData);
-  } catch (error) {
-    console.error("Error fetching matches:", error);
-    res.status(500).json({ error: "Failed to fetch match data" });
+    return res.json(matchesData);
+
+  } catch (err) {
+    console.error("Error fetching matches:", err);
+    return res.status(500).json({ error: "Fetch error", details: err.message });
   }
 };
-
 
 //cntroller to get matches by date and cache
 

@@ -284,94 +284,65 @@ exports.getTopStandings = async (req, res) => {
 
 // Function to fetch all matches with caching
 
-const allMatchesCache = new NodeCache({ stdTTL: 60 }); // cache for 5 minutes
+const allMatchesCache = new NodeCache({ stdTTL: 900 }); // cache for 5 minutes
+
+// Format YYYY-MM-DD
+const formatDate = (date) => date.toISOString().split("T")[0];
+
+// Fetch matches for ONE day (fast)
+async function fetchDay(date) {
+  const cacheKey = `day_${date}`;
+  const cached = allMatchesCache.get(cacheKey);
+  if (cached) return cached;
+
+  const url = `https://apiv3.apifootball.com/?action=get_events&from=${date}&to=${date}&APIkey=${APIkey}&timezone=Europe/Berlin`;
+
+  try {
+    const res = await fetch(url, { timeout: 5000 });
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+    allMatchesCache.set(cacheKey, data);
+    return data;
+  } catch (e) {
+    return [];
+  }
+}
 
 exports.getAllMatches = async (req, res) => {
   try {
-    const cacheKey = "allMatches_last14days";
-    const cached = allMatchesCache.get(cacheKey);
+    const today = new Date();
+    const todayStr = formatDate(today);
 
-    if (cached) {
-      return res.json(cached);
-    }
+    // Fetch TODAY ONLY (fast!)
+    const todayMatches = await fetchDay(todayStr);
 
-    // Date helpers
-    const getDate = (offset) => {
-      const d = new Date();
-      d.setDate(d.getDate() + offset);
-      return d.toISOString().split("T")[0];
+    const matchesData = {
+      live: todayMatches.filter(m => {
+        const s = m.match_status?.trim().toLowerCase();
+        return s === "live" || (parseInt(s) > 0 && parseInt(s) < 90);
+      }),
+      highlight: todayMatches.filter(m => m.match_status === "Finished"),
+      upcoming: todayMatches.filter(m => !m.match_status),
     };
 
-    const from = getDate(-7);
-    const to = getDate(7);
+    // Return instantly
+    res.json(matchesData);
 
-    const url = `https://apiv3.apifootball.com/?action=get_events&from=${from}&to=${to}&APIkey=${APIkey}`;
-
-    const data = await fetchRetry(url);
-
-    if (!Array.isArray(data)) {
-      return res.status(500).json({
-        error: "Invalid response from APIFootball",
-        raw: data,
-      });
-    }
-
-    // LIVE status detection logic
-    const isLive = (status) => {
-      if (!status) return false;
-      const s = status.trim().toLowerCase();
-
-      return (
-        s === "live" ||
-        s === "in progress" ||
-        (parseInt(s) > 0 && parseInt(s) < 90)
-      );
-    };
-
-    // Group matches
-    const listed = {
-      live: [],
-      highlight: [],
-      upcoming: []
-    };
-
-    for (const match of data) {
-      const status = match.match_status;
-
-      if (isLive(status)) {
-        listed.live.push(match);
-      } 
-      else if (status === "Finished") {
-        listed.highlight.push(match);
-      } 
-      else {
-        listed.upcoming.push(match);
+    // 🔥 Background: prefetch other days (non-blocking)
+    const datesToPrefetch = [];
+    for (let i = -7; i <= 7; i++) {
+      if (i !== 0) {
+        const d = new Date();
+        d.setDate(today.getDate() + i);
+        datesToPrefetch.push(formatDate(d));
       }
     }
 
-    // Sort each group by date/time (ascending)
-    const sortByTime = (arr) =>
-      arr.sort((a, b) => {
-        const aTime = new Date(`${a.match_date}T${a.match_time || "00:00"}`);
-        const bTime = new Date(`${b.match_date}T${b.match_time || "00:00"}`);
-        return aTime - bTime;
-      });
-
-    sortByTime(listed.live);
-    sortByTime(listed.highlight);
-    sortByTime(listed.upcoming);
-
-    // Cache final output
-    allMatchesCache.set(cacheKey, listed);
-
-    return res.json(listed);
+    datesToPrefetch.forEach(date => fetchDay(date)); // runs silently
 
   } catch (err) {
-    console.error("❌ /all_matches Error:", err);
-    return res.status(500).json({
-      error: "Failed to fetch all matches",
-      details: err.message,
-    });
+    res.status(500).json({ error: "Failed to fetch match data" });
   }
 };
 

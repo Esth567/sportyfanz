@@ -363,16 +363,18 @@ exports.isDuplicateArticle = (newArticle, seenArticles, options = {}) => {
 
 // Priority sources for deduplication
 const SOURCE_PRIORITY = {
-  'thenff.com': 1,                  // Nigerian Football Federation
-  'goal.com': 2,                     // Goal Nigeria
-  'worldfootballinsider.com': 3,     // Global football
-  'footballtalk.org': 4,
-  'foottheball.com': 5,
-  'espn.com': 6,
-  'espn.com/espn/soccer': 7,
-  'nytimes.com': 8,
-  'skysports.com': 9,
-  'bbc.co.uk': 10,
-  'theguardian.com': 11,
-  'cbssports.com': 12
+  // 🇳🇬 Nigerian football (highest priority)
+  'thenff.com': 1, // Nigeria Football Federation
+
+  // 🌍 African football
+  'cafonline.com': 2,  // CAF (Africa-wide football)
+
+  // 🌍 Global football
+  'espn.com': 3,     // ESPN Soccer (global)
+  'bbc.co.uk': 4,      // BBC Football (global feed)
+  'theguardian.com': 5, // Guardian Football (global feed)
+  'skysports.com': 6,   // Sky Sports Football (international)
+
+  //General global sports
+  'nytimes.com': 7  // NYTimes Sports
 };

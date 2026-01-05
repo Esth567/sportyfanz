@@ -364,9 +364,15 @@ exports.isDuplicateArticle = (newArticle, seenArticles, options = {}) => {
 // Priority sources for deduplication
 const SOURCE_PRIORITY = {
   'espn.com': 1,
+  'espn.com/espn/soccer': 1,
   'skysports.com': 2,
   'bbc.co.uk': 3,
   'nytimes.com': 4,
   'cbssports.com': 5,
-  'theguardian.com': 6
+  'theguardian.com': 6,
+  'worldfootballinsider.com': 1,
+  'footballtalk.org': 2,
+  'foottheball.com': 3,
+  'thenff.com': 1,
+  'goal.com': 2
 };

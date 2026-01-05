@@ -363,16 +363,16 @@ exports.isDuplicateArticle = (newArticle, seenArticles, options = {}) => {
 
 // Priority sources for deduplication
 const SOURCE_PRIORITY = {
-  'espn.com': 1,
-  'espn.com/espn/soccer': 1,
-  'skysports.com': 2,
-  'bbc.co.uk': 3,
-  'nytimes.com': 4,
-  'cbssports.com': 5,
-  'theguardian.com': 6,
-  'worldfootballinsider.com': 1,
-  'footballtalk.org': 2,
-  'foottheball.com': 3,
-  'thenff.com': 1,
-  'goal.com': 2
+  'thenff.com': 1,                  // Nigerian Football Federation
+  'goal.com': 2,                     // Goal Nigeria
+  'worldfootballinsider.com': 3,     // Global football
+  'footballtalk.org': 4,
+  'foottheball.com': 5,
+  'espn.com': 6,
+  'espn.com/espn/soccer': 7,
+  'nytimes.com': 8,
+  'skysports.com': 9,
+  'bbc.co.uk': 10,
+  'theguardian.com': 11,
+  'cbssports.com': 12
 };

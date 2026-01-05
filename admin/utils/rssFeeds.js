@@ -1,17 +1,17 @@
 // Only real RSS feeds here
-const feedUrls = [
-  // Global Football News
-  'https://www.worldfootballinsider.com/rss',         // World Football Insider
-  'https://www.footballtalk.org/feed/',              // Global football news & transfers
-  'https://www.foottheball.com/feed',               // Global football news
+ const feedUrls = [
+  // Global news
+  'https://feeds.bbci.co.uk/sport/football/rss.xml',     // BBC Football (global)
+  'https://www.espn.com/espn/rss/soccer/news',           // ESPN Soccer (global)
+  'https://www.skysports.com/rss/12040',                 // Sky Sports Football (international)
+  'https://www.theguardian.com/football/rss',            // Guardian Football (global)
 
-  // Nigerian Football News
-  'https://www.thenff.com/feed/',                   // Nigeria Football Federation
-  'https://goal.com/en-ng/feeds/news',             // Goal.com Nigeria edition
+  // African / Nigerian football
+  'https://www.cafonline.com/feed/',                     // CAF (Africa football – VERY IMPORTANT)
+  'https://www.thenff.com/feed/',                        // Nigeria Football Federation
 
-  // General Global Sports
-  'https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml', // NYTimes Sports (mostly global)
-  'https://www.espn.com/espn/rss/soccer/news',                 // ESPN Soccer (global focus)
+  // General global sports (football included)
+  'https://rss.nytimes.com/services/xml/rss/nyt/Sports.xml'
 ];
 
 module.exports = { feedUrls };

@@ -953,6 +953,7 @@ document.addEventListener("DOMContentLoaded", initSlider);
 
 
 //function to display matches for the middle layers in home page
+
 let currentCategory = "live";
 let currentSelectedDate = null;
 let selectedDate = null;
@@ -1220,11 +1221,17 @@ let sortedMatches = selectedMatches.sort((a, b) => {
       formattedTime = `
         <div class="live-indicator">
           <span class="red-dot"></span>
-          <span class="live-text">Live</span> - ${matchMinute}
+           ${matchMinute}
         </div>`;
     } else if (category === "highlight") {
       matchStatusDisplay = `<h5>FT</h5>`;
-      scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+     scoreDisplay = `
+   <div class="match-score">
+      <span>${score1}</span>
+      <span>${score2}</span>
+    </div>
+   `;
+
       formattedTime = `
         <div class="time-date-col">
           <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
@@ -1239,29 +1246,33 @@ let sortedMatches = selectedMatches.sort((a, b) => {
 
     html += `
       <div class="match-details" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-        <div class="match-card">
+      
+        <div class="match-time">${formattedTime}</div>
+        <div class="matches-dat">
           <div class="Matchteam">
             <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
             <span>${match.match_hometeam_name}</span>
           </div>
-          <div class="match-status-score">
-            ${scoreDisplay}
-            ${matchStatusDisplay}
-          </div>
+          
           <div class="Matchteam">
             <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
             <span>${match.match_awayteam_name}</span>
           </div>
-        </div>
+          </div>
+
+           <div class="match-status-score">
+            ${scoreDisplay}
+            ${matchStatusDisplay}
+          </div>
+         
         <div class="match-time-country">
-          <div class="match-time"><img src="/assets/icons/clock.png"> ${formattedTime}</div>
           <div class="match-country"><img src="/assets/icons/map-pin.png"> ${country}</div>
           ${matchRound ? `<div class="match-round"><img src="/assets/icons/trophy.png"> ${matchRound}</div>` : ""}
         </div>
+      
         <div class="match-btn">  
           <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
             <img src="/assets/icons/arrow-up.png" alt="Round">
-            View Details
           </button>
         </div>
       </div>`;

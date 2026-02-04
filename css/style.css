@@ -1323,7 +1323,7 @@ body::-webkit-scrollbar {
         margin-top: 10px;
     }
 
-    .match-details {
+   .match-details {
      display: flex;
      align-items: center;
      justify-content: space-between;
@@ -1346,12 +1346,19 @@ body::-webkit-scrollbar {
      min-width: 200px;
     }
 
+  .matches-dat {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap: 3px
+    
+  }
+
        /* Team Names */
     .Matchteam {
        display: flex;
-       align-items: center;
        flex: 1;
-       gap: 6px;
+       align-items: center;
        white-space: normal;  
        overflow: visible;     
        text-overflow: unset;   
@@ -1400,7 +1407,7 @@ body::-webkit-scrollbar {
     .match-status,
     .match-score {
         display: flex;
-        flex-direction: row; /* Stack score and match status vertically for highlight */
+        flex-direction: column; 
         align-items: center;
         font-size: 14px;
         font-family: 'Lato';
@@ -1482,32 +1489,30 @@ body::-webkit-scrollbar {
      /*view button*/    
     .view-details-btn {
         display: flex;
+        background: transparent;
         align-items: center;
-        background: #fff;
-        color: #1A2F4B;
-        border-radius: 20px;
+        color: #fff;
         font-size: 14px;
         font-family: 'Lato';
         font-weight: 600;
         border: none;
         min-width: fit-content;
-        gap: 8px;
+        gap: 2px;
         margin-left: auto;
-        padding: 5px 15px;
+      
     }
     
     .view-details-btn img{
         font-size: 22.5px;
+        color: #fff;
     }
 
     .match-btn button:hover {
-      background: #70c172;
-      color: #1A2F4B;
+      color: #70c172;
     }
 
      .match-btn img:hover {
-      background: #70c172;
-      color: #1A2F4B;
+        color: #70c172;
     }
 
 
@@ -4833,7 +4838,7 @@ body.news-page .news-update {
 
   .match-details {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     white-space: nowrap; 
     overflow: hidden;  
@@ -4844,25 +4849,6 @@ body.news-page .news-update {
   .match-time-country {
     align-items: flex-start;
   }
-
-  /*view button*/    
-    .view-details-btn {
-        display: flex;
-        align-items: center;
-        background: #fff;
-        color: #1A2F4B;
-        border-radius: 20px;
-        font-size: 16px;
-        font-family: 'Lato';
-        font-weight: bold;
-        border: none;
-        min-width: fit-content;
-        width: 173px;
-        height: 30px;
-        gap: 8px;
-        margin-left: auto;
-        padding: 10px;
-    }
 
      /*top scorer*/    
      .slider {
@@ -5085,11 +5071,11 @@ body.news-page .news-update {
     margin-left: -5px;
    }
 
-     .ad-container.placeholder-ad {
+    .ad-container.placeholder-ad {
       height: 120px;           
       font-size: 14px;    
       padding-top: 20px;
-   }
+    }
 
      /*......matches page .....*/
 
@@ -5153,20 +5139,22 @@ body.news-page .news-update {
      margin-right: 10px;
 
   }
+
+ 
       /* Team Names */
     .Matchteam {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis; 
-        justify-content: flex-start;
-       
+       display: flex;
+       align-items: center;
+       gap: 6px;
+       white-space: normal;  
+       overflow: visible;     
+       text-overflow: unset;  
+       flex: unset;  
+       word-break: break-word;  
     }
 
 
-     
+  
     .tab-btn {
       color: #fff;
       border-radius: 20px;

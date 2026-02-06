@@ -617,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 // function to fetch top scorer
 
-//Utility: Normalize player names into safe filenames
+//Normalize player names into safe filenames
 function normalizeNameForAsset(name) {
   if (!name) return "default-player";
 
@@ -1214,40 +1214,51 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     let matchStatusDisplay = "";
     let formattedTime = "";
 
+    scoreHTML = `
+      <div class="match-score">
+      <span>${score1}</span>
+      <span>${score2}</span>
+    </div>`;
+
     if (category === "live") {
       const matchMinute = formatLiveMinute(match.match_date, match.match_time, match.match_status);
 
-      scoreDisplay = `<div class="match-score">${score1} - ${score2}</div>`;
+      scoreDisplay = scoreHTML;
       formattedTime = `
         <div class="live-indicator">
           <span class="red-dot"></span>
            ${matchMinute}
         </div>`;
-    } else if (category === "highlight") {
+    } 
+    else if (category === "highlight") {
       matchStatusDisplay = `<h5>FT</h5>`;
-     scoreDisplay = `
-   <div class="match-score">
-      <span>${score1}</span>
-      <span>${score2}</span>
-    </div>
-   `;
+      scoreDisplay = scoreHTML;
 
       formattedTime = `
         <div class="time-date-col">
-          <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
-        </div>`;
-    } else if (category === "upcoming") {
+          <span class="time">
+          ${formatToUserLocalTime(match.match_date, match.match_time)}
+          </span>
+        </div>`
+        ;
+    } 
+    else if (category === "upcoming") {
       matchStatusDisplay = `<h5>vs</h5>`;
+
       formattedTime = `
         <div class="time-date-col">
-          <span class="time">${formatToUserLocalTime(match.match_date, match.match_time)}</span>
-        </div>`;
-    }
+          <span class="time">
+          ${formatToUserLocalTime(match.match_date, match.match_time)}
+          </span>
+        </div>`
+        ;
+     }
 
     html += `
       <div class="match-details" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-      
+       <div class="match-card">
         <div class="match-time">${formattedTime}</div>
+        
         <div class="matches-dat">
           <div class="Matchteam">
             <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
@@ -1274,6 +1285,7 @@ let sortedMatches = selectedMatches.sort((a, b) => {
           <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
             <img src="/assets/icons/arrow-up.png" alt="Round">
           </button>
+        </div>
         </div>
       </div>`;
     displayedMatchCount++;
@@ -1992,7 +2004,7 @@ function fetchAndRenderLineups(match_id) {
       const homePlayers = lineup.home?.starting_lineups ?? [];
       const awayPlayers = lineup.away?.starting_lineups ?? [];
 
-      // ✅ Hide field if no players
+      //Hide field if no players
       if (homePlayers.length === 0 && awayPlayers.length === 0) {
         field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup formation available.");
@@ -2007,7 +2019,7 @@ function fetchAndRenderLineups(match_id) {
         parseFormation(match?.match_awayteam_system) ||
         inferFormation(awayPlayers, match?.match_awayteam_system);
 
-      // ✅ Hide field if no valid formation
+      //Hide field if no valid formation
       if (!homeFormation && !awayFormation) {
         field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "No lineup formation available.");

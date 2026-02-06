@@ -324,7 +324,7 @@ function renderMatches(matchesData, category) {
         timeDisplay = `
          <div class="live-indicator">
             <span class="red-dot"></span>
-            <span class="live-text">Live</span> - ${matchMinute}
+            ${matchMinute}
          </div>
         `;
      }

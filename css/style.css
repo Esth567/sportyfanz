@@ -35,7 +35,7 @@ body::-webkit-scrollbar {
     background: linear-gradient(to bottom, #1a2f4b 0%, #265a3f 50%, #70c172 100%);
     color: #fff;
     position: fixed;
-    top: 0; /* Start at the top of the page */
+    top: 0; 
     left: 0;
     display: block;
     flex-direction: column;
@@ -56,7 +56,7 @@ body::-webkit-scrollbar {
     width: 95%;
     background: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
     position: relative;
-    margin-bottom: 10px; /* Spacing below the stroke */
+    margin-bottom: 10px; 
     margin-left: 10px;
 }
 
@@ -69,11 +69,11 @@ body::-webkit-scrollbar {
   
 }
 .toggle-icon{
-    display: flex; /* Ensures items are aligned in a row */
-    align-items: center; /* Vertically aligns items */
-    justify-content: space-between; /* Positions icon on left and toggle button on right */
-    width: 100%; /* Full width of the container */
-    padding: 10px 20px; /* Padding for some spacing */
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    width: 100%; 
+    padding: 10px 20px; 
 
 }
 
@@ -92,7 +92,7 @@ body::-webkit-scrollbar {
 
 /* Sidebar Icon */
 .icon img {
-    width: 170px; /* Consistent size */
+    width: 170px; 
     height: 36px;
     object-fit: contain;   
     cursor: pointer;
@@ -102,7 +102,7 @@ body::-webkit-scrollbar {
 .menu {
     display: flex;
     flex-direction: column;
-    height: 100%; /* Full height of the sidebar */
+    height: 100%; 
     justify-content: space-between; 
     flex: 1;
     margin-top: 10px;
@@ -115,10 +115,10 @@ body::-webkit-scrollbar {
 }
 
 .menu ul li {
-    width: 100%; /* Allow the container to expand as needed */
+    width: 100%;
     display: flex;
-    align-items: center; /* Center-align the content */
-    gap: 12px; /* Increase spacing between the image and the text */
+    align-items: center; 
+    gap: 12px;
     padding: 10px; 
     transition: background 0.3s ease; 
 }
@@ -135,13 +135,13 @@ body::-webkit-scrollbar {
     margin: -2px;
     width: 36px;
     height: 36px;
-    border-radius: 50%; /* Keep circular shape */
+    border-radius: 50%; 
     background: rgba(31, 92, 68, 0.397);
     transition: background 0.3s ease;
 }
 
 .menu ul li:hover img {
-    background: white; /* Change image background to white on hover */
+    background: white; 
 }
 .menu ul li a {
     text-decoration: none;
@@ -735,8 +735,8 @@ body::-webkit-scrollbar {
 .news-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;   /* ensures it fills and crops instead of squashing */
-  object-position: center; /* center crop so heads aren't cut off */
+  object-fit: cover;   
+  object-position: center; 
   border-radius: 8px;
   display: block;
 }
@@ -1339,25 +1339,21 @@ body::-webkit-scrollbar {
 
    
     .match-card {
-     display: flex;
-     align-items: center;
-     gap: 15px;
-     flex: 1; 
-     min-width: 200px;
+       display: flex;
+       align-items: center;
+       width: 100%;
+        gap: 15px;
     }
 
   .matches-dat {
     display: flex;
     flex-direction: column;
-    align-items: left;
-    gap: 3px
-    
+    gap: 6px;
+     min-width: 180px;
   }
 
        /* Team Names */
     .Matchteam {
-       display: flex;
-       flex: 1;
        align-items: center;
        white-space: normal;  
        overflow: visible;     
@@ -1365,7 +1361,7 @@ body::-webkit-scrollbar {
        word-break: break-word;  
     }
 
-    .Matchteam span {
+    .match-card span {
        font-size: 17px;
        font-weight: 400;
        font-family: 'Lato';
@@ -1403,7 +1399,6 @@ body::-webkit-scrollbar {
      font-weight: 400;
     }
 
-
     .match-status,
     .match-score {
         display: flex;
@@ -1418,10 +1413,17 @@ body::-webkit-scrollbar {
         
     }
 
+
     .match-status-score {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+       font-size: 16px;
+       color: #fff;
+       font-family: 'Lato';
+       font-weight: 700;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+       
      }
 
     .match-status-score h5 {
@@ -1445,26 +1447,30 @@ body::-webkit-scrollbar {
     }
 
      .match-time img {
-        width: 18.33px; /* Reduce the size of logos */
+        width: 18.33px;
         height: 18.33px;
         color: #b7bfbd;
         object-fit: cover;
       }
 
        .match-country img{
-        width: 16.5px; /* Reduce the size of logos */
+        width: 16.5px;
         height: 20.17px;
         color: #b7bfbd;
         object-fit: cover;
     }
 
     .match-time-country {
-      display: flex;
-      align-items: center;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+      
       gap: 12px;
       font-size: 15px;
       font-family: 'Lato';
       flex-shrink: 0;
+      
     }
 
    .match-time-country div {
@@ -1483,7 +1489,8 @@ body::-webkit-scrollbar {
 
         
     .match-btn {
-      flex-shrink: 0;   
+      flex-shrink: 0; 
+       margin-left: auto;  
     }
 
      /*view button*/    
@@ -5140,19 +5147,6 @@ body.news-page .news-update {
 
   }
 
- 
-      /* Team Names */
-    .Matchteam {
-       display: flex;
-       align-items: center;
-       gap: 6px;
-       white-space: normal;  
-       overflow: visible;     
-       text-overflow: unset;  
-       flex: unset;  
-       word-break: break-word;  
-    }
-
 
   
     .tab-btn {
@@ -5172,7 +5166,19 @@ body.news-page .news-update {
       border: none;
     }
 
-  
+    /* Team Names */
+   /* Team Names */
+    .Matchteam {
+       display: flex;
+       flex: 1;
+       align-items: center;
+       white-space: normal;  
+       overflow: visible;     
+       text-overflow: unset;   
+       word-break: break-word;  
+    }
+
+
 .lineUpsteam-logo {
     width: 24px;
     height: 24px;
@@ -5397,7 +5403,7 @@ body.news-page .news-update {
 
   /* --- REORDER --- */
 .position-header { order: 1; }
-.team-position   { order: 1; }   /* stays as POS values */
+.team-position   { order: 1; }  
 
 .team-name-header { order: 2; }
 .team-infos       { order: 2; }
@@ -5569,7 +5575,7 @@ body.news-page .news-update {
 
   .footer-banner iframe {
     width: 100% !important;
-    height: 50px;                    /* Compact height for mobile */
+    height: 50px;
   }
 
   /*......league table page .....*/

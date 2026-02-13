@@ -11,7 +11,7 @@ const dashboardRoutes = require("../routes/dashboard");
 const leagueRoutes = require("../routes/leagueRoutes");
 const videoRoutes = require("../routes/videoRoutes");
 const playerImageRoutes = require("../routes/playerImageRoutes");
-const fetchnlpnews = require("../routes/fetchnlpnews");
+const fetchnews = require("../routes/newsRoutes");
 const entityDatabase = require("../routes/entitydatabase");
 
 const app = express();
@@ -45,7 +45,7 @@ app.use(
       ) {
         callback(null, true);
       } else {
-        callback(new Error(`❌ Not allowed by CORS: ${origin}`));
+        callback(new Error(`Not allowed by CORS: ${origin}`));
       }
     },
   })
@@ -70,8 +70,9 @@ app.use("/api", dashboardRoutes);
 app.use("/api", leagueRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api", playerImageRoutes);
-app.use("/api", fetchnlpnews);
+app.use("/api", fetchnews);
 app.use("/api", entityDatabase);
+
 
 //Health check
 app.get("/api/health", (req, res) => res.send("API is live."));

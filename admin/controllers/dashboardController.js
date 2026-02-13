@@ -510,7 +510,7 @@ exports.getStandings = async (req, res) => {
   const cached = standingsCache.get(cacheKey);
 
   if (cached) {
-    return res.json({ leagueId, standings: cached }); // ✅ include leagueId
+    return res.json({ leagueId, standings: cached }); //include leagueId
   }
 
   try {
@@ -529,19 +529,19 @@ exports.getStandings = async (req, res) => {
     const data = await response.json();
 
     if (!Array.isArray(data)) {
-      console.warn("⚠️ Invalid API response structure:", data);
+      console.warn("Invalid API response structure:", data);
       standingsCache.set(cacheKey, []); 
-      return res.json({ leagueId, standings: [] }); // ✅ include leagueId
+      return res.json({ leagueId, standings: [] }); //include leagueId
     }
 
-    // ✅ Save to cache
+    //Save to cache
     standingsCache.set(cacheKey, data);
 
-    // ✅ Always return consistent shape
+    //Always return consistent shape
     res.json({ leagueId, standings: data });
 
   } catch (error) {
-    console.error("❌ Standings fetch error (backend):", error);
+    console.error("Standings fetch error (backend):", error);
     res.status(500).json({ leagueId, error: "Server error fetching standings" });
   }
 };
@@ -555,7 +555,7 @@ async function safeJson(res) {
   }
 }
 
-// backend/controllers/lineupController.js
+//lineupController.js
 const lineupCache = new NodeCache({ stdTTL: 300 }); // 5 min cache
 
 exports.getLineups = async (req, res) => {
@@ -594,7 +594,7 @@ exports.getLineups = async (req, res) => {
 
     res.json(responsePayload);
   } catch (err) {
-    console.error("❌ Error fetching lineups/events:", err);
+    console.error("Error fetching lineups/events:", err);
     res.status(500).json({ error: "Failed to fetch lineup data" });
   }
 };

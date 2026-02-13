@@ -303,7 +303,7 @@ function populateNewsSection(sectionId, newsList) {
   const getImageHtml = (item, size = "600x400") => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     if (isValidImage) {
-      return `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
+      return `<img src="/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
                   alt="Image for ${item.title}" 
                   loading="lazy" 
                   onerror="this.src='https://via.placeholder.com/${size}?text=No+Image'" />`;
@@ -609,7 +609,7 @@ window.onpopstate = function (event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
-    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
+    loadNews(sectionId, `/api/sports-summaries`);
   });
 });
                                                                                                                                                                                                                                                                                                                                                                                                
@@ -1012,7 +1012,7 @@ async function fetchMatchesData() {
   try {
     spinner.style.display = "block";
 
-    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const response = await fetch(`/api/all_matches`);
     const data = await response.json();
 
     
@@ -1215,9 +1215,7 @@ let sortedMatches = selectedMatches.sort((a, b) => {
     let formattedTime = "";
 
     scoreHTML = `
-      <div class="match-score">
-      <span>${score1}</span>
-      <span>${score2}</span>
+      <div class="match-score"> <span>${score1}</span> - <span>${score2}</span>
     </div>`;
 
     if (category === "live") {
@@ -1255,39 +1253,39 @@ let sortedMatches = selectedMatches.sort((a, b) => {
      }
 
     html += `
-      <div class="match-details" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
-       <div class="match-card">
-        <div class="match-time">${formattedTime}</div>
-        
-        <div class="matches-dat">
-          <div class="Matchteam">
-            <img src="${match.team_home_badge}" alt="${match.match_hometeam_name} Logo">
-            <span>${match.match_hometeam_name}</span>
-          </div>
-          
-          <div class="Matchteam">
-            <img src="${match.team_away_badge}" alt="${match.match_awayteam_name} Logo">
-            <span>${match.match_awayteam_name}</span>
-          </div>
-          </div>
+     <div class="match-details" data-match-id="${match.match_id}" onclick="displayLiveMatch('${match.match_id}', '${category}')">
 
-           <div class="match-status-score">
-            ${scoreDisplay}
-            ${matchStatusDisplay}
-          </div>
-         
-        <div class="match-time-country">
-          <div class="match-country"><img src="/assets/icons/map-pin.png"> ${country}</div>
-          ${matchRound ? `<div class="match-round"><img src="/assets/icons/trophy.png"> ${matchRound}</div>` : ""}
-        </div>
-      
-        <div class="match-btn">  
-          <button class="view-details-btn" data-match-id="${match.match_id}" data-category="${category}">
-            <img src="/assets/icons/arrow-up.png" alt="Round">
-          </button>
-        </div>
-        </div>
-      </div>`;
+  <div class="match-time">${formattedTime}</div>
+
+  <div class="Matchteam">
+    <img src="${match.team_home_badge}">
+    <span>${match.match_hometeam_name}</span>
+  </div>
+
+  <div class="match-status-score">
+    ${scoreDisplay}
+    ${matchStatusDisplay}
+  </div>
+
+  <div class="Matchteam">
+    <img src="${match.team_away_badge}">
+    <span>${match.match_awayteam_name}</span>
+  </div>
+
+  <div class="match-time-country">
+    <div class="match-country">
+      <img src="/assets/icons/map-pin.png"> ${country}
+    </div>
+  </div>
+
+  <div class="match-btn">
+    <button class="view-details-btn">
+      <img src="/assets/icons/arrow-up.png">
+    </button>
+  </div>
+
+</div>
+`;
     displayedMatchCount++;
   }
 
@@ -2129,7 +2127,7 @@ function fetchAndRenderLineups(match_id) {
     const container = document.getElementById("football-field");
     if (!container || !formation) return;
 
-    // 🔑 Always normalize using parseFormation 
+    //Always normalize using parseFormation 
     let formationArray = Array.isArray(formation)
      ? formation
     : parseFormation(formation);
@@ -2298,7 +2296,7 @@ function updateLiveTimers() {
 // Fetch and display predictions
 async function fetchTodayPredictions(predictionContainer) {
   try {
-    const response = await fetch(`${API_BASE}/api/predictions`);
+    const response = await fetch(`/api/predictions`);
 
     if (!response.ok) {
       predictionContainer.innerHTML = "<p>Prediction loding...</p>";
@@ -2422,11 +2420,11 @@ function closeFixedAd() {
           const newsUpdate = document.querySelector(".news-update");
           const textCont = document.querySelector(".text-cont");
           const liveMatchDemo = document.querySelector(".live-match-demo");
+          const textCont4 = document.querySelector(".text-cont4");
+          const prediction = document.querySelector(".prediction-container");
           const textCont3 = document.querySelector(".text-cont3");
           const slider = document.querySelector(".slider");
           const advertPodcast = document.querySelector(".advert");
-          const textCont4 = document.querySelector(".text-cont4");
-          const prediction = document.querySelector(".prediction-container");
           const leagueTabletextCont = document.querySelector(".leagueTable-text-cont");
           const leagueTableDemo = document.querySelector(".league-table-demo");
           const advert1Podcast = document.querySelector(".advert1");
@@ -2439,11 +2437,11 @@ function closeFixedAd() {
           if (newsUpdate) parent.appendChild(newsUpdate);
           if (textCont) parent.appendChild(textCont);
           if (liveMatchDemo) parent.appendChild(liveMatchDemo);
+          if (textCont4) parent.appendChild(textCont4);
+          if (prediction) parent.appendChild(prediction);
           if (textCont3) parent.appendChild(textCont3);
           if (slider) parent.appendChild(slider);
           if (advertPodcast) parent.appendChild(advertPodcast);
-          if (textCont4) parent.appendChild(textCont4);
-          if (prediction) parent.appendChild(prediction);
           if (leagueTabletextCont) parent.appendChild(leagueTabletextCont);
           if (leagueTableDemo) parent.appendChild(leagueTableDemo);
           if (advert1Podcast) parent.appendChild(advert1Podcast);

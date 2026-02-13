@@ -92,7 +92,7 @@ exports.cleanArticleText = text => {
     stripped = stripped.replace(regex, '');
   });
 
-  // 🧹 Deduplicate repeated or near-identical sentences
+  //Deduplicate repeated or near-identical sentences
   stripped = stripped
     .split(/(?<=[.!?])\s+/)
     .filter((sentence, idx, arr) =>

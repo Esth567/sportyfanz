@@ -303,7 +303,7 @@ function populateNewsSection(sectionId, newsList) {
   const getImageHtml = (item, size = "600x400") => {
     const isValidImage = typeof item.image === 'string' && item.image.trim().startsWith('http');
     if (isValidImage) {
-      return `<img src="/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
+      return `<img src="${API_BASE}/api/image-proxy?url=${encodeURIComponent(item.image)}&width=600&height=400"
                   alt="Image for ${item.title}" 
                   loading="lazy" 
                   onerror="this.src='https://via.placeholder.com/${size}?text=No+Image'" />`;
@@ -609,7 +609,7 @@ window.onpopstate = function (event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
-    loadNews(sectionId, `/api/sports-summaries`);
+    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
   });
 });
                                                                                                                                                                                                                                                                                                                                                                                                
@@ -1012,7 +1012,7 @@ async function fetchMatchesData() {
   try {
     spinner.style.display = "block";
 
-    const response = await fetch(`/api/all_matches`);
+    const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
     

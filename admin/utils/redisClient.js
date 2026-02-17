@@ -14,9 +14,9 @@ async function getRedisClient() {
       },
     });
 
-    client.on('error', (err) => console.error('❌ Redis error:', err));
-    client.on('connect', () => console.log('🔌 Redis connecting...'));
-    client.on('ready', () => console.log('✅ Redis connected'));
+    client.on('error', (err) => console.error('Redis error:', err));
+    client.on('connect', () => console.log('Redis connecting...'));
+    client.on('ready', () => console.log('Redis connected'));
 
     await client.connect();
   }

@@ -11,8 +11,11 @@ const dashboardRoutes = require("../routes/dashboard");
 const leagueRoutes = require("../routes/leagueRoutes");
 const videoRoutes = require("../routes/videoRoutes");
 const playerImageRoutes = require("../routes/playerImageRoutes");
-const fetchnews = require("../routes/newsRoutes");
+const { router: fetchnews, refreshNewsInBackground } = require("../routes/newsRoutes");
+
 const entityDatabase = require("../routes/entitydatabase");
+
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -82,10 +85,12 @@ app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-//404 handler (for non-GET or unmatched API routes)
+//404 handler
 app.use((req, res, next) => {
   res.status(404).json({ error: "Route not found" });
 });
+
+
 
 //Error handler
 app.use((err, req, res, next) => {
@@ -93,7 +98,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong" });
 });
 
-//Start the server
+// Start server
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
+
+  refreshNewsInBackground().catch(err =>
+    console.error("Initial news refresh failed:", err)
+  );
 });
+

@@ -30,7 +30,7 @@ const {
 } = require('../utils/nlpfetchnews');
 
 const CACHE_KEY = 'news:sports-summaries';
-const TTL = 60 * 30; // 30 minutes
+const TTL = 60 * 60; // 1 hour
 
 const parser = new RSSParser();
 
@@ -142,7 +142,7 @@ const generateFreshNews = async () => {
     limit(async () => {
       try {
         const feed = await parser.parseURL(feedUrl);
-        for (const item of feed.items) {
+        for (const item of feed.items.slice(0, 10)) {
           await processArticle(item.link, item.title, item.isoDate || item.pubDate);
         }
       } catch (err) {
@@ -260,21 +260,31 @@ router.get('/sports-summaries', async (req, res) => {
   try {
     const redisClient = await getRedisClient();
     const cached = await redisClient.get(CACHE_KEY);
+
     res.setHeader('Cache-Control', 'public, max-age=60');
 
     if (cached) {
-      refreshNewsInBackground();
+      // Serve cached instantly
+      refreshNewsInBackground(); // update in background
       return res.status(200).json(JSON.parse(cached));
     }
 
-    const freshData = await generateFreshNews();
-    await redisClient.setEx(CACHE_KEY, TTL, JSON.stringify(freshData));
-    res.status(200).json(freshData);
+    // DO NOT generate fresh news inside request
+    // Just trigger background refresh
+    refreshNewsInBackground();
+
+    // Return empty (or skeleton data)
+    return res.status(200).json({
+      trending: [],
+      updates: []
+    });
+
   } catch (err) {
     console.error('Error in /sports-summaries route:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // SSR HTML route
 router.get('/', async (req, res) => {
@@ -301,4 +311,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = {
+  router,
+  refreshNewsInBackground
+};
+

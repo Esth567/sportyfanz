@@ -607,11 +607,23 @@ window.onpopstate = function (event) {
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
-  ["trending-stories", "newsUpdate-stories", "sliderNews-stories"].forEach(sectionId => {
-    loadNews(sectionId, `${API_BASE}/api/sports-summaries`);
-  });
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/sports-summaries`);
+    const data = await response.json();
+
+    window.trendingNews = data.trending;
+    window.updatesNews = data.updates;
+
+    populateNewsSection('trending-stories', data.trending);
+    populateNewsSection('newsUpdate-stories', data.updates);
+    populateNewsSection('sliderNews-stories', [...data.trending, ...data.updates]);
+
+  } catch (err) {
+    console.error("Failed to load news:", err);
+  }
 });
+
                                                                                                                                                                                                                                                                                                                                                                                                
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

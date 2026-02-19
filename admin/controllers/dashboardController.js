@@ -483,7 +483,7 @@ exports.getH2HData = async (req, res) => {
       awayLast: data.secondTeam_lastResults || []
     };
 
-    // ✅ Cache
+    //Cache
     h2hCache.set(cacheKey, result);
 
     res.json(result);
@@ -600,8 +600,8 @@ exports.getLineups = async (req, res) => {
 };
 
 
-
-const predictionCache = new NodeCache({ stdTTL: 300 }); // cache for 5 min
+// prediction 
+const predictionCache = new NodeCache({ stdTTL: 300 });
 
 const getDateString = (offset = 0) => {
   const d = new Date();
@@ -609,67 +609,45 @@ const getDateString = (offset = 0) => {
   return d.toISOString().split("T")[0];
 };
 
-
-// Fetch and display predictions
 exports.getTodayPredictions = async (req, res) => {
   const cacheKey = "todayPredictions";
   const cached = predictionCache.get(cacheKey);
-  if (cached) {
-    return res.json(cached);
-  }
+  if (cached) return res.json(cached);
 
   const today = getDateString();
+ 
+try {
+    const response = await fetch(
+      `https://apiv3.apifootball.com/?action=get_predictions&from=${today}&to=${today}&APIkey=${APIkey}`
+    );
 
-  try {
-    // Fetch odds & events in parallel
-    const [oddsRes, eventsRes] = await Promise.all([
-      fetch(`https://apiv3.apifootball.com/?action=get_odds&from=${today}&to=${today}&APIkey=${APIkey}`),
-      fetch(`https://apiv3.apifootball.com/?action=get_events&from=${today}&to=${today}&APIkey=${APIkey}`)
-    ]);
+    const data = await response.json();
 
-    // Parse JSON
-    const oddsData = await oddsRes.json();
-    const eventsData = await eventsRes.json();
-
-    // Handle API errors gracefully
-    if (!Array.isArray(oddsData)) {
-      console.error("❌ Odds API error:", oddsData);
-      return res.status(500).json({ error: oddsData.error || "Invalid odds data" });
-    }
-    if (!Array.isArray(eventsData)) {
-      console.error("❌ Events API error:", eventsData);
-      return res.status(500).json({ error: eventsData.error || "Invalid events data" });
+    if (!Array.isArray(data)) {
+      console.error("Prediction API error:", data);
+      return res.status(500).json([]);
     }
 
-    // Merge odds with events
-    const enriched = oddsData
-      .map(oddMatch => {
-        const event = eventsData.find(ev => ev.match_id === oddMatch.match_id);
-        if (!event) return null;
+    const enriched = data.map(match => ({
+     match_id: match.match_id,
+     home: match.match_hometeam_name,
+     away: match.match_awayteam_name,
+     time: match.match_time,
+     status: match.match_status,
+     live: match.match_live,
+     league_name: match.league_name,
+     homeScore: match.match_hometeam_score,
+     awayScore: match.match_awayteam_score,
+     prob_home: parseFloat(match.prob_HW || 0),
+     prob_away: parseFloat(match.prob_AW || 0),
+     prob_draw: parseFloat(match.prob_D || 0)
+   }));
 
-        return {
-          match_id: oddMatch.match_id,
-          home: event.match_hometeam_name,
-          away: event.match_awayteam_name,
-          homeLogo: event.team_home_badge,
-          awayLogo: event.team_away_badge,
-          time: event.match_time,
-          league_name: event.league_name,
-          score: `${event.match_hometeam_score} - ${event.match_awayteam_score}`,
-          odd_1: parseFloat(oddMatch.odd_1),
-          odd_2: parseFloat(oddMatch.odd_2)
-        };
-      })
-      .filter(Boolean); // remove nulls
-
-    // Cache result
     predictionCache.set(cacheKey, enriched);
-
-    // Return JSON
     res.json(enriched);
 
   } catch (error) {
-    console.error("❌ Backend prediction error:", error);
-    res.status(500).json({ error: "Failed to fetch predictions" });
+    console.error("Backend prediction error:", error);
+    res.status(500).json([]);
   }
 };

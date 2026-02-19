@@ -1024,7 +1024,7 @@ async function fetchMatchesData() {
   try {
     spinner.style.display = "block";
 
-    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const response = await fetch(`/api/all_matches`);
     const data = await response.json();
 
     
@@ -1998,7 +1998,7 @@ function fetchAndRenderLineups(match_id) {
       field.querySelectorAll(".player-dot").forEach(dot => dot.remove());
       containerWrapper.querySelectorAll(".no-lineup-message").forEach(msg => msg.remove());
 
-      // ✅ Hide field if match hasn’t started
+      //Hide field if match hasn’t started
       if (!match || match.match_status === "Not Started" || match.match_status === "") {
         field.style.display = "none";
         displayNoLineupMessage(containerWrapper, "Lineups will be available when the match starts.");
@@ -2248,159 +2248,153 @@ function createPlayerDiv(player, xPercent, yPercent) {
 
 //function for predition-container in middly layer
 
-const bigLeagues = [
-  "Premier League", "LaLiga", "Serie A", "Bundesliga", 
-  "UEFA Champions League", "Ligue 1", "Ligue 2", "Eredivisie",
-  "Primeira Liga", "Scottish Premiership", "Belgian Pro League",
-  "Turkish Super Lig", "UEFA Champions League", "UEFA Europa League",
-  "UEFA Europa Conference League","FIFA World Cup","UEFA Euro",
-  "Copa America", "AFCON", "Gold Cup", "Asian Cup",
-];
+let predictionIndex = 0;
+let displayScore = "";
+let displayTime = "";
 
-// Normalize league names
-const normalizedLeague = league =>
-  league.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '');
-
-// Validate odds
-function isRealisticOdds(match) {
-  const odd1 = parseFloat(match.odd_1);
-  const odd2 = parseFloat(match.odd_2);
-  return !isNaN(odd1) && !isNaN(odd2) && odd1 > 1 && odd2 > 1 && odd1 < 10 && odd2 < 10;
-}
-
-// User timezone
-function getUserTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
-// Convert match time
-function convertMatchTimeToLocalTime(matchTime) {
-  const userTimezone = getUserTimezone();
-  const today = new Date().toISOString().split("T")[0];
-  const matchDate = new Date(`${today}T${matchTime}`);
-  return matchDate.toLocaleString("en-US", {
-    timeZone: userTimezone,
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-// Update match timers
-function updateLiveTimers() {
-  const now = new Date();
-  document.querySelectorAll(".live-timer").forEach(span => {
-    const startTime = span.dataset.start;
-    const today = new Date().toISOString().split("T")[0];
-    const matchDate = new Date(`${today}T${startTime}`);
-    const diff = Math.floor((now - matchDate) / 60000);
-
-    if (diff >= 0 && diff <= 120) {
-      span.textContent = `${diff}'`;
-    } else if (diff > 120) {
-      span.textContent = "FT";
-    } else {
-      span.textContent = convertMatchTimeToLocalTime(startTime);
-    }
-  });
-}
-
-// Fetch and display predictions
-async function fetchTodayPredictions(predictionContainer) {
+// Fetch predictions
+async function fetchTodayPredictions(container) {
   try {
     const response = await fetch(`/api/predictions`);
 
-    if (!response.ok) {
-      predictionContainer.innerHTML = "<p>Prediction loding...</p>";
+    if (!response.ok) {cc
+      container.innerHTML = "<p>Loading predictions...</p>";
       return;
     }
 
     const data = await response.json();
 
     if (!Array.isArray(data) || data.length === 0) {
-      predictionContainer.innerHTML = "<p>No predictions available.</p>";
+      container.innerHTML = "<p>No predictions available today.</p>";
       return;
     }
 
-    // Filter only big leagues with realistic odds
-    const filtered = data.filter(match => {
-      const leagueNorm = normalizedLeague(match.league_name);
-      return isRealisticOdds(match) &&
-        bigLeagues.some(big => normalizedLeague(big) === leagueNorm);
-    });
-
-    if (filtered.length === 0) {
-      predictionContainer.innerHTML = "<p>No big matches with reliable odds today.</p>";
-      return;
-    }
-
-    // Start the slider
-    startPredictionSlider(predictionContainer, filtered);
+    startPredictionSlider(container, data);
 
   } catch (error) {
     console.error("Prediction fetch error:", error);
-    predictionContainer.innerHTML = "<p>Error loading predictions.</p>";
+    container.innerHTML = "<p>Error loading predictions.</p>";
   }
 }
 
-// Slide logic
-let predictionIndex = 0;
+// Slider
 function startPredictionSlider(container, matches) {
+
   function showSlide() {
-    container.classList.remove("fade-in");
+    const match = matches[predictionIndex];
 
-    setTimeout(() => {
-      const match = matches[predictionIndex];
-      const odd1 = match.odd_1.toFixed(2);
-      const odd2 = match.odd_2.toFixed(2);
+    const homeProb = Number(match.prob_home || 0);
+    const awayProb = Number(match.prob_away || 0);
+    const drawProb = Number(match.prob_draw || 0);
+    const isFinished = match.status === "Finished";
 
-      container.innerHTML = `
-        <div class="prediction-content">
-          <h4>Who do you think will win?</h4>
-          <div class="prediction-selection">
-            <div class="team-nam">
-              <span>${match.home}</span>
-              <div class="team-logo">
-                <img src="${match.homeLogo || '/assets/images/default-logo.png'}" alt="${match.home}">
-              </div>
-              <div class="prediction-number">${odd1}</div>
-            </div>
+     let predictedResult = "";
+     let confidence = 0;
 
-            <div class="prediction-score-status">
-              <h4 class="match-leagueName">${match.league_name}</h4>
-              <h4 class="match-score">${match.score}</h4>
-              <span class="live-timer" data-start="${match.time}">${match.time}</span>
-            </div>
+    //prediction logic
+     if (homeProb >= awayProb && homeProb >= drawProb) {
+     predictedResult = `${match.home} to Win`;
+     confidence = homeProb;
+    } else if (awayProb >= homeProb && awayProb >= drawProb) {
+    predictedResult = `${match.away} to Win`;
+    confidence = awayProb;
+   } else {
+    predictedResult = "Draw";
+    confidence = drawProb;
+  }
 
-            <div class="team-nam">
-              <span>${match.away}</span>
-              <div class="team-logo">
-                <img src="${match.awayLogo || '/assets/images/default-logo.png'}" alt="${match.away}">
-              </div>
-              <div class="prediction-number">${odd2}</div>
-            </div>
-          </div>
-        </div>
-      `;
+  //score logic
+  let displayScore = "";
+  let displayTime = "";
+  let predictionCorrect = false;
 
-      updateLiveTimers();
-      container.classList.add("fade-in");
-      predictionIndex = (predictionIndex + 1) % matches.length;
-    }, 200);
+  if (match.live === "1") {
+    displayScore = `${match.homeScore} - ${match.awayScore}`;
+    displayTime = match.status; 
+  } 
+  else if (isFinished) {
+    displayScore = `${homeScore} - ${awayScore}`;
+    displayTime = "FT";
+  }
+  else {
+    displayScore = "VS";
+    displayTime = match.time;
+  }
+
+  // Check Prediction Accuracy
+  if (isFinished) {
+    if (
+      (homeScore > awayScore && predictedResult.includes(match.home)) ||
+      (awayScore > homeScore && predictedResult.includes(match.away)) ||
+      (homeScore === awayScore && predictedResult === "Draw")
+    ) {
+     predictionCorrect = true;
+   }
+  }
+
+  container.innerHTML = `
+    <div class="prediction-content">
+
+    <h4 class="match-pred">Match Prediction</h4>
+
+    <h4 class="prediction-main">
+      ${isFinished 
+      ? `Result: ${homeScore > awayScore 
+        ? match.home + " Won"
+        : awayScore > homeScore 
+          ? match.away + " Won"
+          : "Match Ended in a Draw"
+       } ${predictionCorrect ? "✅" : "❌"}`
+       : `Prediction: ${predictedResult}`
+     }
+   </h4>
+
+
+
+    <div class="prediction-confidence">
+      Confidence: ${confidence}%
+    </div>
+
+    <div class="prediction-selection">
+
+      <div class="team-block">
+        <span>${match.home}</span>
+        <div class="prediction-number">${homeProb}%</div>
+      </div>
+
+      <div class="prediction-center">
+        <h5>${match.league_name}</h5>
+        <h4 class="predmatch-score">${displayScore}</h4>
+        <span class="predmatch-time">${displayTime}</span>
+        <div class="draw-prob">Draw: ${drawProb}%</div>
+      </div>
+
+      <div class="team-block">
+        <span>${match.away}</span>
+        <div class="prediction-number">${awayProb}%</div>
+      </div>
+
+     </div>
+
+    </div>
+  `;
+
+
+    predictionIndex = (predictionIndex + 1) % matches.length;
   }
 
   showSlide();
   setInterval(showSlide, 10000);
 }
 
-// Initialize
+// Init
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector(".prediction-container");
   if (container) {
     fetchTodayPredictions(container);
-    setInterval(updateLiveTimers, 60000);
   }
 });
+
 
 
 /* Init bottom banner Swiper */

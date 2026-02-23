@@ -1046,7 +1046,7 @@ async function fetchMatchesData() {
             currentCategory = "live"; // default fallback
         }
 
-        // ⚡ Safeguard: if no matches today for the chosen category, auto-shift to upcoming
+        // Safeguard: if no matches today for the chosen category, auto-shift to upcoming
         const today = getTodayDate();
         const { selectedMatches } = getMatchesForCategory(matchesData, currentCategory, today);
 

@@ -867,6 +867,15 @@ body::-webkit-scrollbar {
     background-image: url('../assets/images/fanscheerBlack.png');
 }
 
+/* Banner 6 background image */
+.banner6 {
+    background-image: url('../assets/images/fanz-advt.png');
+}
+/* Banner 7 background image */
+.banner7 {
+    background-image: url('../assets/images/fans-advt.png');
+}
+
 /* Overlay text box */
 .banne2item-contnt {
     background: rgba(0, 0, 0, 0.3);

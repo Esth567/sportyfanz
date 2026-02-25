@@ -1024,7 +1024,7 @@ async function fetchMatchesData() {
   try {
     spinner.style.display = "block";
 
-    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const response = await fetch(`/api/all_matches`);
     const data = await response.json();
 
     
@@ -2366,7 +2366,9 @@ function startPredictionSlider(container, matches) {
         <h5>${match.league_name}</h5>
         <h4 class="predmatch-score">${displayScore}</h4>
         <span class="predmatch-time">${displayTime}</span>
-        <div class="draw-prob">Draw: ${drawProb}%</div>
+        <div class="draw-prob"> Draw: 
+         <span>${drawProb}%</span>
+        </div>
       </div>
 
       <div class="team-block">
@@ -2424,10 +2426,10 @@ function closeFixedAd() {
 
           const textCont1 = document.querySelector(".text-cont1");
           const newsUpdate = document.querySelector(".news-update");
-          const textCont = document.querySelector(".text-cont");
-          const liveMatchDemo = document.querySelector(".live-match-demo");
           const textCont4 = document.querySelector(".text-cont4");
           const prediction = document.querySelector(".prediction-container");
+          const textCont = document.querySelector(".text-cont");
+          const liveMatchDemo = document.querySelector(".live-match-demo");
           const textCont3 = document.querySelector(".text-cont3");
           const slider = document.querySelector(".slider");
           const advertPodcast = document.querySelector(".advert");
@@ -2441,10 +2443,10 @@ function closeFixedAd() {
           
           if (textCont1) parent.appendChild(textCont1);
           if (newsUpdate) parent.appendChild(newsUpdate);
-          if (textCont) parent.appendChild(textCont);
-          if (liveMatchDemo) parent.appendChild(liveMatchDemo);
           if (textCont4) parent.appendChild(textCont4);
           if (prediction) parent.appendChild(prediction);
+          if (textCont) parent.appendChild(textCont);
+          if (liveMatchDemo) parent.appendChild(liveMatchDemo);
           if (textCont3) parent.appendChild(textCont3);
           if (slider) parent.appendChild(slider);
           if (advertPodcast) parent.appendChild(advertPodcast);

@@ -1024,7 +1024,7 @@ async function fetchMatchesData() {
   try {
     spinner.style.display = "block";
 
-    const response = await fetch(`/api/all_matches`);
+    const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
     
@@ -2255,7 +2255,7 @@ let displayTime = "";
 // Fetch predictions
 async function fetchTodayPredictions(container) {
   try {
-    const response = await fetch(`/api/predictions`);
+    const response = await fetch(`${API_BASE}/api/predictions`);
 
     if (!response.ok) {cc
       container.innerHTML = "<p>Loading predictions...</p>";

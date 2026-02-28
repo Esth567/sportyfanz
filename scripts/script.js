@@ -1,6 +1,6 @@
 const API_BASE = location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://admin.sportyfanz.com';
+  : 'https://sportyfanz-production.up.railway.app';
 
   
 //sidebar toggle for web view

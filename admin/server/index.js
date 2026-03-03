@@ -36,7 +36,7 @@ app.use(
       const allowedOrigins = [
         "https://sportyfanz.com",
         "https://www.sportyfanz.com",
-        "https://sportyfanz.onrender.com",
+        "https://sportyfanz.railway.app",
       ];
       const allowedPatterns = [/^https:\/\/your-username-.*\.app\.github\.dev$/];
 

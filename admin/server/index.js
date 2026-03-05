@@ -99,11 +99,11 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
+//app.listen(port, () => {
+  //console.log(`🚀 Server running on port ${port}`);
 
-  refreshNewsInBackground().catch(err =>
-    console.error("Initial news refresh failed:", err)
-  );
-});
+  //refreshNewsInBackground().catch(err =>
+    //console.error("Initial news refresh failed:", err)
+  //);
+//});
 

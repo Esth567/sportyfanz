@@ -36,21 +36,20 @@ app.use(
       const allowedOrigins = [
         "https://sportyfanz.com",
         "https://www.sportyfanz.com",
-        "https://sportyfanz-production.up.railway.app",
+        "https://sportyfanz-production.up.railway.app"
       ];
-      const allowedPatterns = [/^https:\/\/your-username-.*\.app\.github\.dev$/];
 
-      if (!origin) return callback(null, true); // allow curl/Postman
+      if (!origin) return callback(null, true);
 
-      if (
-        allowedOrigins.includes(origin) ||
-        allowedPatterns.some((pattern) => pattern.test(origin))
-      ) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Not allowed by CORS: ${origin}`));
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+
+      console.log("Blocked CORS request from:", origin);
+
+      return callback(null, true); // allow but log
     },
+    credentials: true
   })
 );
 

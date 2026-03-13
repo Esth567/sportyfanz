@@ -97,12 +97,18 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong" });
 });
 
+app.get("/", (req, res) => {
+  res.status(200).send("SportyFanz API running");
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 
-  refreshNewsInBackground().catch(err =>
-    console.error("Initial news refresh failed:", err)
-  );
+  setTimeout(() => {
+    refreshNewsInBackground().catch(err =>
+      console.error("News refresh failed:", err)
+    );
+  }, 5000);
 });
 

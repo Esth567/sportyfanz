@@ -43,18 +43,17 @@ app.use(
 
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin) || 
-        allowedPatterns.some((pattern) =>
-       pattern.test(origin))
-      ){
-       callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        allowedPatterns.some((pattern) => pattern.test(origin))
+      ) {
+        callback(null, true);
       } else {
-        callback(new Error(Not allowed by CORS:
-      ${origin}));
+        callback(new Error(`Not allowed by CORS: ${origin}`));
       }
     },
-   })
-  );
+  })
+);
 
 //Rate limiting for API routes
 const apiLimiter = rateLimit({

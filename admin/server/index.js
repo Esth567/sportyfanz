@@ -36,22 +36,25 @@ app.use(
       const allowedOrigins = [
         "https://sportyfanz.com",
         "https://www.sportyfanz.com",
-        "https://sportyfanz-production.up.railway.app"
+        "https://sportyfanz.onrender.com",
       ];
+
+      const allowedPatterns = [/^https:\/\/your-username-.*\.app\.github\.dev$/];
 
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+      if (allowedOrigins.includes(origin) || 
+        allowedPatterns.some((pattern) =>
+       pattern.test(origin))
+      ){
+       callback(null, true);
+      } else {
+        callback(new Error(Not allowed by CORS:
+      ${origin}));
       }
-
-      console.log("Blocked CORS request from:", origin);
-
-      return callback(null, true); // allow but log
     },
-    credentials: true
-  })
-);
+   })
+  );
 
 //Rate limiting for API routes
 const apiLimiter = rateLimit({
@@ -96,18 +99,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Something went wrong" });
 });
 
-app.get("/", (req, res) => {
-  res.status(200).send("SportyFanz API running");
-});
 
 // Start server
 app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 
-  setTimeout(() => {
-    refreshNewsInBackground().catch(err =>
+     refreshNewsInBackground().catch(err =>
       console.error("News refresh failed:", err)
     );
-  }, 5000);
 });
 

@@ -1,6 +1,6 @@
 const API_BASE = location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://sportyfanz-production.up.railway.app';
+  : 'https://backend.onrender.com';
 
   
 //sidebar toggle for web view

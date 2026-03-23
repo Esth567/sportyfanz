@@ -1,6 +1,6 @@
 const API_BASE = location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://backend.onrender.com';
+  : 'https://production.sportyfanz.com';
 
   
 //sidebar toggle for web view

@@ -16,7 +16,7 @@ async function extractImageFromURL(url) {
 
     const contentType = response.headers['content-type'];
     if (!contentType || !contentType.includes('text/html')) {
-      console.warn(`⚠️ Not HTML content at ${url}`);
+      console.warn(`Not HTML content at ${url}`);
       return null;
     }
 
@@ -81,11 +81,11 @@ async function extractImageFromURL(url) {
     if (image) return image.startsWith('http') ? image : toAbsolute(image);
 
     // 8. Fallback
-    console.warn(`⚠️ No usable image found at ${url}`);
+    console.warn(`No usable image found at ${url}`);
     return null;
 
   } catch (err) {
-    console.error(`❌ Failed to extract image from ${url}:`, err.message);
+    console.error(`Failed to extract image from ${url}:`, err.message);
     return null;
   }
 }

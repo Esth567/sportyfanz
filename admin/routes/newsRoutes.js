@@ -126,6 +126,8 @@ function removeTitleAndSubheading(text, title) {
   return paragraphs.join('\n\n').trim();
 }
 
+const DEFAULT_IMAGE = 'https://sportyfanz.com/assets/images/png-blank-page.webp';
+
 const generateFreshNews = async () => {
   const redisClient = await getRedisClient();
   const rawEntityDB = await redisClient.get('entity:database');
@@ -163,58 +165,75 @@ const generateFreshNews = async () => {
     count: topNews.length + updates.length
   };
 
-  async function processArticle(articleUrl, title = '', pubDate = new Date().toISOString()) {
-    try {
-      if (!articleUrl || !/^https?:\/\//.test(articleUrl) || isExcludedArticle(articleUrl, title)) return;
-      const articleText = await fetchArticleHtmlWithAxios(articleUrl, title);
-      if (!articleText || articleText.length < 300) return;
+  
 
-      const combinedText = `${title}\n\n${articleText}`;
-      let imageUrl = await extractImageFromURL(articleUrl);
-      if (!imageUrl || !/^https?:\/\//.test(imageUrl))
-        imageUrl = 'https://sportyfanz.com/assets/images/default-player.png';
+async function processArticle(articleUrl, title = '', pubDate = new Date().toISOString()) {
+  
+  try {
+    if (!articleUrl || !/^https?:\/\//.test(articleUrl) || isExcludedArticle(articleUrl, title)) return;
 
-      const entities = extractEntities(combinedText);
-      let chunks = chunkSummary(combinedText, 5);
-      chunks = addSeoSubheadingsToChunks(chunks, entities.all, {
-        maxEntitiesPerChunk: 2,
-        minWordsForSubheading: 20,
-        similarityThreshold: 0.9,
-        skipFirstParagraph: true
-      });
+    const articleText = await fetchArticleHtmlWithAxios(articleUrl, title);
+    if (!articleText || articleText.length < 300) return;
 
-      if (chunks.length > 0)
-        chunks[0] = chunks[0].replace(new RegExp(`^${title}`, 'i'), '').trim();
+    const combinedText = `${title}\n\n${articleText}`;
 
-      const fullSummary = autoLinkSources(chunks.join('\n\n'));
-      const sentiment = analyzeSentiment(fullSummary);
-      const seoTitle = slugify(title, { lower: true, strict: true });
+    //Set default image immediately
+    let imageUrl = DEFAULT_IMAGE;
 
-      const articleData = {
-        title: cleanArticleText(title),
-        seoTitle,
-        link: articleUrl,
-        image: imageUrl,
-        paragraphs: chunks,
-        fullSummary,
-        description: chunks[0],
-        date: pubDate,
-        entities,
-        sentiment,
-        entity: null
-      };
+    //Fetch image WITHOUT blocking
+    extractImageFromURL(articleUrl)
+      .then(img => {
+        if (img && /^https?:\/\//.test(img)) {
+          imageUrl = img;
+        }
+      })
+      .catch(() => {});
 
-      if (isDuplicateArticle(articleData, seenArticles, { similarityThreshold: 0.85, timeWindowMinutes: 60 })) return;
-      seenArticles.set(articleData.link, articleData);
+    const entities = extractEntities(combinedText);
+    let chunks = chunkSummary(combinedText, 5);
 
-      if (isTopNewsArticle(articleData) && isFootballArticle(articleData))
-        topNews.push(articleData);
-      else
-        updates.push(articleData);
-    } catch (err) {
-      console.warn(`Error processing article: ${articleUrl}\n`, err.message);
+    chunks = addSeoSubheadingsToChunks(chunks, entities.all, {
+     maxEntitiesPerChunk: 2,
+     minWordsForSubheading: 20,
+     similarityThreshold: 0.9,
+     skipFirstParagraph: true
+    });
+
+    if (chunks.length > 0) {
+      chunks[0] = chunks[0]
+      .replace(new RegExp(`^${title}`, 'i'), '')
+      .trim();
     }
+
+    const fullSummary = autoLinkSources(chunks.join('\n\n'));
+
+    const articleData = {
+      title: cleanArticleText(title),
+      seoTitle: slugify(title, { lower: true, strict: true }),
+      link: articleUrl,
+      image: imageUrl, 
+      paragraphs: chunks,
+      fullSummary,
+      description: chunks[0],
+      date: pubDate,
+      entities,
+      sentiment: analyzeSentiment(chunks.join('\n\n')),
+      entity: null
+    };
+
+    if (isDuplicateArticle(articleData, seenArticles, { similarityThreshold: 0.85, timeWindowMinutes: 60 })) return;
+
+    seenArticles.set(articleData.link, articleData);
+
+    if (isTopNewsArticle(articleData) && isFootballArticle(articleData))
+      topNews.push(articleData);
+    else
+      updates.push(articleData);
+
+  } catch (err) {
+    console.warn(`Error processing article: ${articleUrl}\n`, err.message);
   }
+}
 };
 
 function autoLinkSources(text) {

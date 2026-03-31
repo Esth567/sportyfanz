@@ -126,8 +126,7 @@ function removeTitleAndSubheading(text, title) {
   return paragraphs.join('\n\n').trim();
 }
 
-const DEFAULT_IMAGE = 'https://sportyfanz.com/assets/images/png-blank-page.webp';
-
+const DEFAULT_IMAGE = null
 const generateFreshNews = async () => {
   const redisClient = await getRedisClient();
   const rawEntityDB = await redisClient.get('entity:database');
@@ -178,16 +177,11 @@ async function processArticle(articleUrl, title = '', pubDate = new Date().toISO
     const combinedText = `${title}\n\n${articleText}`;
 
     //Set default image immediately
-    let imageUrl = DEFAULT_IMAGE;
+    let imageUrl = await extractImageFromURL(articleUrl);
 
-    //Fetch image WITHOUT blocking
-    extractImageFromURL(articleUrl)
-      .then(img => {
-        if (img && /^https?:\/\//.test(img)) {
-          imageUrl = img;
-        }
-      })
-      .catch(() => {});
+    if (!imageUrl || !/^https?:\/\//.test(imageUrl)) {
+     imageUrl = DEFAULT_IMAGE;
+   }
 
     const entities = extractEntities(combinedText);
     let chunks = chunkSummary(combinedText, 5);

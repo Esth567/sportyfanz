@@ -1845,6 +1845,7 @@ body::-webkit-scrollbar {
     color: #fff;
     margin-bottom: 0.5rem;
     font-weight: 400;
+    font-family: 'Lato';
   }
   
   .partner-with-us p,
@@ -1876,34 +1877,38 @@ body::-webkit-scrollbar {
   }
   
   .sponsor-form label {
-    font-weight: 600;
+    font-weight: 400;
+    font-family: 'Lato';
+    font-size: 12px;
     color: #fff;
   }
   
   .sponsor-form input,
   .sponsor-form textarea {
-    padding: 0.75rem;
+    padding: 10px;
     background: #1a2f4b;
+    color: #fff;
+    border: transparent;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 12px;
+    font-family: 'Lato';
     width: 100%;
     box-sizing: border-box;
-    
   }
-  
+
   .sponsor-form button {
-    background-color: #0077cc;
-    color: white;
-    padding: 0.75rem 1.25rem;
+    background-color: #1A2F4B;
+    color: #fff;
+    padding: 10px 6px;
     border: none;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 12px;
     cursor: pointer;
     transition: background 0.3s ease;
   }
   
   .sponsor-form button:hover {
-    background-color: #005fa3;
+    background-color: #70c172;
   }
   
   @media (max-width: 600px) {
@@ -2069,6 +2074,15 @@ h1 {
   .tagrow a:hover {
     color: #70c172;
   }
+
+/*---------------------- contact us------------------------------------------*/
+
+.contact-container {
+  margin-top: 50px;
+  justify-content: center;
+  align-items: center;
+
+}
 
 /*------------------------------News css------------------------------------ */
 

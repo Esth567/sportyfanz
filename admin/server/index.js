@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const nodemailer = require('nodemailer');
 const cors = require("cors");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
@@ -62,7 +63,69 @@ const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use("/api/", apiLimiter);
+
+// Configure Nodemailer
+// Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+// Verify transporter (optional but helpful)
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("Email config error:", error);
+  } else {
+    console.log("Email server is ready");
+  }
+});
+
+// CONTACT FORM ROUTE (FIXED)
+app.post('/send', async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    // Basic validation
+    if (!name || !email || !message) {
+      return res.json({
+        success: false,
+        message: 'All fields are required.',
+      });
+    }
+
+    const mailOptions = {
+      from: `"SportyFanz Contact" <${process.env.EMAIL_USER}>`, // SAFE sender
+      to: process.env.EMAIL_USER, // your inbox
+      replyTo: email, // allows you to reply directly to user
+      subject: `📩 New Contact Message from ${name}`,
+      text: `
+Name: ${name}
+Email: ${email}
+
+Message:
+${message}
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({
+      success: true,
+      message: '✅ Message sent successfully!',
+    });
+
+  } catch (error) {
+    console.error("SendMail Error:", error);
+
+    res.json({
+      success: false,
+      message: 'Failed to send message. Please try again later.',
+    });
+  }
+});
 
 //Serve static assets
 app.use("/assets", express.static(path.join(__dirname, "assets")));
@@ -76,6 +139,7 @@ app.use("/api/videos", videoRoutes);
 app.use("/api", playerImageRoutes);
 app.use("/api", fetchnews);
 app.use("/api", entityDatabase);
+app.use("/api/", apiLimiter);
 
 
 //Health check

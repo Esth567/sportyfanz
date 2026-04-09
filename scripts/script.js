@@ -1,7 +1,6 @@
 const API_BASE = location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://production.sportyfanz.com';
-
   
 //sidebar toggle for web view
 function toggleSidebar() {
@@ -2415,6 +2414,35 @@ document.addEventListener("DOMContentLoaded", function () {
 function closeFixedAd() {
   document.getElementById("fixedAd").style.display = "none";
 }
+
+
+/* contact form*/
+const form = document.getElementById('sponsorForm');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const response = await fetch('/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    alert(result.message); // you can later replace with UI message
+
+    if (result.success) form.reset();
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Network error. Please try again.");
+  }
+});
 
 
 //page layout restructure for mobile and tablet view

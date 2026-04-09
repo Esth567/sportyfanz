@@ -3,34 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- SEO Title & Description -->
-  <title>SportyFanz | Football Scores/highlights, Academy Spotlight & Fan-First Media</title>
-  <meta name="description" content="Follow SportyFanz and get all football updates, grassroots academy highlights, match coverage, and fan-driven storytelling. SportyFanz celebrates the community behind the game">
 
-  <!-- Favicon -->
-  <link rel="icon" href="/assets/icons/favicon_48x48_rounded (1).png" type="image/png">
+    <!-- SEO Title & Description -->
+    <title>SportyFanz | Football Scores/highlights, Academy Spotlight & Fan-First Media</title>
+    <meta name="description" content="Follow SportyFanz and get all football updates, grassroots academy highlights, match coverage, and fan-driven storytelling. SportyFanz celebrates the community behind the game.">
 
-  <!-- Open Graph (Facebook & others) -->
-  <meta property="og:title" content="SportyFanz | Football updates, Academy Spotlight & Fan-First Media">
-  <meta property="og:description" content="Football updates, grassroots academy highlights, match coverage, and fan-driven storytelling. SportyFanz celebrates the community behind the game.">
-  <meta property="og:image" content="https://sportyfanz.com/images/sportyLogo.png">
-  <meta property="og:url" content="https://sportyfanz.com">
-  <meta property="og:type" content="website">
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SportyFanz | Where Football Fans Feel Seen & Celebrated">
-  <meta name="twitter:description" content="Football updates, grassroots football highlights, academy spotlight, match updates and fan-driven storytelling.">
-  <meta name="twitter:image" content="https://sportyfanz.com/images/sportyLogo.png">
-
-    <!--Linking swipper css-->
- <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="/css/style.css">
 
-<!--linking link.tss-->
-<script src="https://unpkg.com/ionicons@5.4.0/dist/ionicons.js"></script>
+    <!-- Open Graph (Facebook & others) -->
+    <meta property="og:title" content="SportyFanz | Football updates, Academy Spotlight & Fan-First Media">
+    <meta property="og:description" content="Football updates, grassroots academy highlights, match coverage, and fan-driven storytelling. SportyFanz celebrates the community behind the game.">
+    <meta property="og:image" content="https://sportyfanz.com/images/sportyLogo.png">
+    <meta property="og:url" content="https://sportyfanz.com">
+    <meta property="og:type" content="website">
 
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SportyFanz | Where Football Fans Feel Seen & Celebrated">
+    <meta name="twitter:description" content="Football updates, grassroots football highlights, academy spotlight, match updates and fan-driven storytelling.">
+    <meta name="twitter:image" content="https://sportyfanz.com/images/sportyLogo.png">
+ 
+    <!--Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+
+    <!--AdSense-->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9223163903496974"
+     crossorigin="anonymous">
+    </script>
 </head>
 <body>
     <div class="page-wrapper" style="display: flex;">
@@ -197,38 +207,22 @@
 <script src="/scripts/script.js"></script>
 
 <!-- Footer -->
-<footer class="main-footer">
-    <div class="footer-links">
-      <a href="/about/">About</a>
-      <a href="/privacy-policy/">Privacy Policy</a>
-      <a href="/partner-with-us/">Partnership</a>
-      <a href="sportyfanz89@gmail.com">Contact Us</a>
-    </div>
-    <div class="footer-social">
-      <a href="https://facebook.com/sportfolder" target="_blank">
-        <ion-icon name="logo-facebook" style="font-size: 1.5rem; color: #fff;"></ion-icon>
-      </a>
-      <a href="https://www.instagram.com/sportyfanz_official?igsh=djJlbWl6Z3Uwcnl0" target="_blank">
-        <ion-icon name="logo-instagram" style="font-size: 1.5rem; color: #fff;"></ion-icon>
-      </a>
-      <a href="https://x.com/sporty_fanz" target="_blank">
-        <ion-icon name="logo-twitter"></ion-icon> <!-- X formerly Twitter -->
-      </a>
-      <a href="UCVxq55iRG8QErbDKdSp9g0w" target="_blank">
-        <ion-icon name="logo-youtube"></ion-icon>
-      </a>
-      <a href="https://www.tiktok.com/@sportyfanz" target="_blank">
-        <ion-icon name="logo-tiktok"></ion-icon>
-      </a>
-    </div>
-    <p style="margin-top: 1rem; font-size: 0.9rem;">SportyFanz &copy; 2025 The Ultimate Sports Hub. All rights reserved.</p>
-  </footer>
+<div id="footer"></div>
+
+<script>
+fetch('/footer.html')
+  .then(res => res.text())
+  .then(data => document.getElementById('footer').innerHTML = data);
+</script>
+
   
-  <!-- Fixed Advert Container -->
-<div class="fixed-advert" id="fixedAd">
-  <h5>Advertisement</h5>
-  <button class="close-ad" onclick="closeFixedAd()">✕</button>
-</div>
+<!-- Fixed Advert Container -->
+<!--<div class="footer-banner" id="fixedAd">
+  <iframe scrolling='no' frameBorder='0'  
+    src="https://refbanners.com/I?tag=d_4619433m_21909c_&site=4619433&ad=21909" >
+   </iframe>
+  <button class="close-ad" onclick="closeFixedAd()" aria-label="Close Advertisement">✕</button>
+</div>-->
 
 </body>
 </html>

@@ -8,13 +8,20 @@
 }
 
 /* General Reset */
-body{
-    background: #0A131F;
-    margin: 0; 
-    overflow: hidden;
+body{ 
+  height: 100%; 
+  background: #0A131F; 
+  margin: 0; 
+  padding: 0; 
+  display: flex; 
+  flex-direction: column; 
+  -ms-overflow-style: none; 
+  overflow-x: hidden; 
+} 
+body::-webkit-scrollbar { 
+  width: 0; 
+  background: transparent; 
 }
-
-
 
 img, iframe, ins {
   max-width: 100%;

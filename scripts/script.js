@@ -1061,7 +1061,7 @@ async function fetchMatchesData() {
   try {
     spinner.style.display = "block";
 
-    const response = await fetch(`${API_BASE}/api/all_matches`);
+    const response = await fetch(`/api/all_matches`);
     const data = await response.json();
 
     
@@ -1401,8 +1401,66 @@ function getAvailableMatchDates() {
   ];
 }
 
+
 // Initialize Flatpickr
-function initCalendarPicker() {
+function initCalendarPicker(category = currentCategory) {
+
+  // Calendar Functions
+function getAvailableMatchDates() {
+  return [
+    ...matchesData.live.map(m => m.match_date),
+    ...matchesData.highlight.map(m => m.match_date),
+    ...matchesData.upcoming.map(m => m.match_date)
+  ];
+}
+
+if (typeof flatpickr === "undefined") {
+  console.error("Flatpickr library not loaded. Check CDN script order.");
+  return;
+}
+
+// Initialize Flatpickr
+function initCalendarPicker(category = currentCategory) {
+    const matchDateInput = document.getElementById("match-date");
+    const calendarWrapper = document.querySelector(".calendar-wrapper");
+    if (!matchDateInput || !calendarWrapper) return;
+
+    if (!matchDateInput._flatpickr) {
+        flatpickr(matchDateInput, {
+         dateFormat: "Y-m-d",
+         defaultDate: currentSelectedDate || getTodayDate(),
+         enable: getAvailableMatchDates(),
+         appendTo: calendarWrapper,
+         position: "below left",
+         onChange: (dates, dateStr) => {
+          if (!dateStr) return;
+
+           currentSelectedDate = dateStr;
+
+          //Update the calendar icon immediately
+           const dayEl = document.getElementById("calendar-day");
+          if (dayEl) {
+            const dateObj = luxon.DateTime.fromISO(dateStr);
+            dayEl.textContent = dateObj.toFormat("d"); // Only day number
+          }
+
+
+          //Filter matches for the selected date
+          filterByDate(currentCategory, dateStr);
+       }
+     });
+    } else {
+        matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
+    }
+
+    const calendarBtn = document.querySelector(".calendar");
+    if (calendarBtn) {
+        calendarBtn.addEventListener("click", () => {
+            matchDateInput._flatpickr.open();
+        });
+      }
+    }
+
     const matchDateInput = document.getElementById("match-date");
     const calendarWrapper = document.querySelector(".calendar-wrapper");
     if (!matchDateInput || !calendarWrapper) return;
@@ -2274,9 +2332,6 @@ function createPlayerDiv(player, xPercent, yPercent) {
     return div;
 }
 
-    
-
-
   window.addEventListener("DOMContentLoaded", () => {
     fetchMatchesData(); 
 });
@@ -2289,12 +2344,22 @@ let predictionIndex = 0;
 let displayScore = "";
 let displayTime = "";
 
+// Define Top Leagues
+const TOP_LEAGUES = [
+  "Premier League",
+  "La Liga",
+  "Serie A",
+  "Bundesliga",
+  "Ligue 1",
+  "UEFA Champions League"
+];
+
 // Fetch predictions
 async function fetchTodayPredictions(container) {
   try {
     const response = await fetch(`${API_BASE}/api/predictions`);
 
-    if (!response.ok) {cc
+    if (!response.ok) {
       container.innerHTML = "<p>Loading predictions...</p>";
       return;
     }
@@ -2306,7 +2371,21 @@ async function fetchTodayPredictions(container) {
       return;
     }
 
-    startPredictionSlider(container, data);
+      // PRIORITIZE TOP LEAGUES
+    const topMatches = data.filter(match =>
+      TOP_LEAGUES.includes(match.league_name)
+    );
+
+    const otherMatches = data.filter(match =>
+      !TOP_LEAGUES.includes(match.league_name)
+    );
+
+    const sortedMatches =
+      topMatches.length > 0
+        ? [...topMatches, ...otherMatches]
+        : otherMatches;
+
+    startPredictionSlider(container, sortedMatches);
 
   } catch (error) {
     console.error("Prediction fetch error:", error);
@@ -2314,111 +2393,116 @@ async function fetchTodayPredictions(container) {
   }
 }
 
+
 // Slider
 function startPredictionSlider(container, matches) {
 
   function showSlide() {
     const match = matches[predictionIndex];
 
+    // Safe number parsing
     const homeProb = Number(match.prob_home || 0);
     const awayProb = Number(match.prob_away || 0);
     const drawProb = Number(match.prob_draw || 0);
+
+    const homeScore = Number(match.homeScore || 0);
+    const awayScore = Number(match.awayScore || 0);
+
     const isFinished = match.status === "Finished";
 
-     let predictedResult = "";
-     let confidence = 0;
+    let predictedResult = "";
+    let confidence = 0;
 
-    //prediction logic
-     if (homeProb >= awayProb && homeProb >= drawProb) {
-     predictedResult = `${match.home} to Win`;
-     confidence = homeProb;
+    // Prediction Logic
+    if (homeProb >= awayProb && homeProb >= drawProb) {
+      predictedResult = `${match.home} to Win`;
+      confidence = homeProb;
     } else if (awayProb >= homeProb && awayProb >= drawProb) {
-    predictedResult = `${match.away} to Win`;
-    confidence = awayProb;
-   } else {
-    predictedResult = "Draw";
-    confidence = drawProb;
-  }
+      predictedResult = `${match.away} to Win`;
+      confidence = awayProb;
+    } else {
+      predictedResult = "Draw";
+      confidence = drawProb;
+    }
 
-  //score logic
-  let displayScore = "";
-  let displayTime = "";
-  let predictionCorrect = false;
+     // Score & Time Logic
+    let displayScore = "";
+    let displayTime = "";
+    let predictionCorrect = false;
 
-  if (match.live === "1") {
-    displayScore = `${match.homeScore} - ${match.awayScore}`;
-    displayTime = match.status; 
-  } 
-  else if (isFinished) {
-    displayScore = `${homeScore} - ${awayScore}`;
-    displayTime = "FT";
-  }
-  else {
-    displayScore = "VS";
-    displayTime = match.time;
-  }
+    if (match.live === "1") {
+      displayScore = `${homeScore} - ${awayScore}`;
+      displayTime = match.status;
+    } else if (isFinished) {
+      displayScore = `${homeScore} - ${awayScore}`;
+      displayTime = "FT";
+    } else {
+      displayScore = "VS";
+      displayTime = match.time;
+    }
 
-  // Check Prediction Accuracy
-  if (isFinished) {
-    if (
-      (homeScore > awayScore && predictedResult.includes(match.home)) ||
-      (awayScore > homeScore && predictedResult.includes(match.away)) ||
-      (homeScore === awayScore && predictedResult === "Draw")
-    ) {
-     predictionCorrect = true;
-   }
-  }
+    // Prediction Accuracy
+    if (isFinished) {
+      if (
+        (homeScore > awayScore && predictedResult.includes(match.home)) ||
+        (awayScore > homeScore && predictedResult.includes(match.away)) ||
+        (homeScore === awayScore && predictedResult === "Draw")
+      ) {
+        predictionCorrect = true;
+      }
+    }
 
-  container.innerHTML = `
-    <div class="prediction-content">
+    // Render UI
+    container.innerHTML = `
+      <div class="prediction-content">
 
-    <h4 class="match-pred">Match Prediction</h4>
+        <h4 class="match-pred">Match Prediction</h4>
 
-    <h4 class="prediction-main">
-      ${isFinished 
-      ? `Result: ${homeScore > awayScore 
-        ? match.home + " Won"
-        : awayScore > homeScore 
-          ? match.away + " Won"
-          : "Match Ended in a Draw"
-       } ${predictionCorrect ? "✅" : "❌"}`
-       : `Prediction: ${predictedResult}`
-     }
-   </h4>
+        <h4 class="prediction-main">
+          ${
+            isFinished
+              ? `Result: ${
+                  homeScore > awayScore
+                    ? match.home + " Won"
+                    : awayScore > homeScore
+                    ? match.away + " Won"
+                    : "Match Ended in a Draw"
+                } ${predictionCorrect ? "✅" : "❌"}`
+              : `Prediction: ${predictedResult}`
+          }
+        </h4>
 
+        <div class="prediction-confidence">
+          Confidence: ${confidence}%
+        </div>
 
+        <div class="prediction-selection">
 
-    <div class="prediction-confidence">
-      Confidence: ${confidence}%
-    </div>
+          <div class="team-block">
+            <span>${match.home}</span>
+            <div class="prediction-number">${homeProb}%</div>
+          </div>
 
-    <div class="prediction-selection">
+          <div class="prediction-center">
+            <h5>${match.league_name}</h5>
+            <h4 class="predmatch-score">${displayScore}</h4>
+            <span class="predmatch-time">${displayTime}</span>
 
-      <div class="team-block">
-        <span>${match.home}</span>
-        <div class="prediction-number">${homeProb}%</div>
-      </div>
+            <div class="draw-prob">
+              Draw: <span>${drawProb}%</span>
+            </div>
+          </div>
 
-      <div class="prediction-center">
-        <h5>${match.league_name}</h5>
-        <h4 class="predmatch-score">${displayScore}</h4>
-        <span class="predmatch-time">${displayTime}</span>
-        <div class="draw-prob"> Draw: 
-         <span>${drawProb}%</span>
+          <div class="team-block">
+            <span>${match.away}</span>
+            <div class="prediction-number">${awayProb}%</div>
+          </div>
+
         </div>
       </div>
+    `;
 
-      <div class="team-block">
-        <span>${match.away}</span>
-        <div class="prediction-number">${awayProb}%</div>
-      </div>
-
-     </div>
-
-    </div>
-  `;
-
-
+    // Move to next match
     predictionIndex = (predictionIndex + 1) % matches.length;
   }
 
@@ -2426,14 +2510,13 @@ function startPredictionSlider(container, matches) {
   setInterval(showSlide, 10000);
 }
 
-// Init
+
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector(".prediction-container");
   if (container) {
     fetchTodayPredictions(container);
   }
 });
-
 
 
 /* Init bottom banner Swiper */

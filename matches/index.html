@@ -8,12 +8,11 @@
     <title>SportyFanz | Football Scores/highlights, Academy Spotlight & Fan-First Media</title>
     <meta name="description" content="Follow SportyFanz and get all football updates, grassroots academy highlights, match coverage, and fan-driven storytelling. SportyFanz celebrates the community behind the game.">
 
+
     <!-- Favicon -->
-    <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png">
-    <link rel="icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/sportyLogo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/sportyLogo.png">
+    <link rel="apple-touch-icon" href="/assets/images/sportyLogo.png">
 
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -43,23 +42,23 @@
     </script>
 </head>
 <body class="matches-page">
-    <div class="page-wrapper" style="display: flex;">
+    <div class="page-wrapper"></div>
     <div class="sidebar" id="sidebar">
         <div class="toggle-icon">
-
-             <!-- X-icon for closing sidebar -->
-             <img src="/assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
-             
+         <!-- X-icon for closing sidebar -->
+            <img src="/assets/icons/X.png" alt="Close Sidebar" class="iconX">  
+            
             <div class="icon">
                 <img src="/assets/images/spfanzlogo.png" alt="Logos" class="logos">
             </div>            
-        <div class="toggle-btn" onclick="toggleSidebar()">
+         <!-- Desktop toggle -->
+            <div class="toggle-btn">
             <ion-icon name="menu-outline"></ion-icon>
         </div>    
-    </div>
+       </div>
     <div class="stroke"></div>
     <div class="menu">
-        <ul>
+        <ul>  
             <li>
                 <img src="/assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
                 <a href="/">Dashboard</a>
@@ -107,16 +106,16 @@
     </div>
 
     <div class="body-container">
-     <!-- Header -->
+      <!-- Header -->
     <div class="header">
     <div class="header-top">
-        <div class="mobileMenu-logo">
+        <!-- Movile view Header -->
+            <div class="mobileMenu-logo">
+                <ion-icon name="menu-outline" class="mobile-toggle-btn"></ion-icon>  
+                 <img src="/assets/images/Logo2.png" alt="Logo" class="logo">
+                 <h2>Matches</h2>
+             </div>
 
-            <ion-icon name="menu-outline" class="mobile-toggle-btn"></ion-icon>  
-
-             <img src="/assets/images/Logo2.png" alt="Logo" class="logo">
-             <h2>Matches</h2>
-         </div>
         <h3>Dashboard / Matches</h3>
         <div class="header-topbar">
             <h1>
@@ -148,7 +147,6 @@
     <!-- Horizontal Line -->
     <div class="header-line"></div>
    </div>
-
    
     <!-- Main Content -->
     <div class="content">
@@ -185,12 +183,9 @@
 
         
         <div class="layer middle-layer">
-            
-             
             <div class="matches">
                 <div class="spinner" id="matches-spinner"></div>
-            </div>
-            
+            </div>    
         </div>
         <div class="layer third-layer"> 
             <div class="text-cont">
@@ -227,8 +222,11 @@
         <div class="advert">
             <h5>Advertisement</h5>
          </div>
+
         </div>  
-         </div>  
+     </div> 
+
+    </div> 
 
 
          <!-- Swiper JS -->
@@ -245,10 +243,15 @@
 <div id="footer"></div>
 
 <script>
-fetch('/footer.html')
-  .then(res => res.text())
-  .then(data => document.getElementById('footer').innerHTML = data);
+document.addEventListener("DOMContentLoaded", function () {
+  fetch('/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer').innerHTML = data;
+    });
+});
 </script>
+
 
 <!-- Fixed Advert Container -->
 <!--<div class="footer-banner" id="fixedAd">

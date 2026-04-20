@@ -121,7 +121,7 @@ async function updateLeagueTable(leagueName, leagueId) {
         // Use the league logo mapping (local images)
         const leagueLogo = leagueLogos[leagueName] || '/assets/images/default-logo.png';
 
-        // ✅ On mobile/tablet → append, on desktop → overwrite
+        //On mobile/tablet → append, on desktop → overwrite
         if (window.innerWidth <= 1024) {
             middleLayer.innerHTML += `
                 <div class="league-table">
@@ -413,77 +413,6 @@ async function getTeamDetailsByKey(teamKey) {
 
 
 
- 
-
-// menu toggle button for sidebar for mobile view
-document.addEventListener("DOMContentLoaded", function () {
-    const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.querySelector(".toggle-btn");
-    const menuLogo = document.querySelector(".mobileMenu-logo");
-    const mobileToggleIcon = document.querySelector(".mobile-toggle-btn");
-    const closeIcon = document.querySelector(".iconX");
-
-    function isMobileOrTablet() {
-        return window.innerWidth <= 1024;
-    }
-
-    function updateSidebarVisibility() {
-        if (isMobileOrTablet()) {
-            if (toggleBtn) toggleBtn.style.display = "block";
-            sidebar.classList.remove("active");
-            sidebar.style.display = "none";
-        } else {
-            if (toggleBtn) toggleBtn.style.display = "none";
-            sidebar.classList.remove("collapsed");
-            sidebar.classList.remove("active");
-            sidebar.style.display = "block";
-        }
-    }
-
-    function toggleSidebar() {
-        if (isMobileOrTablet()) {
-            sidebar.classList.toggle("active");
-            sidebar.style.display = sidebar.classList.contains("active") ? "block" : "none";
-        }
-    }
-
-
-    // Attach toggle function to both buttons/icons
-    if (menuLogo) {
-        menuLogo.addEventListener("click", toggleSidebar);
-    }
-
-    if (mobileToggleIcon) {
-        mobileToggleIcon.addEventListener("click", toggleSidebar);
-    }
-
-    if (toggleBtn) {
-        toggleBtn.addEventListener("click", toggleSidebar);
-    }
-
-    if (closeIcon) {
-        closeIcon.addEventListener("click", () => {
-            sidebar.classList.remove("active");
-            sidebar.style.display = "none";
-        });
-    }
-
-    // Move h1 under logo on mobile
-    if (isMobileOrTablet()) {
-        const headerTopbar = document.querySelector(".header-topbar");
-        const h1 = headerTopbar?.querySelector("h1");
-        if (menuLogo && h1) {
-            headerTopbar.insertBefore(h1, menuLogo.nextSibling);
-        }
-    }
-
-    updateSidebarVisibility();
-    window.addEventListener("resize", updateSidebarVisibility);
-});
-
-  
-
-
 //..............mobile and tablet view.....//
 function moveLeaguesCountryForMobile() {
     const leaguesCountry = document.querySelector('.leagues-country');
@@ -539,23 +468,3 @@ function toggleFormColumn() {
 }
  
 
-window.addEventListener("resize", () => {
-  clearTimeout(resizeTimer);
-
-  resizeTimer = setTimeout(() => {
-    document.body.classList.add("resizing-refresh");
-
-    // refresh ads
-    if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
-      try {
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        console.warn("Ad refresh failed", e);
-      }
-    }
-
-    setTimeout(() => {
-      document.body.classList.remove("resizing-refresh");
-    }, 50);
-  }, 200);
-});

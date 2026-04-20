@@ -612,11 +612,12 @@ const getDateString = (offset = 0) => {
 exports.getTodayPredictions = async (req, res) => {
   const cacheKey = "todayPredictions";
   const cached = predictionCache.get(cacheKey);
+
   if (cached) return res.json(cached);
 
   const today = getDateString();
- 
-try {
+
+  try {
     const response = await fetch(
       `https://apiv3.apifootball.com/?action=get_predictions&from=${today}&to=${today}&APIkey=${APIkey}`
     );
@@ -629,21 +630,22 @@ try {
     }
 
     const enriched = data.map(match => ({
-     match_id: match.match_id,
-     home: match.match_hometeam_name,
-     away: match.match_awayteam_name,
-     time: match.match_time,
-     status: match.match_status,
-     live: match.match_live,
-     league_name: match.league_name,
-     homeScore: match.match_hometeam_score,
-     awayScore: match.match_awayteam_score,
-     prob_home: parseFloat(match.prob_HW || 0),
-     prob_away: parseFloat(match.prob_AW || 0),
-     prob_draw: parseFloat(match.prob_D || 0)
-   }));
+      match_id: match.match_id,
+      home: match.match_hometeam_name,
+      away: match.match_awayteam_name,
+      time: match.match_time,
+      status: match.match_status,
+      live: match.match_live,
+      league_name: match.league_name,
+      homeScore: match.match_hometeam_score,
+      awayScore: match.match_awayteam_score,
+      prob_home: parseFloat(match.prob_HW || 0),
+      prob_away: parseFloat(match.prob_AW || 0),
+      prob_draw: parseFloat(match.prob_D || 0)
+    }));
 
     predictionCache.set(cacheKey, enriched);
+
     res.json(enriched);
 
   } catch (error) {

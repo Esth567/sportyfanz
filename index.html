@@ -9,11 +9,9 @@
    <meta name="description" content="Follow SportyFanz and get all football updates, grassroots academy highlights, match coverage, and fan-driven storytelling. SportyFanz celebrates the community behind the game.">
 
   <!-- Favicon -->
-  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png">
-  <link rel="icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/sportyLogo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/sportyLogo.png">
+  <link rel="apple-touch-icon" href="/assets/images/sportyLogo.png">
 
   <!-- CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -35,120 +33,122 @@
   <meta name="twitter:image" content="https://sportyfanz.com/images/sportyLogo.png">
  
     <!--Ionicons -->
-    <script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
-
+    <script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script> 
+    
     <!--AdSense-->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9223163903496974"
      crossorigin="anonymous">
     </script>
 </head>
-<body>
-    <div class="page-wrapper" style="display: flex;">
-    <div class="sidebar" id="sidebar">
-        <div class="toggle-icon">
-         <!-- X-icon for closing sidebar -->
-            <img src="/assets/icons/X.png" alt="Close Sidebar" class="iconX" onclick="closeSidebar()">
-            
-            <div class="icon">
-                <img src="/assets/images/spfanzlogo.png" alt="Logos" class="logos">
-            </div>            
-        <div class="toggle-btn" onclick="toggleSidebar()">
-            <ion-icon name="menu-outline"></ion-icon>
-        </div>    
-    </div>
-    <div class="stroke"></div>
-    <div class="menu">
-        <ul>  
-            <li>
-                <img src="/assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
-                <a href="/">Dashboard</a>
-            </li>
-            <li>
-                <img src="/assets/icons/Newspaper.png" alt="News paper" class="newspaper">
-                <a href="/news/">News</a>
-            </li>
-            <li>
-                <img src="/assets/icons/VideoCamera.png" alt="Video Camera" class="videoCamera">
-                <a href="/matches/">Live Matches</a>
-            </li>
-            <li>
-                <img src="/assets/icons/SoccerBall.png" alt="Soccer Ball" class="soccerBall">
-                <a href="/standings/">League Table</a>
-            </li>             
-            <!-- 
-            <li>
-                <img src="/assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
-                <a href="/podcast/">Podcast</a>
-            </li>
-            <li>
-                <img src="/assets/icons/PokerChip.png" alt="Poker Chip" class="pokerChip">
-                <a href="/prediction/">Prediction</a>
-            </li>
-    
-            <li>
-                <img src="/assets/icons/Gear.png" alt="Gear" class="gear">
-                <a href="/settings/">Settings</a>
-            </li>
-            -->
-        </ul>
+    <body class="home-page">
+        <div class="page-wrapper"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="toggle-icon">
+            <!-- X-icon for closing sidebar -->
+                <img src="/assets/icons/X.png" alt="Close Sidebar" class="iconX">  
+                
+                <div class="icon">
+                    <img src="/assets/images/spfanzlogo.png" alt="Logos" class="logos">
+                </div>            
+            <!-- Desktop toggle -->
+                <div class="toggle-btn">
+                <ion-icon name="menu-outline"></ion-icon>
+            </div>    
+        </div>
         <div class="stroke"></div>
-        <!-- 
-        <div class="logout-section">
-        <ul>
-            <li>
-                <img src="/assets/icons/SignOut.png" alt="Frame" class="frame">
-                <a href="#">Logout</a>
-            </li>
-        </ul>
-        </div>
-      -->
-    </div>
-    </div>
-
-    <div class="body-container">
-     <!-- Header -->
-    <div class="header">
-    <div class="header-top">
-        <h3>Dashboard / Home</h3>
-        <div class="header-topbar">
-
-            <!-- Movile view Header -->
-            <div class="mobileMenu-logo">
-                <ion-icon name="menu-outline" class="mobile-toggle-btn" onclick="toggleSidebar()"></ion-icon>  
-                 <img src="/assets/images/Logo2.png" alt="Logo" class="logo">
-             </div>
-            <h1>
-                Welcome to your <span class="highlight">Ultimate Sports Hub</span>
-            </h1>
-          
-        <div class="header-actions">
-            <!-- Search Bar -->
-            <div class="search-container">
-               <img src="/assets/icons/Vectorsearch.png" alt="search" class="iconSearch"> 
-                <ion-icon name="arrow-forward-outline" class="search-icon"></ion-icon>
-                <input type="text" class="search-bar" placeholder="Search here...">
+        <div class="menu">
+            <ul>  
+                <li>
+                    <img src="/assets/icons/SquaresFour.png" alt="Squares Four" class="quaresfour">
+                    <a href="/">Dashboard</a>
+                </li>
+                <li>
+                    <img src="/assets/icons/Newspaper.png" alt="News paper" class="newspaper">
+                    <a href="/news/">News</a>
+                </li>
+                <li>
+                    <img src="/assets/icons/VideoCamera.png" alt="Video Camera" class="videoCamera">
+                    <a href="/matches/">Live Matches</a>
+                </li>
+                <li>
+                    <img src="/assets/icons/SoccerBall.png" alt="Soccer Ball" class="soccerBall">
+                    <a href="/standings/">League Table</a>
+                </li>             
+                <!-- 
+                <li>
+                    <img src="/assets/icons/Microphone.png" alt="Video Camera" class="videoCamera">
+                    <a href="/podcast/">Podcast</a>
+                </li>
+                <li>
+                    <img src="/assets/icons/PokerChip.png" alt="Poker Chip" class="pokerChip">
+                    <a href="/prediction/">Prediction</a>
+                </li>
+        
+                <li>
+                    <img src="/assets/icons/Gear.png" alt="Gear" class="gear">
+                    <a href="/settings/">Settings</a>
+                </li>
+                -->
+            </ul>
+            <div class="stroke"></div>
+            <!-- 
+            <div class="logout-section">
+            <ul>
+                <li>
+                    <img src="/assets/icons/SignOut.png" alt="Frame" class="frame">
+                    <a href="#">Logout</a>
+                </li>
+            </ul>
             </div>
+        -->
+        </div>
+        </div>
+
+        <div class="body-container">
+        <!-- Header -->
+        <div class="header">
+        <div class="header-top">
+            <h3>Dashboard / Home</h3>
+            <div class="header-topbar">
+
+                <!-- Movile view Header -->
+                <div class="mobileMenu-logo">
+                    <ion-icon name="menu-outline" class="mobile-toggle-btn"></ion-icon>  
+                    <img src="/assets/images/Logo2.png" alt="Logo" class="logo">
+                </div>
+
+                <h1>
+                    Welcome to your <span class="highlight">Ultimate Sports Hub</span>
+                </h1>
             
-            <!-- Notification Icon -->
-            <div class="icons">
-                <img src="/assets/icons/BellSimple.png" alt="Bells">
-                <!-- Settings Icon -->
-                <img src="/assets/icons/UserCircle.png" alt="userCircle">
+            <div class="header-actions">
+                <!-- Search Bar -->
+                <div class="search-container">
+                <img src="/assets/icons/Vectorsearch.png" alt="search" class="iconSearch"> 
+                    <ion-icon name="arrow-forward-outline" class="search-icon"></ion-icon>
+                    <input type="text" class="search-bar" placeholder="Search here...">
+                </div>
+                
+                <!-- Notification Icon -->
+                <div class="icons">
+                    <img src="/assets/icons/BellSimple.png" alt="Bells">
+                    <!-- Settings Icon -->
+                    <img src="/assets/icons/UserCircle.png" alt="userCircle">
+                </div>
+                <!-- Signup Button -->
+                <!--
+                <button class="signup-btn">
+                    <img src="/assets/icons/arrow-up.png" alt="arrowIcon">
+                    Sign In               
+                </button>
+                -->
             </div>
-            <!-- Signup Button -->
-             <!--
-            <button class="signup-btn">
-                <img src="/assets/icons/arrow-up.png" alt="arrowIcon">
-                Sign In               
-            </button>
-            -->
         </div>
+        </div>
+        <!-- Horizontal Line -->
+        <div class="header-line"></div>
     </div>
-    </div>
-    <!-- Horizontal Line -->
-    <div class="header-line"></div>
- </div>
-    <!-- Main Content -->
+        <!-- Main Content -->
     <div class="content">
 
   <!-- First Layer -->
@@ -190,26 +190,25 @@
          <!-- Middle Layer -->
          <div class="layer middle-layer">
             <div class="header-slider">
-                <!-- Banner 1 -->
-                <div class="slider-content banner1">
-                </div>
-            
-                <!-- Banner 2 -->
+                
+                <div class="slider-content banner1"></div>
                 <div class="slider-content banner2">
                     <div class="banne2item-contnt">
                         <h4 class="slider-title">The Voice of The Game</h4>
                     </div>
-                </div>
-
-                <!-- Banner 3 -->
+                </div> 
                 <div class="slider-content banner3"></div>
-                
-                <!-- Banner 4 -->
                 <div class="slider-content banner4"></div>
-                <!-- Banner 5 -->
                 <div class="slider-content banner5"></div>
-            
-
+                        <!-- Banner 6 (VIDEO SLIDE) -->
+                <div class="slider-content video-slide">
+                    <video class="slider-video" autoplay muted loop playsinline>
+                      <source src="/assets/videos/video1.mp4" type="video/mp4">
+                    </video>
+                    <div class="banne2item-contnt">
+                       <h4 class="slider-title">Match Highlights</h4>
+                           </div>
+                    </div>
                 <!-- Slider Navigation -->
                 <button class="slider-arrow left">&#10094;</button>
                 <button class="slider-arrow right">&#10095;</button>
@@ -298,18 +297,14 @@
     </div>
     </div>
 </div>
-</div>
-
 
          <!-- Swiper JS -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <!-- Luxon from CDN -->
    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
 
-
-
          <!--linking custome script-->
-<script src="/scripts/script.js"></script>
+<script src="scripts/script.js"></script>
 
 <!-- Footer -->
 <div id="footer"></div>

@@ -1,18 +1,46 @@
 const API_BASE = location.hostname === 'localhost'
   ? 'http://localhost:3000'
   : 'https://production.sportyfanz.com';
+
+
+    // menu toggle button for sidebar for mobile view
+document.addEventListener("DOMContentLoaded", function () {
+
+  const sidebar = document.getElementById("sidebar"); 
+  const mobileBtn = document.querySelector(".mobile-toggle-btn"); 
+  const toggleBtn = document.querySelector(".toggle-btn"); 
+  const closeIcon = document.querySelector(".iconX"); 
+  const logoIcon = document.querySelector(".icon img");
+
+  function toggleSidebar() {
+    if (window.innerWidth <= 768) {
+      sidebar.classList.toggle("active");
+      console.log("Mobile toggled");
+    } else {
+      sidebar.classList.toggle("collapsed");
+      console.log("Desktop toggled");
+    }
+  }
+
+  if (mobileBtn) mobileBtn.addEventListener("click", toggleSidebar);
+  if (toggleBtn) toggleBtn.addEventListener("click", toggleSidebar);
+  if (logoIcon) logoIcon.addEventListener("click", toggleSidebar);
+
+  if (closeIcon) {
+    closeIcon.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+    });
+  }
+
+  function updateSidebarVisibility() {
+    if (window.innerWidth > 768) {
+      sidebar.classList.remove("active");
+    }
+  }
+
+  window.addEventListener("resize", updateSidebarVisibility);
+});
   
-//sidebar toggle for web view
-function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const container = document.querySelector('.body-container');
-
-    sidebar.classList.toggle("collapsed");
-}
-
-document.querySelector('.icon img').addEventListener('click', toggleSidebar);
-
-
 
 // Display matches for live-match-demo
 document.addEventListener("DOMContentLoaded", function () {
@@ -959,6 +987,16 @@ function showSlide(index) {
   });
 }
 
+//fotball trainin video
+const videos = document.querySelectorAll("video");
+
+videos.forEach(video => {
+  video.addEventListener("play", () => {
+    videos.forEach(v => {
+      if (v !== video) v.pause();
+    });
+  });
+});
 
 document.addEventListener("DOMContentLoaded", initSlider);
 
@@ -2410,6 +2448,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  
 /* Close footer Button banner*/
 function closeFixedAd() {
   document.getElementById("fixedAd").style.display = "none";
@@ -2440,7 +2479,7 @@ form.addEventListener('submit', async (e) => {
 
   } catch (err) {
     console.error(err);
-    alert("❌ Network error. Please try again.");
+    alert("Network error. Please try again.");
   }
 });
 
@@ -2489,72 +2528,7 @@ form.addEventListener('submit', async (e) => {
   window.addEventListener("resize", reorderElements);
 });
 
-
-// menu toggle button for sidebar for mobile view
-document.addEventListener("DOMContentLoaded", function () {
-    const sidebar = document.getElementById("sidebar");
-    const toggleBtn = document.querySelector(".toggle-btn");
-    const menuLogo = document.querySelector(".mobileMenu-logo");
-    const closeIcon = document.querySelector(".iconX");
-
-    function isMobileOrTablet() {
-        return window.innerWidth <= 1024;
-    }
-
-    function updateSidebarVisibility() {
-        if (isMobileOrTablet()) {
-            if (toggleBtn) toggleBtn.style.display = "block";
-            sidebar.classList.remove("collapsed");
-            sidebar.classList.remove("active");
-            sidebar.style.display = "none";
-        } else {
-            if (toggleBtn) toggleBtn.style.display = "none";
-            sidebar.classList.remove("active");
-            sidebar.style.display = "block";
-        }
-    }
-
-    function toggleSidebar() {
-        if (isMobileOrTablet()) {
-            sidebar.classList.remove("collapsed"); // ensure not collapsed
-            sidebar.classList.toggle("active");
-            sidebar.style.display = sidebar.classList.contains("active") ? "block" : "none";
-        } else {
-            // optional: allow collapse/expand on desktop
-            sidebar.classList.toggle("collapsed");
-        }
-    }
-
-    if (menuLogo) {
-        menuLogo.addEventListener("click", toggleSidebar);
-    }
-
-    if (toggleBtn) {
-        toggleBtn.addEventListener("click", toggleSidebar);
-    }
-
-    if (closeIcon) {
-        closeIcon.addEventListener("click", () => {
-            sidebar.classList.remove("active");
-            sidebar.style.display = "none";
-        });
-    }
-
-    // Move h1 under logo (mobile only)
-    if (isMobileOrTablet()) {
-        const headerTopbar = document.querySelector(".header-topbar");
-        const h1 = headerTopbar?.querySelector("h1");
-        if (menuLogo && h1) {
-            headerTopbar.insertBefore(h1, menuLogo.nextSibling);
-        }
-    }
-
-    updateSidebarVisibility();
-    window.addEventListener("resize", updateSidebarVisibility);
-});
-
-
-
+  
 // searchbar
 document.addEventListener("DOMContentLoaded", function () {
   const searchContainer = document.querySelector(".search-container");

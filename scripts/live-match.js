@@ -426,7 +426,7 @@ function getAvailableMatchDates() {
 }
 
 // Initialize Flatpickr
-function initCalendarPicker() {
+function initCalendarPicker(category = currentCategory){
     const matchDateInput = document.getElementById("match-date");
     const calendarWrapper = document.querySelector(".calendar-wrapper");
     if (!matchDateInput || !calendarWrapper) return;

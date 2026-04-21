@@ -1061,7 +1061,7 @@ async function fetchMatchesData() {
   try {
     spinner.style.display = "block";
 
-    const response = await fetch(`/api/all_matches`);
+    const response = await fetch(`${API_BASE}/api/all_matches`);
     const data = await response.json();
 
     
@@ -1391,8 +1391,7 @@ function getMatchesForCategory(matchesData, category, date) {
 }
 
 
-  
- // Calendar Functions
+// Calendar Functions
 function getAvailableMatchDates() {
   return [
     ...matchesData.live.map(m => m.match_date),
@@ -1400,67 +1399,15 @@ function getAvailableMatchDates() {
     ...matchesData.upcoming.map(m => m.match_date)
   ];
 }
-
 
 // Initialize Flatpickr
 function initCalendarPicker(category = currentCategory) {
-
-  // Calendar Functions
-function getAvailableMatchDates() {
-  return [
-    ...matchesData.live.map(m => m.match_date),
-    ...matchesData.highlight.map(m => m.match_date),
-    ...matchesData.upcoming.map(m => m.match_date)
-  ];
-}
 
 if (typeof flatpickr === "undefined") {
   console.error("Flatpickr library not loaded. Check CDN script order.");
   return;
 }
 
-// Initialize Flatpickr
-function initCalendarPicker(category = currentCategory) {
-    const matchDateInput = document.getElementById("match-date");
-    const calendarWrapper = document.querySelector(".calendar-wrapper");
-    if (!matchDateInput || !calendarWrapper) return;
-
-    if (!matchDateInput._flatpickr) {
-        flatpickr(matchDateInput, {
-         dateFormat: "Y-m-d",
-         defaultDate: currentSelectedDate || getTodayDate(),
-         enable: getAvailableMatchDates(),
-         appendTo: calendarWrapper,
-         position: "below left",
-         onChange: (dates, dateStr) => {
-          if (!dateStr) return;
-
-           currentSelectedDate = dateStr;
-
-          //Update the calendar icon immediately
-           const dayEl = document.getElementById("calendar-day");
-          if (dayEl) {
-            const dateObj = luxon.DateTime.fromISO(dateStr);
-            dayEl.textContent = dateObj.toFormat("d"); // Only day number
-          }
-
-
-          //Filter matches for the selected date
-          filterByDate(currentCategory, dateStr);
-       }
-     });
-    } else {
-        matchDateInput._flatpickr.set("enable", getAvailableMatchDates());
-    }
-
-    const calendarBtn = document.querySelector(".calendar");
-    if (calendarBtn) {
-        calendarBtn.addEventListener("click", () => {
-            matchDateInput._flatpickr.open();
-        });
-      }
-    }
-
     const matchDateInput = document.getElementById("match-date");
     const calendarWrapper = document.querySelector(".calendar-wrapper");
     if (!matchDateInput || !calendarWrapper) return;
@@ -1500,7 +1447,6 @@ function initCalendarPicker(category = currentCategory) {
         });
     }
 }
-
 
 // Update filterByDate to accept selected date
 function filterByDate(category, selectedDate) {

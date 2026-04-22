@@ -4902,18 +4902,30 @@ body.news-page .news-update {
  .matches-container {
     padding-left: 6px;
     padding-right: 6px;
+    width: 100%;
   }
 
-    .match-details {
+  .Matchteam {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0; 
+    overflow: hidden;
+  }
+   .match-details {
+     display: grid;
      grid-template-columns: 
-       50px
-       minmax(120px, 1fr)
-       70px
-       minmax(120px, 1fr)
-       90px
-       30px;
-    }
+      minmax(45px, auto)  /* time */
+      minmax(0, 1fr)      /* home */
+      auto                /* score */
+      minmax(0, 1fr)      /* away */
+      max-content         /* country fits content only */
+      24px;               /*tighter button */
 
+    gap: 4px; /* slightly tighter */
+    align-items: center;
+    width: 100%;
+  }
  
   /* SECOND ROW */
   .match-time-country {
@@ -4928,9 +4940,18 @@ body.news-page .news-update {
       object-fit: cover;
     }
 
+    .match-time {
+      white-space: nowrap;
+      text-align: left;
+    }
+
+
+.match-status-score {
+  white-space: nowrap;
+  text-align: center;
+}
 
   .match-btn {
-    grid-column: 3 / 5;
     grid-row: 2;
     justify-self: end;
     margin-left: 0; 
@@ -4945,6 +4966,9 @@ body.news-page .news-update {
     font-size: 14px;
   }
 
+  .match-time-country {
+    grid-column: 1 / span 3;
+   }
     .Matchteam img {
        width: 13.73px;
        height: 17px;
@@ -4953,10 +4977,12 @@ body.news-page .news-update {
      }
 
   .Matchteam span {
+    flex: 1;             
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
+  }
 
 
 .player-image img {

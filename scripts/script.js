@@ -1029,7 +1029,7 @@ function getBerlinTime(dateStr, timeStr) {
 
 // Convert Berlin time to the user's local timezone
 function convertToUserLocalTime(berlinTime) {
-  return berlinTime.setZone(DateTime.local().zoneName);
+  return berlinTime.setZone(DateTime.local().zoneName);cheering
 }
 
 // Format match time for display in local time
@@ -1069,7 +1069,7 @@ async function fetchMatchesData() {
       live: data.live || [],
       upcoming: data.upcoming || [],
       highlight: data.highlight || [],
-      allHighlights: data.highlight || []  
+      allHighlights: data.highlight || [] 
     };
 
        // Pick starting category

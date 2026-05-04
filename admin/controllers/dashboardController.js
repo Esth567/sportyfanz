@@ -98,26 +98,66 @@ const topScorersCache = new NodeCache({ stdTTL: 60 });
 
 // --- CONFIG ---
 const leaguesToFetch = [
-  152, // EPL
-  302, // La Liga
-  175, // Serie A
-  168, // Bundesliga
-  207, // Ligue 1
-  28,  // World Cup
-  24,  // UEFA Qualifiers
-  195, // NPFL
+  152, //Premier League
+  153, //Championship
+  154, //League One
+  155, //League Two
+  302, //La Liga
+  303, //La Liga 2
+  207, //Serie B
+  208, //Serie A
+  175, //Bundesliga
+  176, //Bundesliga 2
+  168, //Ligue 1
+  169, //Ligue 2
+  3, //Champions League
+  848, //Europa League
+  23, //Europa Conference League
+  1, //World Cup
+  4, //Euro Championship
+  12, //CAF Champions League
+  20, //Africa Cup of Nations
+  403, //NPFL
 ];
 
 // Display names for leagues
 const leagueNames = {
-  152: "EPL",
+  // England
+  152: "Premier League",
+  153: "Championship",
+  154: "League One",
+  155: "League Two",
+
+  // Spain
   302: "La Liga",
-  175: "Serie A",
-  168: "Bundesliga",
-  207: "Ligue 1",
-  28:  "World Cup",
-  24:  "UEFA Qualifiers",
-  195: "NPFL",
+  303: "La Liga 2",
+
+  // Italy
+  207: "Serie B",
+  208: "Serie A",
+  // Germany
+  175: "Bundesliga",
+  176: "Bundesliga 2",
+
+  // France
+  168: "Ligue 1",
+  169: "Ligue 2",
+
+  // Europe (UEFA)
+  3: "Champions League",
+  848: "Europa League",
+  23: "Europa Conference League",
+
+  // International
+  1: "World Cup",
+  4: "Euro Championship",
+
+  // Africa
+  12: "CAF Champions League",
+  20: "Africa Cup of Nations",
+
+  // Nigeria (if you plan local coverage)
+  403: "NPFL"
 };
 
 // truncate helper

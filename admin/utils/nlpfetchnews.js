@@ -26,8 +26,8 @@ exports.extractTextFromHtml = html => {
   }
 
   if (!text || text.trim().length < 300) {
-    text = root.text || '';
-  }
+  return ''; // DO NOT fallback to full page text
+}
 
   return cleanArticleText(text);
 };
